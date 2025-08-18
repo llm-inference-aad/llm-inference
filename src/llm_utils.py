@@ -130,6 +130,29 @@ def llm_code_qc_hf(code_from_llm, base_code, generate_text=None):
 
 def submit_mixtral_hf(txt2mixtral, max_new_tokens=1024, top_p=0.15, temperature=0.1, 
                       model_id="mistralai/Mixtral-8x7B-Instruct-v0.1", return_gen=False):
+    """
+    This function submits a model prompt to mixtral through the HuggingFace Inference API
+
+    Parameters
+    ----------
+    txt2mixtral : str
+        Prompt that will be sent to mixtral
+    max_new_tokens : int, optional
+       A setting to tell the LLM the maximum number of tokens to return, by default 1024
+    top_p : float, optional
+        _description_, by default 0.15
+    temperature : float, optional
+        _description_, by default 0.1
+    model_id : str, optional
+       Which mixtral variant to utilize for inference, by default "mistralai/Mixtral-8x7B-Instruct-v0.1"
+    return_gen : bool, optional
+        _description_, by default False
+
+    Returns
+    -------
+    str
+        Model's output from inference
+    """    
     max_new_tokens = np.random.randint(900, 1300)
     os.environ['HF_API_KEY'] = DONT_SCRAPE_ME
     huggingface_hub.login(new_session=False)
@@ -156,6 +179,29 @@ def submit_mixtral_hf(txt2mixtral, max_new_tokens=1024, top_p=0.15, temperature=
     
 def submit_llama3_hf(txt2llama, max_new_tokens=1024, top_p=0.15, temperature=0.1, 
                       model_id="meta-llama/Meta-Llama-3.1-70B-Instruct", return_gen=False):
+    """
+    This function submits a model prompt to Llama3 through the HuggingFace Inference API
+
+    Parameters
+    ----------
+    txt2llama : str
+        Prompt that will be sent to Llama3
+    max_new_tokens : int, optional
+        A setting to tell the LLM the maximum number of tokens to return, by default 1024
+    top_p : float, optional
+        _description_, by default 0.15
+    temperature : float, optional
+        _description_, by default 0.1
+    model_id : str, optional
+        Which Llama3 variant to utilize for inference, by default "meta-llama/Meta-Llama-3.1-70B-Instruct"
+    return_gen : bool, optional
+        _description_, by default False
+
+    Returns
+    -------
+    str
+        Model's output from inference
+    """    
     max_new_tokens = np.random.randint(900, 1300)
     os.environ['HF_API_KEY'] = DONT_SCRAPE_ME
     huggingface_hub.login(new_session=False)
@@ -181,6 +227,19 @@ def submit_llama3_hf(txt2llama, max_new_tokens=1024, top_p=0.15, temperature=0.1
         return results[0]
     
 def submit_gemini_api(txt2gemini, **kwargs):
+    """
+    This function submits a model prompt to Gemini through its API
+
+    Parameters
+    ----------
+    txt2gemini : str
+        Prompt that will be sent to Gemini
+
+    Returns
+    -------
+    str
+        Model's output from inference
+    """    
     client = genai.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(
         model="gemini-2.0-flash",

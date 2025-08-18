@@ -14,49 +14,76 @@ from src.utils.print_utils import print_population, print_scores, box_print, pri
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
 from src.cfg.constants import *
 
-def print_ancestery(data):
+def print_ancestry(data):
     for gene in data.keys():
         print(f'gene: {gene}')
         print(f"\t{data[gene]['GENES']}")
         print(f"\t{data[gene]['MUTATE_TYPE']}")
         
-def update_ancestry(gene_id_child, gene_id_parent, ancestery, mutation_type=None, gene_id_parent2=None):
+def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None, gene_id_parent2=None):
     """
     Updates the ancestry data for a given child gene based on its parent(s).
 
-    :param gene_id_child: The ID of the child gene.
-    :param gene_id_parent: The ID of the first parent gene.
-    :param ancestery: The global data structure for ancestry.
-    :param mutation_type: The type of mutation (for the first part of the code). Default is None.
-    :param gene_id_parent2: The ID of the second parent gene (for the second part of the code). Default is None.
+    Parameters
+    ----------
+    gene_id_child: 
+        The ID of the child gene.
+    gene_id_parent: 
+        The ID of the first parent gene.
+    ancestry: dict 
+        The global data structure for ancestry.
+    mutation_type: 
+        The type of mutation (for the first part of the code). Default is None.
+    gene_id_parent2: 
+        The ID of the second parent gene (for the second part of the code). Default is None.
+
+    Returns
+    -------
+    dict
+        Ancestry dictionary
     """
     # Common part for both functionalities
-    ancestery[gene_id_child] = copy.deepcopy(ancestery[gene_id_parent])
+    ancestry[gene_id_child] = copy.deepcopy(ancestry[gene_id_parent])
 
     # Handle the specifics for either part 1 or part 2
     if gene_id_parent2 is None:
         # Part 1 functionality
-        ancestery[gene_id_child]['GENES'] = copy.deepcopy(ancestery[gene_id_parent]['GENES']) + [gene_id_child]
-        ancestery[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestery[gene_id_parent]['MUTATE_TYPE']) + [mutation_type]
+        ancestry[gene_id_child]['GENES'] = copy.deepcopy(ancestry[gene_id_parent]['GENES']) + [gene_id_child]
+        ancestry[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestry[gene_id_parent]['MUTATE_TYPE']) + [mutation_type]
     else:
         # Part 2 functionality
         cross_id = f'P:{gene_id_parent2}-C:{gene_id_child}'
-        ancestery[gene_id_child]['GENES'] = copy.deepcopy(ancestery[gene_id_parent]['GENES']) + [cross_id]
-        ancestery[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestery[gene_id_parent]['MUTATE_TYPE']) + ["CrossOver"]
+        ancestry[gene_id_child]['GENES'] = copy.deepcopy(ancestry[gene_id_parent]['GENES']) + [cross_id]
+        ancestry[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestry[gene_id_parent]['MUTATE_TYPE']) + ["CrossOver"]
 
-    return ancestery
+    return ancestry
 
 
 def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR):
     """
-    :Generates a template based on given probabilities and gene information.
-    :param PROB_EOT: Probability for End of Tree (EoT) operation.
-    :param GEN_COUNT: Current generation count.
-    :param TOP_N_GENES: List of top N genes.
-    :param SOTA_ROOT: Directory path for state-of-the-art root.
-    :param SEED_NETWORK: Seed network file path.
-    :param ROOT_DIR: Root directory for templates.
-    :return: A tuple containing the template text and the mutation type.
+    Generates a template based on given probabilities and gene information.
+    
+    Parameters
+    ----------
+    PROB_EOT: float
+        Probability for End of Tree (EoT) operation.
+    GEN_COUNT: 
+        Current generation count.
+    TOP_N_GENES: list
+        List of top N genes.
+    SOTA_ROOT: 
+        Directory path for state-of-the-art root.
+    SEED_NETWORK: 
+        Seed network file path.
+    ROOT_DIR: 
+        Root directory for templates.
+    
+    Returns
+    -------
+    template_txt : str
+        The template text for the mutation
+    mutation_type : str
+        The type of mutation generated
     """
 
     if (PROB_EOT > np.random.uniform()) and (GEN_COUNT > 0):
@@ -102,7 +129,7 @@ def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
     def fetch_gene(filepath):
         return os.path.basename(filepath).replace('network_','').replace('.py','')
     
-    global GLOBAL_DATA_ANCESTERY
+    global GLOBAL_DATA_ANCESTRY
     
     QC_CHECK_BOOL = PROB_QC > np.random.uniform()
     
@@ -117,9 +144,9 @@ def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
         template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
                                                     SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
         if GEN_COUNT >= 0: # this does not need to happen at creation of population
-            GLOBAL_DATA_ANCESTERY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTERY, 
+            GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
                                                     mutation_type=mute_type, gene_id_parent2=None)
-            # print(gene_id_child); print(GLOBAL_DATA_ANCESTERY[gene_id_parent])
+            # print(gene_id_child); print(GLOBAL_DATA_ANCESTRY[gene_id_parent])
         out_dir = str(GENERATION)
         file_path = os.path.join(out_dir, f'{gene_id_child}_model.txt')
         os.makedirs(out_dir, exist_ok=True)
@@ -131,7 +158,7 @@ def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
         
     elif python_file=='src/llm_crossover.py':
         gene_id_parent2 = fetch_gene(input_filename_y)
-        GLOBAL_DATA_ANCESTERY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTERY, 
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
                                                 mutation_type=None, gene_id_parent2=gene_id_parent2)
         
         temp_text = f"{python_file} {input_filename_x} {input_filename_y} {output_filename} --top_p {top_p} --temperature {temperature}"
@@ -204,13 +231,19 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
     """
     Check for the completion of a job by searching for its output file and scanning for errors.
 
-    Parameters:
-    job_id (str): The job ID to check.
-    check_interval (int): Time in seconds between checks.
-    timeout (int): Maximum time in seconds to wait for job completion.
+    Parameters
+    ----------
+    job_id : str 
+        The job ID to check.
+    check_interval : int
+        Time in seconds between checks.
+    timeout: int
+        Maximum time in seconds to wait for job completion.
 
-    Returns:
-    bool: True if job completed successfully, False otherwise.
+    Returns
+    -------
+    state: bool
+        True if job completed successfully, False otherwise.
     """
 
     if local_output is not None:
@@ -268,7 +301,7 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     # Log data
     GLOBAL_DATA[gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
                             'status':'subbed file', 'fitness':None, 'start_time':time.time()}
-    GLOBAL_DATA_ANCESTERY[gene_id] = {'GENES':[gene_id], 'MUTATE_TYPE':["CREATED"]}
+    GLOBAL_DATA_ANCESTRY[gene_id] = {'GENES':[gene_id], 'MUTATE_TYPE':["CREATED"]}
     
     individual = container([gene_id])  # Assign a file ID
     
@@ -399,7 +432,8 @@ def check4results(gene_id):
         pass
     
 def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
-    """ This function submits jobs and then if submitted it checks for four possibilities.
+    """ 
+    This function submits jobs and then if submitted it checks for four possibilities.
     
     timeout: (int): seconds until the model run is killed and assigned the max error
     loop_delay (int): seconds until iterating over the jobs
@@ -471,12 +505,24 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
 def update_individual(ind, new_gene_id, old_gene_id=None, process_success=True, process_type='Mutation'):
     """
     Update an individual based on the success or failure of a process.
+    
+    Parameters
+    ----------
+    ind: 
+        The individual to be updated.
+    new_gene_id: 
+        The new gene ID to be assigned to the individual.
+    old_gene_id: optional, default=None 
+        The old gene ID to be removed from GLOBAL_DATA. Optional.
+    process_success: bool, optional, default=True
+        Flag indicating if the process was successful. Default is True.
+    process_type: str
+        Type of process ('Mutation', 'Mating', etc.). Default is 'Mutation'.
 
-    :param ind: The individual to be updated.
-    :param new_gene_id: The new gene ID to be assigned to the individual.
-    :param old_gene_id: The old gene ID to be removed from GLOBAL_DATA. Optional.
-    :param process_success: Flag indicating if the process was successful. Default is True.
-    :param process_type: Type of process ('Mutation', 'Mating', etc.). Default is 'Mutation'.
+    Returns
+    -------
+    ind:
+        Updated individual
     """
     operation = 'Mutated' if process_type == 'Mutation' else 'Mated'
 
@@ -486,7 +532,7 @@ def update_individual(ind, new_gene_id, old_gene_id=None, process_success=True, 
         if old_gene_id is not None and old_gene_id in GLOBAL_DATA.keys():
             del GLOBAL_DATA[old_gene_id]
         print(f'\t☑ {operation}: {new_gene_id}')
-        # GLOBAL_DATA_ANCESTERY[new_gene_id] = {'SCORES':[], 'GENES':[], 'CROSS_OVERS':{}, 'MUTATE_TYPE':[]}
+        # GLOBAL_DATA_ANCESTRY[new_gene_id] = {'SCORES':[], 'GENES':[], 'CROSS_OVERS':{}, 'MUTATE_TYPE':[]}
     else:
         print(f'\t☠ Failed {operation}: {new_gene_id}')
         if new_gene_id in GLOBAL_DATA.keys():
@@ -543,6 +589,19 @@ def delayed_creation_check(offspring):
     return offspring
 
 def delayed_mutate_check(offspring):
+    """
+    Iterates through list of offspring and checks status of running mutation jobs.
+
+    Parameters
+    ----------
+    offspring: list
+        List of offspring
+    
+    Returns
+    -------
+    offspring: list
+        Updated list of offspring
+    """
     if DELAYED_CHECK is True:
         for individual in offspring:
             k = individual[0]
@@ -639,11 +698,18 @@ def customCrossover(ind1, ind2):
 def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     """
     Custom mutation function that randomly changes the temperature parameter of the individual's task and assigns a new ID.
-    Parameters:
-    individual (list): The individual to be mutated.
-    indpb (float): The probability of mutating each gene.
-    Returns:
-    tuple: The mutated individual.
+
+    Parameters
+    ----------
+    individual: list 
+        The individual to be mutated
+    indpb: float 
+        The probability of mutating each gene
+
+    Returns
+    -------
+    individual:
+        The mutated individual
     """
     
     # Check if mutation occurs (based on the mutation probability)
@@ -711,7 +777,7 @@ def save_checkpoint(gen, folder_name="checkpoints"):
         "GLOBAL_DATA_HIST": GLOBAL_DATA_HIST,
         "population": population,
         "hof": hof,
-        "GLOBAL_DATA_ANCESTERY":GLOBAL_DATA_ANCESTERY,
+        "GLOBAL_DATA_ANCESTRY":GLOBAL_DATA_ANCESTRY,
     }
     filename = os.path.join(folder_name, f'checkpoint_gen_{gen}.pkl')
     with open(filename, 'wb') as file:
@@ -768,7 +834,7 @@ TOP_N_GENES = None
 LINKED_GENES = {}
 GLOBAL_DATA = {}
 GLOBAL_DATA_HIST = {}
-GLOBAL_DATA_ANCESTERY = {}
+GLOBAL_DATA_ANCESTRY = {}
 # Main Evolution Loop
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Generation')
@@ -782,7 +848,7 @@ if __name__ == "__main__":
         box_print("LOADING CHECKPOINT")
         GLOBAL_DATA = checkpoint["GLOBAL_DATA"]
         GLOBAL_DATA_HIST = checkpoint["GLOBAL_DATA_HIST"]
-        GLOBAL_DATA_ANCESTERY = checkpoint["GLOBAL_DATA_ANCESTERY"]
+        GLOBAL_DATA_ANCESTRY = checkpoint["GLOBAL_DATA_ANCESTRY"]
         population = checkpoint["population"]
         hof = checkpoint["hof"]
     else:
@@ -799,7 +865,7 @@ if __name__ == "__main__":
         ind.fitness.values = PLACEHOLDER_FITNESS
         
     check_and_update_fitness(population)
-    # print_ancestery(GLOBAL_DATA_ANCESTERY)
+    # print_ancestry(GLOBAL_DATA_ANCESTRY)
     # Evolution
     for gen in range(start_gen, num_generations):
         GEN_COUNT = gen
@@ -839,8 +905,8 @@ if __name__ == "__main__":
         offspring = list(map(toolbox.clone, offspring))
         GLOBAL_DATA_HIST.update(GLOBAL_DATA.copy())
 
-        # box_print(f"GLOBAL_DATA_ANCESTERY", new_line_end=False)
-        # print_ancestery(GLOBAL_DATA_ANCESTERY)
+        # box_print(f"GLOBAL_DATA_ANCESTRY", new_line_end=False)
+        # print_ancestry(GLOBAL_DATA_ANCESTRY)
         # Apply crossover on the offspring
         box_print("Mating", print_bbox_len=60, new_line_end=False)
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
@@ -849,8 +915,8 @@ if __name__ == "__main__":
                 del child1.fitness.values
                 del child2.fitness.values 
                 
-        # box_print(f"GLOBAL_DATA_ANCESTERY", new_line_end=False)
-        # print_ancestery(GLOBAL_DATA_ANCESTERY)
+        # box_print(f"GLOBAL_DATA_ANCESTRY", new_line_end=False)
+        # print_ancestry(GLOBAL_DATA_ANCESTRY)
                 
         box_print("Batch Checking Mated Genes", print_bbox_len=60, new_line_end=False)       
         offspring = delayed_mate_check(offspring)
@@ -863,8 +929,8 @@ if __name__ == "__main__":
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
                 
-        box_print(f"GLOBAL_DATA_ANCESTERY", new_line_end=False)
-        print_ancestery(GLOBAL_DATA_ANCESTERY)
+        box_print(f"GLOBAL_DATA_ANCESTRY", new_line_end=False)
+        print_ancestry(GLOBAL_DATA_ANCESTRY)
                 
         box_print("Batch Checking Mutated Genes", print_bbox_len=60, new_line_end=False)
         offspring = delayed_mutate_check(offspring)

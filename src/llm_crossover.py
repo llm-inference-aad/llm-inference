@@ -11,7 +11,28 @@ from llm_utils import (split_file, submit_mixtral, submit_mixtral_hf,
 def augment_network(input_filename_x, input_filename_y, output_filename,
                     top_p=0.15, temperature=0.1, apply_quality_control=False,
                     inference_submission=False):
-    """Augment Python Network Script."""
+    """
+    Augment Python Network Script.
+
+    Parameters
+    ----------
+    input_filename_x : os.PathLike
+        _description_
+    input_filename_y : os.PathLike
+        _description_
+    output_filename : os.PathLike
+        _description_
+    top_p : float, optional
+        _description_, by default 0.15
+    temperature : float, optional
+        _description_, by default 0.1
+    apply_quality_control : bool, optional
+        _description_, by default False
+    inference_submission : bool, optional
+        _description_, by default False
+    """    
+
+
     # Split the input files
     parts_x = split_file(input_filename_x)
     parts_y = split_file(input_filename_y)
@@ -46,7 +67,19 @@ def augment_network(input_filename_x, input_filename_y, output_filename,
 
 
 def write_augmented_code(output_filename, parts_x, parts_y):
-    """Writes the augmented code to the output file."""
+    """
+    Writes the augmented code to the output file.
+
+    Parameters
+    ----------
+    output_filename : os.PathLike
+        _description_
+    parts_x : _type_
+        _description_
+    parts_y : _type_
+        _description_
+    """    
+
     try:
         prompt_log_cross = parts_y[0].split("# --PROMPT LOG--\n")[0]
         prompt_log_cross = f"\n# {'='*10} Start: GeneCrossed\n{prompt_log_cross.strip()}\n# {'='*10} End:\n"
