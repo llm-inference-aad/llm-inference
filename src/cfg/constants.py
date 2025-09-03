@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 #: Root directory of the repository
-ROOT_DIR = "/home/hice1/jzutty3/llm-guided-evolution"
+ROOT_DIR = os.environ['LLM_INFERENCE_ROOT_DIR']
 #: DATA_PATH absolute or relative to ExquisiteNetV2
 DATA_PATH = "./cifar10"
 #: Location where the current seed repo resides
@@ -105,11 +105,14 @@ hostname
 # Load GCC version 9.2.0
 # module load gcc/13.2.0
 module load cuda
-module load anaconda3
+# module load anaconda3
 # Activate Conda environment
-conda activate llm_guided_env
-export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+# conda activate llm_guided_env
+# export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 # conda info
+
+export LD_LIBRARY_PATH=~/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+source ~/scratch/llm-inference/.venv/bin/activate
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
@@ -135,11 +138,14 @@ hostname
 # module load gcc/13.2.0
 # module load cuda/11.8
 module load cuda
-module load anaconda3
+# module load anaconda3
 # Activate Conda environment
-conda activate llm_guided_env
-export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+# conda activate llm_guided_env
+# export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 # conda info
+
+source ~/scratch/llm-inference/.venv/bin/activate
+export LD_LIBRARY_PATH=~/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
