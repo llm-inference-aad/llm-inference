@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 #: Root directory of the repository
-ROOT_DIR = "/home/hice1/jzutty3/llm-guided-evolution"
+ROOT_DIR = "/home/hice1/rmanimaran8/scratch/llm-inference/llm-inference"
 #: DATA_PATH absolute or relative to ExquisiteNetV2
 DATA_PATH = "./cifar10"
 #: Location where the current seed repo resides
@@ -59,7 +59,7 @@ PROB_QC = 0.0
 PROB_EOT = 0.25
 
 #: Number of generations to run for
-num_generations = 30  # Number of generations
+num_generations = 1  # Number of generations
 
 #: Population size for launching optimization
 start_population_size = 32
