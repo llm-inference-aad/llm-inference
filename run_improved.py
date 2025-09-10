@@ -131,6 +131,10 @@ def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
     
     global GLOBAL_DATA_ANCESTRY
     
+    # Initialize ancestry for seed network if not exists
+    if 'network' not in GLOBAL_DATA_ANCESTRY:
+        GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
+    
     QC_CHECK_BOOL = PROB_QC > np.random.uniform()
     
     # Extract the directory path from the file path

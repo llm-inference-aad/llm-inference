@@ -20,8 +20,8 @@ import huggingface_hub
 from huggingface_hub import InferenceClient
 import textwrap
 from transformers import AutoTokenizer
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 
 
 
@@ -240,12 +240,9 @@ def submit_gemini_api(txt2gemini, **kwargs):
     str
         Model's output from inference
     """    
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=[txt2gemini],
-        
-    )
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-2.0-flash-exp")
+    response = model.generate_content(txt2gemini)
     return response.text
 
 
