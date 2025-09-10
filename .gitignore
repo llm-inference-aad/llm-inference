@@ -10,3 +10,4 @@ build/
 tests/*/outputs
 slurm_logs/*
 src/cfg/constants.py
+setup_uv.sh
