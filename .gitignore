@@ -8,4 +8,8 @@ sota/ExquisiteNetV2/cifar-10-batches-py
 *.bmp
 build/
 tests/*/outputs
+slurm-*.out
+setup_uv.sh
+uv.lock
+src/cfg/constants.py
 .env
