@@ -1,49 +1,80 @@
-# #!/bin/bash
-# #SBATCH --job-name=llm_opt
-# #SBATCH -t 8:00:00              		# Runtime in D-HH:MM
-# #SBATCH --mem-per-gpu 16G
-# #SBATCH -n 1                          # number of CPU cores
-# #SBATCH -N 1
-# #SBATCH --gres=gpu:1
-# #SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
-
-# echo "launching LLM Guided Evolution"
-# hostname
-# # module load anaconda3/2020.07 2021.11
-# module load cuda
-# module load anaconda3
-# export CUDA_VISIBLE_DEVICES=0
-
-# # conda activate llm_guided_env
-# export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
-# # conda info
-
-# python run_improved.py first_test
-
-
 #!/bin/bash
 #SBATCH --job-name=llm_opt
 #SBATCH -t 8:00:00                # Runtime in D-HH:MM
-#SBATCH --mem-per-gpu 16G
+#SBATCH --mem-per-gpu=16G
 #SBATCH -n 1                      # number of CPU cores
 #SBATCH -N 1
 #SBATCH --gres=gpu:1
 #SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
 
-echo "launching LLM Guided Evolution"
-hostname
+set -Eeuo pipefail
 
+echo "=== Launching LLM Guided Evolution ==="
+echo "Hostname: $(hostname)"
+echo "Working dir: $(pwd)"
+date
+
+# ----------------------------
+# Load modules / CUDA / Python
+# ----------------------------
 module load cuda
+module load anaconda3 || true      # in case your cluster uses a different Python; harmless if absent
 export CUDA_VISIBLE_DEVICES=0
-export LD_LIBRARY_PATH=~/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 
-source ~/scratch/llm-inference/.env
-export LLM_INFERENCE_ROOT_DIR=$LLM_INFERENCE_ROOT_DIR
-echo "LLM_INFERENCE_ROOT_DIR is set to $LLM_INFERENCE_ROOT_DIR"
+# ----------------------------
+# Ensure uv on PATH
+# ----------------------------
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v uv >/dev/null 2>&1; then
+  echo "ERROR: 'uv' not found on PATH. Install with: pipx install uv  (or per your cluster setup)"
+  exit 1
+fi
 
-source ~/scratch/llm-inference/.venv/bin/activate
+echo "UV version: $(uv --version)"
+echo "Python via uv: $(uv run python --version)"
 
-which python
-python --version
+# ----------------------------
+# Load environment variables
+# ----------------------------
+if [[ ! -f .env ]]; then
+  echo "ERROR: .env file not found in $(pwd)"
+  exit 1
+fi
 
-python run_improved.py first_test
+# Auto-export all keys defined in .env into this shell's environment
+set -a
+source .env
+set +a
+
+# Quick masked sanity checks (show only prefixes)
+echo "GEMINI_API_KEY prefix: ${GEMINI_API_KEY:0:8}********"
+: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/rmanimaran8/scratch/llm-inference/llm-inference}"
+export LLM_INFERENCE_ROOT_DIR
+echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
+
+# ----------------------------
+# CUDA libs for uv environment (best-effort)
+# ----------------------------
+# Some clusters need nvjitlink visible to the Python env used by uv.
+UV_SITE_PKGS="$(uv run python - <<'PY'
+import site
+print(site.getsitepackages()[0])
+PY
+)"
+export LD_LIBRARY_PATH="$UV_SITE_PKGS/nvidia/nvjitlink/lib:${LD_LIBRARY_PATH:-}"
+echo "LD_LIBRARY_PATH updated for nvjitlink (best-effort)."
+
+# ----------------------------
+# Final info dump
+# ----------------------------
+echo "UV Python path: $(uv run which python)"
+nvidia-smi || true
+
+# ----------------------------
+# Run your job
+# ----------------------------
+echo "=== Running: uv run python run_improved.py first_test ==="
+uv run python run_improved.py first_test
+
+echo "=== Job complete ==="
+date
