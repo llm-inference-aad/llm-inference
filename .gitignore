@@ -13,3 +13,4 @@ setup_uv.sh
 uv.lock
 src/cfg/constants.py
 .env
+src/utils/privit.py
