@@ -13,3 +13,4 @@ setup_uv.sh
 uv.lock
 .env
 hostname.log
+.venv/

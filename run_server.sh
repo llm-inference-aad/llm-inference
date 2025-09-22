@@ -6,14 +6,14 @@ echo "Loading environment variables from .env..."
 export $(grep -v '^#' .env | grep -v '^$' | xargs)
 
 echo "Activating virtual environment..."
-source .venv/bin/activate
+source "${VENV_PATH}/bin/activate"
 
 echo "Starting LLM server..."
-echo "Server will be available at: http://localhost:8000"
-echo "API docs will be available at: http://localhost:8000/docs"
+echo "Server will be available at: http://localhost:${SERVER_PORT}"
+echo "API docs will be available at: http://localhost:${SERVER_PORT}/docs"
 echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-# Run the server
-python -m uvicorn server:app --host 0.0.0.0 --port 8000 --workers 1
+# Run the server using environment variables
+python -m uvicorn server:app --host "${SERVER_HOST}" --port "${SERVER_PORT}" --workers "${SERVER_WORKERS}"
