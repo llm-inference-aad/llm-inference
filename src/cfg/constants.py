@@ -144,8 +144,8 @@ module load cuda
 # export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 # conda info
 
-source /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv/bin/activate
-export LD_LIBRARY_PATH=/home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+source /home/hice1/kbhavsar31/scratch/llm-inference/.venv/bin/activate
+export LD_LIBRARY_PATH=/home/hice1/kbhavsar31/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false

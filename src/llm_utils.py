@@ -377,7 +377,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
     """
     try:
         # Read the hostname from the file written by the server
-        hostname_file = "/home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log"
+        hostname_file = "/home/hice1/kbhavsar31/scratch/llm-inference/hostname.log"
         
         if not os.path.exists(hostname_file):
             raise Exception("Server hostname file not found. Make sure the server is running.")

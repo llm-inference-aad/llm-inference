@@ -48,7 +48,7 @@ set +a
 
 # Quick masked sanity checks (show only prefixes)
 
-: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/rmanimaran8/scratch/llm-inference/llm-inference}"
+: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/kbhavsar31/scratch/llm-inference}"
 export LLM_INFERENCE_ROOT_DIR
 echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
 

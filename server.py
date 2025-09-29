@@ -6,6 +6,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import threading
 import asyncio
+import json
+import hashlib
+import uuid
+from datetime import datetime
+from pathlib import Path
 from src.cfg.constants import *
 
 app = FastAPI(title="LLM API", version="1.0")
@@ -15,6 +20,56 @@ MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/mode
 
 BATCH_SIZE = 8  # num of LLM requests to process at once
 BATCH_WAIT_TIME = 2  # max wait time for batch to fill in s
+
+# Generate unique run hash for this server session
+RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
+METRICS_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "metrics" / "data"
+METRICS_FILE = METRICS_DIR / f"e2e-latency-{RUN_HASH}.json"
+
+# Ensure metrics directory exists
+METRICS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Initialize metrics file with metadata
+metrics_metadata = {
+    "run_hash": RUN_HASH,
+    "session_start": datetime.now().isoformat(),
+    "model_path": MODEL_PATH,
+    "batch_size": BATCH_SIZE,
+    "batch_wait_time": BATCH_WAIT_TIME,
+    "requests": []
+}
+
+with open(METRICS_FILE, 'w') as f:
+    json.dump(metrics_metadata, f, indent=2)
+
+def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None):
+    """Save end-to-end latency metrics to JSON file"""
+    try:
+        # Read current metrics
+        with open(METRICS_FILE, 'r') as f:
+            metrics = json.load(f)
+        
+        # Add new request metrics
+        request_metrics = {
+            "timestamp": datetime.now().isoformat(),
+            "prompt_length": len(request_data["prompt"]),
+            "max_new_tokens": request_data["max_new_tokens"],
+            "temperature": request_data["temperature"],
+            "top_p": request_data["top_p"],
+            "e2e_latency_sec": round(e2e_time, 4),
+            "batch_processing_time_sec": round(batch_processing_time, 4),
+            "batch_size": batch_size,
+            "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None
+        }
+        
+        metrics["requests"].append(request_metrics)
+        
+        # Write back to file
+        with open(METRICS_FILE, 'w') as f:
+            json.dump(metrics, f, indent=2)
+            
+    except Exception as e:
+        print(f"Error saving latency metrics: {str(e)}")
 
 class LLMRequest(BaseModel):
     prompt: str
@@ -104,6 +159,7 @@ class LLMModel:
                             break
                     
                     batch_size = len(batch)
+                    batch_processing_start = time.time()
                     print(f"Processing batch of {batch_size} requests")
                     
                     prompts = [req["prompt"] for req in batch]
@@ -126,13 +182,17 @@ class LLMModel:
                     response_time = round(time.time() - start_time, 2)
                     
                     # for every future, set its result
-                    for result, future in zip(results, futures):
+                    for i, (result, future) in enumerate(zip(results, futures)):
                         output_txt = result[0].get("generated_text", str(result))
+                        
+                        # Calculate queue wait time for this specific request
+                        queue_wait_time = batch_processing_start - batch[i].get("queue_start_time", batch_processing_start)
                         
                         future.set_result({
                             "generated_text": output_txt,
                             "response_time_sec": response_time,
-                            "batch_size": batch_size
+                            "batch_size": batch_size,
+                            "queue_wait_time_sec": round(queue_wait_time, 4)
                         })
                         
                         # done with task
@@ -160,13 +220,19 @@ class LLMModel:
             async with self.batch_lock:
                 self.is_processing = False
     
-    async def generate(self, request_dict):
+    async def generate(self, request_dict, queue_start_time=None):
         """Submit a request to the batch processor"""
         # future is a placeholder for later result
         future = asyncio.Future()
         
+        # Store queue start time with the request
+        request_with_timing = {
+            **request_dict,
+            "queue_start_time": queue_start_time or time.time()
+        }
+        
         # put in queue
-        await self.request_queue.put((request_dict, future))
+        await self.request_queue.put((request_with_timing, future))
         
         # start processing batches if not already started
         await self.start_batch_processor()
@@ -187,8 +253,10 @@ async def generate_text(request: LLMRequest):
         temperature (int): randomness, higher for more varied outputs
 
     Returns:
-    dict: generated_text (output of LLM) and response_time (time after intializing model until generated text obtained)
+    dict: generated_text (output of LLM), response_time, and run_hash for metrics tracking
     """
+    e2e_start_time = time.time()
+    
     try:
         # Convert request to dict
         request_dict = {
@@ -201,13 +269,36 @@ async def generate_text(request: LLMRequest):
         # Get the model instance
         model = LLMModel()
         
+        # Track queue wait time
+        queue_start_time = time.time()
+        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(e2e_start_time))}")
+        
         # Submit to the batch processor and wait for result
-        start_time = time.time()
-        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(start_time))}")
+        result = await model.generate(request_dict, queue_start_time)
         
-        result = await model.generate(request_dict)
+        # Calculate end-to-end latency
+        e2e_time = time.time() - e2e_start_time
         
-        print(f"Request completed in {time.time() - start_time:.2f}s")
+        # Extract batch processing time and queue wait time from result
+        batch_processing_time = result.get("response_time_sec", 0)
+        batch_size = result.get("batch_size", 1)
+        queue_wait_time = result.get("queue_wait_time_sec", 0)
+        
+        # Save latency metrics
+        save_latency_metrics(
+            request_dict, 
+            e2e_time, 
+            batch_processing_time, 
+            batch_size, 
+            queue_wait_time
+        )
+        
+        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing)")
+        
+        # Add run hash and e2e latency to response
+        result["e2e_latency_sec"] = round(e2e_time, 4)
+        result["run_hash"] = RUN_HASH
+        
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -217,3 +308,5 @@ async def root():
     return {"message": "LLM API is running!"}
 
 print('Server running with server-side batching!')
+print(f'Run Hash: {RUN_HASH}')
+print(f'Metrics will be saved to: {METRICS_FILE}')
