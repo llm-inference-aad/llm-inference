@@ -111,8 +111,8 @@ module load cuda
 # export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 # conda info
 
-export LD_LIBRARY_PATH=~/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
-source ~/scratch/llm-inference/.venv/bin/activate
+export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH"
+source "$VENV_PATH/bin/activate"
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
@@ -121,7 +121,7 @@ source ~/scratch/llm-inference/.venv/bin/activate
 {}
 """
 
-
+# modify the script to use .env 
 #: Template script for submitting a prompt to the LLM
 LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=llm_oper
@@ -134,23 +134,27 @@ LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 echo "Launching AIsurBL"
 hostname
 
-# Load GCC version 9.2.0
-# module load gcc/13.2.0
-# module load cuda/11.8
+# Load modules
 module load cuda
-# module load anaconda3
-# Activate Conda environment
-# conda activate llm_guided_env
-# export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
-# conda info
+module load python/3.12.5
 
-source /home/hice1/kbhavsar31/scratch/llm-inference/.venv/bin/activate
-export LD_LIBRARY_PATH=/home/hice1/kbhavsar31/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+
+# Load environment variables
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+fi
+
+# Ensure uv is in PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Activate virtual environment and set library paths
+source "$VENV_PATH/bin/activate"
+export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH"
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
 
-# Run Python script
+# Run Python script with uv
 {}
 """
 

@@ -2,7 +2,7 @@ import time
 import os
 import torch
 import transformers
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 import threading
 import asyncio
@@ -17,6 +17,9 @@ app = FastAPI(title="LLM API", version="1.0")
 
 # Path To Local Large Language Model (from environment variable)
 MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it")
+
+# Note: Security middleware removed for compatibility
+# The 404 errors from malicious requests will still be logged by FastAPI
 
 BATCH_SIZE = 8  # num of LLM requests to process at once
 BATCH_WAIT_TIME = 2  # max wait time for batch to fill in s
@@ -85,12 +88,23 @@ class LLMModel:
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
-                    print(f"Loading model at {MODEL_PATH} for the first time")
+                    print(f"Loading model at {MODEL_PATH}")
                     cls._instance = super(LLMModel, cls).__new__(cls)
                     cls._instance._initialize()
         return cls._instance
     
     def _initialize(self):
+        """Load the model immediately during initialization"""
+        start_time = time.time()
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(f"[{timestamp}] ===== MODEL LOADING STARTED =====")
+        print(f"[{timestamp}] Initializing model components...")
+        print(f"[{timestamp}] Model path: {MODEL_PATH}")
+        
+        # Load model
+        print(f"[{timestamp}] Loading model weights and configuration...")
+        model_load_start = time.time()
+        
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             MODEL_PATH,
             trust_remote_code=True,
@@ -98,13 +112,31 @@ class LLMModel:
             device_map="auto",
             attn_implementation="sdpa" # faster inference
         ).eval()
+        
+        model_load_time = time.time() - model_load_start
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(f"[{timestamp}] Model weights loaded in {model_load_time:.2f} seconds")
 
+        # Load tokenizer
+        print(f"[{timestamp}] Loading tokenizer...")
+        tokenizer_start = time.time()
+        
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_PATH)
         
-        # for batching, need to set pad tokens
+        tokenizer_time = time.time() - tokenizer_start
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(f"[{timestamp}] Tokenizer loaded in {tokenizer_time:.2f} seconds")
+        
+        # Set pad tokens for batching
+        print(f"[{timestamp}] Configuring tokenizer for batching...")
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
             self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+            print(f"[{timestamp}] Set pad_token to eos_token")
+        
+        # Create pipeline
+        print(f"[{timestamp}] Creating text generation pipeline...")
+        pipeline_start = time.time()
         
         self.pipeline = transformers.pipeline(
             model=self.model,
@@ -117,13 +149,26 @@ class LLMModel:
             max_new_tokens=1648,
             repetition_penalty=1.1,
             do_sample=True,
-            batch_size=BATCH_SIZE # for batch support
+            batch_size=BATCH_SIZE
         )
         
-        self.request_queue = asyncio.Queue() # queue for holding requests to process
-        self.batch_task = None # current task
-        self.batch_lock = asyncio.Lock() # lock for
-        self.is_processing = False # current state
+        pipeline_time = time.time() - pipeline_start
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(f"[{timestamp}] Pipeline created in {pipeline_time:.2f} seconds")
+        
+        # Initialize async components for batching
+        print(f"[{timestamp}] Initializing async batching components...")
+        self.request_queue = asyncio.Queue()
+        self.batch_task = None
+        self.batch_lock = asyncio.Lock()
+        self.is_processing = False
+        
+        total_time = time.time() - start_time
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        print(f"[{timestamp}] ===== MODEL LOADING COMPLETED =====")
+        print(f"[{timestamp}] Total loading time: {total_time:.2f} seconds")
+        print(f"[{timestamp}] Model is ready to serve requests!")
+        print(f"[{timestamp}] Server-side batching enabled with batch_size={BATCH_SIZE}")
     
     async def start_batch_processor(self):
         """Start the batch processor if it's not already running"""
@@ -243,14 +288,14 @@ class LLMModel:
 @app.post("/generate")
 async def generate_text(request: LLMRequest):
     """
-    Submits LLMRequest to the local model. If the model has not been intialized before, this function will first have to intialize the model.
+    Submits LLMRequest to the local model. The model is already loaded at startup.
 
     Parameters:
     LLMRequest:
-        txt2llm (str): input to llm
+        prompt (str): input to llm
         max_new_tokens (int): maximum number of tokens model should generate
-        top_p (int): threshold, higher to consider wider range of words
-        temperature (int): randomness, higher for more varied outputs
+        top_p (float): threshold, higher to consider wider range of words
+        temperature (float): randomness, higher for more varied outputs
 
     Returns:
     dict: generated_text (output of LLM), response_time, and run_hash for metrics tracking
@@ -266,7 +311,7 @@ async def generate_text(request: LLMRequest):
             "temperature": request.temperature
         }
         
-        # Get the model instance
+        # Get the model instance (already loaded at startup)
         model = LLMModel()
         
         # Track queue wait time
@@ -306,6 +351,23 @@ async def generate_text(request: LLMRequest):
 @app.get("/")
 async def root():
     return {"message": "LLM API is running!"}
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize the model when the server starts"""
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    print(f"[{timestamp}] ===== SERVER STARTUP INITIATED =====")
+    print(f"[{timestamp}] Starting LLM server...")
+    print(f"[{timestamp}] Loading model during startup...")
+    print(f"[{timestamp}] This may take several minutes depending on model size...")
+    
+    # This will trigger the detailed model loading process
+    model = LLMModel()
+    
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    print(f"[{timestamp}] ===== SERVER STARTUP COMPLETE =====")
+    print(f"[{timestamp}] Server is ready to accept requests!")
+    print(f"[{timestamp}] Available endpoints: /generate (POST), / (GET)")
 
 print('Server running with server-side batching!')
 print(f'Run Hash: {RUN_HASH}')

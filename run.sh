@@ -18,7 +18,7 @@ date
 # Load modules / CUDA / Python
 # ----------------------------
 module load cuda
-module load anaconda3 || true      # in case your cluster uses a different Python; harmless if absent
+module load anaconda3 || true     # Load Python 3.12.5 which is compatible with our requirements
 export CUDA_VISIBLE_DEVICES=0
 
 # ----------------------------
@@ -48,7 +48,8 @@ set +a
 
 # Quick masked sanity checks (show only prefixes)
 
-: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/kbhavsar31/scratch/llm-inference}"
+
+: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/satmuri6/scratch/llm-inference}"
 export LLM_INFERENCE_ROOT_DIR
 echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
 
