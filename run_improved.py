@@ -835,6 +835,8 @@ LINKED_GENES = {}
 GLOBAL_DATA = {}
 GLOBAL_DATA_HIST = {}
 GLOBAL_DATA_ANCESTRY = {}
+# Initialize the seed network entry
+GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
 # Main Evolution Loop
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Generation')

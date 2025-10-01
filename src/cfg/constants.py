@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 #: Root directory of the repository
-ROOT_DIR = os.environ['LLM_INFERENCE_ROOT_DIR']
+ROOT_DIR = os.environ.get('LLM_INFERENCE_ROOT_DIR', os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 #: DATA_PATH absolute or relative to ExquisiteNetV2
 DATA_PATH = "./cifar10"
 #: Location where the current seed repo resides
@@ -31,8 +31,8 @@ else:
 
 #LLM_MODEL = 'mixtral'
 #LLM_MODEL = 'llama3'
-#: LLM Model to use. Choices currently include ['gemini', 'mixtral', 'llama3']
-LLM_MODEL = 'gemini'
+#: LLM Model to use. Choices currently include ['gemini', 'mixtral', 'llama3', 'local_server']
+LLM_MODEL = 'local_server'
 try:
 	GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
 except:
@@ -50,7 +50,7 @@ INVALID_FITNESS_MAX = tuple([float(x*np.inf*-1) for x in FITNESS_WEIGHTS])
 PLACEHOLDER_FITNESS = tuple([int(x*9999999999*-1) for x in FITNESS_WEIGHTS])
 
 #: Number of elite individuals to utilize within the Evolution of Thought (EOT) operation
-NUM_EOT_ELITES = 10
+NUM_EOT_ELITES = 2
 
 #: Cycle in the optimization and output directory where intermediate data will be stored.
 GENERATION = 0
@@ -59,10 +59,10 @@ PROB_QC = 0.0
 PROB_EOT = 0.25
 
 #: Number of generations to run for
-num_generations = 30  # Number of generations
+num_generations = 1  # Number of generations
 
 #: Population size for launching optimization
-start_population_size = 32
+start_population_size = 8
 # start_population_size = 144   # Size of the population 124=72
 #population_size = 44 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
 
@@ -72,9 +72,9 @@ population_size = 8 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual
 #: Number of elites to consider
-num_elites = 44
+num_elites = 8
 #: Number of individuals to keep in the hall of fame across the optimization
-hof_size = 100
+hof_size = 8
 
 
 # Job Sub Constants/Params
@@ -84,7 +84,7 @@ hof_size = 100
 #: Whether (True) or not (False) you wish to run quality control checks on responses from the LLM
 QC_CHECK_BOOL = False
 #: Whether (True) or not (False) to submit LLM prompts remotely to sources such as hugging face.
-INFERENCE_SUBMISSION = True
+INFERENCE_SUBMISSION = False  # Use local server
 #LLM_GPU = 'NVIDIAA100-SXM4-80GB|NVIDIAA10080GBPCIe|TeslaV100-PCIE-32GB|QuadroRTX4000|GeForceGTX1080Ti|GeForceGTX1080|TeslaV100-PCIE-32GB|TeslaV100S-PCIE-32GB'
 #LLM_GPU = 'NVIDIAA100-SXM4-80GB|NVIDIAA10080GBPCIe|TeslaV100-PCIE-32GB|TeslaV100S-PCIE-32GB|NVIDIARTX6000AdaGeneration|NVIDIARTXA6000|NVIDIARTXA5000|NVIDIARTXA4000|GeForceGTX1080Ti|QuadroRTX4000|QuadroP4000|GeForceGTX1080|TeslaP4'
 #: If using slurm, this string will be used to request GPUs for the submission of prompts to the LLM.
@@ -111,8 +111,8 @@ module load cuda
 # export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 # conda info
 
-export LD_LIBRARY_PATH=~/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
-source ~/scratch/llm-inference/.venv/bin/activate
+export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH"
+source "$VENV_PATH/bin/activate"
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
@@ -121,7 +121,7 @@ source ~/scratch/llm-inference/.venv/bin/activate
 {}
 """
 
-
+# modify the script to use .env 
 #: Template script for submitting a prompt to the LLM
 LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=llm_oper
@@ -134,23 +134,26 @@ LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 echo "Launching AIsurBL"
 hostname
 
-# Load GCC version 9.2.0
-# module load gcc/13.2.0
-# module load cuda/11.8
+# Load modules
 module load cuda
-# module load anaconda3
-# Activate Conda environment
-# conda activate llm_guided_env
-# export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
-# conda info
+module load python/3.12.5
 
-source ~/scratch/llm-inference/.venv/bin/activate
-export LD_LIBRARY_PATH=~/scratch/llm-inference/.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
+# Load environment variables
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+fi
+
+# Ensure uv is in PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Activate virtual environment and set library paths
+source "$VENV_PATH/bin/activate"
+export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH"
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
 
-# Run Python script
+# Run Python script with uv
 {}
 """
 
