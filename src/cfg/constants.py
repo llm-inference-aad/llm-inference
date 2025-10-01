@@ -138,6 +138,7 @@ hostname
 module load cuda
 module load python/3.12.5
 
+
 # Load environment variables
 if [ -f .env ]; then
     export $(grep -v '^#' .env | grep -v '^$' | xargs)
