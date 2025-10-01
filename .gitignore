@@ -9,3 +9,4 @@ sota/ExquisiteNetV2/cifar-10-batches-py
 build/
 tests/*/outputs
 .env
+uv.lock
