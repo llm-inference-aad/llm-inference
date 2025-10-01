@@ -12,3 +12,4 @@ slurm-*.out
 setup_uv.sh
 uv.lock
 .env
+hostname.log
