@@ -69,7 +69,7 @@ def clean_code_from_llm(code_from_llm):
     return code_from_llm
 
 
-def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False):
+def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None):
     """Generates augmented code using Mixtral."""
     box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
     print(txt2llm)
@@ -91,10 +91,10 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
     
     if apply_quality_control:
         base_code = retrieve_base_code(augment_idx)
-        code_from_llm, generate_text = llm_code_generator(txt2llm, return_gen=True, top_p=top_p, temperature=temperature)
+        code_from_llm, generate_text = llm_code_generator(txt2llm, return_gen=True, top_p=top_p, temperature=temperature, gene_id=gene_id)
         code_from_llm = qc_func(code_from_llm, base_code, generate_text)
     else:
-        code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+        code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature, gene_id=gene_id)
         box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
         print(code_from_llm)
         code_from_llm = clean_code_from_llm(code_from_llm)
@@ -173,6 +173,7 @@ def submit_mixtral_hf(
     temperature=0.1,
     model_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
     return_gen=False,
+    gene_id=None,
 ):
     # Respect an env override and cap hard
     max_new_tokens = min(int(os.getenv("MIXTRAL_MAX_NEW_TOKENS", max_new_tokens)), 2048)
@@ -225,7 +226,7 @@ def submit_mixtral_hf(
             raise
     
 def submit_llama3_hf(txt2llama, max_new_tokens=1024, top_p=0.15, temperature=0.1, 
-                      model_id="meta-llama/Meta-Llama-3.1-70B-Instruct", return_gen=False):
+                      model_id="meta-llama/Meta-Llama-3.1-70B-Instruct", return_gen=False, gene_id=None):
     """
     This function submits a model prompt to Llama3 through the HuggingFace Inference API
 
@@ -274,7 +275,7 @@ def submit_llama3_hf(txt2llama, max_new_tokens=1024, top_p=0.15, temperature=0.1
     else:
         return results[0]
     
-def submit_gemini_api(txt2gemini, **kwargs):
+def submit_gemini_api(txt2gemini, gene_id=None, **kwargs):
     """
     This function submits a model prompt to Gemini through its API
 
@@ -299,7 +300,7 @@ def submit_gemini_api(txt2gemini, **kwargs):
 
 
 def submit_mixtral(txt2mixtral, max_new_tokens=764, top_p=0.15, temperature=0.1, 
-                   model_id="gpt2", return_gen=False):
+                   model_id="gpt2", return_gen=False, gene_id=None):
     max_new_tokens = np.random.randint(800, 1000)
     print(f'max_new_tokens: {max_new_tokens}')
     start_time = time.time()
@@ -362,7 +363,7 @@ def mutate_prompts(n=5):
             file.write(output)
 
 
-def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7, **kwargs):
+def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
     """
     Submit a request to the local FastAPI server running on PACE-ICE cluster.
     
@@ -371,6 +372,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
         max_new_tokens (int): Maximum number of tokens to generate
         top_p (float): Nucleus sampling parameter
         temperature (float): Sampling temperature
+        gene_id (str): Identifier for the individual this request belongs to
     
     Returns:
         str: Generated text from the local server
@@ -378,7 +380,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
     try:
         # Read the hostname from the file written by the server
         hostname_file = os.getenv("HOSTNAME_LOG_FILE", "/home/hice1/satmuri6/scratch/llm-inference/hostname.log")
-        
+
         if not os.path.exists(hostname_file):
             raise Exception("Server hostname file not found. Make sure the server is running.")
         
@@ -394,7 +396,8 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
             "prompt": txt2llm,
             "max_new_tokens": max_new_tokens,
             "top_p": top_p,
-            "temperature": temperature
+            "temperature": temperature,
+            "gene_id": gene_id
         }
         
         # Make the HTTP request

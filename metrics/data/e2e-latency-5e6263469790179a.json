@@ -1,0 +1,8 @@
+{
+  "run_hash": "5e6263469790179a",
+  "session_start": "2025-10-08T18:00:53.526633",
+  "model_path": "/storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Llama-70B/",
+  "batch_size": 8,
+  "batch_wait_time": 2,
+  "requests": []
+}
