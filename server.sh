@@ -4,10 +4,14 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem 160G
 #SBATCH -c 16
+#SBATCH --output=results/slurm-server-%j.out
+#SBATCH --error=results/slurm-server-%j.err
 
 echo "launching LLM Server"
 
 hostname
+
+mkdir -p results/slurm
 
 module load cuda
 

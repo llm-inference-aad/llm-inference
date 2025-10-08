@@ -166,7 +166,11 @@ def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
     else:
         raise ValueError("Invalid python_file argument")
 
-    bash_script_content = LLM_BASH_SCRIPT_TEMPLATE.format(gpu, python_runline)
+    bash_script_content = LLM_BASH_SCRIPT_TEMPLATE.format(
+        gpu_constraint=gpu,
+        python_runline=python_runline,
+        slurm_log_dir=SLURM_LOG_DIR,
+    )
     return bash_script_content
 
 def create_bash_file(file_path, **kwargs):
@@ -329,7 +333,10 @@ def submit_run(gene_id):
 
         # python_runline = f'python {train_file} -bs 216 -epoch 2 -network "models.network_{gene_id}" {tmp}'
         python_runline = f'python {train_file} -bs 216 -network "models.network_{gene_id}" {tmp}'
-        bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(python_runline)
+        bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(
+            python_runline=python_runline,
+            slurm_log_dir=SLURM_LOG_DIR,
+        )
         return bash_script_content
 
     # This is for subbing the python code

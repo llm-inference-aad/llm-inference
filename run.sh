@@ -6,6 +6,8 @@
 #SBATCH -N 1
 #SBATCH --gres=gpu:1
 #SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
+#SBATCH --output=results/slurm-main-%j.out
+#SBATCH --error=results/slurm-main-%j.err
 
 set -Eeuo pipefail
 
@@ -13,6 +15,8 @@ echo "=== Launching LLM Guided Evolution ==="
 echo "Hostname: $(hostname)"
 echo "Working dir: $(pwd)"
 date
+
+mkdir -p results/slurm
 
 # ----------------------------
 # Load modules / CUDA / Python

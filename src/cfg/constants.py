@@ -10,6 +10,9 @@ DATA_PATH = "./cifar10"
 SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 #: Location where the network architecture for the seed resides
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
+#: Directory for aggregated Slurm logs
+SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'results', 'slurm')
+os.makedirs(SLURM_LOG_DIR, exist_ok=True)
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 LOCAL = True
 if LOCAL:
@@ -99,6 +102,8 @@ PYTHON_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --mem-per-gpu 16G
 #SBATCH -n 12
 #SBATCH -N 1
+#SBATCH --output={slurm_log_dir}/eval-%j.out
+#SBATCH --error={slurm_log_dir}/eval-%j.err
 echo "Launching Python Evaluation"
 hostname
 
@@ -118,7 +123,7 @@ source "$VENV_PATH/bin/activate"
 # export TOKENIZERS_PARALLELISM=false
 
 # Run Python script
-{}
+{python_runline}
 """
 
 # modify the script to use .env 
@@ -127,10 +132,12 @@ LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=llm_oper
 #SBATCH -t 8:00:00
 #SBATCH --gres=gpu:1
-#SBATCH -C "{}"
+#SBATCH -C "{gpu_constraint}"
 #SBATCH --mem-per-gpu 16G
 #SBATCH -n 12
 #SBATCH -N 1
+#SBATCH --output={slurm_log_dir}/llm-%j.out
+#SBATCH --error={slurm_log_dir}/llm-%j.err
 echo "Launching AIsurBL"
 hostname
 
@@ -155,7 +162,7 @@ export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.12/site-packages/nvidia/nvjitlink
 # export TOKENIZERS_PARALLELISM=false
 
 # Run Python script with uv
-{}
+{python_runline}
 """
 
 
