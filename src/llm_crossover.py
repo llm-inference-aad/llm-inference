@@ -10,7 +10,7 @@ from llm_utils import (split_file, submit_mixtral, submit_mixtral_hf,
 
 def augment_network(input_filename_x, input_filename_y, output_filename,
                     top_p=0.15, temperature=0.1, apply_quality_control=False,
-                    inference_submission=False):
+                    inference_submission=False, gene_id=None):
     """
     Augment Python Network Script.
 
@@ -54,7 +54,7 @@ def augment_network(input_filename_x, input_filename_y, output_filename,
     txt2llm = template_txt.format(x.strip(), y.strip())
     # Generate augmented code
     code_from_llm = generate_augmented_code(txt2llm, augment_idx, apply_quality_control,
-                                            top_p, temperature, inference_submission=inference_submission)
+                                            top_p, temperature, inference_submission=inference_submission, gene_id=gene_id)
     # Insert note if present
     temp_txt = parts_x[augment_idx]
     note_txt = extract_note(temp_txt)
@@ -104,6 +104,7 @@ if __name__ == "__main__":
     parser.add_argument('--temperature', type=float, default=0.1, help='Temperature value for text generation')
     parser.add_argument('--apply_quality_control', type=str2bool, default=False, help='Use LLM QC')
     parser.add_argument('--inference_submission', type=str2bool, default=False, help='Hugging Face bool')
+    parser.add_argument('--gene_id', type=str, default=None, help='Gene ID for tracking')
 
     # Parse the arguments
     args = parser.parse_args()
@@ -116,4 +117,5 @@ if __name__ == "__main__":
                     temperature=args.temperature,
                     apply_quality_control=args.apply_quality_control,
                     inference_submission=args.inference_submission,
+                    gene_id=args.gene_id
                    )
