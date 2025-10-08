@@ -10,6 +10,8 @@ sota/ExquisiteNetV2/cifar-10
 build/
 tests/*/outputs
 slurm-*.out
+slurm-*.err
+results/slurm-*
 setup_uv.sh
 uv.lock
 .env
