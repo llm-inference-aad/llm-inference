@@ -1,0 +1,410 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-19-2025 18:35:48
+Job ID:    3069580
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-011-13-0.pace.gatech.edu
+Writing server hostname 'atl1-1-03-011-13-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-011-13-0.pace.gatech.edu
+INFO:     Started server process [2947640]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://atl1-1-03-011-13-0.pace.gatech.edu:8000 (Press CTRL+C to quit)
+Server running with simplified inference!
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8 for the first time
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:12<00:38, 12.74s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:24<00:24, 12.20s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:36<00:12, 12.07s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:41<00:00,  9.30s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:41<00:00, 10.38s/it]
+Device set to use cuda:0
+Request received at 18:38:29
+Request completed in 14.49s
+INFO:     172.27.144.12:46002 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:58
+Request completed in 6.73s
+INFO:     172.27.144.12:49288 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:14
+Request completed in 8.02s
+INFO:     172.27.144.12:39856 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:32
+Request completed in 6.62s
+INFO:     172.27.144.12:39300 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:48
+Request completed in 7.42s
+INFO:     172.27.144.12:34560 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:40:05
+Request completed in 6.53s
+INFO:     172.27.144.12:58852 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:40:21
+Request completed in 1.89s
+INFO:     172.27.144.12:40518 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:40:33
+Request completed in 2.41s
+INFO:     172.27.144.12:48272 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:41:37
+Request completed in 4.44s
+INFO:     172.27.144.12:33910 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:41:51
+Request completed in 8.00s
+INFO:     172.27.144.12:49378 - "POST /generate HTTP/1.1" 200 OK
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+Request received at 18:42:09
+Request completed in 3.59s
+INFO:     172.27.144.12:52764 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:42:22
+Request completed in 10.11s
+INFO:     172.27.144.12:56648 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:42:42
+Request completed in 5.04s
+INFO:     172.27.144.12:36554 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:42:56
+Request completed in 5.03s
+INFO:     172.27.144.12:40030 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:43:11
+Request completed in 4.80s
+INFO:     172.27.144.12:38832 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:43:25
+Request completed in 6.65s
+INFO:     172.27.144.12:55792 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:43:42
+Request completed in 2.09s
+INFO:     172.27.144.12:56912 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:43:53
+Request completed in 10.07s
+INFO:     172.27.144.12:50016 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:44:13
+Request completed in 5.86s
+INFO:     172.27.144.12:58878 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:44:28
+Request completed in 5.20s
+INFO:     172.27.144.12:56286 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:44:43
+Request completed in 5.39s
+INFO:     172.27.144.12:37400 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:44:58
+Request completed in 11.73s
+INFO:     172.27.144.12:36420 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:45:19
+Request completed in 10.82s
+INFO:     172.27.144.12:58030 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:45:40
+Request completed in 2.10s
+INFO:     172.27.144.12:52884 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:45:51
+Request completed in 3.23s
+INFO:     172.27.144.12:41854 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:46:04
+Request completed in 5.69s
+INFO:     172.27.144.12:37530 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:46:20
+Request completed in 6.98s
+INFO:     172.27.144.12:55970 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:46:36
+Request completed in 11.72s
+INFO:     172.27.144.12:37420 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:46:58
+Request completed in 3.17s
+INFO:     172.27.144.12:52444 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:47:10
+Request completed in 3.96s
+INFO:     172.27.144.12:48364 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:47:24
+Request completed in 11.69s
+INFO:     172.27.144.12:58570 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:47:45
+Request completed in 4.20s
+INFO:     172.27.144.12:51790 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:47:59
+Request completed in 4.86s
+INFO:     172.27.144.12:60578 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:48:13
+Request completed in 3.14s
+INFO:     172.27.144.12:60218 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:48:26
+Request completed in 5.18s
+INFO:     172.27.144.12:58110 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:48:41
+Request completed in 5.18s
+INFO:     172.27.144.12:56396 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:48:56
+Request completed in 5.02s
+INFO:     172.27.144.12:45810 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:49:10
+Request completed in 5.95s
+INFO:     172.27.144.12:47402 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:49:26
+Request completed in 4.05s
+INFO:     172.27.144.12:34422 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:49:39
+Request completed in 4.23s
+INFO:     172.27.144.12:40504 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:49:53
+Request completed in 3.81s
+INFO:     172.27.144.12:48934 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:50:07
+Request completed in 4.39s
+INFO:     172.27.144.12:52926 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:50:20
+Request completed in 2.37s
+INFO:     172.27.144.12:32836 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:50:32
+Request completed in 7.77s
+INFO:     172.27.144.12:45936 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:50:50
+Request completed in 4.29s
+INFO:     172.27.144.12:38252 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:51:04
+Request completed in 8.76s
+INFO:     172.27.144.12:47986 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:51:22
+Request completed in 8.39s
+INFO:     172.27.144.12:51204 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:51:40
+Request completed in 5.84s
+INFO:     172.27.144.12:43092 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:28:18
+Request completed in 0.32s
+INFO:     128.61.254.108:57142 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:28:37
+Request completed in 10.94s
+INFO:     128.61.254.108:54922 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:29:09
+Request completed in 6.38s
+INFO:     128.61.254.108:40688 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:29:30
+Request completed in 4.95s
+INFO:     128.61.254.108:52126 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:29:46
+Request completed in 6.20s
+INFO:     128.61.254.108:48376 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:30:05
+Request completed in 3.88s
+INFO:     128.61.254.108:54246 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:30:19
+Request completed in 3.84s
+INFO:     128.61.254.108:44064 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:30:33
+Request completed in 4.63s
+INFO:     128.61.254.108:56966 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:31:38
+Request completed in 3.91s
+INFO:     128.61.254.108:45602 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:32:00
+Request completed in 1.74s
+INFO:     128.61.254.108:44446 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:32:13
+Request completed in 2.87s
+INFO:     128.61.254.108:39294 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:32:29
+Request completed in 3.93s
+INFO:     128.61.254.108:35968 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:32:43
+Request completed in 2.37s
+INFO:     128.61.254.108:58944 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:32:59
+Request completed in 6.31s
+INFO:     128.61.254.108:38422 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:33:15
+Request completed in 3.84s
+INFO:     128.61.254.108:42866 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:33:31
+Request completed in 11.58s
+INFO:     128.61.254.108:50666 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:00
+Request completed in 4.81s
+INFO:     128.61.254.108:42906 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:16
+Request completed in 8.52s
+INFO:     128.61.254.108:44500 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:36
+Request completed in 8.83s
+INFO:     128.61.254.108:51426 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:58
+Request completed in 5.27s
+INFO:     128.61.254.108:54446 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:14
+Request completed in 5.82s
+INFO:     128.61.254.108:56894 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:31
+Request completed in 6.04s
+INFO:     128.61.254.108:50174 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:50
+Request completed in 7.61s
+INFO:     128.61.254.108:59910 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:36:10
+Request completed in 4.51s
+INFO:     128.61.254.108:60268 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:36:25
+Request completed in 5.17s
+INFO:     128.61.254.108:50414 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:36:41
+Request completed in 5.53s
+INFO:     128.61.254.108:41566 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:37:01
+Request completed in 3.12s
+INFO:     128.61.254.108:42522 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:37:16
+Request completed in 9.04s
+INFO:     128.61.254.108:41228 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:37:37
+Request completed in 11.65s
+INFO:     128.61.254.108:38430 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:00:23
+Request completed in 7.46s
+INFO:     172.27.144.14:44870 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:00:45
+Request completed in 3.15s
+INFO:     172.27.144.14:54922 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:00:58
+Request completed in 5.33s
+INFO:     172.27.144.14:49106 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:01:13
+Request completed in 4.75s
+INFO:     172.27.144.14:42346 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:01:27
+Request completed in 3.76s
+INFO:     172.27.144.14:46678 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:01:41
+Request completed in 6.06s
+INFO:     172.27.144.14:34072 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:01:56
+Request completed in 6.35s
+INFO:     172.27.144.14:58314 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:02:12
+Request completed in 5.86s
+INFO:     172.27.144.14:39248 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:03:20
+Request completed in 3.68s
+INFO:     172.27.144.14:38574 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:03:33
+Request completed in 5.11s
+INFO:     172.27.144.14:42342 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:03:48
+Request completed in 2.83s
+INFO:     172.27.144.14:35774 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:04:00
+Request completed in 1.20s
+INFO:     172.27.144.14:60962 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:04:11
+Request completed in 4.45s
+INFO:     172.27.144.14:41152 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:04:25
+Request completed in 2.97s
+INFO:     172.27.144.14:35798 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:04:37
+Request completed in 5.74s
+INFO:     172.27.144.14:43820 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:04:53
+Request completed in 5.94s
+INFO:     172.27.144.14:41950 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:05:08
+Request completed in 3.58s
+INFO:     172.27.144.14:36274 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:05:21
+Request completed in 5.05s
+INFO:     172.27.144.14:60246 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:05:36
+Request completed in 4.78s
+INFO:     172.27.144.14:44396 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:05:50
+Request completed in 3.91s
+INFO:     172.27.144.14:55422 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:06:04
+Request completed in 4.83s
+INFO:     172.27.144.14:34766 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:06:18
+Request completed in 4.66s
+INFO:     172.27.144.14:42444 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:06:32
+Request completed in 11.74s
+INFO:     172.27.144.14:54384 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:06:54
+Request completed in 3.19s
+INFO:     172.27.144.14:41992 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:07:06
+Request completed in 3.97s
+INFO:     172.27.144.14:44388 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:07:20
+Request completed in 6.12s
+INFO:     172.27.144.14:35800 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:07:35
+Request completed in 2.52s
+INFO:     172.27.144.14:53430 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:07:47
+Request completed in 8.29s
+INFO:     172.27.144.14:44628 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:08:05
+Request completed in 6.45s
+INFO:     172.27.144.14:50550 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:08:21
+Request completed in 6.12s
+INFO:     172.27.144.14:42286 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:08:36
+Request completed in 3.90s
+INFO:     172.27.144.14:40252 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:08:50
+Request completed in 6.99s
+INFO:     172.27.144.14:49782 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:09:06
+Request completed in 2.71s
+INFO:     172.27.144.14:46550 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:09:18
+Request completed in 2.25s
+INFO:     172.27.144.14:39680 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:09:30
+Request completed in 4.58s
+INFO:     172.27.144.14:35248 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:09:44
+Request completed in 11.77s
+INFO:     172.27.144.14:50604 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:10:05
+Request completed in 2.49s
+INFO:     172.27.144.14:40576 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:10:18
+Request completed in 4.70s
+INFO:     172.27.144.14:58060 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:10:32
+Request completed in 3.95s
+INFO:     172.27.144.14:59298 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:10:45
+Request completed in 4.41s
+INFO:     172.27.144.14:55256 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:10:59
+Request completed in 2.38s
+INFO:     172.27.144.14:54846 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:11:11
+Request completed in 3.50s
+INFO:     172.27.144.14:56262 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:11:24
+Request completed in 4.12s
+INFO:     172.27.144.14:46522 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:11:38
+Request completed in 5.94s
+INFO:     172.27.144.14:54070 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:11:53
+Request completed in 11.75s
+INFO:     172.27.144.14:35310 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:14
+Request completed in 5.84s
+INFO:     172.27.144.14:35504 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:30
+Request completed in 3.63s
+INFO:     172.27.144.14:56864 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:43
+Request completed in 5.51s
+INFO:     172.27.144.14:42024 - "POST /generate HTTP/1.1" 200 OK
+slurmstepd: error: *** JOB 3069580 ON atl1-1-03-011-13-0 CANCELLED AT 2025-09-20T10:35:52 DUE TO TIME LIMIT ***
+---------------------------------------
+Begin Slurm Epilog: Sep-20-2025 10:35:54
+Job ID:        3069580
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=10-16:01:04,vmem=0,walltime=16:00:04,mem=18470204K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-011-13-0
+---------------------------------------

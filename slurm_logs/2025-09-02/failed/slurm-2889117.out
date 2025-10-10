@@ -1,0 +1,67 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-02-2025 13:24:54
+Job ID:    2889117
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Guided Evolution
+atl1-1-03-012-18-0.pace.gatech.edu
+
+EnvironmentNameNotFound: Could not find conda environment: llm_guided_env
+You can list all discoverable environments with `conda info --envs`.
+
+
+
+     active environment : None
+            shell level : 0
+       user config file : /home/hice1/rmanimaran8/.condarc
+ populated config files : 
+          conda version : 24.1.2
+    conda-build version : 3.27.0
+         python version : 3.10.13.final.0
+                 solver : libmamba (default)
+       virtual packages : __archspec=1=sapphirerapids
+                          __conda=24.1.2=0
+                          __cuda=12.9=0
+                          __glibc=2.34=0
+                          __linux=5.14.0=0
+                          __unix=0=0
+       base environment : /usr/local/pace-apps/manual/packages/anaconda3/2023.03  (read only)
+      conda av data dir : /usr/local/pace-apps/manual/packages/anaconda3/2023.03/etc/conda
+  conda av metadata url : None
+           channel URLs : https://repo.anaconda.com/pkgs/main/linux-64
+                          https://repo.anaconda.com/pkgs/main/noarch
+                          https://repo.anaconda.com/pkgs/r/linux-64
+                          https://repo.anaconda.com/pkgs/r/noarch
+          package cache : /usr/local/pace-apps/manual/packages/anaconda3/2023.03/pkgs
+                          /home/hice1/rmanimaran8/.conda/pkgs
+       envs directories : /home/hice1/rmanimaran8/.conda/envs
+                          /usr/local/pace-apps/manual/packages/anaconda3/2023.03/envs
+               platform : linux-64
+             user-agent : conda/24.1.2 requests/2.29.0 CPython/3.10.13 Linux/5.14.0-503.40.1.el9_5.x86_64 rhel/9.5 glibc/2.34 solver/libmamba conda-libmamba-solver/24.1.0 libmambapy/1.5.6 aau/0.4.3 c/8pVrs_HE1BNsKUcqXdcSrQ s/o-aFnWHe7wTxU3i3W-jEtg
+                UID:GID : 3032586:2626
+             netrc file : None
+           offline mode : False
+
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 14, in <module>
+    from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 23, in <module>
+    from google import genai
+ImportError: cannot import name 'genai' from 'google' (unknown location)
+---------------------------------------
+Begin Slurm Epilog: Sep-02-2025 13:25:16
+Job ID:        2889117
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:h100=1,mem=16G,node=1
+Rsrc Used:     cput=00:00:22,vmem=0,walltime=00:00:22,mem=766M,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-012-18-0
+---------------------------------------

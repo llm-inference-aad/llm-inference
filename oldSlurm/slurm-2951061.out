@@ -1,0 +1,32 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-10-2025 17:33:04
+Job ID:    2951061
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Guided Evolution
+atl1-1-03-004-25-0.pace.gatech.edu
+/var/lib/slurm/slurmd/job2951061/slurm_script: line 17: /home/hice1/rmanimaran8/scratch/llm-inference/.env: No such file or directory
+LLM_INFERENCE_ROOT_DIR is set to 
+/var/lib/slurm/slurmd/job2951061/slurm_script: line 21: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+/usr/bin/python
+Python 3.9.21
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 11, in <module>
+    from deap import base, creator, tools
+ModuleNotFoundError: No module named 'deap'
+---------------------------------------
+Begin Slurm Epilog: Sep-10-2025 17:33:05
+Job ID:        2951061
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:l40s=1,mem=16G,node=1
+Rsrc Used:     cput=00:00:01,vmem=0,walltime=00:00:01,mem=18140K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-004-25-0
+---------------------------------------

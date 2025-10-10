@@ -1,0 +1,1820 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-09-2025 16:25:11
+Job ID:    3290438
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+=== Launching LLM Guided Evolution ===
+Hostname: atl1-1-03-004-25-0.pace.gatech.edu
+Working dir: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+Thu Oct  9 16:25:11 EDT 2025
+UV version: uv 0.8.15
+Python via uv: Python 3.13.7
+LLM_INFERENCE_ROOT_DIR: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+LD_LIBRARY_PATH updated for nvjitlink (best-effort).
+UV Python path: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+Thu Oct  9 16:25:14 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L40S                    On  |   00000000:41:00.0 Off |                    0 |
+| N/A   43C    P8             37W /  350W |       0MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== Running: uv run python run_improved.py first_test ===
+
+⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣶⣶⠶⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⣀⣹⣟⣛⣛⣻⣿⣿⣿⡾⠟⢉⣴⠟⢁⣴⠋⣹⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⠛⠛⣿⠉⢉⣩⠵⠚⠁⢀⡴⠛⠁⣠⠞⠁⣰⠏⠸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢻⣷⠋⠁⠀⢀⡴⠋⠀⢀⡴⠋⠀⣼⠃⠀⡼⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢻⣆⣠⡴⠋⠀⠀⣠⠟⠀⢀⡾⠁⠀⡼⠁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠻⣯⡀⠀⢀⡼⠃⠀⢠⡟⠀⢀⡾⠁⢀⣾⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠻⣶⣟⡀⠀⣰⠏⠀⢀⡾⠁⠀⣼⢹⣿⣀⣤⣤⣴⠶⢿⡿⠛⢛⣷⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠶⠶⠾⠷⠶⠿⠛⢻⣟⠉⣥⠟⠁⣠⠟⠀⢠⠞⠁⣄⡿⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠞⠁⢀⡴⠋⠀⣴⠋⠀⣰⠟⠀⣤⡾⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⢠⠞⠁⢀⡾⠁⢀⡼⠃⢀⡴⠋⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠋⠀⣰⠏⠀⣠⠟⠀⣰⠟⠁⢀⡴⠛⣿⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⡼⠃⢀⡼⠋⢠⡞⠁⣠⣞⣋⣤⣶⣿⡟⠛⣿⠛⠛⣻⠟⠷⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣦⣾⣤⣴⣯⡶⠾⠟⠛⠉⠉⠉⣿⡇⢠⡏⠀⣰⠏⠀⢀⣼⠋⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⡾⠀⢰⠏⠀⢠⡞⠁⠀⣠⠞⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠇⢠⠏⠀⣰⠋⠀⣠⠞⠁⠀⢀⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⢠⠟⢀⡼⠁⣠⠞⠁⣀⣴⢾⣿⣤⣿⣦⣄⣀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡟⣠⠏⣠⠞⣁⣴⣾⣿⣿⣿⣿⣿⣿⡏⢹⡏⠛⠳⣦⣄⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣾⣷⠿⠿⠛⠉⠀⠀⠈⠳⣬⣿⡟⣾⠁⠀⣼⠃⠉⠻⠆
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⡏⠀⣼⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠁⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣟⡼⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⣃⠀⠀
+
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxYyOvpo2a7ukMkV3fS7ScMwl2.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+Renowned worldwide as an AI researcher, lauded for your inventive and unorthodox methods, you are now summoned to apply your distinctive innovations to rejuvenate a dormant project:
+
+Q: How can you create a unique variant of this code snippet by applying unusual modifications to default parameters or hyperparameters to potentially improve its performance?
+
+The current code block:
+```python
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to approach this problem.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxYyOvpo2a7ukMkV3fS7ScMwl2.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxYyOvpo2a7ukMkV3fS7ScMwl2
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxgx5RmU2igaBZaW2lNoAiMVa8.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+As a leading authority in machine learning, you possess a profound grasp of sophisticated artificial intelligence methodologies, a skill set that has directed you to your most recent endeavor:
+
+Q: How can you apply significant and complex modifications to this code snippet to substantially elevate the model's performance? The addition of helper functions is encouraged!
+
+The current code block:
+```python
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve the given code.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.dropout = nn.Dropout2d(p=0.2)
+        self.activation = nn.ReLU(inplace=True)
+        
+        # Initialize weights using He initialization for better gradient flow
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, (nn.BatchNorm2d)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, x):
+        max_pooled = self.maxpool(x)
+        min_pooled = self.minpool(x)
+        concatenated = torch.cat((max_pooled, min_pooled), dim=1)
+        processed = self.pw(concatenated)
+        bn_output = self.bn(processed)
+        activated = self.activation(bn_output)
+        dropped = self.dropout(activated)
+        return dropped
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.dropout = nn.Dropout2d(p=0.2)
+        self.activation = nn.ReLU(inplace=True)
+        
+        # Initialize weights using He initialization for better gradient flow
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, (nn.BatchNorm2d)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, x):
+        max_pooled = self.maxpool(x)
+        min_pooled = self.minpool(x)
+        concatenated = torch.cat((max_pooled, min_pooled), dim=1)
+        processed = self.pw(concatenated)
+        bn_output = self.bn(processed)
+        activated = self.activation(bn_output)
+        dropped = self.dropout(activated)
+        return dropped
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxgx5RmU2igaBZaW2lNoAiMVa8.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxgx5RmU2igaBZaW2lNoAiMVa8
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxKKCU8DgBzz8LELuy4ziNLOHY.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+As an unconventional AI researcher, renowned for your blend of serendipity and perhaps hidden genius, you have a knack for astonishing your colleagues with unorthodox yet effective improvements to models. This unique skill has led to your latest assignment: 
+
+Q: How can you apply modifications to this code snippet to substantially reduce parameters while trying to maintain the model's performance?
+
+The current code block:
+```python
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to approach this problem.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxKKCU8DgBzz8LELuy4ziNLOHY.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxKKCU8DgBzz8LELuy4ziNLOHY
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxbNBOPWwsbkllpU4fvKlLgS3z.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+Q: What are some obscure modifications to default parameters or hyperparameters that could potentially improve the performance of this existing code snippet?
+
+The current code block:
+```python
+class ME(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.pw = nn.Conv2d(cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+.
+Okay, so I have this Python code for a neural network module called ME. It's using PyTorch. The user is asking about obscure modifications to default parameters or hyperparameters that could improve its performance. Hmm, what can I do here?
+
+First, looking at the code, there are three main components: MaxPool2d, Conv2d (pointwise), and BatchNorm2d. Maybe tweaking their parameters could help.
+
+For the MaxPool2d layer, the kernel size is 2, which is standard. But maybe changing the stride? Oh wait, no, because if we change the stride, it might affect the output dimensions. Since the requirement says to retain original tensor input/output sizes, I shouldn't alter the stride. Alternatively, perhaps adding padding? Wait, but the current setup uses ceil_mode=True, which handles odd-sized inputs. So maybe that's already handled.
+
+Looking at the pointwise convolution, it has bias=False. That's common practice when followed by BN, as BN includes learnable biases. So probably fine.
+
+What about the BatchNorm layer? By default, it has affine=True, which allows scaling and shifting. Maybe adjusting eps or momentum? Lowering eps could make it more stable during training, but too low might cause issues. Momentum controls how fast the running mean/variance update; lower momentum makes them track faster, which might be better for certain tasks.
+
+Another thought: Could adding dropout after the BN help prevent overfitting? Or maybe initializing weights differently? For example, using He initialization instead of the default.
+
+Wait, let me check the default initializations. In PyTorch, Conv2d layers use He uniform initialization by default, which is good. But sometimes, using different initializations like Xavier might help depending on the data.
+
+Also, what about the order of operations? Sometimes people apply activation functions before batch norm. Here, after BN, there's no activation. Maybe adding ReLU after BN could introduce non-linearity, improving model capacity.
+
+But the question specifies "obscure" modifications. So maybe something less obvious. Like, changing the max pooling to average pooling? No, that would change the behavior significantly. Alternatively, using a different type of normalization, like LayerNorm or GroupNorm, but that might require more changes.
+
+Alternatively, could we add a residual connection? That is, after processing, add the input back. But since the input is passed through max pool, which reduces spatial dimensions, unless the input is adjusted via a 1x1 conv, it might not work. But that complicates things beyond an obscure modification.
+
+Hmm, another idea: Using a different kernel size for the pointwise convolution. Currently, it's 1x1. Maybe 3x3 with padding=1? But that would increase computation and might not fit the original design.
+
+Wait, perhaps using a depth-wise separable convolution instead of pointwise? That could reduce parameters while maintaining performance. But implementing that would require splitting into two layers: depth-wise and point-wise. However, that's a significant change, not just a parameter tweak.
+
+Back to the initial idea: Adjusting the BatchNorm parameters. Let's try lowering the momentum from the default 0.1 to something smaller, say 0.01. This makes the running statistics update slower, which might help in some cases.
+
+Additionally, maybe setting track_running_stats=False for evaluation mode, but that's usually not recommended. Alternatively, using a different eps value, like 1e-5 instead of the default 1e-3. Although, lower eps can lead to numerical instability.
+
+Another obscure parameter: The number of groups in the convolution. Setting groups=cin would make it depth-wise, but again, that's a bigger change.
+
+Wait, perhaps using a different padding strategy in the max pool. But since ceil_mode is True, it's handling uneven sizes. Not sure if changing that helps.
+
+Alternatively
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+Back to the initial idea: Adjusting the BatchNorm parameters. Let's try lowering the momentum from the default 0.1 to something smaller, say 0.01. This makes the running statistics update slower, which might help in some cases.
+
+Additionally, maybe setting track_running_stats=False for evaluation mode, but that's usually not recommended. Alternatively, using a different eps value, like 1e-5 instead of the default 1e-3. Although, lower eps can lead to numerical instability.
+
+Another obscure parameter: The number of groups in the convolution. Setting groups=cin would make it depth-wise, but again, that's a bigger change.
+
+Wait, perhaps using a different padding strategy in the max pool. But since ceil_mode is True, it's handling uneven sizes. Not sure if changing that helps.
+
+Alternatively
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxbNBOPWwsbkllpU4fvKlLgS3z.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxbNBOPWwsbkllpU4fvKlLgS3z
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx7T4RX2KBDm7QQHLA3FQZTeRl.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+Renowned worldwide as an AI researcher, lauded for your inventive and unorthodox methods, you are now summoned to apply your distinctive innovations to rejuvenate a dormant project:
+
+Q: How can you modify this code snippet to significantly reduce its parameters while aiming to maintain the model's performance?
+
+The current code block:
+```python
+# -- NOTE --
+# Note: The classes SE_LN and SE used in this architecture are pre-existing and fully implemented elsewhere. 
+# It is not necessary to create new implementations or modify these classes for this architecture. They should be used as-is. 
+# -- NOTE --
+
+def pad_num_x(k_s):
+    pad_per_side = int((k_s-1)*0.5)
+    return pad_per_side
+    
+class DFSEBV2(nn.Module):
+    def __init__(self, cin, dw_s, is_LN):
+        super().__init__()
+        self.pw1 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(cin)
+        self.act1 = nn.SiLU()
+        self.dw1 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        if is_LN:
+            self.seln = SE_LN(cin)
+        else:
+            self.seln = SE(cin,3)
+            
+        self.pw2 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(cin)
+        self.act2 = nn.Hardswish()
+        self.dw2 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+
+    def forward(self, x):
+        y = x
+        x = self.pw1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        x = self.dw1(x)
+        x = self.seln(x)
+        x += y
+        
+        x = self.pw2(x)       
+        x = self.bn2(x)
+        x = self.act2(x)
+        x = self.dw2(x)
+        x += y
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+.
+Okay, so I need to modify this Python code to reduce the number of parameters while keeping the model's performance. Hmm, let me look at the code first.
+
+The code defines a class DFSEBV2 which is a neural network module. It has several layers including pointwise convolutions (pw1, pw2), depthwise separable convolutions (dw1, dw2), batch normalization (bn1, bn2), activation functions (act1, act2), and some kind of squeeze-excitation modules (seln).
+
+Wait, the problem says to reduce parameters but keep performance. So maybe I can find parts where we're using more parameters than necessary and simplify them.
+
+Looking at the layers:
+
+Each pw layer is a 1x1 convolution with 'cin' input and output channels. These have cin^2 parameters each because it's a linear transformation on each channel.
+
+Then there are two depthwise convolutions, which use groups equal to the number of channels, so they only operate within each channel. Their parameter count depends on kernel size and depth multiplier, but since it's groups=cin, each kernel is applied per channel, so the number of parameters here is small compared to regular convolutions.
+
+BatchNorm layers have 2*cin parameters each (gamma and beta). Activation functions don't add parameters.
+
+The SE_LN or SE modules might also contribute parameters depending on their implementation, but since those are pre-existing, I can't change them.
+
+So, how can I reduce the total parameters? Maybe by reducing the number of layers or making some layers share weights or something like that.
+
+Wait, looking at the structure, after the first set of layers (pw1, bn1, act1, dw1, seln), there's a residual connection adding y (which is the input x). Then another similar block (pw2, bn2, act2, dw2) with another residual addition.
+
+Hmm, perhaps combining these two blocks into one could reduce parameters. Or maybe replacing some layers with fewer parameters.
+
+Another idea: Since both pw1 and pw2 are 1x1 convolutions with the same input and output channels, maybe they can be combined somehow. But I'm not sure how without changing the computation.
+
+Alternatively, what if I remove one of the pw layers? For example, replace pw2 with identity or something. But that might affect performance.
+
+Wait, another approach: Using group convolutions in pw layers. If I split the pw layers into multiple groups, each with fewer channels, the total parameters would decrease. But I'm not sure if that maintains performance.
+
+Or maybe using a smaller kernel size for the depthwise convolutions. Wait, the kernel size is passed as dw_s, which is fixed when initializing the class. So unless I can make dw_s smaller, but that's determined by the user.
+
+Alternatively, perhaps removing one of the batchnorm layers. But BN helps with training, so removing it might hurt performance.
+
+Wait, another thought: What about using a single pw layer instead of two? Like, combine the operations of pw1 and pw2 into a single layer. That way, we save the parameters from one pw layer and one bn layer.
+
+But then, how does that affect the computation? Because currently, each pw is followed by bn, activation, dw, etc., and then added to the residual.
+
+If I merge pw1 and pw2, maybe I can have a single pw layer that handles both steps. But I'm not sure if that's possible without altering the computation flow too much.
+
+Alternatively, maybe using a different type of layer that has fewer parameters but similar functionality. For example, replacing some convolutions with pointwise group convolutions or something.
+
+Wait, another angle: The two blocks are quite similar. Perhaps I can factor out some common components. For instance, creating a helper function or a nested class that defines a repeated block, thus reusing parameters.
+
+But
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+The code defines a class DFSEBV2 which is a neural network module. It has several layers including pointwise convolutions (pw1, pw2), depthwise separable convolutions (dw1, dw2), batch normalization (bn1, bn2), activation functions (act1, act2), and some kind of squeeze-excitation modules (seln).
+
+Wait, the problem says to reduce parameters but keep performance. So maybe I can find parts where we're using more parameters than necessary and simplify them.
+
+Looking at the layers:
+
+Each pw layer is a 1x1 convolution with 'cin' input and output channels. These have cin^2 parameters each because it's a linear transformation on each channel.
+
+Then there are two depthwise convolutions, which use groups equal to the number of channels, so they only operate within each channel. Their parameter count depends on kernel size and depth multiplier, but since it's groups=cin, each kernel is applied per channel, so the number of parameters here is small compared to regular convolutions.
+
+BatchNorm layers have 2*cin parameters each (gamma and beta). Activation functions don't add parameters.
+
+The SE_LN or SE modules might also contribute parameters depending on their implementation, but since those are pre-existing, I can't change them.
+
+So, how can I reduce the total parameters? Maybe by reducing the number of layers or making some layers share weights or something like that.
+
+Wait, looking at the structure, after the first set of layers (pw1, bn1, act1, dw1, seln), there's a residual connection adding y (which is the input x). Then another similar block (pw2, bn2, act2, dw2) with another residual addition.
+
+Hmm, perhaps combining these two blocks into one could reduce parameters. Or maybe replacing some layers with fewer parameters.
+
+Another idea: Since both pw1 and pw2 are 1x1 convolutions with the same input and output channels, maybe they can be combined somehow. But I'm not sure how without changing the computation.
+
+Alternatively, what if I remove one of the pw layers? For example, replace pw2 with identity or something. But that might affect performance.
+
+Wait, another approach: Using group convolutions in pw layers. If I split the pw layers into multiple groups, each with fewer channels, the total parameters would decrease. But I'm not sure if that maintains performance.
+
+Or maybe using a smaller kernel size for the depthwise convolutions. Wait, the kernel size is passed as dw_s, which is fixed when initializing the class. So unless I can make dw_s smaller, but that's determined by the user.
+
+Alternatively, perhaps removing one of the batchnorm layers. But BN helps with training, so removing it might hurt performance.
+
+Wait, another thought: What about using a single pw layer instead of two? Like, combine the operations of pw1 and pw2 into a single layer. That way, we save the parameters from one pw layer and one bn layer.
+
+But then, how does that affect the computation? Because currently, each pw is followed by bn, activation, dw, etc., and then added to the residual.
+
+If I merge pw1 and pw2, maybe I can have a single pw layer that handles both steps. But I'm not sure if that's possible without altering the computation flow too much.
+
+Alternatively, maybe using a different type of layer that has fewer parameters but similar functionality. For example, replacing some convolutions with pointwise group convolutions or something.
+
+Wait, another angle: The two blocks are quite similar. Perhaps I can factor out some common components. For instance, creating a helper function or a nested class that defines a repeated block, thus reusing parameters.
+
+But
+
+************************************************************************************************************************
+*                             Python code saved to network_xXx7T4RX2KBDm7QQHLA3FQZTeRl.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXx7T4RX2KBDm7QQHLA3FQZTeRl
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxJp9Rt9wLfkvcTVjHSWstlIBj.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+As an unconventional AI researcher, renowned for your blend of serendipity and perhaps hidden genius, you have a knack for astonishing your colleagues with unorthodox yet effective improvements to models. This unique skill has led to your latest assignment: 
+
+Q: How can you apply complex modifications to this code snippet to substantially elevate the model's performance?
+
+The current code block:
+```python
+# -- NOTE --
+# Note: The classes SE_LN and SE used in this architecture are pre-existing and fully implemented elsewhere. 
+# It is not necessary to create new implementations or modify these classes for this architecture. They should be used as-is. 
+# -- NOTE --
+
+def pad_num_x(k_s):
+    pad_per_side = int((k_s-1)*0.5)
+    return pad_per_side
+    
+class DFSEBV2(nn.Module):
+    def __init__(self, cin, dw_s, is_LN):
+        super().__init__()
+        self.pw1 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(cin)
+        self.act1 = nn.SiLU()
+        self.dw1 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        if is_LN:
+            self.seln = SE_LN(cin)
+        else:
+            self.seln = SE(cin,3)
+            
+        self.pw2 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(cin)
+        self.act2 = nn.Hardswish()
+        self.dw2 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+
+    def forward(self, x):
+        y = x
+        x = self.pw1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        x = self.dw1(x)
+        x = self.seln(x)
+        x += y
+        
+        x = self.pw2(x)       
+        x = self.bn2(x)
+        x = self.act2(x)
+        x = self.dw2(x)
+        x += y
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve this code.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+
+def pad_num_x(k_s):
+    pad_per_side = int((k_s - 1) * 0.5)
+    return pad_per_side
+
+class DFSEBV2(nn.Module):
+    def __init__(self, cin, dw_s, is_LN):
+        super().__init__()
+        self.pw1 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(cin)
+        self.act1 = nn.SiLU()
+        self.dw1 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        if is_LN:
+            self.seln = SE_LN(cin)
+        else:
+            self.seln = SE(cin, 3)
+        
+        self.pw2 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(cin)
+        self.act2 = nn.Hardswish()
+        self.dw2 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        
+        # Adding depth-wise separable convolution for better feature extraction
+        self.expansion_conv = nn.Sequential(
+            nn.Conv2d(cin, 2*cin, 1, 1, 0),
+            nn.BatchNorm2d(2*cin),
+            nn.ReLU(),
+            nn.Conv2d(2*cin, 2*cin, dw_s, 1, pad_num_x(dw_s), groups=2*cin),
+            nn.BatchNorm2d(2*cin),
+            nn.ReLU(),
+            nn.Conv2d(2*cin, cin, 1, 1, 0),
+            nn.BatchNorm2d(cin)
+        )
+        
+        # Adding attention mechanism for improved context awareness
+        self.attention = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(cin, cin // 8, 1),
+            nn.ReLU(),
+            nn.Conv2d(cin // 8, cin, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        y = x
+        x = self.pw1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        x = self.dw1(x)
+        x = self.seln(x)
+        x += y
+        
+        x = self.pw2(x)
+        x = self.bn2(x)
+        x = self.act2(x)
+        x = self.dw2(x)
+        x += y
+        
+        # Applying expansion and attention
+        expanded = self.expansion_conv(x)
+        attention = self.attention(expanded)
+        x = expanded * attention + x
+        return x
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+
+def pad_num_x(k_s):
+    pad_per_side = int((k_s - 1) * 0.5)
+    return pad_per_side
+
+class DFSEBV2(nn.Module):
+    def __init__(self, cin, dw_s, is_LN):
+        super().__init__()
+        self.pw1 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(cin)
+        self.act1 = nn.SiLU()
+        self.dw1 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        if is_LN:
+            self.seln = SE_LN(cin)
+        else:
+            self.seln = SE(cin, 3)
+        
+        self.pw2 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(cin)
+        self.act2 = nn.Hardswish()
+        self.dw2 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        
+        # Adding depth-wise separable convolution for better feature extraction
+        self.expansion_conv = nn.Sequential(
+            nn.Conv2d(cin, 2*cin, 1, 1, 0),
+            nn.BatchNorm2d(2*cin),
+            nn.ReLU(),
+            nn.Conv2d(2*cin, 2*cin, dw_s, 1, pad_num_x(dw_s), groups=2*cin),
+            nn.BatchNorm2d(2*cin),
+            nn.ReLU(),
+            nn.Conv2d(2*cin, cin, 1, 1, 0),
+            nn.BatchNorm2d(cin)
+        )
+        
+        # Adding attention mechanism for improved context awareness
+        self.attention = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(cin, cin // 8, 1),
+            nn.ReLU(),
+            nn.Conv2d(cin // 8, cin, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        y = x
+        x = self.pw1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        x = self.dw1(x)
+        x = self.seln(x)
+        x += y
+        
+        x = self.pw2(x)
+        x = self.bn2(x)
+        x = self.act2(x)
+        x = self.dw2(x)
+        x += y
+        
+        # Applying expansion and attention
+        expanded = self.expansion_conv(x)
+        attention = self.attention(expanded)
+        x = expanded * attention + x
+        return x
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxJp9Rt9wLfkvcTVjHSWstlIBj.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxJp9Rt9wLfkvcTVjHSWstlIBj
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxE7BTbuDoqAsp7ZtMJqW5bTVp.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+Q: What complex modifications can be explored to potentially enhance the performance of this existing code snippet?
+
+The current code block:
+```python
+def pad_num_y(k_s):
+    pad_per_side = int((k_s-1)*0.5)
+    return pad_per_side
+    
+class DW(nn.Module):
+    def __init__(self, cin, dw_s):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, dw_s, 1, pad_num_y(dw_s), groups=cin)
+        self.act = nn.Hardswish()
+
+    def forward(self, x):
+        x = self.dw(x)
+        x = self.act(x)
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve the given code's performance.
+
+First, the `pad_num_y` function calculates padding based on kernel size. We can optimize it by using a lambda for brevity and efficiency.
+
+Next, within the `DW` class:
+
+1. **Depthwise Separable Convolution**: The current implementation uses grouped convolution which is efficient but could be further optimized. Using `nn.Conv2d` with `groups=cin` is standard, but perhaps leveraging other optimizations like channel shuffle or more efficient padding might help.
+
+2. **Activation Function**: The Hardswish activation is already efficient, but we can make sure it's in its most optimal form. Alternatively, using a memory-efficient version if available.
+
+3. **Padding Calculation**: Instead of calling a separate function, inline the calculation for potential speed gains.
+
+4. **JIT Compilation**: Applying Just-In-Time compilation via `torch.jit.script` can sometimes provide significant speed improvements by optimizing the graph.
+
+5. **Mixed Precision Training**: Utilizing `torch.cuda.amp` for automatic mixed precision could reduce memory usage and increase speed, especially on GPUs.
+
+6. **Model Parallelism**: Distribute the model across multiple GPUs if available, though this depends on the hardware setup.
+
+7. **Fused Operations**: Combining operations where possible to reduce kernel launches, such as fusing the convolution and activation.
+
+8. **Efficient Padding**: Use same padding to ensure that the spatial dimensions are preserved post-convolution, which might simplify downstream layers.
+
+9. **Kernel Size Optimization**: Experimenting with different kernel sizes or dilated convolutions could lead to better performance without significantly affecting accuracy.
+
+10. **Weight Initialization**: Proper initialization of weights can lead to faster convergence during training.
+
+Let me implement some of these optimizations into the code.
+</think>
+
+```python
+import torch.nn as nn
+from torch import Tensor
+
+def pad_num_y(k_s):
+    return (k_s - 1) // 2
+
+@torch.jit.script
+class DW(nn.Module):
+    def __init__(self, cin: int, dw_s: int):
+        super(DW, self).__init__()
+        self.dw = nn.Conv2d(cin, cin, dw_s, 1, pad_num_y(dw_s), groups=cin)
+        self.act = nn.Hardsigmoid()  # More memory efficient alternative
+        
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.dw(x)
+        x = self.act(x)
+        return x
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch.nn as nn
+from torch import Tensor
+
+def pad_num_y(k_s):
+    return (k_s - 1) // 2
+
+@torch.jit.script
+class DW(nn.Module):
+    def __init__(self, cin: int, dw_s: int):
+        super(DW, self).__init__()
+        self.dw = nn.Conv2d(cin, cin, dw_s, 1, pad_num_y(dw_s), groups=cin)
+        self.act = nn.Hardsigmoid()  # More memory efficient alternative
+        
+    def forward(self, x: Tensor) -> Tensor:
+        x = self.dw(x)
+        x = self.act(x)
+        return x
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxE7BTbuDoqAsp7ZtMJqW5bTVp.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxE7BTbuDoqAsp7ZtMJqW5bTVp
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxjmeMvViJaPefwxvTcP2hMEJy.sh
+	‣ Output: Launching AIsurBL
+atl1-1-03-004-25-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+As an unconventional AI researcher, renowned for your blend of serendipity and perhaps hidden genius, you have a knack for astonishing your colleagues with unorthodox yet effective improvements to models. This unique skill has led to your latest assignment: 
+
+Q: How can you apply complex modifications to this code snippet to substantially elevate the model's performance?
+
+The current code block:
+```python
+class SE(nn.Module):
+    def __init__(self, cin, ratio):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))
+        self.fc1 = nn.Linear(cin, int(cin/ratio), bias=False)
+        self.act1 = nn.ReLU()
+        self.fc2 = nn.Linear(self.fc1.out_features, cin, bias=False)
+        self.act2 = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1,x.size()[1])
+        x = self.fc1(x)
+        x = self.act1(x)
+        x = self.fc2(x)
+        x = self.act2(x)
+        x = x.view(-1,x.size()[1],1,1)
+        return x*y 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3290438
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve this Squeeze-and-Excitation (SE) module.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class SE(nn.Module):
+    def __init__(self, cin, ratio):
+        super(SE, self).__init__()
+        self.cin = cin
+        self.ratio = ratio
+        
+        # Global average pooling layer
+        self.gavg = nn.AdaptiveAvgPool2d((1, 1))
+        
+        # First fully connected layer
+        self.fc1 = nn.Linear(cin, int(cin / ratio), bias=False)
+        self.bn1 = nn.BatchNorm1d(int(cin / ratio))  # Added batch normalization
+        self.act1 = nn.ReLU(inplace=True)
+        
+        # Second fully connected layer
+        self.fc2 = nn.Linear(int(cin / ratio), cin, bias=False)
+        self.bn2 = nn.BatchNorm1d(cin)  # Added batch normalization
+        self.act2 = nn.Sigmoid()
+        
+    def forward(self, x):
+        # Store input tensor for later multiplication
+        y = x
+        
+        # Apply global average pooling
+        x = self.gavg(x)
+        
+        # Flatten the tensor
+        x = x.view(-1, self.cin)
+        
+        # First fully connected layer with activation
+        x = self.fc1(x)
+        x = self.bn1(x)  # Batch normalization after FC1
+        x = self.act1(x)
+        
+        # Second fully connected layer with activation
+        x = self.fc2(x)
+        x = self.bn2(x)  # Batch normalization after FC2
+        x = self.act2(x)
+        
+        # Reshape and multiply with input tensor
+        x = x.view(-1, self.cin, 1, 1)
+        return x * y
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class SE(nn.Module):
+    def __init__(self, cin, ratio):
+        super(SE, self).__init__()
+        self.cin = cin
+        self.ratio = ratio
+        
+        # Global average pooling layer
+        self.gavg = nn.AdaptiveAvgPool2d((1, 1))
+        
+        # First fully connected layer
+        self.fc1 = nn.Linear(cin, int(cin / ratio), bias=False)
+        self.bn1 = nn.BatchNorm1d(int(cin / ratio))  # Added batch normalization
+        self.act1 = nn.ReLU(inplace=True)
+        
+        # Second fully connected layer
+        self.fc2 = nn.Linear(int(cin / ratio), cin, bias=False)
+        self.bn2 = nn.BatchNorm1d(cin)  # Added batch normalization
+        self.act2 = nn.Sigmoid()
+        
+    def forward(self, x):
+        # Store input tensor for later multiplication
+        y = x
+        
+        # Apply global average pooling
+        x = self.gavg(x)
+        
+        # Flatten the tensor
+        x = x.view(-1, self.cin)
+        
+        # First fully connected layer with activation
+        x = self.fc1(x)
+        x = self.bn1(x)  # Batch normalization after FC1
+        x = self.act1(x)
+        
+        # Second fully connected layer with activation
+        x = self.fc2(x)
+        x = self.bn2(x)  # Batch normalization after FC2
+        x = self.act2(x)
+        
+        # Reshape and multiply with input tensor
+        x = x.view(-1, self.cin, 1, 1)
+        return x * y
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxjmeMvViJaPefwxvTcP2hMEJy.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxjmeMvViJaPefwxvTcP2hMEJy
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                      SUBMITTING MODELS CREATED BY LLM                                      *
+**************************************************************************************************************
+
+
+************************************************************
+*                  Checking Model Runs: 0                  *
+************************************************************
+Checking for: SOTA_ROOT ./models/network_xXxYyOvpo2a7ukMkV3fS7ScMwl2.py
+	‣ Bash Script Saved to 0/xXxYyOvpo2a7ukMkV3fS7ScMwl2_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxYyOvpo2a7ukMkV3fS7ScMwl2
+Device: cuda
+num of params: 0.5182 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 124
+    tr  loss: 1.7518      tr  acc: 0.3486
+min tr  loss: 1.7518  max tr  acc: 0.3486
+    val loss: 1.8490      val acc: 0.3520
+min val loss: 1.8490  max val acc: 0.3520
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 248
+    tr  loss: 1.3277      tr  acc: 0.5175
+min tr  loss: 1.3277  max tr  acc: 0.5175
+    val loss: 3.6076      val acc: 0.1876
+min val loss: 1.8490  max val acc: 0.3520
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.8327
+Train Acc: 0.3567
+--------------------
+Val loss: 1.8490
+Val Acc: 0.3520
+--------------------
+Test loss: 1.8174
+Test Acc: 0.3606
+--------------------
+Training time: 266.88 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxYyOvpo2a7ukMkV3fS7ScMwl2
+
+results have been written to results/xXxYyOvpo2a7ukMkV3fS7ScMwl2_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxYyOvpo2a7ukMkV3fS7ScMwl2, None
+Checking the Results for Gene: xXxYyOvpo2a7ukMkV3fS7ScMwl2
+	☑ LLM Job Completed Successfully.
+Checking for: SOTA_ROOT ./models/network_xXxgx5RmU2igaBZaW2lNoAiMVa8.py
+	‣ Bash Script Saved to 0/xXxgx5RmU2igaBZaW2lNoAiMVa8_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxgx5RmU2igaBZaW2lNoAiMVa8
+Device: cuda
+num of params: 0.5182 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 104
+    tr  loss: 1.8487      tr  acc: 0.3090
+min tr  loss: 1.8487  max tr  acc: 0.3090
+    val loss: 1.7811      val acc: 0.3454
+min val loss: 1.7811  max val acc: 0.3454
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 227
+    tr  loss: 1.4945      tr  acc: 0.4539
+min tr  loss: 1.4945  max tr  acc: 0.4539
+    val loss: 1.7413      val acc: 0.3563
+min val loss: 1.7413  max val acc: 0.3563
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.7417
+Train Acc: 0.3544
+--------------------
+Val loss: 1.7413
+Val Acc: 0.3563
+--------------------
+Test loss: 1.7416
+Test Acc: 0.3565
+--------------------
+Training time: 245.75 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxgx5RmU2igaBZaW2lNoAiMVa8
+
+results have been written to results/xXxgx5RmU2igaBZaW2lNoAiMVa8_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxgx5RmU2igaBZaW2lNoAiMVa8, None
+Checking the Results for Gene: xXxgx5RmU2igaBZaW2lNoAiMVa8
+	☑ LLM Job Completed Successfully.
+Checking for: SOTA_ROOT ./models/network_xXxKKCU8DgBzz8LELuy4ziNLOHY.py
+	‣ Bash Script Saved to 0/xXxKKCU8DgBzz8LELuy4ziNLOHY_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxKKCU8DgBzz8LELuy4ziNLOHY
+Device: cuda
+num of params: 0.5182 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 105
+    tr  loss: 1.7518      tr  acc: 0.3486
+min tr  loss: 1.7518  max tr  acc: 0.3486
+    val loss: 1.8490      val acc: 0.3520
+min val loss: 1.8490  max val acc: 0.3520
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 224
+    tr  loss: 1.3277      tr  acc: 0.5175
+min tr  loss: 1.3277  max tr  acc: 0.5175
+    val loss: 3.6076      val acc: 0.1876
+min val loss: 1.8490  max val acc: 0.3520
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.8327
+Train Acc: 0.3567
+--------------------
+Val loss: 1.8490
+Val Acc: 0.3520
+--------------------
+Test loss: 1.8174
+Test Acc: 0.3606
+--------------------
+Training time: 243.74 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxKKCU8DgBzz8LELuy4ziNLOHY
+
+results have been written to results/xXxKKCU8DgBzz8LELuy4ziNLOHY_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxKKCU8DgBzz8LELuy4ziNLOHY, None
+Checking the Results for Gene: xXxKKCU8DgBzz8LELuy4ziNLOHY
+	☑ LLM Job Completed Successfully.
+Checking for: SOTA_ROOT ./models/network_xXxbNBOPWwsbkllpU4fvKlLgS3z.py
+	‣ Bash Script Saved to 0/xXxbNBOPWwsbkllpU4fvKlLgS3z_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/./sota/ExquisiteNetV2/train.py", line 306, in <module>
+    main()
+    ~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/./sota/ExquisiteNetV2/train.py", line 55, in main
+    networks_module = importlib.import_module(args.network)
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1022, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1160, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1090, in source_to_code
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/models/network_xXxbNBOPWwsbkllpU4fvKlLgS3z.py", line 180
+    Back to the initial idea: Adjusting the BatchNorm parameters. Let's try lowering the momentum from the default 0.1 to something smaller, say 0.01. This makes the running statistics update slower, which might help in some cases.
+                                                                     ^
+SyntaxError: unterminated string literal (detected at line 180)
+	‣ Running py File for xXxbNBOPWwsbkllpU4fvKlLgS3z, None
+Checking the Results for Gene: xXxbNBOPWwsbkllpU4fvKlLgS3z
+	☠ Error Found in LLM Job Output.
+Checking for: SOTA_ROOT ./models/network_xXx7T4RX2KBDm7QQHLA3FQZTeRl.py
+	‣ Bash Script Saved to 0/xXx7T4RX2KBDm7QQHLA3FQZTeRl_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/./sota/ExquisiteNetV2/train.py", line 306, in <module>
+    main()
+    ~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/./sota/ExquisiteNetV2/train.py", line 55, in main
+    networks_module = importlib.import_module(args.network)
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1022, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1160, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1090, in source_to_code
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/models/network_xXx7T4RX2KBDm7QQHLA3FQZTeRl.py", line 85
+    Wait, the problem says to reduce parameters but keep performance. So maybe I can find parts where we're using more parameters than necessary and simplify them.
+                                                                                                        ^
+SyntaxError: unterminated string literal (detected at line 85)
+	‣ Running py File for xXx7T4RX2KBDm7QQHLA3FQZTeRl, None
+Checking the Results for Gene: xXx7T4RX2KBDm7QQHLA3FQZTeRl
+	☠ Error Found in LLM Job Output.
+Checking for: SOTA_ROOT ./models/network_xXxJp9Rt9wLfkvcTVjHSWstlIBj.py
+	‣ Bash Script Saved to 0/xXxJp9Rt9wLfkvcTVjHSWstlIBj_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxJp9Rt9wLfkvcTVjHSWstlIBj
+Device: cuda
+num of params: 1.3761 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 108
+    tr  loss: 1.5160      tr  acc: 0.4364
+min tr  loss: 1.5160  max tr  acc: 0.4364
+    val loss: 1.3482      val acc: 0.5118
+min val loss: 1.3482  max val acc: 0.5118
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 229
+    tr  loss: 0.9936      tr  acc: 0.6433
+min tr  loss: 0.9936  max tr  acc: 0.6433
+    val loss: 1.0215      val acc: 0.6335
+min val loss: 1.0215  max val acc: 0.6335
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.0097
+Train Acc: 0.6362
+--------------------
+Val loss: 1.0215
+Val Acc: 0.6335
+--------------------
+Test loss: 1.0477
+Test Acc: 0.6241
+--------------------
+Training time: 248.36 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxJp9Rt9wLfkvcTVjHSWstlIBj
+
+results have been written to results/xXxJp9Rt9wLfkvcTVjHSWstlIBj_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxJp9Rt9wLfkvcTVjHSWstlIBj, None
+Checking the Results for Gene: xXxJp9Rt9wLfkvcTVjHSWstlIBj
+	☑ LLM Job Completed Successfully.
+Checking for: SOTA_ROOT ./models/network_xXxE7BTbuDoqAsp7ZtMJqW5bTVp.py
+	‣ Bash Script Saved to 0/xXxE7BTbuDoqAsp7ZtMJqW5bTVp_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/./sota/ExquisiteNetV2/train.py", line 306, in <module>
+    main()
+    ~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/./sota/ExquisiteNetV2/train.py", line 55, in main
+    networks_module = importlib.import_module(args.network)
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/models/network_xXxE7BTbuDoqAsp7ZtMJqW5bTVp.py", line 200, in <module>
+    @torch.jit.script
+     ^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/jit/_script.py", line 1429, in script
+    ret = _script_impl(
+        obj=obj,
+    ...<3 lines>...
+        example_inputs=example_inputs,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/jit/_script.py", line 1163, in _script_impl
+    raise RuntimeError(
+        f"Type '{obj}' cannot be compiled since it inherits from nn.Module, pass an instance instead"
+    )
+RuntimeError: Type '<class 'models.network_xXxE7BTbuDoqAsp7ZtMJqW5bTVp.DW'>' cannot be compiled since it inherits from nn.Module, pass an instance instead
+	‣ Running py File for xXxE7BTbuDoqAsp7ZtMJqW5bTVp, None
+Checking the Results for Gene: xXxE7BTbuDoqAsp7ZtMJqW5bTVp
+	☠ Error Found in LLM Job Output.
+Checking for: SOTA_ROOT ./models/network_xXxjmeMvViJaPefwxvTcP2hMEJy.py
+	‣ Bash Script Saved to 0/xXxjmeMvViJaPefwxvTcP2hMEJy_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-03-004-25-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxjmeMvViJaPefwxvTcP2hMEJy
+Device: cuda
+num of params: 0.5182 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 108
+    tr  loss: 1.7518      tr  acc: 0.3486
+min tr  loss: 1.7518  max tr  acc: 0.3486
+    val loss: 1.8490      val acc: 0.3520
+min val loss: 1.8490  max val acc: 0.3520
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 222
+    tr  loss: 1.3277      tr  acc: 0.5175
+min tr  loss: 1.3277  max tr  acc: 0.5175
+    val loss: 3.6076      val acc: 0.1876
+min val loss: 1.8490  max val acc: 0.3520
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.8327
+Train Acc: 0.3567
+--------------------
+Val loss: 1.8490
+Val Acc: 0.3520
+--------------------
+Test loss: 1.8174
+Test Acc: 0.3606
+--------------------
+Training time: 239.65 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxjmeMvViJaPefwxvTcP2hMEJy
+
+results have been written to results/xXxjmeMvViJaPefwxvTcP2hMEJy_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxjmeMvViJaPefwxvTcP2hMEJy, None
+Checking the Results for Gene: xXxjmeMvViJaPefwxvTcP2hMEJy
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                   Evalutated All Genes                   *
+************************************************************
+
+
+**************************************************************************************************************
+*                                           STARTING GENERATION: 0                                           *
+**************************************************************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 8
+Gene: xXxYyOvpo2a7ukMkV3fS7ScMwl2
+	‣ Fitness: (0.36059999465942383, 518230.0), Submission Flag: True
+	‣ Runtime: 42 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxgx5RmU2igaBZaW2lNoAiMVa8
+	‣ Fitness: (0.3564999997615814, 518230.0), Submission Flag: True
+	‣ Runtime: 41 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxKKCU8DgBzz8LELuy4ziNLOHY
+	‣ Fitness: (0.36059999465942383, 518230.0), Submission Flag: True
+	‣ Runtime: 40 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxbNBOPWwsbkllpU4fvKlLgS3z
+	‣ Fitness: (-inf, inf), Submission Flag: True
+	‣ Runtime: 39 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXx7T4RX2KBDm7QQHLA3FQZTeRl
+	‣ Fitness: (-inf, inf), Submission Flag: True
+	‣ Runtime: 37 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxJp9Rt9wLfkvcTVjHSWstlIBj
+	‣ Fitness: (0.6240999698638916, 1376129.0), Submission Flag: True
+	‣ Runtime: 36 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxE7BTbuDoqAsp7ZtMJqW5bTVp
+	‣ Fitness: (-inf, inf), Submission Flag: True
+	‣ Runtime: 34 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxjmeMvViJaPefwxvTcP2hMEJy
+	‣ Fitness: (0.36059999465942383, 518230.0), Submission Flag: True
+	‣ Runtime: 33 min, Status: completed
+	‣ LLM Job-ID: None
+
+************************************************************
+*                     Invalid Removal                      *
+************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 5
+Gene: xXxYyOvpo2a7ukMkV3fS7ScMwl2
+	‣ Fitness: (0.36059999465942383, 518230.0), Submission Flag: True
+	‣ Runtime: 42 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxgx5RmU2igaBZaW2lNoAiMVa8
+	‣ Fitness: (0.3564999997615814, 518230.0), Submission Flag: True
+	‣ Runtime: 41 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxKKCU8DgBzz8LELuy4ziNLOHY
+	‣ Fitness: (0.36059999465942383, 518230.0), Submission Flag: True
+	‣ Runtime: 40 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxJp9Rt9wLfkvcTVjHSWstlIBj
+	‣ Fitness: (0.6240999698638916, 1376129.0), Submission Flag: True
+	‣ Runtime: 36 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxjmeMvViJaPefwxvTcP2hMEJy
+	‣ Fitness: (0.36059999465942383, 518230.0), Submission Flag: True
+	‣ Runtime: 33 min, Status: completed
+	‣ LLM Job-ID: None
+
+************************************************************
+*                        Selection                         *
+************************************************************
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 900, in <module>
+    offspring = toolbox.select(population, population_size)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 805, in true_nsga2
+    new_pop = tools.selTournamentDCD(pop, k) # mults of 4
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/deap/tools/emo.py", line 167, in selTournamentDCD
+    raise ValueError("selTournamentDCD: k must be less than or equal to individuals length")
+ValueError: selTournamentDCD: k must be less than or equal to individuals length
+---------------------------------------
+Begin Slurm Epilog: Oct-09-2025 17:09:31
+Job ID:        3290438
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:l40s=1,mem=16G,node=1
+Rsrc Used:     cput=00:44:21,vmem=0,walltime=00:44:21,mem=8120656K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-004-25-0
+---------------------------------------

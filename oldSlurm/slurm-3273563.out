@@ -1,0 +1,93 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-08-2025 15:40:42
+Job ID:    3273563
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-010-15-0.pace.gatech.edu
+Loading environment variables from .env file
+Activating virtual environment at: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv
+Writing server hostname 'atl1-1-03-010-15-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-010-15-0.pace.gatech.edu
+INFO:     Started server process [1161410]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: cb1ce2a9c12fbae3
+Metrics will be saved to: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/metrics/data/e2e-latency-cb1ce2a9c12fbae3.json
+[2025-10-08 15:40:46] ===== SERVER STARTUP INITIATED =====
+[2025-10-08 15:40:46] Starting LLM server...
+[2025-10-08 15:40:46] Loading model during startup...
+[2025-10-08 15:40:46] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-08 15:40:46] ===== MODEL LOADING STARTED =====
+[2025-10-08 15:40:46] Initializing model components...
+[2025-10-08 15:40:46] Model path: /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-08 15:40:46] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:25<02:56, 25.26s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:50<02:30, 25.07s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [01:14<02:03, 24.65s/it]Loading checkpoint shards:  50%|█████     | 4/8 [01:38<01:37, 24.42s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [02:03<01:13, 24.50s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [02:27<00:49, 24.51s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [02:51<00:24, 24.35s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:02<00:00, 20.22s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:02<00:00, 22.87s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+[2025-10-08 15:43:51] Model weights loaded in 185.41 seconds
+[2025-10-08 15:43:51] Loading tokenizer...
+[2025-10-08 15:43:51] Tokenizer loaded in 0.35 seconds
+[2025-10-08 15:43:51] Configuring tokenizer for batching...
+[2025-10-08 15:43:51] Creating text generation pipeline...
+[2025-10-08 15:43:51] Pipeline created in 0.09 seconds
+[2025-10-08 15:43:51] Initializing async batching components...
+[2025-10-08 15:43:51] ===== MODEL LOADING COMPLETED =====
+[2025-10-08 15:43:51] Total loading time: 185.86 seconds
+[2025-10-08 15:43:51] Model is ready to serve requests!
+[2025-10-08 15:43:51] Server-side batching enabled with batch_size=8
+[2025-10-08 15:43:51] ===== SERVER STARTUP COMPLETE =====
+[2025-10-08 15:43:51] Server is ready to accept requests!
+[2025-10-08 15:43:51] Available endpoints: /generate (POST), / (GET)
+Request received at 15:44:02
+Processing batch of 1 requests
+Request completed in 9.97s (E2E), 7.97s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:60488 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:44:33
+Processing batch of 1 requests
+Request completed in 7.38s (E2E), 5.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:50530 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:44:52
+Processing batch of 1 requests
+Request completed in 8.63s (E2E), 6.63s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:51730 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:45:12
+Processing batch of 1 requests
+Request completed in 12.93s (E2E), 10.93s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:58602 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:45:37
+Processing batch of 1 requests
+Request completed in 28.62s (E2E), 26.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38326 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:46:17
+Processing batch of 1 requests
+Request completed in 16.35s (E2E), 14.35s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:41886 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:46:46
+Processing batch of 1 requests
+Request completed in 7.50s (E2E), 5.50s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:35306 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:47:05
+Processing batch of 1 requests
+Request completed in 7.92s (E2E), 5.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:47502 - "POST /generate HTTP/1.1" 200 OK
+slurmstepd: error: *** JOB 3273563 ON atl1-1-03-010-15-0 CANCELLED AT 2025-10-08T15:47:37 ***
+---------------------------------------
+Begin Slurm Epilog: Oct-08-2025 15:47:40
+Job ID:        3273563
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=01:50:40,vmem=0,walltime=00:06:55,mem=65508100K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-010-15-0
+---------------------------------------

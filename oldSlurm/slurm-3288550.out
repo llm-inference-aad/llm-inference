@@ -1,0 +1,2204 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-09-2025 12:49:07
+Job ID:    3288550
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-011-3-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+Activating virtual environment at: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv
+Writing server hostname 'atl1-1-03-011-3-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-011-3-0.pace.gatech.edu
+INFO:     Started server process [1183849]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: e71ea77e02661ab5
+Metrics will be saved to: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/metrics/data/e2e-latency-e71ea77e02661ab5.json
+[2025-10-09 12:50:19] ===== SERVER STARTUP INITIATED =====
+[2025-10-09 12:50:19] Starting LLM server...
+[2025-10-09 12:50:19] Loading model during startup...
+[2025-10-09 12:50:19] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-09 12:50:19] ===== MODEL LOADING STARTED =====
+[2025-10-09 12:50:19] Initializing model components...
+[2025-10-09 12:50:19] Model path: /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-09 12:50:19] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:24<02:52, 24.71s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:52<02:37, 26.25s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [01:16<02:06, 25.39s/it]Loading checkpoint shards:  50%|█████     | 4/8 [01:43<01:43, 25.92s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [02:09<01:18, 26.03s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [02:34<00:51, 25.74s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [02:59<00:25, 25.54s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:11<00:00, 21.19s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:11<00:00, 23.94s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://atl1-1-03-011-3-0.pace.gatech.edu:8000 (Press CTRL+C to quit)
+[2025-10-09 12:53:55] Model weights loaded in 216.22 seconds
+[2025-10-09 12:53:55] Loading tokenizer...
+[2025-10-09 12:53:56] Tokenizer loaded in 1.15 seconds
+[2025-10-09 12:53:56] Configuring tokenizer for batching...
+[2025-10-09 12:53:56] Creating text generation pipeline...
+[2025-10-09 12:53:57] Pipeline created in 0.88 seconds
+[2025-10-09 12:53:57] Initializing async batching components...
+[2025-10-09 12:53:57] ===== MODEL LOADING COMPLETED =====
+[2025-10-09 12:53:57] Total loading time: 218.25 seconds
+[2025-10-09 12:53:57] Model is ready to serve requests!
+[2025-10-09 12:53:57] Server-side batching enabled with batch_size=8
+[2025-10-09 12:53:57] ===== SERVER STARTUP COMPLETE =====
+[2025-10-09 12:53:57] Server is ready to accept requests!
+[2025-10-09 12:53:57] Available endpoints: /generate (POST), / (GET)
+Request received at 12:53:58 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 22.40s (E2E), 20.40s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:50556 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:54:20 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 18.68s (E2E), 16.67s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:48844 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:54:39 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.88s (E2E), 26.87s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:57628 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:55:08 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 28.71s (E2E), 26.70s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:42198 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:55:37 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.83s (E2E), 26.82s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:33856 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:56:05 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 28.64s (E2E), 26.63s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:40226 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:56:34 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.70s (E2E), 26.69s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:52958 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:57:03 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 24.15s (E2E), 22.14s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:34954 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:57:27 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.65s (E2E), 26.64s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:48840 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:57:56 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 20.86s (E2E), 18.85s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:41368 - "POST /generate HTTP/1.1" 200 OK
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+Request received at 12:58:16 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 8.05s (E2E), 6.04s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:57534 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:58:28 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 8.31s (E2E), 6.31s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:55046 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:58:36 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 21.64s (E2E), 19.63s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:52330 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:58:58 [Job: 3288553]
+Request received at 12:58:58 [Job: 3288551]
+Processing batch of 2 requests
+Request completed in 31.65s (E2E), 29.64s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.18:42130 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 31.65s (E2E), 29.64s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:43516 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:30 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.95s (E2E), 26.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:46134 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:59 [Job: 3288551]
+Request received at 12:59:59 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 37.51s (E2E), 35.50s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:60840 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.51s (E2E), 35.50s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.18:33458 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:36 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 11.35s (E2E), 9.34s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:50268 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:48 [Job: 3288551]
+Request received at 13:00:48 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 20.66s (E2E), 18.66s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:56262 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 20.48s (E2E), 18.66s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.18:57152 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:08 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.74s (E2E), 26.73s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:40396 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:37 [Job: 3288551]
+Request received at 13:01:37 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 37.20s (E2E), 35.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:48802 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.20s (E2E), 35.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.18:60864 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:14 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.93s (E2E), 26.93s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:48502 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:43 [Job: 3288551]
+Request received at 13:02:43 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 20.20s (E2E), 18.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:39068 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 20.21s (E2E), 18.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.18:44634 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:03:03 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 20.21s (E2E), 18.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:43960 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:03:24 [Job: 3288551]
+Request received at 13:03:24 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 37.44s (E2E), 35.44s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:56950 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.45s (E2E), 35.44s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.18:57554 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:04:01 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 22.43s (E2E), 20.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:38746 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:04:23 [Job: 3288551]
+Request received at 13:04:23 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 24.75s (E2E), 22.74s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:56806 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 24.75s (E2E), 22.74s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.18:59686 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:04:48 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.67s (E2E), 26.66s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:50110 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:05:17 [Job: 3288551]
+Request received at 13:05:17 [Job: 3288553]
+Processing batch of 2 requests
+Request completed in 36.38s (E2E), 34.37s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:33814 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 36.38s (E2E), 34.37s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.18:33626 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:05:53 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 22.27s (E2E), 20.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:47408 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:06:16 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 28.77s (E2E), 26.76s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:42660 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:06:44 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.66s (E2E), 26.65s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:52408 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:07:13 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 22.37s (E2E), 20.36s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:59776 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:07:35 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 9.82s (E2E), 7.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:54322 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:07:47 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 22.78s (E2E), 20.78s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:53822 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:08:10 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.77s (E2E), 26.76s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:40674 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:08:38 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 7.52s (E2E), 5.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:34460 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:08:47 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 8.64s (E2E), 6.64s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:54990 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:08:58 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 7.51s (E2E), 5.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:39854 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:09:05 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.01s (E2E), 26.00s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:55362 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:09:33 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 19.19s (E2E), 17.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:37914 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:09:52 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.69s (E2E), 26.68s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:51508 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:10:21 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 10.08s (E2E), 8.07s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:59194 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:10:31 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 8.83s (E2E), 6.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:46952 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:10:42 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 11.61s (E2E), 9.61s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:50306 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:10:54 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 9.88s (E2E), 7.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:54764 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:11:06 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 28.73s (E2E), 26.73s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:37736 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:11:34 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 13.92s (E2E), 11.91s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:47726 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:11:48 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 28.77s (E2E), 26.77s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:34768 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:12:17 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 15.68s (E2E), 13.67s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:34850 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:12:33 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 9.52s (E2E), 7.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:53202 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:12:42 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 28.75s (E2E), 26.74s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:33340 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:13:11 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 18.68s (E2E), 16.67s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:45710 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:13:30 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 15.04s (E2E), 13.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:33198 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:13:45 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 6.96s (E2E), 4.95s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:43820 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:13:54 [Job: 3288552]
+Processing batch of 1 requests
+Request completed in 16.32s (E2E), 14.32s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:34192 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:14:10 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 22.27s (E2E), 20.26s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:40910 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:14:44 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 28.96s (E2E), 26.96s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:35564 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:15:24 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 25.34s (E2E), 23.34s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:37230 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:16:01 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 11.11s (E2E), 9.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:34588 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:16:23 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 8.75s (E2E), 6.75s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:47884 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:16:44 [Job: 3288551]
+Processing batch of 1 requests
+Request completed in 25.34s (E2E), 23.34s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:42128 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:17:56 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 6.44s (E2E), 4.44s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:48836 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:18:14 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 26.96s (E2E), 24.96s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:56964 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:18:53 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 28.95s (E2E), 26.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:45302 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:19:33 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 22.39s (E2E), 20.39s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:60730 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:20:07 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 18.68s (E2E), 16.68s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:55818 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:20:37 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 16.72s (E2E), 14.72s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:54188 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:21:06 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 16.72s (E2E), 14.72s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:35040 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:21:34 [Job: 3288554]
+Processing batch of 1 requests
+Request completed in 28.69s (E2E), 26.69s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:33982 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:24:28 [Job: 3288556]
+Request received at 13:24:28 [Job: 3288555]
+Processing batch of 2 requests
+Request completed in 11.60s (E2E), 9.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:57018 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 11.61s (E2E), 9.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:57016 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:24:54 [Job: 3288556]
+Request received at 13:24:54 [Job: 3288555]
+Processing batch of 2 requests
+Request completed in 35.78s (E2E), 33.78s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:45638 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 35.79s (E2E), 33.78s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:45654 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:25:39 [Job: 3288555]
+Request received at 13:25:39 [Job: 3288556]
+Processing batch of 2 requests
+Request completed in 18.60s (E2E), 16.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:51506 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 18.60s (E2E), 16.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:51498 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:26:07 [Job: 3288556]
+Request received at 13:26:07 [Job: 3288555]
+Processing batch of 2 requests
+Request completed in 21.00s (E2E), 19.00s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:49512 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 21.00s (E2E), 19.00s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:49514 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:26:37 [Job: 3288555]
+Request received at 13:26:37 [Job: 3288556]
+Processing batch of 2 requests
+Request completed in 35.53s (E2E), 33.53s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:33768 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 35.53s (E2E), 33.53s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:33770 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:27:22 [Job: 3288555]
+Request received at 13:27:22 [Job: 3288556]
+Processing batch of 2 requests
+Request completed in 36.62s (E2E), 34.62s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:58524 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 36.62s (E2E), 34.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:58540 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:28:07 [Job: 3288555]
+Request received at 13:28:07 [Job: 3288556]
+Processing batch of 2 requests
+Request completed in 35.42s (E2E), 33.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:60640 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 35.43s (E2E), 33.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:60642 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:28:52 [Job: 3288555]
+Request received at 13:28:52 [Job: 3288556]
+Processing batch of 2 requests
+Request completed in 29.94s (E2E), 27.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:60200 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 29.95s (E2E), 27.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:60208 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:41:01 [Job: 3288557]
+Processing batch of 1 requests
+Request completed in 28.67s (E2E), 26.67s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:44184 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:41:43 [Job: 3288557]
+Processing batch of 1 requests
+Request completed in 21.81s (E2E), 19.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:33416 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:42:05 [Job: 3288559]
+Request received at 13:42:05 [Job: 3288561]
+Request received at 13:42:05 [Job: 3288560]
+Request received at 13:42:05 [Job: 3288562]
+Request received at 13:42:05 [Job: 3288558]
+Processing batch of 5 requests
+Request completed in 43.31s (E2E), 41.30s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:59360 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.31s (E2E), 41.30s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:59364 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.31s (E2E), 41.30s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:59358 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.32s (E2E), 41.30s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:59362 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.32s (E2E), 41.30s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:59366 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:42:49 [Job: 3288557]
+Processing batch of 1 requests
+Request completed in 9.62s (E2E), 7.62s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:33782 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:43:04 [Job: 3288561]
+Request received at 13:43:04 [Job: 3288560]
+Request received at 13:43:04 [Job: 3288558]
+Request received at 13:43:04 [Job: 3288559]
+Request received at 13:43:04 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 43.11s (E2E), 41.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56002 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.11s (E2E), 41.11s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:56000 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.12s (E2E), 41.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56016 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.12s (E2E), 41.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56026 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.10s (E2E), 41.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56036 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:43:48 [Job: 3288557]
+Request received at 13:43:48 [Job: 3288563]
+Processing batch of 2 requests
+Request completed in 35.40s (E2E), 33.40s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:34172 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 35.41s (E2E), 33.40s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.91:45616 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:44:23 [Job: 3288561]
+Request received at 13:44:23 [Job: 3288560]
+Request received at 13:44:23 [Job: 3288558]
+Request received at 13:44:23 [Job: 3288559]
+Request received at 13:44:23 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 39.89s (E2E), 37.88s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56682 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.89s (E2E), 37.88s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56708 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.89s (E2E), 37.88s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56680 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.90s (E2E), 37.88s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:56716 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.90s (E2E), 37.88s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56728 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:45:03 [Job: 3288557]
+Request received at 13:45:03 [Job: 3288563]
+Processing batch of 2 requests
+Request completed in 16.55s (E2E), 14.55s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:56350 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 16.55s (E2E), 14.55s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:57312 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:45:19 [Job: 3288560]
+Request received at 13:45:19 [Job: 3288559]
+Request received at 13:45:19 [Job: 3288558]
+Request received at 13:45:19 [Job: 3288561]
+Request received at 13:45:19 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 42.21s (E2E), 40.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:44134 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.21s (E2E), 40.21s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:44132 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.22s (E2E), 40.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:44136 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.22s (E2E), 40.21s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:44168 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.22s (E2E), 40.21s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:44178 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:46:02 [Job: 3288563]
+Request received at 13:46:02 [Job: 3288557]
+Processing batch of 2 requests
+Request completed in 13.06s (E2E), 11.06s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:33292 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 13.06s (E2E), 11.06s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:51176 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:46:15 [Job: 3288560]
+Request received at 13:46:15 [Job: 3288561]
+Request received at 13:46:15 [Job: 3288558]
+Request received at 13:46:15 [Job: 3288559]
+Request received at 13:46:15 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 43.28s (E2E), 41.28s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:36956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.29s (E2E), 41.28s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:36954 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.29s (E2E), 41.28s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:36980 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.29s (E2E), 41.28s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:36994 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.29s (E2E), 41.28s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:37008 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:46:58 [Job: 3288563]
+Request received at 13:46:58 [Job: 3288557]
+Processing batch of 2 requests
+Request completed in 26.12s (E2E), 24.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:60372 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 26.12s (E2E), 24.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:59882 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:47:24 [Job: 3288560]
+Request received at 13:47:24 [Job: 3288558]
+Request received at 13:47:24 [Job: 3288559]
+Request received at 13:47:24 [Job: 3288561]
+Request received at 13:47:24 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 42.23s (E2E), 40.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:51454 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.23s (E2E), 40.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:51464 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.23s (E2E), 40.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:51480 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.24s (E2E), 40.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:51484 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.24s (E2E), 40.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:51500 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:48:06 [Job: 3288563]
+Request received at 13:48:06 [Job: 3288557]
+Processing batch of 2 requests
+Request completed in 17.59s (E2E), 15.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:47496 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 17.59s (E2E), 15.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:39488 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:48:24 [Job: 3288560]
+Request received at 13:48:24 [Job: 3288559]
+Request received at 13:48:24 [Job: 3288561]
+Request received at 13:48:24 [Job: 3288558]
+Request received at 13:48:24 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 42.12s (E2E), 40.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:45782 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.13s (E2E), 40.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:45780 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.13s (E2E), 40.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:45798 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.13s (E2E), 40.12s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:45802 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.14s (E2E), 40.12s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:45804 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:49:06 [Job: 3288563]
+Processing batch of 1 requests
+Request completed in 9.34s (E2E), 7.33s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:36442 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:49:15 [Job: 3288559]
+Request received at 13:49:15 [Job: 3288560]
+Request received at 13:49:15 [Job: 3288558]
+Request received at 13:49:15 [Job: 3288561]
+Request received at 13:49:15 [Job: 3288562]
+Processing batch of 5 requests
+Request completed in 40.02s (E2E), 38.01s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:46398 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.02s (E2E), 38.01s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:46406 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.02s (E2E), 38.01s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:46416 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.03s (E2E), 38.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:46428 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.03s (E2E), 38.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:46432 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:49:55 [Job: 3288563]
+Processing batch of 1 requests
+Request completed in 9.00s (E2E), 7.00s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:57232 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:50:13 [Job: 3288563]
+Processing batch of 1 requests
+Request completed in 28.66s (E2E), 26.66s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.91:33916 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:05:46 [Job: 3290429]
+Request received at 16:05:46 [Job: 3290427]
+Request received at 16:05:46 [Job: 3290428]
+Processing batch of 3 requests
+Request completed in 43.95s (E2E), 41.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:41180 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.98s (E2E), 41.95s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:41182 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.98s (E2E), 41.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:41184 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:06:46 [Job: 3290428]
+Request received at 16:06:46 [Job: 3290427]
+Request received at 16:06:46 [Job: 3290429]
+Processing batch of 3 requests
+Request completed in 32.99s (E2E), 30.99s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:37982 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 33.00s (E2E), 30.99s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:37980 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 33.00s (E2E), 30.99s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:37978 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:07:28 [Job: 3290427]
+Request received at 16:07:28 [Job: 3290429]
+Request received at 16:07:28 [Job: 3290428]
+Processing batch of 3 requests
+Request completed in 36.82s (E2E), 34.82s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:54890 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 36.82s (E2E), 34.82s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:54888 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 36.82s (E2E), 34.82s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:54886 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:08:14 [Job: 3290428]
+Request received at 16:08:14 [Job: 3290429]
+Request received at 16:08:14 [Job: 3290427]
+Processing batch of 3 requests
+Request completed in 37.20s (E2E), 35.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:35846 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.21s (E2E), 35.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:35848 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.21s (E2E), 35.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:35864 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:09:00 [Job: 3290428]
+Request received at 16:09:00 [Job: 3290429]
+Request received at 16:09:00 [Job: 3290427]
+Processing batch of 3 requests
+Request completed in 38.27s (E2E), 36.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:34128 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.28s (E2E), 36.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:34126 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.28s (E2E), 36.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:34130 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:09:48 [Job: 3290429]
+Request received at 16:09:48 [Job: 3290427]
+Request received at 16:09:48 [Job: 3290428]
+Processing batch of 3 requests
+Request completed in 30.38s (E2E), 28.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:36320 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 30.38s (E2E), 28.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:36318 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 30.38s (E2E), 28.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:36342 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:10:27 [Job: 3290427]
+Request received at 16:10:27 [Job: 3290429]
+Request received at 16:10:27 [Job: 3290428]
+Processing batch of 3 requests
+Request completed in 27.14s (E2E), 25.14s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:54864 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 27.15s (E2E), 25.14s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:54862 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 27.15s (E2E), 25.14s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:54884 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:11:03 [Job: 3290428]
+Request received at 16:11:03 [Job: 3290427]
+Request received at 16:11:03 [Job: 3290429]
+Processing batch of 3 requests
+Request completed in 30.62s (E2E), 28.62s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:50206 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 30.62s (E2E), 28.62s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:50210 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 30.62s (E2E), 28.62s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:50222 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:18:50 [Job: 3290433]
+Request received at 16:18:50 [Job: 3290430]
+Processing batch of 2 requests
+Request completed in 35.03s (E2E), 33.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:60186 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 34.97s (E2E), 33.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.9:33872 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:19:25 [Job: 3290431]
+Processing batch of 1 requests
+Request completed in 22.93s (E2E), 20.93s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:55478 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:19:48 [Job: 3290434]
+Request received at 16:19:48 [Job: 3290433]
+Request received at 16:19:48 [Job: 3290430]
+Processing batch of 3 requests
+Request completed in 37.19s (E2E), 35.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:59872 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.20s (E2E), 35.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:47686 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.20s (E2E), 35.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:37516 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:20:25 [Job: 3290431]
+Processing batch of 1 requests
+Request completed in 6.49s (E2E), 4.49s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:41622 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:20:35 [Job: 3290433]
+Processing batch of 1 requests
+Request completed in 19.17s (E2E), 17.16s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:47578 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:20:54 [Job: 3290430]
+Request received at 16:20:54 [Job: 3290434]
+Request received at 16:20:54 [Job: 3290431]
+Processing batch of 3 requests
+Request completed in 30.60s (E2E), 28.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:33572 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 30.61s (E2E), 28.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:58690 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 30.61s (E2E), 28.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:58194 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:21:24 [Job: 3290433]
+Processing batch of 1 requests
+Request completed in 14.59s (E2E), 12.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:54240 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:21:39 [Job: 3290434]
+Request received at 16:21:39 [Job: 3290430]
+Request received at 16:21:39 [Job: 3290431]
+Processing batch of 3 requests
+Request completed in 23.51s (E2E), 21.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:50748 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 23.52s (E2E), 21.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:36180 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 23.52s (E2E), 21.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:54656 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:22:03 [Job: 3290433]
+Processing batch of 1 requests
+Request completed in 22.38s (E2E), 20.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:44620 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:22:25 [Job: 3290434]
+Request received at 16:22:25 [Job: 3290431]
+Request received at 16:22:25 [Job: 3290430]
+Processing batch of 3 requests
+Request completed in 38.94s (E2E), 36.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:34422 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.95s (E2E), 36.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:38780 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.95s (E2E), 36.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:59662 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:23:04 [Job: 3290433]
+Processing batch of 1 requests
+Request completed in 11.46s (E2E), 9.46s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:55408 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:23:15 [Job: 3290434]
+Request received at 16:23:16 [Job: 3290430]
+Request received at 16:23:16 [Job: 3290431]
+Processing batch of 3 requests
+Request completed in 35.06s (E2E), 33.05s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:40606 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 34.80s (E2E), 33.05s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:39054 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 34.78s (E2E), 33.05s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:47476 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:23:50 [Job: 3290433]
+Request received at 16:23:50 [Job: 3290435]
+Processing batch of 2 requests
+Request completed in 37.17s (E2E), 35.17s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:43248 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.18s (E2E), 35.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:35456 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:24:28 [Job: 3290434]
+Request received at 16:24:28 [Job: 3290430]
+Request received at 16:24:28 [Job: 3290431]
+Processing batch of 3 requests
+Request completed in 38.91s (E2E), 36.91s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:52110 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.92s (E2E), 36.91s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:56842 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.92s (E2E), 36.91s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:47706 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:25:07 [Job: 3290433]
+Request received at 16:25:07 [Job: 3290435]
+Processing batch of 2 requests
+Request completed in 25.53s (E2E), 23.53s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:35158 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 25.54s (E2E), 23.53s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:58486 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:25:32 [Job: 3290434]
+Request received at 16:25:32 [Job: 3290437]
+Request received at 16:25:32 [Job: 3290436]
+Request received at 16:25:32 [Job: 3290430]
+Request received at 16:25:32 [Job: 3290431]
+Processing batch of 5 requests
+Request completed in 39.10s (E2E), 37.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:50834 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.11s (E2E), 37.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:47102 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.11s (E2E), 37.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:50618 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.11s (E2E), 37.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.9:39830 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.12s (E2E), 37.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:56762 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:11 [Job: 3290435]
+Processing batch of 1 requests
+Request completed in 20.58s (E2E), 18.58s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:36036 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:32 [Job: 3290434]
+Request received at 16:26:32 [Job: 3290438]
+Request received at 16:26:32 [Job: 3290437]
+Request received at 16:26:32 [Job: 3290436]
+Request received at 16:26:32 [Job: 3290440]
+Processing batch of 5 requests
+Request completed in 43.19s (E2E), 41.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:51798 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.19s (E2E), 41.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:56582 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.20s (E2E), 41.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:60450 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.20s (E2E), 41.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:37646 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.21s (E2E), 41.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:51350 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:15 [Job: 3290435]
+Request received at 16:27:15 [Job: 3290441]
+Processing batch of 2 requests
+Request completed in 35.45s (E2E), 33.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:39900 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 35.46s (E2E), 33.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:57884 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:50 [Job: 3290437]
+Request received at 16:27:50 [Job: 3290436]
+Request received at 16:27:50 [Job: 3290440]
+Request received at 16:27:50 [Job: 3290439]
+Request received at 16:27:50 [Job: 3290438]
+Processing batch of 5 requests
+Request completed in 22.81s (E2E), 20.80s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:35928 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 22.81s (E2E), 20.80s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:43794 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 22.82s (E2E), 20.80s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:56568 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 22.82s (E2E), 20.80s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:44670 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 22.82s (E2E), 20.80s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:46540 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:13 [Job: 3290443]
+Request received at 16:28:13 [Job: 3290441]
+Request received at 16:28:13 [Job: 3290435]
+Processing batch of 3 requests
+Request completed in 37.01s (E2E), 35.01s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:34202 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.02s (E2E), 35.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:57602 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.02s (E2E), 35.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:59444 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:50 [Job: 3290437]
+Request received at 16:28:50 [Job: 3290438]
+Request received at 16:28:50 [Job: 3290436]
+Request received at 16:28:50 [Job: 3290440]
+Processing batch of 4 requests
+Request completed in 40.51s (E2E), 38.51s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:36310 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.51s (E2E), 38.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:45794 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.52s (E2E), 38.51s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:49904 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.52s (E2E), 38.51s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:41128 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:31 [Job: 3290435]
+Request received at 16:29:31 [Job: 3290441]
+Request received at 16:29:31 [Job: 3290443]
+Request received at 16:29:31 [Job: 3290444]
+Request received at 16:29:31 [Job: 3290439]
+Processing batch of 5 requests
+Request completed in 42.80s (E2E), 40.80s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:55704 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.81s (E2E), 40.80s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:37330 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.81s (E2E), 40.80s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:53052 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.82s (E2E), 40.80s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:34200 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.82s (E2E), 40.80s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:54816 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:14 [Job: 3290437]
+Request received at 16:30:14 [Job: 3290438]
+Request received at 16:30:14 [Job: 3290436]
+Request received at 16:30:14 [Job: 3290440]
+Processing batch of 4 requests
+Request completed in 38.04s (E2E), 36.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:58688 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.04s (E2E), 36.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:36556 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.04s (E2E), 36.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:60020 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.05s (E2E), 36.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:40500 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:52 [Job: 3290441]
+Request received at 16:30:52 [Job: 3290435]
+Request received at 16:30:52 [Job: 3290443]
+Request received at 16:30:52 [Job: 3290444]
+Processing batch of 4 requests
+Request completed in 40.25s (E2E), 38.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:38206 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.26s (E2E), 38.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:34502 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.26s (E2E), 38.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:57542 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.27s (E2E), 38.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:40648 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:32 [Job: 3290446]
+Request received at 16:31:32 [Job: 3290437]
+Request received at 16:31:32 [Job: 3290438]
+Request received at 16:31:32 [Job: 3290436]
+Request received at 16:31:32 [Job: 3290440]
+Request received at 16:31:32 [Job: 3290439]
+Processing batch of 6 requests
+Request completed in 44.48s (E2E), 42.48s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:44894 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.48s (E2E), 42.48s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:43210 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.49s (E2E), 42.48s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:44906 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.49s (E2E), 42.48s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:54636 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.49s (E2E), 42.48s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:60128 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.50s (E2E), 42.48s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:55796 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:32:16 [Job: 3290441]
+Request received at 16:32:16 [Job: 3290435]
+Request received at 16:32:16 [Job: 3290443]
+Request received at 16:32:16 [Job: 3290444]
+Processing batch of 4 requests
+Request completed in 40.42s (E2E), 38.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:33502 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.43s (E2E), 38.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:55054 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.43s (E2E), 38.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:42608 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.44s (E2E), 38.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:34940 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:32:57 [Job: 3290437]
+Request received at 16:32:57 [Job: 3290440]
+Request received at 16:32:57 [Job: 3290438]
+Request received at 16:32:57 [Job: 3290436]
+Request received at 16:32:57 [Job: 3290446]
+Request received at 16:32:57 [Job: 3290450]
+Request received at 16:32:57 [Job: 3290439]
+Processing batch of 7 requests
+Request completed in 47.24s (E2E), 45.24s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:36508 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.24s (E2E), 45.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:34732 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.25s (E2E), 45.24s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:37486 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.25s (E2E), 45.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:35166 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.26s (E2E), 45.24s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:37492 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.26s (E2E), 45.24s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:36524 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.27s (E2E), 45.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:59978 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:33:44 [Job: 3290441]
+Request received at 16:33:44 [Job: 3290443]
+Request received at 16:33:44 [Job: 3290449]
+Request received at 16:33:44 [Job: 3290444]
+Request received at 16:33:44 [Job: 3290448]
+Request received at 16:33:44 [Job: 3290451]
+Processing batch of 6 requests
+Request completed in 43.15s (E2E), 41.14s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:52568 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.15s (E2E), 41.14s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:47310 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.16s (E2E), 41.14s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:53834 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.16s (E2E), 41.14s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:54184 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.16s (E2E), 41.14s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:53860 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.17s (E2E), 41.14s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:38282 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:34:27 [Job: 3290437]
+Request received at 16:34:27 [Job: 3290450]
+Request received at 16:34:27 [Job: 3290436]
+Request received at 16:34:27 [Job: 3290438]
+Request received at 16:34:27 [Job: 3290446]
+Request received at 16:34:27 [Job: 3290440]
+Request received at 16:34:27 [Job: 3290439]
+Request received at 16:34:29 [Job: 3290453]
+Processing batch of 8 requests
+Request completed in 48.30s (E2E), 46.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:39316 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.30s (E2E), 46.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:39318 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.31s (E2E), 46.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:54328 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.31s (E2E), 46.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:38450 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.32s (E2E), 46.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:38454 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.32s (E2E), 46.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:55100 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.33s (E2E), 46.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:43402 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.97s (E2E), 46.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:33510 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:16 [Job: 3290441]
+Request received at 16:35:16 [Job: 3290444]
+Request received at 16:35:16 [Job: 3290451]
+Request received at 16:35:16 [Job: 3290443]
+Request received at 16:35:16 [Job: 3290448]
+Request received at 16:35:16 [Job: 3290449]
+Request received at 16:35:16 [Job: 3290452]
+Processing batch of 7 requests
+Request completed in 44.38s (E2E), 42.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:55606 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.39s (E2E), 42.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:53384 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.39s (E2E), 42.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:42974 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.40s (E2E), 42.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:42984 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.40s (E2E), 42.38s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.8:56806 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.40s (E2E), 42.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:46320 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.41s (E2E), 42.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:57284 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:00 [Job: 3290450]
+Request received at 16:36:00 [Job: 3290453]
+Request received at 16:36:00 [Job: 3290438]
+Request received at 16:36:00 [Job: 3290446]
+Request received at 16:36:00 [Job: 3290440]
+Request received at 16:36:00 [Job: 3290439]
+Processing batch of 6 requests
+Request completed in 43.12s (E2E), 41.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:55384 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.12s (E2E), 41.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:45546 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.13s (E2E), 41.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:56450 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.13s (E2E), 41.12s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:56452 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.13s (E2E), 41.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:54034 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.14s (E2E), 41.12s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:52782 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:43 [Job: 3290441]
+Request received at 16:36:43 [Job: 3290451]
+Request received at 16:36:43 [Job: 3290443]
+Request received at 16:36:43 [Job: 3290448]
+Request received at 16:36:43 [Job: 3290444]
+Request received at 16:36:43 [Job: 3290452]
+Request received at 16:36:43 [Job: 3290449]
+Processing batch of 7 requests
+Request completed in 45.03s (E2E), 43.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:54882 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.04s (E2E), 43.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:38848 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.04s (E2E), 43.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:38864 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.05s (E2E), 43.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:35240 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.05s (E2E), 43.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:59134 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.06s (E2E), 43.03s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:60704 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.06s (E2E), 43.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:41698 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:37:28 [Job: 3290450]
+Request received at 16:37:28 [Job: 3290446]
+Request received at 16:37:28 [Job: 3290453]
+Request received at 16:37:28 [Job: 3290439]
+Request received at 16:37:29 [Job: 3290456]
+Processing batch of 5 requests
+Request completed in 42.19s (E2E), 40.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:38956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.19s (E2E), 40.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:55592 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.20s (E2E), 40.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:49466 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.20s (E2E), 40.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:58956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.23s (E2E), 40.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:36704 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:38:11 [Job: 3290452]
+Request received at 16:38:11 [Job: 3290455]
+Request received at 16:38:11 [Job: 3290454]
+Request received at 16:38:11 [Job: 3290448]
+Request received at 16:38:11 [Job: 3290444]
+Request received at 16:38:11 [Job: 3290449]
+Request received at 16:38:11 [Job: 3290451]
+Request received at 16:38:11 [Job: 3290443]
+Processing batch of 8 requests
+Request completed in 48.92s (E2E), 48.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:57086 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.93s (E2E), 48.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:38226 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.93s (E2E), 48.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:38224 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.94s (E2E), 48.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:52424 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.94s (E2E), 48.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:43098 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.95s (E2E), 48.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:41130 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.95s (E2E), 48.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:45576 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.96s (E2E), 48.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:45592 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:39:00 [Job: 3290446]
+Request received at 16:39:00 [Job: 3290453]
+Request received at 16:39:00 [Job: 3290456]
+Request received at 16:39:00 [Job: 3290450]
+Request received at 16:39:00 [Job: 3290439]
+Processing batch of 5 requests
+Request completed in 43.23s (E2E), 41.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:49474 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.23s (E2E), 41.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:52000 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.24s (E2E), 41.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:52012 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.24s (E2E), 41.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:34822 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.25s (E2E), 41.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:51268 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:39:43 [Job: 3290452]
+Request received at 16:39:43 [Job: 3290448]
+Request received at 16:39:43 [Job: 3290444]
+Request received at 16:39:43 [Job: 3290455]
+Request received at 16:39:43 [Job: 3290454]
+Request received at 16:39:43 [Job: 3290449]
+Processing batch of 6 requests
+Request completed in 43.83s (E2E), 41.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:36720 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.83s (E2E), 41.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:34384 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.84s (E2E), 41.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:35768 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.84s (E2E), 41.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:52454 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.85s (E2E), 41.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:52462 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.85s (E2E), 41.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:54774 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:40:27 [Job: 3290446]
+Request received at 16:40:27 [Job: 3290456]
+Request received at 16:40:27 [Job: 3290453]
+Request received at 16:40:27 [Job: 3290451]
+Request received at 16:40:27 [Job: 3290450]
+Processing batch of 5 requests
+Request completed in 43.37s (E2E), 41.37s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:46932 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.38s (E2E), 41.37s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:54976 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.38s (E2E), 41.37s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:54982 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.39s (E2E), 41.37s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:47308 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.62s (E2E), 41.37s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:33270 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:41:10 [Job: 3290452]
+Request received at 16:41:10 [Job: 3290455]
+Request received at 16:41:10 [Job: 3290454]
+Request received at 16:41:10 [Job: 3290448]
+Processing batch of 4 requests
+Request completed in 38.94s (E2E), 36.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:36468 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.95s (E2E), 36.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:57282 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.95s (E2E), 36.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:57294 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.96s (E2E), 36.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.8:36950 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:41:49 [Job: 3290450]
+Request received at 16:41:49 [Job: 3290446]
+Request received at 16:41:49 [Job: 3290449]
+Request received at 16:41:49 [Job: 3290453]
+Request received at 16:41:49 [Job: 3290456]
+Processing batch of 5 requests
+Request completed in 43.20s (E2E), 41.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:50996 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.21s (E2E), 41.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:40842 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.21s (E2E), 41.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:51488 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.22s (E2E), 41.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:47434 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.22s (E2E), 41.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:47436 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:42:32 [Job: 3290452]
+Request received at 16:42:32 [Job: 3290455]
+Request received at 16:42:32 [Job: 3290454]
+Request received at 16:42:32 [Job: 3290448]
+Request received at 16:42:32 [Job: 3290451]
+Processing batch of 5 requests
+Request completed in 42.32s (E2E), 40.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:37878 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.33s (E2E), 40.32s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:44222 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.33s (E2E), 40.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:44234 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.34s (E2E), 40.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.8:58514 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.34s (E2E), 40.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:33346 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:43:15 [Job: 3290456]
+Request received at 16:43:15 [Job: 3290453]
+Request received at 16:43:15 [Job: 3290450]
+Processing batch of 3 requests
+Request completed in 37.01s (E2E), 35.01s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:35982 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.02s (E2E), 35.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:35988 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.02s (E2E), 35.01s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:43984 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:43:52 [Job: 3290449]
+Request received at 16:43:52 [Job: 3290452]
+Request received at 16:43:52 [Job: 3290455]
+Request received at 16:43:52 [Job: 3290454]
+Request received at 16:43:52 [Job: 3290448]
+Request received at 16:43:52 [Job: 3290457]
+Processing batch of 6 requests
+Request completed in 43.83s (E2E), 41.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:50696 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.84s (E2E), 41.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:54972 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.84s (E2E), 41.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:60986 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.85s (E2E), 41.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:32770 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.85s (E2E), 41.83s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:39128 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.86s (E2E), 41.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:46708 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:44:35 [Job: 3290453]
+Request received at 16:44:35 [Job: 3290456]
+Request received at 16:44:35 [Job: 3290451]
+Request received at 16:44:35 [Job: 3290458]
+Processing batch of 4 requests
+Request completed in 39.96s (E2E), 37.96s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:54258 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.97s (E2E), 37.96s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:54262 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.97s (E2E), 37.96s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:49502 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.98s (E2E), 37.96s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:44994 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:45:15 [Job: 3290452]
+Request received at 16:45:15 [Job: 3290455]
+Request received at 16:45:15 [Job: 3290454]
+Request received at 16:45:17 [Job: 3290457]
+Processing batch of 4 requests
+Request completed in 41.37s (E2E), 39.37s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:50070 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.38s (E2E), 39.37s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:46774 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.38s (E2E), 39.37s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:46778 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.04s (E2E), 39.37s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:36916 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:45:57 [Job: 3290449]
+Request received at 16:45:57 [Job: 3290451]
+Request received at 16:45:57 [Job: 3290458]
+Request received at 16:45:57 [Job: 3290456]
+Processing batch of 4 requests
+Request completed in 38.92s (E2E), 36.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:51256 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.93s (E2E), 36.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:56834 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.93s (E2E), 36.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:60758 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.94s (E2E), 36.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:58852 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:46:36 [Job: 3290455]
+Request received at 16:46:36 [Job: 3290454]
+Request received at 16:46:36 [Job: 3290457]
+Processing batch of 3 requests
+Request completed in 38.98s (E2E), 36.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:36550 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.98s (E2E), 36.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:36552 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.99s (E2E), 36.98s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:33838 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:47:15 [Job: 3290458]
+Request received at 16:47:15 [Job: 3290456]
+Processing batch of 2 requests
+Request completed in 35.12s (E2E), 33.12s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:36736 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 35.13s (E2E), 33.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:59298 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:47:50 [Job: 3290455]
+Request received at 16:47:50 [Job: 3290454]
+Processing batch of 2 requests
+Request completed in 21.49s (E2E), 19.49s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:36128 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 21.49s (E2E), 19.49s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:36136 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:48:11 [Job: 3290458]
+Processing batch of 1 requests
+Request completed in 22.43s (E2E), 20.43s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:40226 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:48:35 [Job: 3290457]
+Processing batch of 1 requests
+Request completed in 16.30s (E2E), 14.30s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:40928 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:48:51 [Job: 3290458]
+Processing batch of 1 requests
+Request completed in 16.12s (E2E), 14.12s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:58154 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:49:19 [Job: 3290458]
+Processing batch of 1 requests
+Request completed in 28.91s (E2E), 26.91s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:57920 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:49:48 [Job: 3290462]
+Processing batch of 1 requests
+Request completed in 19.55s (E2E), 17.54s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:59636 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:50:08 [Job: 3290458]
+Request received at 16:50:08 [Job: 3290457]
+Request received at 16:50:08 [Job: 3290459]
+Processing batch of 3 requests
+Request completed in 29.27s (E2E), 27.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.19:48400 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 29.28s (E2E), 27.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:33760 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 29.28s (E2E), 27.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:35148 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:50:37 [Job: 3290461]
+Request received at 16:50:37 [Job: 3290462]
+Request received at 16:50:37 [Job: 3290460]
+Processing batch of 3 requests
+Request completed in 38.36s (E2E), 36.36s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:33570 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.37s (E2E), 36.36s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:52748 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.37s (E2E), 36.36s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.200:57002 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:15 [Job: 3290458]
+Processing batch of 1 requests
+Request completed in 28.63s (E2E), 26.63s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.19:57442 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:44 [Job: 3290463]
+Request received at 16:51:44 [Job: 3290462]
+Request received at 16:51:44 [Job: 3290459]
+Request received at 16:51:44 [Job: 3290460]
+Request received at 16:51:44 [Job: 3290461]
+Processing batch of 5 requests
+Request completed in 40.42s (E2E), 38.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.198:54994 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.43s (E2E), 38.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:41768 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.44s (E2E), 38.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:35304 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.44s (E2E), 38.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.200:35028 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.45s (E2E), 38.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:35458 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:52:24 [Job: 3290457]
+Request received at 16:52:24 [Job: 3290466]
+Request received at 16:52:24 [Job: 3290464]
+Processing batch of 3 requests
+Request completed in 37.17s (E2E), 35.16s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:54286 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.17s (E2E), 35.16s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:48606 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 37.18s (E2E), 35.16s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.133:56256 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:53:02 [Job: 3290465]
+Request received at 16:53:02 [Job: 3290462]
+Request received at 16:53:02 [Job: 3290460]
+Request received at 16:53:02 [Job: 3290463]
+Request received at 16:53:02 [Job: 3290459]
+Processing batch of 5 requests
+Request completed in 40.49s (E2E), 38.49s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:52682 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.50s (E2E), 38.49s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:43262 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.51s (E2E), 38.49s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.200:45724 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.51s (E2E), 38.49s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.198:45714 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.50s (E2E), 38.49s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:59342 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:53:42 [Job: 3290466]
+Request received at 16:53:42 [Job: 3290461]
+Request received at 16:53:42 [Job: 3290464]
+Processing batch of 3 requests
+Request completed in 38.11s (E2E), 36.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:40004 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.12s (E2E), 36.11s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:34406 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.13s (E2E), 36.11s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.133:36930 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:54:20 [Job: 3290462]
+Request received at 16:54:20 [Job: 3290460]
+Request received at 16:54:20 [Job: 3290463]
+Request received at 16:54:20 [Job: 3290457]
+Request received at 16:54:20 [Job: 3290459]
+Request received at 16:54:21 [Job: 3290465]
+Processing batch of 6 requests
+Request completed in 45.17s (E2E), 43.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:46814 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.17s (E2E), 43.17s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.200:54372 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.18s (E2E), 43.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.198:53174 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.18s (E2E), 43.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:56120 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.19s (E2E), 43.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:37152 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.33s (E2E), 43.17s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:57492 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:55:05 [Job: 3290466]
+Request received at 16:55:05 [Job: 3290461]
+Request received at 16:55:05 [Job: 3290464]
+Processing batch of 3 requests
+Request completed in 38.95s (E2E), 36.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:34388 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.96s (E2E), 36.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:40806 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.97s (E2E), 36.95s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.133:52372 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:55:44 [Job: 3290467]
+Request received at 16:55:44 [Job: 3290462]
+Request received at 16:55:44 [Job: 3290460]
+Request received at 16:55:44 [Job: 3290463]
+Request received at 16:55:44 [Job: 3290459]
+Processing batch of 5 requests
+Request completed in 43.32s (E2E), 41.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:54956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.33s (E2E), 41.32s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:56586 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.34s (E2E), 41.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.200:51076 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.34s (E2E), 41.32s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.198:33630 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.35s (E2E), 41.32s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:42342 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:56:28 [Job: 3290466]
+Request received at 16:56:28 [Job: 3290464]
+Request received at 16:56:28 [Job: 3290465]
+Request received at 16:56:28 [Job: 3290461]
+Request received at 16:56:28 [Job: 3290457]
+Processing batch of 5 requests
+Request completed in 41.20s (E2E), 39.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:42060 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.21s (E2E), 39.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.133:59882 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.22s (E2E), 39.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:34466 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.22s (E2E), 39.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:57800 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.23s (E2E), 39.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:51946 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:57:09 [Job: 3290460]
+Request received at 16:57:09 [Job: 3290463]
+Request received at 16:57:09 [Job: 3290462]
+Request received at 16:57:09 [Job: 3290467]
+Request received at 16:57:09 [Job: 3290459]
+Processing batch of 5 requests
+Request completed in 48.16s (E2E), 46.16s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.200:50680 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.17s (E2E), 46.16s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.198:57376 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.18s (E2E), 46.16s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:42230 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.18s (E2E), 46.16s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:44854 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.19s (E2E), 46.16s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:44856 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:57:57 [Job: 3290466]
+Request received at 16:57:57 [Job: 3290464]
+Request received at 16:57:57 [Job: 3290461]
+Request received at 16:57:57 [Job: 3290465]
+Processing batch of 4 requests
+Request completed in 39.60s (E2E), 37.59s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:51012 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.60s (E2E), 37.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.133:45480 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.61s (E2E), 37.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:48358 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 39.61s (E2E), 37.59s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:53990 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:58:37 [Job: 3290462]
+Request received at 16:58:37 [Job: 3290460]
+Request received at 16:58:37 [Job: 3290463]
+Request received at 16:58:37 [Job: 3290467]
+Request received at 16:58:37 [Job: 3290459]
+Request received at 16:58:37 [Job: 3290471]
+Processing batch of 6 requests
+Request completed in 45.18s (E2E), 43.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:38236 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.19s (E2E), 43.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.200:45740 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.19s (E2E), 43.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.198:44722 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.20s (E2E), 43.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:59818 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.20s (E2E), 43.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:59830 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 45.21s (E2E), 43.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:49008 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:59:22 [Job: 3290470]
+Request received at 16:59:22 [Job: 3290466]
+Request received at 16:59:22 [Job: 3290464]
+Request received at 16:59:22 [Job: 3290468]
+Request received at 16:59:22 [Job: 3290474]
+Request received at 16:59:22 [Job: 3290472]
+Request received at 16:59:22 [Job: 3290461]
+Processing batch of 7 requests
+Request completed in 44.84s (E2E), 42.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:45764 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.85s (E2E), 42.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:51948 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.85s (E2E), 42.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.133:37286 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.86s (E2E), 42.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.202:46610 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.87s (E2E), 42.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:32794 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.87s (E2E), 42.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.8:42218 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.88s (E2E), 42.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:43588 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:00:07 [Job: 3290467]
+Request received at 17:00:07 [Job: 3290459]
+Request received at 17:00:07 [Job: 3290471]
+Request received at 17:00:07 [Job: 3290465]
+Request received at 17:00:07 [Job: 3290460]
+Request received at 17:00:07 [Job: 3290463]
+Processing batch of 6 requests
+Request completed in 41.25s (E2E), 39.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:53328 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.25s (E2E), 39.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:53332 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.26s (E2E), 39.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:53342 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.27s (E2E), 39.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:57412 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.27s (E2E), 39.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.200:56144 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.28s (E2E), 39.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.198:33422 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:00:48 [Job: 3290466]
+Request received at 17:00:48 [Job: 3290474]
+Request received at 17:00:48 [Job: 3290464]
+Request received at 17:00:48 [Job: 3290472]
+Request received at 17:00:48 [Job: 3290468]
+Request received at 17:00:48 [Job: 3290461]
+Request received at 17:00:48 [Job: 3290479]
+Request received at 17:00:48 [Job: 3290476]
+Processing batch of 8 requests
+Request completed in 44.22s (E2E), 44.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:35022 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.23s (E2E), 44.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:45788 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.24s (E2E), 44.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.133:54766 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.24s (E2E), 44.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:36910 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.25s (E2E), 44.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.202:42872 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.26s (E2E), 44.22s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:34032 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.26s (E2E), 44.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:53066 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.27s (E2E), 44.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:38618 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:01:33 [Job: 3290470]
+Request received at 17:01:33 [Job: 3290478]
+Request received at 17:01:33 [Job: 3290463]
+Request received at 17:01:33 [Job: 3290471]
+Request received at 17:01:33 [Job: 3290467]
+Request received at 17:01:33 [Job: 3290475]
+Processing batch of 6 requests
+Request completed in 28.28s (E2E), 26.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:47966 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 28.28s (E2E), 26.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:60616 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 28.29s (E2E), 26.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.198:33996 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 28.30s (E2E), 26.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:56306 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 28.30s (E2E), 26.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:56312 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 28.31s (E2E), 26.27s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:58990 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:02:01 [Job: 3290465]
+Request received at 17:02:01 [Job: 3290466]
+Request received at 17:02:01 [Job: 3290479]
+Request received at 17:02:01 [Job: 3290464]
+Request received at 17:02:01 [Job: 3290468]
+Request received at 17:02:01 [Job: 3290472]
+Request received at 17:02:01 [Job: 3290476]
+Processing batch of 7 requests
+Request completed in 47.45s (E2E), 45.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:56754 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.46s (E2E), 45.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:36956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.47s (E2E), 45.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:36962 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.47s (E2E), 45.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.133:39164 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.48s (E2E), 45.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.202:55610 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.49s (E2E), 45.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.8:42388 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.49s (E2E), 45.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:57712 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:02:48 [Job: 3290474]
+Request received at 17:02:48 [Job: 3290475]
+Request received at 17:02:48 [Job: 3290471]
+Request received at 17:02:48 [Job: 3290467]
+Request received at 17:02:48 [Job: 3290481]
+Processing batch of 5 requests
+Request completed in 41.98s (E2E), 39.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:56516 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.99s (E2E), 39.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:41872 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.00s (E2E), 39.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:40208 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.00s (E2E), 39.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:40210 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.01s (E2E), 39.98s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:53054 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:03:30 [Job: 3290470]
+Request received at 17:03:30 [Job: 3290479]
+Request received at 17:03:30 [Job: 3290468]
+Request received at 17:03:30 [Job: 3290472]
+Request received at 17:03:30 [Job: 3290478]
+Request received at 17:03:30 [Job: 3290482]
+Request received at 17:03:30 [Job: 3290483]
+Request received at 17:03:30 [Job: 3290476]
+Request received at 17:03:30 [Job: 3290465]
+Processing batch of 8 requests
+Request completed in 49.26s (E2E), 49.26s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:36954 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.27s (E2E), 49.26s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:44580 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.28s (E2E), 49.26s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.202:56868 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.28s (E2E), 49.26s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:58860 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.29s (E2E), 49.26s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:47874 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.30s (E2E), 49.26s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:53458 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.30s (E2E), 49.26s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:57148 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.31s (E2E), 49.26s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:48364 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:04:20 [Job: 3290484]
+Request received at 17:04:20 [Job: 3290475]
+Request received at 17:04:20 [Job: 3290481]
+Request received at 17:04:20 [Job: 3290480]
+Request received at 17:04:20 [Job: 3290485]
+Request received at 17:04:20 [Job: 3290467]
+Request received at 17:04:20 [Job: 3290471]
+Request received at 17:04:20 [Job: 3290474]
+Processing batch of 8 requests
+Request completed in 98.51s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:53068 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.20s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:48718 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.21s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:41110 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.22s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:56026 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.22s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:36088 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.23s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:52394 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.24s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:48694 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.24s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:48706 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:05:09 [Job: 3290476]
+Request received at 17:05:09 [Job: 3290479]
+Request received at 17:05:09 [Job: 3290483]
+Request received at 17:05:09 [Job: 3290468]
+Request received at 17:05:09 [Job: 3290472]
+Request received at 17:05:09 [Job: 3290486]
+Request received at 17:05:09 [Job: 3290482]
+Request received at 17:05:09 [Job: 3290470]
+Request received at 17:05:09 [Job: 3290478]
+Request received at 17:05:09 [Job: 3290487]
+Processing batch of 8 requests
+Request completed in 98.50s (E2E), 49.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:48714 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.26s (E2E), 49.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:54742 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.27s (E2E), 49.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:37710 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.27s (E2E), 49.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:40278 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.28s (E2E), 49.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.202:47530 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.29s (E2E), 49.25s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:47620 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.29s (E2E), 49.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:37660 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.30s (E2E), 49.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:49688 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:05:58 [Job: 3290485]
+Request received at 17:05:58 [Job: 3290484]
+Request received at 17:05:58 [Job: 3290475]
+Request received at 17:05:58 [Job: 3290481]
+Request received at 17:05:58 [Job: 3290467]
+Request received at 17:05:58 [Job: 3290471]
+Processing batch of 8 requests
+Request completed in 93.18s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:37476 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.18s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:34376 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.19s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:44704 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.89s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:43028 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.90s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:43038 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.90s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:59284 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.91s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:54846 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.92s (E2E), 43.87s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:60872 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:06:42 [Job: 3290476]
+Request received at 17:06:42 [Job: 3290480]
+Request received at 17:06:42 [Job: 3290488]
+Request received at 17:06:42 [Job: 3290479]
+Request received at 17:06:42 [Job: 3290468]
+Request received at 17:06:42 [Job: 3290465]
+Request received at 17:06:42 [Job: 3290472]
+Request received at 17:06:42 [Job: 3290483]
+Request received at 17:06:42 [Job: 3290486]
+Request received at 17:06:42 [Job: 3290474]
+Request received at 17:06:42 [Job: 3290482]
+Processing batch of 8 requests
+Request completed in 92.82s (E2E), 48.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:60870 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.90s (E2E), 48.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:34580 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.91s (E2E), 48.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:40702 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.91s (E2E), 48.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:58294 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.92s (E2E), 48.89s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:58304 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.93s (E2E), 48.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.202:39412 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.93s (E2E), 48.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:37248 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.94s (E2E), 48.89s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:59168 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:07:31 [Job: 3290487]
+Request received at 17:07:31 [Job: 3290475]
+Request received at 17:07:31 [Job: 3290481]
+Request received at 17:07:31 [Job: 3290485]
+Request received at 17:07:31 [Job: 3290484]
+Request received at 17:07:31 [Job: 3290478]
+Request received at 17:07:31 [Job: 3290470]
+Processing batch of 8 requests
+Request completed in 98.14s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:55646 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.14s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:55652 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.15s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:34818 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.16s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:40336 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.22s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:60108 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.22s (E2E), 49.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:50296 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.23s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:43088 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.24s (E2E), 49.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:33314 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:08:20 [Job: 3290494]
+Request received at 17:08:20 [Job: 3290476]
+Request received at 17:08:20 [Job: 3290479]
+Request received at 17:08:20 [Job: 3290488]
+Request received at 17:08:20 [Job: 3290468]
+Request received at 17:08:20 [Job: 3290472]
+Request received at 17:08:20 [Job: 3290480]
+Processing batch of 8 requests
+Request completed in 98.69s (E2E), 49.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:33318 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.70s (E2E), 49.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:38956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.71s (E2E), 49.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:40200 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.47s (E2E), 49.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:55072 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.48s (E2E), 49.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:34680 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.48s (E2E), 49.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56964 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.49s (E2E), 49.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56966 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.50s (E2E), 49.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.202:42164 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:09:10 [Job: 3290471]
+Request received at 17:09:10 [Job: 3290485]
+Request received at 17:09:10 [Job: 3290487]
+Request received at 17:09:10 [Job: 3290482]
+Request received at 17:09:10 [Job: 3290483]
+Request received at 17:09:10 [Job: 3290486]
+Request received at 17:09:10 [Job: 3290475]
+Request received at 17:09:10 [Job: 3290481]
+Request received at 17:09:10 [Job: 3290489]
+Request received at 17:09:10 [Job: 3290497]
+Request received at 17:09:10 [Job: 3290474]
+Processing batch of 8 requests
+Request completed in 96.43s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.147.8:50026 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 96.44s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:35650 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.94s (E2E), 46.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:43804 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.95s (E2E), 46.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:46370 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.95s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:42264 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.96s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:50354 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.97s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:53318 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.98s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:53330 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:09:57 [Job: 3290495]
+Request received at 17:09:57 [Job: 3290494]
+Request received at 17:09:57 [Job: 3290484]
+Request received at 17:09:57 [Job: 3290468]
+Request received at 17:09:57 [Job: 3290479]
+Request received at 17:09:57 [Job: 3290488]
+Request received at 17:09:57 [Job: 3290476]
+Request received at 17:09:57 [Job: 3290470]
+Processing batch of 8 requests
+Request completed in 96.08s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:48778 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 96.09s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:34812 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 96.10s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:55546 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 96.10s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:41040 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 96.11s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:48272 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.14s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:53558 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.14s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:50408 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.15s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:50308 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:10:46 [Job: 3290478]
+Request received at 17:10:46 [Job: 3290498]
+Request received at 17:10:46 [Job: 3290496]
+Request received at 17:10:46 [Job: 3290499]
+Request received at 17:10:46 [Job: 3290485]
+Request received at 17:10:46 [Job: 3290482]
+Request received at 17:10:46 [Job: 3290487]
+Request received at 17:10:46 [Job: 3290483]
+Request received at 17:10:46 [Job: 3290486]
+Request received at 17:10:46 [Job: 3290472]
+Request received at 17:10:46 [Job: 3290471]
+Processing batch of 8 requests
+Processing batch of 8 requests
+Request completed in 142.90s (E2E), 44.54s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.202:52722 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 142.91s (E2E), 44.54s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:46926 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 142.92s (E2E), 44.54s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:46938 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 142.92s (E2E), 44.54s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:53098 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 142.93s (E2E), 44.54s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:40894 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.78s (E2E), 44.54s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:56830 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.79s (E2E), 44.54s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:54186 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.79s (E2E), 44.54s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:54176 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.80s (E2E), 49.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:45968 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.81s (E2E), 49.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:55216 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.82s (E2E), 49.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:40480 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.82s (E2E), 49.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:39072 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.83s (E2E), 49.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:43618 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.84s (E2E), 49.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:43626 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.85s (E2E), 49.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.147.8:54008 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.85s (E2E), 49.20s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:46308 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:12:20 [Job: 3290480]
+Request received at 17:12:20 [Job: 3290484]
+Request received at 17:12:20 [Job: 3290494]
+Request received at 17:12:20 [Job: 3290497]
+Request received at 17:12:20 [Job: 3290495]
+Request received at 17:12:20 [Job: 3290475]
+Request received at 17:12:20 [Job: 3290481]
+Request received at 17:12:20 [Job: 3290474]
+Request received at 17:12:20 [Job: 3290489]
+Processing batch of 8 requests
+Request completed in 48.84s (E2E), 48.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:33812 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.84s (E2E), 48.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:43526 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.85s (E2E), 48.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:40644 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.86s (E2E), 48.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:40342 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.87s (E2E), 48.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:52452 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.87s (E2E), 48.84s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:52278 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.88s (E2E), 48.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:52628 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.89s (E2E), 48.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.89:53718 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:13:09 [Job: 3290483]
+Request received at 17:13:09 [Job: 3290486]
+Request received at 17:13:09 [Job: 3290485]
+Request received at 17:13:09 [Job: 3290487]
+Request received at 17:13:09 [Job: 3290476]
+Request received at 17:13:09 [Job: 3290479]
+Request received at 17:13:09 [Job: 3290488]
+Request received at 17:13:09 [Job: 3290482]
+Request received at 17:13:09 [Job: 3290470]
+Request received at 17:13:09 [Job: 3290499]
+Request received at 17:13:09 [Job: 3290498]
+Request received at 17:13:09 [Job: 3290496]
+Request received at 17:13:09 [Job: 3290478]
+Processing batch of 8 requests
+Request completed in 95.82s (E2E), 46.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:48454 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.93s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:37114 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.94s (E2E), 46.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:37124 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.95s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:53286 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.95s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:35758 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.96s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:35764 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.97s (E2E), 46.92s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:56742 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.98s (E2E), 46.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:56750 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:13:56 [Job: 3290484]
+Request received at 17:13:56 [Job: 3290494]
+Request received at 17:13:56 [Job: 3290495]
+Request received at 17:13:56 [Job: 3290497]
+Request received at 17:13:56 [Job: 3290475]
+Request received at 17:13:56 [Job: 3290481]
+Request received at 17:13:56 [Job: 3290480]
+Request received at 17:13:56 [Job: 3290474]
+Processing batch of 8 requests
+Request completed in 94.22s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:58536 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 94.23s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:58336 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 94.24s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:58352 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 94.24s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:54222 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 94.25s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:54228 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 94.26s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:58834 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.28s (E2E), 47.23s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:57956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 47.29s (E2E), 47.23s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:52632 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:14:43 [Job: 3290485]
+Request received at 17:14:43 [Job: 3290487]
+Request received at 17:14:43 [Job: 3290483]
+Request received at 17:14:43 [Job: 3290486]
+Request received at 17:14:43 [Job: 3290488]
+Request received at 17:14:43 [Job: 3290489]
+Processing batch of 8 requests
+Request completed in 91.68s (E2E), 44.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:51764 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 91.69s (E2E), 44.38s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:55356 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 91.70s (E2E), 44.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.134:35138 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 91.71s (E2E), 44.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.201:33586 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 91.71s (E2E), 44.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:43198 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 91.72s (E2E), 44.38s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.89:50182 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.43s (E2E), 44.38s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:56974 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 44.44s (E2E), 44.38s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:47120 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:15:28 [Job: 3290484]
+Request received at 17:15:28 [Job: 3290470]
+Request received at 17:15:28 [Job: 3290499]
+Request received at 17:15:28 [Job: 3290482]
+Request received at 17:15:28 [Job: 3290494]
+Request received at 17:15:28 [Job: 3290498]
+Request received at 17:15:28 [Job: 3290496]
+Request received at 17:15:28 [Job: 3290478]
+Processing batch of 8 requests
+Request completed in 93.39s (E2E), 48.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:35806 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.39s (E2E), 48.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:35814 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.40s (E2E), 48.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:41836 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 93.41s (E2E), 48.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:41928 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.97s (E2E), 48.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.176:49154 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.98s (E2E), 48.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:37806 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.99s (E2E), 48.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:37816 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.99s (E2E), 48.94s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:35098 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:16:17 [Job: 3290495]
+Request received at 17:16:17 [Job: 3290485]
+Request received at 17:16:17 [Job: 3290481]
+Request received at 17:16:17 [Job: 3290487]
+Request received at 17:16:17 [Job: 3290497]
+Request received at 17:16:17 [Job: 3290480]
+Processing batch of 8 requests
+Request completed in 98.10s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:35108 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.11s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:45794 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.12s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:45800 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 98.13s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:56720 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.13s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:50132 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.14s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:59964 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.15s (E2E), 49.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.201:37944 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 49.16s (E2E), 49.10s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.92:42036 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:17:06 [Job: 3290483]
+Request received at 17:17:06 [Job: 3290486]
+Request received at 17:17:06 [Job: 3290484]
+Request received at 17:17:06 [Job: 3290499]
+Request received at 17:17:06 [Job: 3290482]
+Request received at 17:17:06 [Job: 3290489]
+Request received at 17:17:06 [Job: 3290488]
+Processing batch of 8 requests
+Request completed in 97.97s (E2E), 48.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:60924 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 97.98s (E2E), 48.81s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:47956 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.82s (E2E), 48.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:56094 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.83s (E2E), 48.81s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.174:56106 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.84s (E2E), 48.81s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.176:56518 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.85s (E2E), 48.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:42140 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.86s (E2E), 48.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:50092 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 48.86s (E2E), 48.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:59692 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:17:55 [Job: 3290487]
+Request received at 17:17:55 [Job: 3290494]
+Request received at 17:17:55 [Job: 3290478]
+Request received at 17:17:55 [Job: 3290498]
+Request received at 17:17:55 [Job: 3290496]
+Request received at 17:17:55 [Job: 3290495]
+Processing batch of 7 requests
+Request completed in 95.40s (E2E), 44.59s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:41324 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.53s (E2E), 44.59s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.92:45554 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.54s (E2E), 44.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:57246 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.55s (E2E), 44.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.177:60214 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.55s (E2E), 44.59s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:49850 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.56s (E2E), 44.59s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:49856 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 46.57s (E2E), 44.59s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:57360 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:18:41 [Job: 3290486]
+Request received at 17:18:41 [Job: 3290489]
+Request received at 17:18:41 [Job: 3290480]
+Request received at 17:18:41 [Job: 3290499]
+Request received at 17:18:41 [Job: 3290497]
+Processing batch of 5 requests
+Request completed in 43.13s (E2E), 41.13s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.174:36292 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.14s (E2E), 41.13s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:55604 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.15s (E2E), 41.13s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:55616 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.16s (E2E), 41.13s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:48318 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 43.16s (E2E), 41.13s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:59712 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:19:24 [Job: 3290494]
+Request received at 17:19:24 [Job: 3290498]
+Request received at 17:19:24 [Job: 3290496]
+Request received at 17:19:24 [Job: 3290488]
+Request received at 17:19:24 [Job: 3290495]
+Processing batch of 5 requests
+Request completed in 42.80s (E2E), 40.79s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.93:44480 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.80s (E2E), 40.79s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:39104 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.81s (E2E), 40.79s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:39108 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.82s (E2E), 40.79s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:50506 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 42.83s (E2E), 40.79s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:55974 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:20:07 [Job: 3290489]
+Request received at 17:20:07 [Job: 3290480]
+Request received at 17:20:07 [Job: 3290499]
+Request received at 17:20:07 [Job: 3290497]
+Processing batch of 4 requests
+Request completed in 40.34s (E2E), 38.34s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:43916 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.35s (E2E), 38.34s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.175:43918 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.36s (E2E), 38.34s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:56456 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 40.36s (E2E), 38.34s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:48790 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:20:48 [Job: 3290494]
+Request received at 17:20:48 [Job: 3290498]
+Request received at 17:20:48 [Job: 3290496]
+Request received at 17:20:48 [Job: 3290495]
+Request received at 17:20:48 [Job: 3290488]
+Processing batch of 5 requests
+Request completed in 41.57s (E2E), 39.57s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.93:60550 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.58s (E2E), 39.57s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:43666 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.59s (E2E), 39.57s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:43672 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.60s (E2E), 39.57s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:52968 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 41.61s (E2E), 39.57s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.90:45204 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:21:29 [Job: 3290489]
+Request received at 17:21:29 [Job: 3290497]
+Request received at 17:21:29 [Job: 3290499]
+Processing batch of 3 requests
+Request completed in 38.33s (E2E), 36.33s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:36946 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.34s (E2E), 36.33s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:34288 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.34s (E2E), 36.33s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:60002 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:22:08 [Job: 3290498]
+Request received at 17:22:08 [Job: 3290496]
+Request received at 17:22:08 [Job: 3290495]
+Processing batch of 3 requests
+Request completed in 38.86s (E2E), 36.86s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:41862 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.87s (E2E), 36.86s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:41870 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 38.88s (E2E), 36.86s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.94:50582 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:22:46 [Job: 3290489]
+Request received at 17:22:46 [Job: 3290499]
+Processing batch of 2 requests
+Request completed in 11.00s (E2E), 9.00s (batch processing), evaluation score: 1.0
+INFO:     172.27.149.175:47506 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 11.01s (E2E), 9.00s (batch processing), evaluation score: 1.0
+INFO:     172.27.150.94:46756 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:22:59 [Job: 3290498]
+Request received at 17:22:59 [Job: 3290496]
+Processing batch of 2 requests
+Request completed in 36.28s (E2E), 34.28s (batch processing), evaluation score: 1.0
+INFO:     172.27.146.199:43122 - "POST /generate HTTP/1.1" 200 OK
+Request completed in 36.29s (E2E), 34.28s (batch processing), evaluation score: 0.0
+INFO:     172.27.146.199:43136 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:23:35 [Job: 3290497]
+Processing batch of 1 requests
+Request completed in 29.15s (E2E), 27.15s (batch processing), evaluation score: 0.0
+INFO:     172.27.150.90:40040 - "POST /generate HTTP/1.1" 200 OK
+slurmstepd: error: *** JOB 3288550 ON atl1-1-03-011-3-0 CANCELLED AT 2025-10-09T18:08:16 ***
+---------------------------------------
+Begin Slurm Epilog: Oct-09-2025 18:08:19
+Job ID:        3288550
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=3-13:06:24,vmem=0,walltime=05:19:09,mem=66024968K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-011-3-0
+---------------------------------------

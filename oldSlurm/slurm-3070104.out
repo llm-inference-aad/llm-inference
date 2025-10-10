@@ -1,0 +1,1785 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-19-2025 19:38:05
+Job ID:    3070104
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+=== Launching LLM Guided Evolution ===
+Hostname: atl1-1-01-002-8-0.pace.gatech.edu
+Working dir: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+Fri Sep 19 19:38:05 EDT 2025
+UV version: uv 0.8.15
+Python via uv: Python 3.13.7
+LLM_INFERENCE_ROOT_DIR: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+LD_LIBRARY_PATH updated for nvjitlink (best-effort).
+UV Python path: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+Fri Sep 19 19:38:10 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Tesla V100-PCIE-32GB           On  |   00000000:D8:00.0 Off |                    0 |
+| N/A   31C    P0             25W /  250W |       0MiB /  32768MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== Running: uv run python run_improved.py first_test ===
+
+⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣶⣶⠶⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⣀⣹⣟⣛⣛⣻⣿⣿⣿⡾⠟⢉⣴⠟⢁⣴⠋⣹⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⠛⠛⣿⠉⢉⣩⠵⠚⠁⢀⡴⠛⠁⣠⠞⠁⣰⠏⠸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢻⣷⠋⠁⠀⢀⡴⠋⠀⢀⡴⠋⠀⣼⠃⠀⡼⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢻⣆⣠⡴⠋⠀⠀⣠⠟⠀⢀⡾⠁⠀⡼⠁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠻⣯⡀⠀⢀⡼⠃⠀⢠⡟⠀⢀⡾⠁⢀⣾⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠻⣶⣟⡀⠀⣰⠏⠀⢀⡾⠁⠀⣼⢹⣿⣀⣤⣤⣴⠶⢿⡿⠛⢛⣷⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠶⠶⠾⠷⠶⠿⠛⢻⣟⠉⣥⠟⠁⣠⠟⠀⢠⠞⠁⣄⡿⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠞⠁⢀⡴⠋⠀⣴⠋⠀⣰⠟⠀⣤⡾⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⢠⠞⠁⢀⡾⠁⢀⡼⠃⢀⡴⠋⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠋⠀⣰⠏⠀⣠⠟⠀⣰⠟⠁⢀⡴⠛⣿⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⡼⠃⢀⡼⠋⢠⡞⠁⣠⣞⣋⣤⣶⣿⡟⠛⣿⠛⠛⣻⠟⠷⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣦⣾⣤⣴⣯⡶⠾⠟⠛⠉⠉⠉⣿⡇⢠⡏⠀⣰⠏⠀⢀⣼⠋⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⡾⠀⢰⠏⠀⢠⡞⠁⠀⣠⠞⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠇⢠⠏⠀⣰⠋⠀⣠⠞⠁⠀⢀⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⢠⠟⢀⡼⠁⣠⠞⠁⣀⣴⢾⣿⣤⣿⣦⣄⣀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡟⣠⠏⣠⠞⣁⣴⣾⣿⣿⣿⣿⣿⣿⡏⢹⡏⠛⠳⣦⣄⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣾⣷⠿⠿⠛⠉⠀⠀⠈⠳⣬⣿⡟⣾⠁⠀⣼⠃⠉⠻⠆
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⡏⠀⣼⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠁⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣟⡼⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⣃⠀⠀
+
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxCqipEOwUGMZ7xZ9g1CzSxMoy.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx1ENozU9wbbdroojq2zw0Pel3.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxJn0xRcMrY0pZDdO0xyHhtKps.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxDboXeFuwfdrkX1Ady2J9tuOQ.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx2YmdkxNiNHZfaFE8IIsmPwl7.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx5i7FdeB2VwF98djc3PImSgge.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxwZLGN6Bjk1qvwQ7Jh9UpsaE9.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxcSdVKfIdLDw6ughnmDHOyzZi.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                      SUBMITTING MODELS CREATED BY LLM                                      *
+**************************************************************************************************************
+
+
+************************************************************
+*                  Checking Model Runs: 0                  *
+************************************************************
+
+************************************************************
+*                   Evalutated All Genes                   *
+************************************************************
+
+
+**************************************************************************************************************
+*                                           STARTING GENERATION: 0                                           *
+**************************************************************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 8
+Gene: xXxCqipEOwUGMZ7xZ9g1CzSxMoy
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx1ENozU9wbbdroojq2zw0Pel3
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxJn0xRcMrY0pZDdO0xyHhtKps
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxDboXeFuwfdrkX1Ady2J9tuOQ
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx2YmdkxNiNHZfaFE8IIsmPwl7
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx5i7FdeB2VwF98djc3PImSgge
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxwZLGN6Bjk1qvwQ7Jh9UpsaE9
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxcSdVKfIdLDw6ughnmDHOyzZi
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+
+************************************************************
+*                     Invalid Removal                      *
+************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 0
+
+************************************************************
+*                        Selection                         *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxqgeMRctbGY0Ou7hU74Rw1zTE.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxiHTX7oUASGd90wFFuCDm45PQ.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxmIMvsDNDOhCTGLGP2LBzY3of.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx2SiDSu4RCOoceEcbfV0QKE0n.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxRQ47oV4ju1jsLlmf73V76phV.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxpYsPx53mhn2bIV4gHm3256jh.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxzmq78Cls2n6eR4PF5jt6ISNr.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxmncJ069QImLZkFrwDCXtUD1L.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxp4muN5zviAM8RPu8EIJCd80W.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxcJ49XTz8pLVeMRoa2XE3kzkC.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxvSauLaF1X3jwjuhAMe5FKHoO.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxxVpJ7BYLia8xF8e1zQTLGYOz.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxLgotAMbBoYN6YWPNMJZ3abNl.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxCIIq4ehltMmPD3jztKgaOiFM.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxFr2Z1Odh8vPWjELfQJaEnovV.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxmrXbXLXYzO0KzIiPuJ3vb7h5.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxkHwhF6doQoJ2N0vQ7Mq5y5if.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxMJ2CxVn7DESxCAK9b13z4cfp.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxImQB142FJ5x2qf6nFTyqsN3a.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxE7uC5aUMFuoVfzDtj2DD0EAX.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxYs9HnA5IM13aWxfwQFkdm0D1.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxnS8F9FPKUD37KWw0H46eCo0h.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxMjCrUUf2kKxNOpYB38q1jwpi.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxgHJmVVJaA2UyiiJC6nT1fvC0.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxg6EmQrAJZMROZUHFlsORoA5e.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx7Gca4UxV6AoSAfajclY9oDfc.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxCoWPUSx0jfdGnzjcYvWamUJH.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxvSQkh2QVsl5aiRVCXHxIGL4C.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxmaJqJZe4g3Qsym3pFWEOFqYi.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxLTdBBjtmBY2aEPFNdRkZMV4J.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxeXxlfBcRs27ljfLW7QCb7JZG.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxSaBdTPRKzhxZ8xhMOUVXUXcq.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxdBgAHrdEDl5bS3twRNUAr3Q3.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxOY1UkPv59melEypNNC12garP.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxEj9yeSrItRBvREYVoJD4YECA.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxuu8iLgr22CueZBX1dVJJ6f7P.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxAwimmAsyT2XCTAWvBUukMCgJ.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxRza1VVrT9IzSHN34e08LxCJ4.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxUqTMN9k9holtFssIEDev537u.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxGGtZi4ZyWc9JFKT1fKJygLMX.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 406, in submit_local_server
+    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+Exception: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 413, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server returned status code 500: {"detail":"'LLMModel' object has no attribute 'request_queue'"}
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+=== Job complete ===
+Fri Sep 19 19:47:11 EDT 2025
+---------------------------------------
+Begin Slurm Epilog: Sep-19-2025 19:47:11
+Job ID:        3070104
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:v100=1,mem=16G,node=1
+Rsrc Used:     cput=00:09:06,vmem=0,walltime=00:09:06,mem=1191284K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-01-002-8-0
+---------------------------------------

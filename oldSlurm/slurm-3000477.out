@@ -1,0 +1,176 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-15-2025 19:51:31
+Job ID:    3000477
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-014-30-0.pace.gatech.edu
+Writing server hostname 'atl1-1-03-014-30-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-014-30-0.pace.gatech.edu
+INFO:     Started server process [1211833]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://atl1-1-03-014-30-0.pace.gatech.edu:8000 (Press CTRL+C to quit)
+Server running with simplified inference!
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it for the first time
+INFO:     128.61.254.123:44054 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:37
+INFO:     172.27.150.93:42558 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:45
+INFO:     172.27.150.93:54418 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:50
+INFO:     128.61.254.123:53476 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:54
+INFO:     172.27.150.93:48632 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:59
+INFO:     128.61.254.123:53342 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:02
+INFO:     172.27.150.93:48644 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:07
+INFO:     128.61.254.123:52904 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:11
+INFO:     172.27.150.93:36886 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:18
+INFO:     128.61.254.123:43796 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:19
+INFO:     172.27.150.93:47530 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:26
+INFO:     128.61.254.123:35926 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:28
+INFO:     172.27.150.93:58260 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:35
+INFO:     128.61.254.123:49666 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:37
+INFO:     172.27.150.93:44030 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:44
+INFO:     128.61.254.123:58184 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:45
+INFO:     172.27.150.93:48252 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:53
+INFO:     128.61.254.123:60584 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:52:54
+INFO:     172.27.150.93:55238 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:01
+INFO:     128.61.254.123:44634 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:02
+INFO:     172.27.150.93:55250 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:10
+INFO:     128.61.254.123:44640 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:10
+INFO:     172.27.150.93:34054 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:19
+INFO:     172.27.150.93:34736 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:20
+INFO:     128.61.254.123:55916 - "POST /generate HTTP/1.1" 500 Internal Server Error
+INFO:     128.61.254.123:34912 - "GET / HTTP/1.1" 200 OK
+Request received at 19:53:27
+INFO:     172.27.150.93:41236 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:27
+INFO:     128.61.254.123:34928 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:31
+INFO:     128.61.254.123:39788 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:36
+INFO:     172.27.150.93:44608 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:40
+INFO:     128.61.254.123:39790 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:44
+INFO:     172.27.150.93:44274 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:48
+INFO:     128.61.254.123:38750 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:53
+INFO:     172.27.150.93:44282 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:53:57
+INFO:     128.61.254.123:47724 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:01
+INFO:     172.27.150.93:51524 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:08
+INFO:     128.61.254.123:52220 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:10
+INFO:     172.27.150.93:38150 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:16
+INFO:     128.61.254.123:56456 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:18
+INFO:     172.27.150.93:36688 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:25
+INFO:     128.61.254.123:48740 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:26
+INFO:     172.27.150.93:35692 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:33
+INFO:     128.61.254.123:56630 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:35
+INFO:     172.27.150.93:51740 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:43
+INFO:     172.27.150.93:51752 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:45
+INFO:     128.61.254.123:45542 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:53
+INFO:     172.27.150.93:44734 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:54:53
+INFO:     128.61.254.123:48792 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:01
+INFO:     172.27.150.93:51004 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:02
+INFO:     128.61.254.123:58466 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:09
+INFO:     172.27.150.93:32828 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:10
+INFO:     128.61.254.123:58480 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:18
+INFO:     172.27.150.93:56298 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:21
+INFO:     128.61.254.123:53246 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:26
+INFO:     172.27.150.93:58458 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:29
+INFO:     128.61.254.123:53252 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:34
+INFO:     172.27.150.93:39552 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:38
+INFO:     128.61.254.123:60070 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:43
+INFO:     172.27.150.93:39558 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:47
+INFO:     128.61.254.123:51270 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:51
+INFO:     172.27.150.93:59496 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:55:55
+INFO:     128.61.254.123:55536 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:00
+INFO:     172.27.150.93:48230 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:04
+INFO:     128.61.254.123:51332 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:08
+INFO:     172.27.150.93:36254 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:12
+INFO:     128.61.254.123:59962 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:16
+INFO:     172.27.150.93:54512 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:25
+INFO:     172.27.150.93:56280 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:33
+INFO:     172.27.150.93:56296 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:41
+INFO:     172.27.150.93:48032 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:50
+INFO:     172.27.150.93:48596 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:56:58
+INFO:     172.27.150.93:49492 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:57:06
+INFO:     172.27.150.93:56944 - "POST /generate HTTP/1.1" 500 Internal Server Error
+slurmstepd: error: *** JOB 3000477 ON atl1-1-03-014-30-0 CANCELLED AT 2025-09-15T19:57:44 ***
+---------------------------------------
+Begin Slurm Epilog: Sep-15-2025 19:57:45
+Job ID:        3000477
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h200=1,mem=160G,node=1
+Rsrc Used:     cput=01:39:44,vmem=0,walltime=00:06:14,mem=348724K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-014-30-0
+---------------------------------------

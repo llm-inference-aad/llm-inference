@@ -1,0 +1,34 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-19-2025 19:58:36
+Job ID:    3070248
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-011-13-0.pace.gatech.edu
+Loading environment variables from .env file
+Activating virtual environment at: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv
+Writing server hostname 'atl1-1-03-011-13-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-011-13-0.pace.gatech.edu
+INFO:     Started server process [3000647]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): [errno 98] address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+Server running with server-side batching!
+---------------------------------------
+Begin Slurm Epilog: Sep-19-2025 19:58:40
+Job ID:        3070248
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=00:01:04,vmem=0,walltime=00:00:04,mem=250448K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-011-13-0
+---------------------------------------

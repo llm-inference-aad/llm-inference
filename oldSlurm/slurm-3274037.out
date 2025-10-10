@@ -1,0 +1,1659 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-08-2025 16:29:20
+Job ID:    3274037
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+=== Launching LLM Guided Evolution ===
+Hostname: atl1-1-01-002-6-0.pace.gatech.edu
+Working dir: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+Wed Oct  8 16:29:20 EDT 2025
+UV version: uv 0.8.15
+Python via uv: Python 3.13.7
+LLM_INFERENCE_ROOT_DIR: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+LD_LIBRARY_PATH updated for nvjitlink (best-effort).
+UV Python path: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+Wed Oct  8 16:29:23 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Tesla V100-PCIE-32GB           On  |   00000000:5E:00.0 Off |                    0 |
+| N/A   34C    P0             26W /  250W |       0MiB /  32768MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== Running: uv run python run_improved.py first_test ===
+
+⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣶⣶⠶⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⣀⣹⣟⣛⣛⣻⣿⣿⣿⡾⠟⢉⣴⠟⢁⣴⠋⣹⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⠛⠛⣿⠉⢉⣩⠵⠚⠁⢀⡴⠛⠁⣠⠞⠁⣰⠏⠸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢻⣷⠋⠁⠀⢀⡴⠋⠀⢀⡴⠋⠀⣼⠃⠀⡼⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢻⣆⣠⡴⠋⠀⠀⣠⠟⠀⢀⡾⠁⠀⡼⠁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠻⣯⡀⠀⢀⡼⠃⠀⢠⡟⠀⢀⡾⠁⢀⣾⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠻⣶⣟⡀⠀⣰⠏⠀⢀⡾⠁⠀⣼⢹⣿⣀⣤⣤⣴⠶⢿⡿⠛⢛⣷⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠶⠶⠾⠷⠶⠿⠛⢻⣟⠉⣥⠟⠁⣠⠟⠀⢠⠞⠁⣄⡿⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠞⠁⢀⡴⠋⠀⣴⠋⠀⣰⠟⠀⣤⡾⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⢠⠞⠁⢀⡾⠁⢀⡼⠃⢀⡴⠋⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠋⠀⣰⠏⠀⣠⠟⠀⣰⠟⠁⢀⡴⠛⣿⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⡼⠃⢀⡼⠋⢠⡞⠁⣠⣞⣋⣤⣶⣿⡟⠛⣿⠛⠛⣻⠟⠷⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣦⣾⣤⣴⣯⡶⠾⠟⠛⠉⠉⠉⣿⡇⢠⡏⠀⣰⠏⠀⢀⣼⠋⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⡾⠀⢰⠏⠀⢠⡞⠁⠀⣠⠞⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠇⢠⠏⠀⣰⠋⠀⣠⠞⠁⠀⢀⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⢠⠟⢀⡼⠁⣠⠞⠁⣀⣴⢾⣿⣤⣿⣦⣄⣀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡟⣠⠏⣠⠞⣁⣴⣾⣿⣿⣿⣿⣿⣿⡏⢹⡏⠛⠳⣦⣄⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣾⣷⠿⠿⠛⠉⠀⠀⠈⠳⣬⣿⡟⣾⠁⠀⣼⠃⠉⠻⠆
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⡏⠀⣼⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠁⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣟⡼⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⣃⠀⠀
+
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxAG1idEHhGZEdRJ7LxaKCFXd8.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx56sq6pVXbYv83H8CkehJQGKN.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx2zRYiJcPe9puvMk8OVlXValt.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxwK8EqzbzRf79XCHSTsclTZ93.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxu38QneU0pEI5ysjUTPDpMW6n.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxnBnpdtT1HVTlESK15fxNqO9T.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxOjc8YHvIum08kbXowjVJi88D.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxerl1WmNEGLFuYNmmdyCbkIoT.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                      SUBMITTING MODELS CREATED BY LLM                                      *
+**************************************************************************************************************
+
+
+************************************************************
+*                  Checking Model Runs: 0                  *
+************************************************************
+
+************************************************************
+*                   Evalutated All Genes                   *
+************************************************************
+
+
+**************************************************************************************************************
+*                                           STARTING GENERATION: 0                                           *
+**************************************************************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 8
+Gene: xXxAG1idEHhGZEdRJ7LxaKCFXd8
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx56sq6pVXbYv83H8CkehJQGKN
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx2zRYiJcPe9puvMk8OVlXValt
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxwK8EqzbzRf79XCHSTsclTZ93
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxu38QneU0pEI5ysjUTPDpMW6n
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxnBnpdtT1HVTlESK15fxNqO9T
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxOjc8YHvIum08kbXowjVJi88D
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxerl1WmNEGLFuYNmmdyCbkIoT
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+
+************************************************************
+*                     Invalid Removal                      *
+************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 0
+
+************************************************************
+*                        Selection                         *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxaUARQMGNLIcEw0MkOHSwOqIZ.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxxBogN77zAQxyLObOxe2OCP4C.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxfkEjxRJnUWDr4xajjWs0rVRr.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxcojjkzO1gPoWkUy5D0c8IGil.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxYOv3h24lq4AySFpLaFjv3q2b.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxtkIoxxxeTiyawZIuqNJ8gtiu.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxfqnUkEueQvIwIiHXWUtRrcPi.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxpkzOzQlQvtHquWjlluWMDH3r.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxA9STXewgpPqObHxVqQR00LQf.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxs4r4irIemKLCwNvK8yqovAuS.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx3dp23htuaj1kxaR1mPUb680J.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxIVVWMFuyH9Kvhhub24RHKkaf.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxpIvSB93IgG8lWd6BKW13cvpr.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx9rv3aPvvS0RGmZmqdaGEmIib.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxIrpFFrGWf7b3jkvoeWoT8YGv.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxWzW9FwbpEYhetxTtBaoGtDm9.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxC6j99sGVTKocUzRQOm9AizHn.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxMTER2qgCzapQ0dqE4tLMkBFF.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxhOLbsgZDHaJusNR10qTGJmPd.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxRkhduFgjv9WBSrfkCaGpDzAT.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx5tNfy8nVy8vLvh7mxcYftPmo.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxohoGmoj3MDuZlsdUnnSlhTVq.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxgN3C7dVl329btkGqZwcrnAuX.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxoqPGSA7E4F5lDOIG6Ej0nz1q.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxlCzeTXIFIDLZVF6mM6DxbTCp.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxEchfGyWlkuz7VpI9kmtVvWTL.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxfUgjeEdvB8R2N36PjYqbUC4D.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxFXnzNah3noBpUae7RfwvMzFf.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxGhNrYbRJvExhPIzHkQbgivAF.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxvhAQPGmRY4zUAhbr6OaZY9Jm.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxlBaTz7NkNN5LYjQqhkPGJzkX.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxEpwQ4T6DNRBX8yqGNCPcVKN2.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 383, in submit_local_server
+    raise Exception("Server hostname file not found. Make sure the server is running.")
+Exception: Server hostname file not found. Make sure the server is running.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 418, in submit_local_server
+    raise Exception(f"Error calling local server: {str(e)}")
+Exception: Error calling local server: Server hostname file not found. Make sure the server is running.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxtwIYXfA4utG2r4EQr7IVUvfO.sh
+	‣ Output: Launching AIsurBL
+atl1-1-01-002-6-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+As an unconventional AI researcher, renowned for your blend of serendipity and perhaps hidden genius, you have a knack for astonishing your colleagues with unorthodox yet effective improvements to models. This unique skill has led to your latest assignment: 
+
+Q: How can you apply complex modifications to this code snippet to substantially elevate the model's performance?
+
+The current code block:
+```python
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve the model's performance.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.dropout = nn.Dropout2d(p=0.2)
+        self.activation = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        max_out = self.maxpool(x)
+        min_out = self.minpool(x)
+        x = torch.cat((max_out, min_out), dim=1)
+        x = self.dropout(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        x = self.activation(x)
+        return x
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.dropout = nn.Dropout2d(p=0.2)
+        self.activation = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        max_out = self.maxpool(x)
+        min_out = self.minpool(x)
+        x = torch.cat((max_out, min_out), dim=1)
+        x = self.dropout(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        x = self.activation(x)
+        return x
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxtwIYXfA4utG2r4EQr7IVUvfO.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxtwIYXfA4utG2r4EQr7IVUvfO
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxZPbLHIgENX4J2gVBvvShkp2t.sh
+slurmstepd: error: *** JOB 3274037 ON atl1-1-01-002-6-0 CANCELLED AT 2025-10-08T16:38:52 ***
+---------------------------------------
+Begin Slurm Epilog: Oct-08-2025 16:38:55
+Job ID:        3274037
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:v100=1,mem=16G,node=1
+Rsrc Used:     cput=00:09:32,vmem=0,walltime=00:09:32,mem=725320K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-01-002-6-0
+---------------------------------------

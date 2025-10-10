@@ -1,0 +1,920 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-13-2025 17:48:37
+Job ID:    2977860
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+=== Launching LLM Guided Evolution ===
+Hostname: atl1-1-03-004-21-0.pace.gatech.edu
+Working dir: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference
+Sat Sep 13 17:48:37 EDT 2025
+UV version: uv 0.8.15
+Python via uv: Python 3.13.7
+GEMINI_API_KEY prefix: AIzaSyA6********
+LLM_INFERENCE_ROOT_DIR: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+LD_LIBRARY_PATH updated for nvjitlink (best-effort).
+UV Python path: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+Sat Sep 13 17:48:40 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L40S                    On  |   00000000:44:00.0 Off |                    0 |
+| N/A   38C    P8             36W /  350W |       0MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== Running: uv run python run_improved.py first_test ===
+
+⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣶⣶⠶⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⣀⣹⣟⣛⣛⣻⣿⣿⣿⡾⠟⢉⣴⠟⢁⣴⠋⣹⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⠛⠛⣿⠉⢉⣩⠵⠚⠁⢀⡴⠛⠁⣠⠞⠁⣰⠏⠸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢻⣷⠋⠁⠀⢀⡴⠋⠀⢀⡴⠋⠀⣼⠃⠀⡼⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢻⣆⣠⡴⠋⠀⠀⣠⠟⠀⢀⡾⠁⠀⡼⠁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠻⣯⡀⠀⢀⡼⠃⠀⢠⡟⠀⢀⡾⠁⢀⣾⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠻⣶⣟⡀⠀⣰⠏⠀⢀⡾⠁⠀⣼⢹⣿⣀⣤⣤⣴⠶⢿⡿⠛⢛⣷⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠶⠶⠾⠷⠶⠿⠛⢻⣟⠉⣥⠟⠁⣠⠟⠀⢠⠞⠁⣄⡿⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠞⠁⢀⡴⠋⠀⣴⠋⠀⣰⠟⠀⣤⡾⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⢠⠞⠁⢀⡾⠁⢀⡼⠃⢀⡴⠋⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠋⠀⣰⠏⠀⣠⠟⠀⣰⠟⠁⢀⡴⠛⣿⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⡼⠃⢀⡼⠋⢠⡞⠁⣠⣞⣋⣤⣶⣿⡟⠛⣿⠛⠛⣻⠟⠷⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣦⣾⣤⣴⣯⡶⠾⠟⠛⠉⠉⠉⣿⡇⢠⡏⠀⣰⠏⠀⢀⣼⠋⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⡾⠀⢰⠏⠀⢠⡞⠁⠀⣠⠞⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠇⢠⠏⠀⣰⠋⠀⣠⠞⠁⠀⢀⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⢠⠟⢀⡼⠁⣠⠞⠁⣀⣴⢾⣿⣤⣿⣦⣄⣀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡟⣠⠏⣠⠞⣁⣴⣾⣿⣿⣿⣿⣿⣿⡏⢹⡏⠛⠳⣦⣄⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣾⣷⠿⠿⠛⠉⠀⠀⠈⠳⣬⣿⡟⣾⠁⠀⣼⠃⠉⠻⠆
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⡏⠀⣼⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠁⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣟⡼⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⣃⠀⠀
+
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxc9CqNRBwJWeRsQ4GlxnjkLb4.sh
+	‣ Failed to Submit Script.
+	‣ Error: `flash-attention` package not found, consider installing for better performance: No module named 'flash_attn'.
+Current `flash-attention` does not support `window_size`. Either upgrade or use `attn_implementation='eager'`.
+
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]
+Fetching 2 files:   0%|          | 0/2 [00:27<?, ?it/s]
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 597, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1308, in _get_resolved_checkpoint_files
+    checkpoint_files, sharded_metadata = get_checkpoint_shard_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        _commit_hash=commit_hash,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 1119, in get_checkpoint_shard_files
+    cached_filenames = cached_files(
+        pretrained_model_name_or_path,
+    ...<10 lines>...
+        _commit_hash=_commit_hash,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 493, in cached_files
+    snapshot_download(
+    ~~~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/_snapshot_download.py", line 332, in snapshot_download
+    thread_map(
+    ~~~~~~~~~~^
+        _inner_hf_hub_download,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        tqdm_class=tqdm_class or hf_tqdm,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/tqdm/contrib/concurrent.py", line 69, in thread_map
+    return _executor_map(ThreadPoolExecutor, fn, *iterables, **tqdm_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/tqdm/contrib/concurrent.py", line 51, in _executor_map
+    return list(tqdm_class(ex.map(fn, *iterables, chunksize=chunksize), **kwargs))
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/_snapshot_download.py", line 306, in _inner_hf_hub_download
+    return hf_hub_download(
+        repo_id,
+    ...<15 lines>...
+        headers=headers,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: No such file or directory (os error 2)
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx3tyhJByfhXfhuiyZFnjgKxyx.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1150, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 321, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 478, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: Disk quota exceeded (os error 122)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1268, in _get_resolved_checkpoint_files
+    raise OSError(
+    ...<5 lines>...
+    ) from e
+OSError: Can't load the model for 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' is the correct path to a directory containing a file named pytorch_model.bin, tf_model.h5, model.ckpt or flax_model.msgpack.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx7Xi3yOwliw9ZfSlpvTXKAnpW.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1150, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 321, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 478, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: Disk quota exceeded (os error 122)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1268, in _get_resolved_checkpoint_files
+    raise OSError(
+    ...<5 lines>...
+    ) from e
+OSError: Can't load the model for 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' is the correct path to a directory containing a file named pytorch_model.bin, tf_model.h5, model.ckpt or flax_model.msgpack.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxivMFWEC52bch1icwzhuKKwTP.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1150, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 321, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 478, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: Disk quota exceeded (os error 122)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1268, in _get_resolved_checkpoint_files
+    raise OSError(
+    ...<5 lines>...
+    ) from e
+OSError: Can't load the model for 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' is the correct path to a directory containing a file named pytorch_model.bin, tf_model.h5, model.ckpt or flax_model.msgpack.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxQOSBet6zEU6QCczbPfYmKrGv.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1150, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 321, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 478, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: Disk quota exceeded (os error 122)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1268, in _get_resolved_checkpoint_files
+    raise OSError(
+    ...<5 lines>...
+    ) from e
+OSError: Can't load the model for 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' is the correct path to a directory containing a file named pytorch_model.bin, tf_model.h5, model.ckpt or flax_model.msgpack.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxgpyo4D8pdueDmriqukTuCrsP.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1150, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 321, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 478, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: Disk quota exceeded (os error 122)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1268, in _get_resolved_checkpoint_files
+    raise OSError(
+    ...<5 lines>...
+    ) from e
+OSError: Can't load the model for 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' is the correct path to a directory containing a file named pytorch_model.bin, tf_model.h5, model.ckpt or flax_model.msgpack.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxAZtxa9gOxg1VzdmwZRvRA4Cq.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1150, in _get_resolved_checkpoint_files
+    resolved_archive_file = cached_file(pretrained_model_name_or_path, filename, **cached_file_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 321, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 566, in cached_files
+    raise e
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/utils/hub.py", line 478, in cached_files
+    hf_hub_download(
+    ~~~~~~~~~~~~~~~^
+        path_or_repo_id,
+        ^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        local_files_only=local_files_only,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+        # Destination
+    ...<14 lines>...
+        force_download=force_download,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1171, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        incomplete_path=Path(blob_path + ".incomplete"),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<8 lines>...
+        xet_file_data=xet_file_data,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 1723, in _download_to_tmp_and_move
+    xet_get(
+    ~~~~~~~^
+        incomplete_path=incomplete_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        displayed_filename=filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/huggingface_hub/file_download.py", line 629, in xet_get
+    download_files(
+    ~~~~~~~~~~~~~~^
+        xet_download_info,
+        ^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        progress_updater=[progress_updater],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: Data processing error: CAS service error : IO Error: Disk quota exceeded (os error 122)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 261, in submit_mixtral
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        model_id,
+    ...<2 lines>...
+        device_map='auto'
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 5027, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path=pretrained_model_name_or_path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        transformers_explicit_filename=transformers_explicit_filename,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/transformers/modeling_utils.py", line 1268, in _get_resolved_checkpoint_files
+    raise OSError(
+    ...<5 lines>...
+    ) from e
+OSError: Can't load the model for 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'. If you were trying to load it from 'https://huggingface.co/models', make sure you don't have a local directory with the same name. Otherwise, make sure 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' is the correct path to a directory containing a file named pytorch_model.bin, tf_model.h5, model.ckpt or flax_model.msgpack.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxjCuIelvd1ohD9F6XxtcfQZc6.sh
+slurmstepd: error: *** JOB 2977860 ON atl1-1-03-004-21-0 CANCELLED AT 2025-09-13T17:51:54 ***
+---------------------------------------
+Begin Slurm Epilog: Sep-13-2025 17:51:57
+Job ID:        2977860
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:l40s=1,mem=16G,node=1
+Rsrc Used:     cput=00:03:17,vmem=0,walltime=00:03:17,mem=6622096K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-004-21-0
+---------------------------------------

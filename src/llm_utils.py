@@ -377,7 +377,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
     """
     try:
         # Read the hostname from the file written by the server
-        hostname_file = os.getenv("HOSTNAME_LOG_FILE", "/home/hice1/satmuri6/scratch/llm-inference/hostname.log")
+        hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{ROOT_DIR}/hostname.log")
 
         if not os.path.exists(hostname_file):
             raise Exception("Server hostname file not found. Make sure the server is running.")
@@ -389,12 +389,41 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
         server_port = os.getenv("SERVER_PORT", "8000")
         api_url = f"http://{server_hostname}:{server_port}/generate"
         
+        # Get job identification from environment (use Slurm job ID directly)
+        # Try multiple sources to find the Slurm job ID
+        job_id = os.getenv("SLURM_JOB_ID") or os.getenv("SLURM_JOBID") or os.getenv("JOB_ID")
+        
+        # Debug: Print what we found
+        if job_id:
+            print(f"[DEBUG] Found job_id from environment: {job_id}")
+        
+        if not job_id:
+            # Try to read from slurm environment file if it exists
+            try:
+                slurm_env_file = f"/proc/{os.getpid()}/environ"
+                if os.path.exists(slurm_env_file):
+                    with open(slurm_env_file, 'rb') as f:
+                        env_data = f.read().decode('utf-8', errors='ignore')
+                        for item in env_data.split('\x00'):
+                            if item.startswith('SLURM_JOB_ID='):
+                                job_id = item.split('=', 1)[1]
+                                print(f"[DEBUG] Found job_id from /proc/environ: {job_id}")
+                                break
+            except Exception as e:
+                print(f"[DEBUG] Could not read /proc/environ: {e}")
+        
+        # Final fallback
+        if not job_id:
+            job_id = "local"
+            print(f"[DEBUG] Using fallback job_id: {job_id}")
+        
         # Prepare the request payload
         payload = {
             "prompt": txt2llm,
             "max_new_tokens": max_new_tokens,
             "top_p": top_p,
-            "temperature": temperature
+            "temperature": temperature,
+            "job_id": job_id  # Add job identifier to match with slurm file
         }
         
         # Make the HTTP request
