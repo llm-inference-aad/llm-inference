@@ -427,7 +427,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
         }
         
         # Make the HTTP request
-        response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+        response = requests.post(api_url, json=payload, timeout=None)  #  minute timeout
         
         if response.status_code == 200:
             result = response.json()
