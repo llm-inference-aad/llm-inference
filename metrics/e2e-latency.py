@@ -180,6 +180,36 @@ class LatencyAnalyzer:
             print(f"\n🎯 PERFORMANCE METRICS:")
             print(f"   Throughput:     {stats['throughput_req_per_sec']:.2f} req/sec")
             
+            # Gene-specific analysis
+            gene_requests = {}
+            for req in requests:
+                gene_id = req.get("gene_id")
+                if gene_id:
+                    if gene_id not in gene_requests:
+                        gene_requests[gene_id] = []
+                    gene_requests[gene_id].append(req)
+            
+            if gene_requests:
+                print(f"\n🧬 GENE-SPECIFIC ANALYSIS:")
+                print(f"   Total Unique Genes: {len(gene_requests)}")
+                
+                # Sort genes by request count for better display
+                sorted_genes = sorted(gene_requests.items(), key=lambda x: len(x[1]), reverse=True)
+                
+                for gene_id, gene_reqs in sorted_genes[:10]:  # Show top 10 genes
+                    gene_latencies = [req["e2e_latency_sec"] for req in gene_reqs]
+                    avg_latency = np.mean(gene_latencies)
+                    min_latency = np.min(gene_latencies)
+                    max_latency = np.max(gene_latencies)
+                    request_count = len(gene_reqs)
+                    print(f"   {gene_id}: {request_count} reqs, {avg_latency:.3f}s avg, {min_latency:.3f}s min, {max_latency:.3f}s max")
+                
+                if len(gene_requests) > 10:
+                    print(f"   ... and {len(gene_requests) - 10} more genes")
+            else:
+                print(f"\n🧬 GENE-SPECIFIC ANALYSIS:")
+                print(f"   No gene_id information found in requests")
+            
             # Generate visualizations
             self.create_visualizations(run_hash, requests, stats)
             
@@ -255,8 +285,105 @@ class LatencyAnalyzer:
             # Show the plot
             plt.show()
             
+            # Create gene-specific visualization if gene data exists
+            self.create_gene_analysis_plot(run_hash, requests)
+            
         except Exception as e:
             print(f"Error creating visualizations: {e}")
+    
+    def create_gene_analysis_plot(self, run_hash: str, requests: List[Dict]):
+        """Create gene-specific analysis plot"""
+        try:
+            # Extract gene-specific data
+            gene_requests = {}
+            for req in requests:
+                gene_id = req.get("gene_id")
+                if gene_id:
+                    if gene_id not in gene_requests:
+                        gene_requests[gene_id] = []
+                    gene_requests[gene_id].append(req)
+            
+            if not gene_requests:
+                print("No gene_id data found - skipping gene analysis plot")
+                return
+            
+            # Calculate gene statistics
+            gene_stats = []
+            for gene_id, gene_reqs in gene_requests.items():
+                latencies = [req["e2e_latency_sec"] for req in gene_reqs]
+                gene_stats.append({
+                    'gene_id': gene_id,
+                    'request_count': len(gene_reqs),
+                    'avg_latency': np.mean(latencies),
+                    'min_latency': np.min(latencies),
+                    'max_latency': np.max(latencies),
+                    'std_latency': np.std(latencies) if len(latencies) > 1 else 0
+                })
+            
+            # Sort by request count
+            gene_stats.sort(key=lambda x: x['request_count'], reverse=True)
+            
+            # Take top 15 genes for visualization
+            top_genes = gene_stats[:15]
+            
+            if len(top_genes) < 2:
+                print("Not enough genes with data for gene analysis plot")
+                return
+            
+            # Create the plot
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+            fig.suptitle(f'Gene-Specific Analysis for Run: {run_hash}', fontsize=14, fontweight='bold')
+            
+            # Plot 1: Request count per gene
+            gene_names = [g['gene_id'][:8] + '...' if len(g['gene_id']) > 8 else g['gene_id'] for g in top_genes]
+            request_counts = [g['request_count'] for g in top_genes]
+            
+            bars1 = ax1.bar(range(len(gene_names)), request_counts, alpha=0.7, color='lightblue', edgecolor='black')
+            ax1.set_xlabel('Gene ID')
+            ax1.set_ylabel('Number of Requests')
+            ax1.set_title('Request Count per Gene')
+            ax1.set_xticks(range(len(gene_names)))
+            ax1.set_xticklabels(gene_names, rotation=45, ha='right')
+            ax1.grid(True, alpha=0.3)
+            
+            # Add value labels on bars
+            for bar, count in zip(bars1, request_counts):
+                height = bar.get_height()
+                ax1.text(bar.get_x() + bar.get_width()/2., height,
+                        f'{count}', ha='center', va='bottom', fontsize=8)
+            
+            # Plot 2: Average latency per gene with error bars
+            avg_latencies = [g['avg_latency'] for g in top_genes]
+            std_latencies = [g['std_latency'] for g in top_genes]
+            
+            bars2 = ax2.bar(range(len(gene_names)), avg_latencies, yerr=std_latencies, 
+                           alpha=0.7, color='lightcoral', edgecolor='black', capsize=3)
+            ax2.set_xlabel('Gene ID')
+            ax2.set_ylabel('Average E2E Latency (seconds)')
+            ax2.set_title('Average Latency per Gene (with std dev)')
+            ax2.set_xticks(range(len(gene_names)))
+            ax2.set_xticklabels(gene_names, rotation=45, ha='right')
+            ax2.grid(True, alpha=0.3)
+            
+            # Add value labels on bars
+            for bar, latency in zip(bars2, avg_latencies):
+                height = bar.get_height()
+                ax2.text(bar.get_x() + bar.get_width()/2., height,
+                        f'{latency:.3f}s', ha='center', va='bottom', fontsize=8)
+            
+            plt.tight_layout()
+            
+            # Save the gene analysis plot
+            gene_plot_filename = f"gene_analysis_{run_hash}.png"
+            gene_plot_path = self.metrics_dir / gene_plot_filename
+            plt.savefig(gene_plot_path, dpi=300, bbox_inches='tight')
+            print(f"🧬 Gene analysis plot saved to: {gene_plot_path}")
+            
+            # Show the plot
+            plt.show()
+            
+        except Exception as e:
+            print(f"Error creating gene analysis plot: {e}")
     
     def compare_runs(self, run_hashes: List[str]):
         """Compare metrics across multiple runs"""
