@@ -117,13 +117,68 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
     return template_txt, mute_type
 
 
-def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
-                      input_filename_y=None,
-                      output_filename=f'{SOTA_ROOT}/models/network_x.py',
-                      gpu='TeslaV100-PCIE-32GB',
-                      python_file='src/llm_mutation.py', 
-                      top_p=0.1, temperature=0.2,
-                     
+def write_bash_script(python_file, input_filename_x, output_filename, gene_id_child, gene_id_parent, temperature, top_p, template_txt, input_filename_y=None, gpu=LLM_GPU):
+    """
+    Generates a bash script content for submitting job associated with operating LLM prompts.
+
+    Args:
+        python_file (str): _description_
+        input_filename_x (str): _description_
+        output_filename (str): _description_
+        gene_id_child (str): _description_
+        gene_id_parent (str): _description_
+        temperature (float): _description_
+        top_p (float): _description_
+        template_txt (str): _description_
+        input_filename_y (str, optional): _description_. Defaults to None.
+        gpu (str, optional): _description_. Defaults to LLM_GPU.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        str: A string containing the contents of the bash script.
+    """
+    # Ensure SLURM log directory exists before generating scripts
+    ensure_slurm_log_dir()
+    
+    # Validate and set defaults for gpu_constraint
+    if not gpu or gpu.strip() == "":
+        gpu = LLM_GPU  # Use default if empty
+    
+    if python_file=='src/llm_mutation.py':
+        mutation_type = retrieve_base_code(template_txt)
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=mutation_type, gene_id_parent2=None)
+        out_dir = str(GENERATION)
+        file_path = os.path.join(out_dir, f'{gene_id_child}_model.txt')
+        os.makedirs(out_dir, exist_ok=True)
+        with open(file_path, 'w') as file:
+            file.write(template_txt)
+            
+        temp_text = f'{python_file} {input_filename_x} {output_filename} {file_path} --top_p {top_p} --temperature {temperature}'
+        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
+        
+    elif python_file=='src/llm_crossover.py':
+        gene_id_parent2 = fetch_gene(input_filename_y)
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=None, gene_id_parent2=gene_id_parent2)
+        
+        temp_text = f"{python_file} {input_filename_x} {input_filename_y} {output_filename} --top_p {top_p} --temperature {temperature}"
+        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
+    else:
+        raise ValueError("Invalid python_file argument")
+
+    # Validate python_runline is not empty
+    if not python_runline or python_runline.strip() == "":
+        raise ValueError("python_runline cannot be empty")
+
+    bash_script_content = LLM_BASH_SCRIPT_TEMPLATE.format(
+        gpu_constraint=gpu,
+        python_runline=python_runline,
+        slurm_log_dir=SLURM_LOG_DIR,
+    )
+    return bash_script_content
                      ):
     
     def fetch_gene(filepath):
@@ -333,6 +388,14 @@ def submit_run(gene_id):
 
         # python_runline = f'python {train_file} -bs 216 -epoch 2 -network "models.network_{gene_id}" {tmp}'
         python_runline = f'python {train_file} -bs 216 -network "models.network_{gene_id}" {tmp}'
+        
+        # Ensure SLURM log directory exists before generating scripts
+        ensure_slurm_log_dir()
+        
+        # Validate python_runline is not empty
+        if not python_runline or python_runline.strip() == "":
+            raise ValueError("python_runline cannot be empty")
+        
         bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(
             python_runline=python_runline,
             slurm_log_dir=SLURM_LOG_DIR,

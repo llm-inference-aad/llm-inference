@@ -11,8 +11,7 @@ SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 #: Location where the network architecture for the seed resides
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
-SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'results', 'slurm')
-os.makedirs(SLURM_LOG_DIR, exist_ok=True)
+SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 LOCAL = True
 if LOCAL:
@@ -40,6 +39,8 @@ try:
 	GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
 except:
 	GEMINI_API_KEY = ''
+# Surya: Retry budget for LLM code generation (tune to trade off diversity vs. reliability)
+LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3))
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
 
 # Evolution Constants/Params
@@ -62,7 +63,7 @@ PROB_QC = 0.0
 PROB_EOT = 0.25
 
 #: Number of generations to run for
-num_generations = 1  # Number of generations
+num_generations = 5  # Number of generations
 
 #: Population size for launching optimization
 start_population_size = 8
@@ -132,7 +133,7 @@ LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=llm_oper
 #SBATCH -t 8:00:00
 #SBATCH --gres=gpu:1
-#SBATCH -C "{gpu_constraint}"
+#SBATCH -C {gpu_constraint}
 #SBATCH --mem-per-gpu 16G
 #SBATCH -n 12
 #SBATCH -N 1
@@ -165,6 +166,16 @@ export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.12/site-packages/nvidia/nvjitlink
 {python_runline}
 """
 
+
+# Helper Functions
+# ----------------
+
+def ensure_slurm_log_dir():
+    """
+    Ensure the SLURM log directory exists.
+    This should be called during program startup/configuration rather than at import time.
+    """
+    os.makedirs(SLURM_LOG_DIR, exist_ok=True)
 
 
 # Misc. Non-sense
