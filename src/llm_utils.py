@@ -36,44 +36,74 @@ def retrieve_base_code(idx):
 def clean_code_from_llm(code_from_llm):
     """Cleans the code received from LLM."""
     code_from_llm = code_from_llm.strip()
-    
-    # Try to extract code from triple backticks first
-    if "```" in code_from_llm:
-        parts = code_from_llm.split("```")
-        if len(parts) > 1:
-            # Get the first code block
-            code_block = parts[1]
-            lines = code_block.split('\n')
-            # Skip the first line if it's a language identifier (e.g., "python")
-            if len(lines) > 1 and lines[0].strip() in ['python', 'py', '']:
-                return '\n'.join(lines[1:]).strip()
-            else:
-                return code_block.strip()
-    
+    if not code_from_llm:
+        return ""
+
+    # Surya: Extract code from fenced blocks using regex instead to avoid capturing markdown prose
+    fenced_blocks = re.findall(r"```(?:python)?\s*(.*?)```", code_from_llm, flags=re.IGNORECASE | re.DOTALL)
+    if fenced_blocks:
+        return fenced_blocks[-1].strip()
+
     # If no triple backticks, try to find Python code patterns
     lines = code_from_llm.split('\n')
     python_lines = []
     in_code = False
-    
+
+    keywords = ('def ', 'class ', 'import ', 'from ', '@', 'for ', 'while ', 'if ', 'try', 'with ', 'return ', 'pass', 'raise ')
     for line in lines:
-        # Look for Python function/class definitions
-        if any(keyword in line for keyword in ['def ', 'class ', 'import ', 'from ']):
+        stripped = line.strip()
+        if not stripped:
+            if in_code:
+                python_lines.append(line)
+            continue
+        if any(stripped.startswith(keyword) for keyword in keywords):
             in_code = True
         if in_code:
             python_lines.append(line)
-    
+
     if python_lines:
         return '\n'.join(python_lines).strip()
-    
-    # Fallback: return the original text
-    return code_from_llm
+
+    # No recognizable code found
+    return ""
+
+
+def _validate_python_snippet(snippet: str) -> tuple[bool, str]:
+    """Compile-check Python code before saving to catch syntax errors early."""
+    if not snippet or not snippet.strip():
+        return False, "empty snippet"
+    try:
+        compile(snippet, "<llm_snippet>", "exec")
+    except (SyntaxError, IndentationError, ValueError) as exc:
+        return False, f"{exc.__class__.__name__}: {exc}"
+    except Exception as exc:  # Catch other rare issues such as encoding errors
+        return False, f"{exc.__class__.__name__}: {exc}"
+    return True, ""
+
+
+def _format_retry_prompt(base_prompt: str, attempt: int) -> str:
+    """Add stricter formatting instructions on retry attempts to coerce valid code."""
+    if attempt == 0:
+        return base_prompt
+    enforcement = (
+        "\n\nSTRICT INSTRUCTIONS: Return only the fully updated Python code inside a single ```python``` fenced block. "
+        "Do not include commentary, analysis, or markdown outside that block."
+    )
+    return f"{base_prompt}{enforcement}"
+
+
+def validate_module_source(source_code: str, module_path: str, module_name: Optional[str] = None) -> None:
+    """Execute module source to catch runtime errors (NameError, etc.) before evaluation."""
+    unique_name = module_name or f"_llmge_validation_{hash(module_path)}"
+    module_globals = {"__name__": unique_name, "__file__": module_path}
+    exec(compile(source_code, module_path, "exec"), module_globals, {})
 
 
 def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None):
-    """Generates augmented code using Mixtral."""
+    """Generate augmented code with retry loop: validates syntax before accepting LLM output."""
     box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
     print(txt2llm)
-    
+
     if inference_submission is False:
         if LLM_MODEL == 'local_server':
             llm_code_generator = submit_local_server
@@ -88,19 +118,38 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         elif LLM_MODEL == 'gemini':
             llm_code_generator = submit_gemini_api
         qc_func = llm_code_qc_hf
-    
-    if apply_quality_control:
-        base_code = retrieve_base_code(augment_idx)
-        code_from_llm, generate_text = llm_code_generator(txt2llm, return_gen=True, top_p=top_p, temperature=temperature, gene_id=gene_id)
-        code_from_llm = qc_func(code_from_llm, base_code, generate_text)
-    else:
-        code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature, gene_id=gene_id)
-        box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
-        print(code_from_llm)
-        code_from_llm = clean_code_from_llm(code_from_llm)
-    box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
-    print(code_from_llm)
-    return code_from_llm
+
+    last_error = ""
+    # Surya: Better retry loop with a configurable max retry constant: re-prompt LLM if generated code fails validation tests
+    for attempt in range(LLM_GENERATION_MAX_RETRIES):
+        prompt = _format_retry_prompt(txt2llm, attempt)
+        if apply_quality_control:
+            base_code = retrieve_base_code(augment_idx)
+            raw_response, generate_text = llm_code_generator(
+                prompt, return_gen=True, top_p=top_p, temperature=temperature, gene_id=gene_id
+            )
+            candidate_code = qc_func(raw_response, base_code, generate_text)
+        else:
+            raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
+            box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
+            print(raw_response)
+            candidate_code = clean_code_from_llm(raw_response)
+
+        candidate_code = clean_code_from_llm(candidate_code)
+
+        is_valid, validation_error = _validate_python_snippet(candidate_code)
+        if is_valid:
+            box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
+            print(candidate_code)
+            return candidate_code
+
+        last_error = validation_error or "unable to extract python code"
+        box_print("INVALID LLM OUTPUT", print_bbox_len=60, new_line_end=False)
+        print(f"Attempt {attempt + 1} failed validation: {last_error}")
+
+    raise RuntimeError(
+        f"LLM failed to provide valid Python after {LLM_GENERATION_MAX_RETRIES} attempts. Last error: {last_error}"
+    )
 
 def extract_note(txt):
     """Extracts note from the part if present."""

@@ -11,7 +11,7 @@ build/
 tests/*/outputs
 slurm-*.out
 slurm-*.err
-results/slurm-*
+slurm-results/
 setup_uv.sh
 uv.lock
 .env

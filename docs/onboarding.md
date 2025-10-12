@@ -1,6 +1,6 @@
-# Onboarding Document
+# Onboarding Document for ExquisiteNetV2 LLMGE on CIFAR10
 
-## Assumption Checks
+## Principle Assumptions
 
 - **Assumption 1 – GA manipulates ExquisiteNetV2 on CIFAR10**: Confirmed via the DEAP-driven loop that mutates networks under `sota/ExquisiteNetV2`. Validation: Individuals are ExquisiteNet variants evaluated with CIFAR10 data.
     - `run_improved.py:900`

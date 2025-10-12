@@ -4,7 +4,7 @@ This note captures the additions made while wiring up the Pareto front workflow 
 
 ## Overview
 - Added `scripts/plot_pareto.py` to aggregate `{gene}_results.txt` files written by `sota/ExquisiteNetV2/train.py` and render a Pareto front (maximize test accuracy, minimize parameter count).
-- Introduced a shared `results/slurm/` directory (`src/cfg/constants.py`) and routed every Slurm batch script through it so logs are no longer scattered across the repo.
+- Introduced a shared `slurm-results/` directory (`src/cfg/constants.py`) and routed every Slurm batch script through it so logs are no longer scattered across the repo.
 - Expanded project dependencies with `matplotlib>=3.9.0` (see `pyproject.toml`) for plotting support.
 
 ## Producing Results
@@ -30,8 +30,8 @@ The script will:
 If the results directory is missing or empty, the tool exits gracefully after printing a message.
 
 ## Centralized Slurm Logs
-- `src/cfg/constants.py` now defines `SLURM_LOG_DIR = results/slurm/` and guarantees the directory exists at import time.
-- Both Slurm templates (`PYTHON_BASH_SCRIPT_TEMPLATE`, `LLM_BASH_SCRIPT_TEMPLATE`) now emit `--output` and `--error` directives pointing to `results/slurm/`.
+- `src/cfg/constants.py` now defines `SLURM_LOG_DIR = slurm-results/` and guarantees the directory exists at import time.
+- Both Slurm templates (`PYTHON_BASH_SCRIPT_TEMPLATE`, `LLM_BASH_SCRIPT_TEMPLATE`) now emit `--output` and `--error` directives pointing to `slurm-results/`.
 - `run.sh` and `server.sh` mirror the behavior by placing their job logs under the same folder and creating it as needed.
 
 This structure keeps the repository root clean and makes it easier to archive or purge Slurm logs without touching model artifacts.
@@ -39,4 +39,4 @@ This structure keeps the repository root clean and makes it easier to archive or
 ## Troubleshooting
 - **No plot generated:** verify that evaluation jobs completed successfully and produced files inside `sota/ExquisiteNetV2/results/`.
 - **Matplotlib import error:** rerun `pip install -e .` (or `pip install matplotlib`) inside the virtual environment to pick up the new dependency.
-- **Log location:** inspect `results/slurm/` for both the evolution loop logs (`slurm-main-*.out/err`) and the underlying LLM/evaluation jobs (`llm-*.out`, `eval-*.out`).
+- **Log location:** inspect `slurm-results/` for both the evolution loop logs (`slurm-main-*.out/err`) and the underlying LLM/evaluation jobs (`llm-*.out`, `eval-*.out`).

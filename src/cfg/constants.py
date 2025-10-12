@@ -63,7 +63,7 @@ PROB_QC = 0.0
 PROB_EOT = 0.25
 
 #: Number of generations to run for
-num_generations = 5  # Number of generations
+num_generations = 1  # Number of generations
 
 #: Population size for launching optimization
 start_population_size = 8

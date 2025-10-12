@@ -45,8 +45,10 @@ def get_args():
 
 
 def main():
-    # ADDED FOR LLM
-    os.chdir('./sota/ExquisiteNetV2')
+    # ADDED FOR LLM - change to ExquisiteNetV2 directory if not already there
+    if not os.path.basename(os.getcwd()) == 'ExquisiteNetV2':
+        if os.path.exists('./sota/ExquisiteNetV2'):
+            os.chdir('./sota/ExquisiteNetV2')
 
     args = get_args()
 

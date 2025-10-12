@@ -28,7 +28,7 @@ BATCH_WAIT_TIME = 2  # max wait time for batch to fill in s
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
 METRICS_BASE_PATH = os.getenv("METRICS_PATH", "./metrics")
 METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
-METRICS_FILE = METRICS_DIR / f"e2e-latency-{RUN_HASH}.json"
+METRICS_FILE = METRICS_DIR / f"-latency-{RUN_HASH}.json"
 
 # Ensure metrics directory exists
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
@@ -46,7 +46,7 @@ metrics_metadata = {
 with open(METRICS_FILE, 'w') as f:
     json.dump(metrics_metadata, f, indent=2)
 
-def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None):
+def save_latency_metrics(request_data, _time, batch_processing_time, batch_size, queue_wait_time=None):
     """Save end-to-end latency metrics to JSON file"""
     try:
         # Read current metrics
@@ -61,7 +61,7 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
             "max_new_tokens": request_data["max_new_tokens"],
             "temperature": request_data["temperature"],
             "top_p": request_data["top_p"],
-            "e2e_latency_sec": round(e2e_time, 4),
+            "_latency_sec": round(_time, 4),
             "batch_processing_time_sec": round(batch_processing_time, 4),
             "batch_size": batch_size,
             "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None
@@ -304,7 +304,7 @@ async def generate_text(request: LLMRequest):
     Returns:
     dict: generated_text (output of LLM), response_time, and run_hash for metrics tracking
     """
-    e2e_start_time = time.time()
+    _start_time = time.time()
     
     try:
         # Convert request to dict
@@ -322,13 +322,13 @@ async def generate_text(request: LLMRequest):
         # Track queue wait time
         queue_start_time = time.time()
         gene_info = f" for gene {request.gene_id}" if request.gene_id else ""
-        print(f"Request received{gene_info} at {time.strftime('%H:%M:%S', time.localtime(e2e_start_time))}")
+        print(f"Request received{gene_info} at {time.strftime('%H:%M:%S', time.localtime(_start_time))}")
         
         # Submit to the batch processor and wait for result
         result = await model.generate(request_dict, queue_start_time)
         
         # Calculate end-to-end latency
-        e2e_time = time.time() - e2e_start_time
+        _time = time.time() - _start_time
         
         # Extract batch processing time and queue wait time from result
         batch_processing_time = result.get("response_time_sec", 0)
@@ -338,16 +338,16 @@ async def generate_text(request: LLMRequest):
         # Save latency metrics
         save_latency_metrics(
             request_dict, 
-            e2e_time, 
+            _time, 
             batch_processing_time, 
             batch_size, 
             queue_wait_time
         )
         
-        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing)")
+        print(f"Request completed in {_time:.2f}s (), {batch_processing_time:.2f}s (batch processing)")
         
-        # Add run hash and e2e latency to response
-        result["e2e_latency_sec"] = round(e2e_time, 4)
+        # Add run hash and  latency to response
+        result["_latency_sec"] = round(_time, 4)
         result["run_hash"] = RUN_HASH
         result["gene_id"] = request.gene_id
         

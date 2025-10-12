@@ -95,7 +95,7 @@ A Pull Request (PR) is a formal request to merge your changes into the `main` br
 Code review is a critical quality gate. It helps catch bugs, enforce coding standards, and share knowledge across the team.
 
 -   **Process**:
-    -   Assign at least one or two team members as reviewers on your PR.
+    -   Assign at least one team member as a reviewer on your PR.
     -   Reviewers should provide constructive, respectful feedback.
     -   The author should address all comments, pushing new commits to the same branch to update the PR.
 
@@ -110,7 +110,7 @@ Once a PR has been approved and has passed all automated checks, it can be merge
 
 -   **Prerequisites**:
     -   At least one reviewer has approved the changes.
-    -   All CI/CD checks (e.g., tests, linting, builds) are passing.
+    -   All CI/CD checks if applicable (e.g., tests, linting, builds) are passing.
 
 -   **Merge Strategy**:
     -   Use **Squash and Merge**. This combines all of the feature branch's commits into a single, clean commit on the `main` branch. The commit message should be the PR title and description.
