@@ -1,0 +1,9 @@
+To make it more efficient, especially when dealing with large datasets.
+</think>
+
+Here’s a more efficient version of the code that uses a set to track seen items, which reduces the time complexity from O(n^2) to O(n):
+
+
+```python
+{}
+```

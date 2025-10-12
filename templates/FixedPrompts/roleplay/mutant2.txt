@@ -1,0 +1,11 @@
+python
+def process_data(data):
+    processed = []
+    for item in data:
+        if condition(item):
+            processed.append(process_item(item))
+    return processed
+
+```python
+{}
+```

@@ -1,8 +1,12 @@
-Question: What are some complex modifications that could be considered to potentially improve the performance of the following existing Python code snippet?
+python
+def process_data(data):
+    result = []
+    for item in data:
+        processed_item = some_processing(item)
+        if processed_item not in result:
+            result.append(processed_item)
+    return result
 
-Here is the current code:
-
-(code snippet provided)
 ```python
 {}
 ```

@@ -1,0 +1,10 @@
+To make it more concise and readable.
+
+</think>
+
+Here's a more concise and readable version of the code:
+
+
+```python
+{}
+```
