@@ -1,0 +1,1774 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-10-2025 17:44:05
+Job ID:    2951137
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Guided Evolution
+atl1-1-03-004-21-0.pace.gatech.edu
+LLM_INFERENCE_ROOT_DIR is set to /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+UV version: uv 0.8.15
+Python version: Python 3.13.7
+Current working directory: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+UV Python location: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+
+⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣶⣶⠶⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⣀⣹⣟⣛⣛⣻⣿⣿⣿⡾⠟⢉⣴⠟⢁⣴⠋⣹⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⠛⠛⣿⠉⢉⣩⠵⠚⠁⢀⡴⠛⠁⣠⠞⠁⣰⠏⠸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢻⣷⠋⠁⠀⢀⡴⠋⠀⢀⡴⠋⠀⣼⠃⠀⡼⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢻⣆⣠⡴⠋⠀⠀⣠⠟⠀⢀⡾⠁⠀⡼⠁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠻⣯⡀⠀⢀⡼⠃⠀⢠⡟⠀⢀⡾⠁⢀⣾⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠻⣶⣟⡀⠀⣰⠏⠀⢀⡾⠁⠀⣼⢹⣿⣀⣤⣤⣴⠶⢿⡿⠛⢛⣷⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠶⠶⠾⠷⠶⠿⠛⢻⣟⠉⣥⠟⠁⣠⠟⠀⢠⠞⠁⣄⡿⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠞⠁⢀⡴⠋⠀⣴⠋⠀⣰⠟⠀⣤⡾⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⢠⠞⠁⢀⡾⠁⢀⡼⠃⢀⡴⠋⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠋⠀⣰⠏⠀⣠⠟⠀⣰⠟⠁⢀⡴⠛⣿⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⡼⠃⢀⡼⠋⢠⡞⠁⣠⣞⣋⣤⣶⣿⡟⠛⣿⠛⠛⣻⠟⠷⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣦⣾⣤⣴⣯⡶⠾⠟⠛⠉⠉⠉⣿⡇⢠⡏⠀⣰⠏⠀⢀⣼⠋⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⡾⠀⢰⠏⠀⢠⡞⠁⠀⣠⠞⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠇⢠⠏⠀⣰⠋⠀⣠⠞⠁⠀⢀⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⢠⠟⢀⡼⠁⣠⠞⠁⣀⣴⢾⣿⣤⣿⣦⣄⣀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡟⣠⠏⣠⠞⣁⣴⣾⣿⣿⣿⣿⣿⣿⡏⢹⡏⠛⠳⣦⣄⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣾⣷⠿⠿⠛⠉⠀⠀⠈⠳⣬⣿⡟⣾⠁⠀⣼⠃⠉⠻⠆
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⡏⠀⣼⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠁⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣟⡼⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⣃⠀⠀
+
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx5Pri9SbMUgm4ytWRL3BxGDCb.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx5Pri9SbMUgm4ytWRL3BxGDCb.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxeHPxgD6Dwd9RleGdjkfbaXSC.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxeHPxgD6Dwd9RleGdjkfbaXSC.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx5JewLHNQudmRcTP9qoyD1GOO.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx5JewLHNQudmRcTP9qoyD1GOO.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxdjiJP2gIquQL9iEpQhq21Mgj.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxdjiJP2gIquQL9iEpQhq21Mgj.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxHfZcByXOnqY8NPwmNZuedxC9.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxHfZcByXOnqY8NPwmNZuedxC9.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxm8lUZEMcmOe5KKniI05HcF2p.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxm8lUZEMcmOe5KKniI05HcF2p.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxtaS9nrNIrLnLwQ62sSGTMU6d.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxtaS9nrNIrLnLwQ62sSGTMU6d.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx0H5NFWYjpCmDamkzEeYTteZ5.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx0H5NFWYjpCmDamkzEeYTteZ5.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxN2Qk4JD7083cmB89fJwpn8j1.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxN2Qk4JD7083cmB89fJwpn8j1.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxczC8LxNVgCSZDIZu8G1t6JuW.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxczC8LxNVgCSZDIZu8G1t6JuW.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxKtIGF4fwttYFjucOcifUrFV7.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxKtIGF4fwttYFjucOcifUrFV7.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxIkT8RFycT3CPZDEkfg5rNBoO.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxIkT8RFycT3CPZDEkfg5rNBoO.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxAmjWWfCGyPAz51JE4TKHaE7P.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxAmjWWfCGyPAz51JE4TKHaE7P.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxv1mdsXTt7UCHytEynFCaozPy.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxv1mdsXTt7UCHytEynFCaozPy.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxSMUielspSkPc5MbChkl2NFt2.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxSMUielspSkPc5MbChkl2NFt2.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxtUQBYQsrcA3aBY9UWac6dFYq.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxtUQBYQsrcA3aBY9UWac6dFYq.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxbotlZMPhmCPO959nfmG3lzhw.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxbotlZMPhmCPO959nfmG3lzhw.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxE7moO46831SxCDVU2IUe8rQJ.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxE7moO46831SxCDVU2IUe8rQJ.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxikiOglUZecpbhmWUEHS5mOvt.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxikiOglUZecpbhmWUEHS5mOvt.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxNXBZklp8WabrgLJOVzEMIfmO.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxNXBZklp8WabrgLJOVzEMIfmO.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxVehRMF92jlxXxnrAQHpApMlG.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxVehRMF92jlxXxnrAQHpApMlG.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxuxeqKN2sbjmffbpr99oh4r9b.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxuxeqKN2sbjmffbpr99oh4r9b.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx0O7QJm0U9OzZ9OTKIrz4iS8q.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx0O7QJm0U9OzZ9OTKIrz4iS8q.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxPSzpIufjLga7NmEoDQkFhOaV.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxPSzpIufjLga7NmEoDQkFhOaV.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxeJXUxp5nfcmIHW8wK2wzSHSX.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxeJXUxp5nfcmIHW8wK2wzSHSX.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx7OYFNVFYyssQTaoupFlLDKWY.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx7OYFNVFYyssQTaoupFlLDKWY.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxMFzMnysLGj8FEbVyKLddGFGc.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxMFzMnysLGj8FEbVyKLddGFGc.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxRAhvUKjX6SKNy39htw2DopW2.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxRAhvUKjX6SKNy39htw2DopW2.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx5vYqViL8eeukTnJO72ABB8D2.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx5vYqViL8eeukTnJO72ABB8D2.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxnAzRWTJexF7bEu63a8EYYV5r.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxnAzRWTJexF7bEu63a8EYYV5r.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx0QfkHEEECYWzT6aED7UWqjub.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXx0QfkHEEECYWzT6aED7UWqjub.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxKgecDiYlUyJuiXcJvdeMDU4d.sh
+	‣ Failed to Submit Script.
+	‣ Error: 0/xXxKgecDiYlUyJuiXcJvdeMDU4d.sh: line 22: /home/hice1/rmanimaran8/scratch/llm-inference/.venv/bin/activate: No such file or directory
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 61, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 243, in submit_gemini_api
+    client = genai.Client(api_key=GEMINI_API_KEY)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/google/genai/_api_client.py", line 654, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                      SUBMITTING MODELS CREATED BY LLM                                      *
+**************************************************************************************************************
+
+
+************************************************************
+*                  Checking Model Runs: 0                  *
+************************************************************
+
+************************************************************
+*                   Evalutated All Genes                   *
+************************************************************
+
+
+**************************************************************************************************************
+*                                           STARTING GENERATION: 0                                           *
+**************************************************************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 32
+Gene: xXx5Pri9SbMUgm4ytWRL3BxGDCb
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 4 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxeHPxgD6Dwd9RleGdjkfbaXSC
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 4 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx5JewLHNQudmRcTP9qoyD1GOO
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxdjiJP2gIquQL9iEpQhq21Mgj
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxHfZcByXOnqY8NPwmNZuedxC9
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxm8lUZEMcmOe5KKniI05HcF2p
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxtaS9nrNIrLnLwQ62sSGTMU6d
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx0H5NFWYjpCmDamkzEeYTteZ5
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxN2Qk4JD7083cmB89fJwpn8j1
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxczC8LxNVgCSZDIZu8G1t6JuW
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxKtIGF4fwttYFjucOcifUrFV7
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 3 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxIkT8RFycT3CPZDEkfg5rNBoO
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxAmjWWfCGyPAz51JE4TKHaE7P
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxv1mdsXTt7UCHytEynFCaozPy
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxSMUielspSkPc5MbChkl2NFt2
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxtUQBYQsrcA3aBY9UWac6dFYq
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxbotlZMPhmCPO959nfmG3lzhw
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxE7moO46831SxCDVU2IUe8rQJ
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxikiOglUZecpbhmWUEHS5mOvt
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 2 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxNXBZklp8WabrgLJOVzEMIfmO
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxVehRMF92jlxXxnrAQHpApMlG
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxuxeqKN2sbjmffbpr99oh4r9b
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx0O7QJm0U9OzZ9OTKIrz4iS8q
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxPSzpIufjLga7NmEoDQkFhOaV
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxeJXUxp5nfcmIHW8wK2wzSHSX
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx7OYFNVFYyssQTaoupFlLDKWY
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxMFzMnysLGj8FEbVyKLddGFGc
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 1 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxRAhvUKjX6SKNy39htw2DopW2
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx5vYqViL8eeukTnJO72ABB8D2
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxnAzRWTJexF7bEu63a8EYYV5r
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx0QfkHEEECYWzT6aED7UWqjub
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxKgecDiYlUyJuiXcJvdeMDU4d
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 0 min, Status: subbed file
+	‣ LLM Job-ID: None
+
+************************************************************
+*                     Invalid Removal                      *
+************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 0
+
+************************************************************
+*                        Selection                         *
+************************************************************
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 888, in <module>
+    createPopulation()
+    ~~~~~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 812, in createPopulation
+    population = toolbox.population(n=start_population_size)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/deap/tools/init.py", line 23, in initRepeat
+    return container(func() for _ in range(n))
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/deap/tools/init.py", line 23, in <genexpr>
+    return container(func() for _ in range(n))
+                     ~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 295, in create_individual
+    successful_sub_flag, job_id, local_output = submit_bash(file_path,
+                                                ~~~~~~~~~~~^^^^^^^^^^^
+                                              input_filename_x=f'{SOTA_ROOT}/network.py',
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+                                              python_file='src/llm_mutation.py',
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                              top_p=0.1, temperature=temperature)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 189, in submit_bash
+    create_bash_file(file_path, **kwargs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 173, in create_bash_file
+    bash_script_content = write_bash_script(**kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 147, in write_bash_script
+    GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY,
+                                            mutation_type=mute_type, gene_id_parent2=None)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 46, in update_ancestry
+    ancestry[gene_id_child] = copy.deepcopy(ancestry[gene_id_parent])
+                                            ~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'network'
+---------------------------------------
+Begin Slurm Epilog: Sep-10-2025 17:48:59
+Job ID:        2951137
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:l40s=1,mem=16G,node=1
+Rsrc Used:     cput=00:04:55,vmem=0,walltime=00:04:55,mem=1170800K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-004-21-0
+---------------------------------------

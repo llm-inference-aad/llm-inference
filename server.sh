@@ -8,7 +8,7 @@
 echo "launching LLM Server"
 
 hostname
-
+    
 module load cuda
 
 # Load environment variables from .env file
@@ -26,6 +26,16 @@ else
     export HOSTNAME_LOG_FILE="$(pwd)/hostname.log"
     export CUDA_VISIBLE_DEVICES="0"
     export MKL_THREADING_LAYER="GNU"
+fi
+
+# IMPORTANT: Command-line/sbatch exports override .env values
+# This allows parallel jobs to use different ports
+echo "Checking for environment overrides..."
+if [ ! -z "$SERVER_PORT" ]; then
+    echo "  SERVER_PORT override detected: $SERVER_PORT"
+fi
+if [ ! -z "$HOSTNAME_LOG_FILE" ]; then
+    echo "  HOSTNAME_LOG_FILE override detected: $HOSTNAME_LOG_FILE"
 fi
 
 # Make sure CUDA can see all GPUs

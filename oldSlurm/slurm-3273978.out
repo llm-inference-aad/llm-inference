@@ -1,0 +1,48 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-08-2025 16:23:41
+Job ID:    3273978
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-010-15-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+Activating virtual environment at: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv
+Writing server hostname 'atl1-1-03-010-15-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-010-15-0.pace.gatech.edu
+INFO:     Started server process [1179273]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: c6774adf978ac319
+Metrics will be saved to: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/metrics/data/e2e-latency-c6774adf978ac319.json
+[2025-10-08 16:23:44] ===== SERVER STARTUP INITIATED =====
+[2025-10-08 16:23:44] Starting LLM server...
+[2025-10-08 16:23:44] Loading model during startup...
+[2025-10-08 16:23:44] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-08 16:23:44] ===== MODEL LOADING STARTED =====
+[2025-10-08 16:23:44] Initializing model components...
+[2025-10-08 16:23:44] Model path: /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-08 16:23:44] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:24<02:50, 24.32s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:49<02:28, 24.81s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [01:13<02:03, 24.61s/it]Loading checkpoint shards:  50%|█████     | 4/8 [01:38<01:38, 24.50s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [02:03<01:14, 24.67s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [02:28<00:50, 25.06s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [02:53<00:24, 24.84s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:05<00:00, 20.74s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:05<00:00, 23.17s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://atl1-1-03-010-15-0.pace.gatech.edu:8000 (Press CTRL+C to quit)
+slurmstepd: error: *** JOB 3273978 ON atl1-1-03-010-15-0 CANCELLED AT 2025-10-08T16:28:46 ***
+---------------------------------------
+Begin Slurm Epilog: Oct-08-2025 16:28:48
+Job ID:        3273978
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=01:21:20,vmem=0,walltime=00:05:05,mem=64671836K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-010-15-0
+---------------------------------------

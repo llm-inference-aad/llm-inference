@@ -1,0 +1,1374 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-09-2025 18:15:02
+Job ID:    3291414
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+=== Launching LLM Guided Evolution ===
+Hostname: atl1-1-01-005-5-0.pace.gatech.edu
+Working dir: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+Thu Oct  9 18:15:02 EDT 2025
+UV version: uv 0.8.15
+Python via uv: Python 3.13.7
+LLM_INFERENCE_ROOT_DIR: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+LD_LIBRARY_PATH updated for nvjitlink (best-effort).
+UV Python path: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+Thu Oct  9 18:15:08 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Quadro RTX 6000                On  |   00000000:5E:00.0 Off |                    0 |
+| N/A   28C    P8             13W /  250W |       0MiB /  23040MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== Running: uv run python run_improved.py first_test ===
+
+⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣿⡇⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣶⣶⠶⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⣀⣹⣟⣛⣛⣻⣿⣿⣿⡾⠟⢉⣴⠟⢁⣴⠋⣹⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⠛⠛⣿⠉⢉⣩⠵⠚⠁⢀⡴⠛⠁⣠⠞⠁⣰⠏⠸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢻⣷⠋⠁⠀⢀⡴⠋⠀⢀⡴⠋⠀⣼⠃⠀⡼⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢻⣆⣠⡴⠋⠀⠀⣠⠟⠀⢀⡾⠁⠀⡼⠁⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠻⣯⡀⠀⢀⡼⠃⠀⢠⡟⠀⢀⡾⠁⢀⣾⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠻⣶⣟⡀⠀⣰⠏⠀⢀⡾⠁⠀⣼⢹⣿⣀⣤⣤⣴⠶⢿⡿⠛⢛⣷⢶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠶⠶⠾⠷⠶⠿⠛⢻⣟⠉⣥⠟⠁⣠⠟⠀⢠⠞⠁⣄⡿⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⠞⠁⢀⡴⠋⠀⣴⠋⠀⣰⠟⠀⣤⡾⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⢠⠞⠁⢀⡾⠁⢀⡼⠃⢀⡴⠋⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣷⠋⠀⣰⠏⠀⣠⠟⠀⣰⠟⠁⢀⡴⠛⣿⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣧⡼⠃⢀⡼⠋⢠⡞⠁⣠⣞⣋⣤⣶⣿⡟⠛⣿⠛⠛⣻⠟⠷⢶⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⣦⣾⣤⣴⣯⡶⠾⠟⠛⠉⠉⠉⣿⡇⢠⡏⠀⣰⠏⠀⢀⣼⠋⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⡾⠀⢰⠏⠀⢠⡞⠁⠀⣠⠞⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠇⢠⠏⠀⣰⠋⠀⣠⠞⠁⠀⢀⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⢠⠟⢀⡼⠁⣠⠞⠁⣀⣴⢾⣿⣤⣿⣦⣄⣀⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⡟⣠⠏⣠⠞⣁⣴⣾⣿⣿⣿⣿⣿⣿⡏⢹⡏⠛⠳⣦⣄⡀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⢷⣾⣷⠿⠿⠛⠉⠀⠀⠈⠳⣬⣿⡟⣾⠁⠀⣼⠃⠉⠻⠆
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣧⡏⠀⣼⠃⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠁⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣟⡼⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢙⣃⠀⠀
+
+
+**************************************************************************************************************
+*                                     CREATING POPULATION FROM SEED CODE                                     *
+**************************************************************************************************************
+
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxgOOjY55aRakslwZlqx3OVAbp.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 430, in submit_local_server
+    response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 439, in submit_local_server
+    raise Exception("Could not connect to local server. Make sure the server is running.")
+Exception: Could not connect to local server. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxleiku2lOELC2gyNL7dIyi3TJ.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 430, in submit_local_server
+    response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 439, in submit_local_server
+    raise Exception("Could not connect to local server. Make sure the server is running.")
+Exception: Could not connect to local server. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx14uOTmXfOmcs3KASHmD5xldm.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x155465603e00>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465603e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 430, in submit_local_server
+    response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465603e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 439, in submit_local_server
+    raise Exception("Could not connect to local server. Make sure the server is running.")
+Exception: Could not connect to local server. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx9SLLdH0JKLrjjwUN4HsmV4Ig.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 430, in submit_local_server
+    response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 439, in submit_local_server
+    raise Exception("Could not connect to local server. Make sure the server is running.")
+Exception: Could not connect to local server. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxivGJVY342zCofmDh44z0TLbO.sh
+	‣ Failed to Submit Script.
+	‣ Error: Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/home/hice1/rmanimaran8/.local/share/uv/python/cpython-3.13.7-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 430, in submit_local_server
+    response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='atl1-1-03-010-25-0.pace.gatech.edu', port=8000): Max retries exceeded with url: /generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x155465607e00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 66, in <module>
+    augment_network(input_filename=args.input_filename,
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    output_filename=args.output_filename,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                    inference_submission=args.inference_submission,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   )
+                   ^
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_mutation.py", line 32, in augment_network
+    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
+                                            top_p, temperature, inference_submission=inference_submission)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 97, in generate_augmented_code
+    code_from_llm = llm_code_generator(txt2llm, top_p=top_p, temperature=temperature)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 439, in submit_local_server
+    raise Exception("Could not connect to local server. Make sure the server is running.")
+Exception: Could not connect to local server. Make sure the server is running.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXx0TXsah67aoMrAgZ06calseub.sh
+	‣ Output: Launching AIsurBL
+atl1-1-01-005-5-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+Renowned worldwide as an AI researcher, lauded for your inventive and unorthodox methods, you are now summoned to apply your distinctive innovations to rejuvenate a dormant project:
+
+Q: How can you apply significant and complex modifications to this code snippet to substantially elevate the model's performance? Creating needed helper functions is encouraged!
+
+The current code block:
+```python
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):  
+    if weight_decay != 0:
+        g0, g1, g2 = [], [], []  # optimizer parameter groups
+        for v in model.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):  # bias
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):  # weight (no decay)
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):  # weight (with decay)
+                g1.append(v.weight)
+        
+        opt = SGD(g0, lr, 0.9, nesterov=nesterov)
+        opt.add_param_group({'params': g1, 'weight_decay': weight_decay})  # add g1 with weight_decay
+        opt.add_param_group({'params': g2})  # add g2 (biases)
+    else:
+        opt = SGD(model.parameters(), lr, 0.9, nesterov=nesterov)
+    return opt 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3291414
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve this code.
+</think>
+
+```python
+import torch
+from torch import nn
+from torch.optim import SGD
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.nn.utils import clip_grad_norm_
+
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):
+    def create_groups(module):
+        g0, g1, g2 = [], [], []
+        for v in module.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):
+                g1.append(v.weight)
+        return g0, g1, g2
+    
+    g0, g1, g2 = create_groups(model)
+    
+    opt = SGD([
+        {'params': g0, 'lr': lr},
+        {'params': g1, 'lr': lr, 'weight_decay': weight_decay},
+        {'params': g2, 'lr': lr*2}
+    ], momentum=0.9, nesterov=nesterov)
+    
+    scheduler = CosineAnnealingLR(opt, T_max=100, eta_min=lr/100)
+    
+    def optimize_step(loss, scaler=None):
+        opt.zero_grad()
+        loss.backward()
+        if scaler is not None:
+            scaler.step(opt)
+            scaler.update()
+        else:
+            clip_grad_norm_(model.parameters(), max_norm=1.0)
+            opt.step()
+        scheduler.step()
+    
+    model.optimize_step = optimize_step
+    return opt
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+from torch import nn
+from torch.optim import SGD
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.nn.utils import clip_grad_norm_
+
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):
+    def create_groups(module):
+        g0, g1, g2 = [], [], []
+        for v in module.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):
+                g1.append(v.weight)
+        return g0, g1, g2
+    
+    g0, g1, g2 = create_groups(model)
+    
+    opt = SGD([
+        {'params': g0, 'lr': lr},
+        {'params': g1, 'lr': lr, 'weight_decay': weight_decay},
+        {'params': g2, 'lr': lr*2}
+    ], momentum=0.9, nesterov=nesterov)
+    
+    scheduler = CosineAnnealingLR(opt, T_max=100, eta_min=lr/100)
+    
+    def optimize_step(loss, scaler=None):
+        opt.zero_grad()
+        loss.backward()
+        if scaler is not None:
+            scaler.step(opt)
+            scaler.update()
+        else:
+            clip_grad_norm_(model.parameters(), max_norm=1.0)
+            opt.step()
+        scheduler.step()
+    
+    model.optimize_step = optimize_step
+    return opt
+
+************************************************************************************************************************
+*                             Python code saved to network_xXx0TXsah67aoMrAgZ06calseub.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXx0TXsah67aoMrAgZ06calseub
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxyVyQLnOXzet3xitrRNNLwfaw.sh
+	‣ Output: Launching AIsurBL
+atl1-1-01-005-5-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+As a leading authority in machine learning, you possess a profound grasp of sophisticated artificial intelligence methodologies, a skill set that has directed you to your most recent endeavor:
+
+Q: How can you apply significant and complex modifications to this code snippet to substantially elevate the model's performance? The addition of helper functions is encouraged!
+
+The current code block:
+```python
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.ln = nn.LayerNorm(cin)
+        self.act = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.ln(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        return x*y 
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3291414
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to improve this code.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super(SE_LN, self).__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.fc1 = nn.Linear(cin, cin//2, bias=False)
+        self.fc2 = nn.Linear(cin//2, cin, bias=False)
+        self.ln = nn.LayerNorm(cin)
+        self.act = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = self.ln(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        return x * y
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super(SE_LN, self).__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.fc1 = nn.Linear(cin, cin//2, bias=False)
+        self.fc2 = nn.Linear(cin//2, cin, bias=False)
+        self.ln = nn.LayerNorm(cin)
+        self.act = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = self.ln(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        return x * y
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxyVyQLnOXzet3xitrRNNLwfaw.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxyVyQLnOXzet3xitrRNNLwfaw
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                    Create Individual                     *
+************************************************************
+	‣ FixedPrompts
+	‣ Bash script saved to 0/xXxNe8Rk5G5tv22RH91Ba1mqf97.sh
+	‣ Output: Launching AIsurBL
+atl1-1-01-005-5-0.pace.gatech.edu
+Loading /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/sota/ExquisiteNetV2/network.py code
+
+************************************************************
+*                      PROMPT TO LLM                       *
+************************************************************
+Question: What are some complex modifications that could be considered to potentially improve the performance of the following existing Python code snippet?
+
+Here is the current code:
+
+(code snippet provided)
+```python
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+```
+1. Retain original class names.
+2. Format the code in Markdown.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+
+A: Let us think step by step
+[DEBUG] Found job_id from environment: 3291414
+
+************************************************************
+*                      TEXT FROM LLM                       *
+************************************************************
+ about how to optimize this code for better performance.
+
+First, let's analyze the existing code. The `MinPool2d_x` class uses negative max pooling on negative inputs to simulate min pooling. While this works, it introduces unnecessary computations because we negate the input twice—once when calling `max_pool2d` and once inside the method. This can be optimized by directly implementing min pooling without negations.
+
+Next, looking at the `EVE` class, it concatenates the outputs of max pooling and min pooling along the channel dimension before applying point-wise convolution and batch normalization. However, using separate max and min pools might not be as efficient as combining them into a single operation if possible.
+
+Another consideration is the use of `ceil_mode=True`, which affects how the pooling operations handle input sizes. Depending on the input dimensions, this could lead to different output shapes, but since both max and min pools use the same mode, their outputs should align correctly.
+
+Potential optimizations include:
+- Implementing a custom min pooling layer without relying on negation.
+- Combining the max and min pooling operations into a single pass over the data to reduce memory usage and computation time.
+- Utilizing more efficient PyTorch functions or avoiding unnecessary intermediate tensors.
+</think>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return F.avg_pool2d(x, self.ks, ceil_mode=self.ceil_mode)  # Replace max pool with avg pool
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.AvgPool2d(2, ceil_mode=True)  # Replace max pool with avg pool
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+```
+
+************************************************************
+*                      CODE FROM LLM                       *
+************************************************************
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return F.avg_pool2d(x, self.ks, ceil_mode=self.ceil_mode)  # Replace max pool with avg pool
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.AvgPool2d(2, ceil_mode=True)  # Replace max pool with avg pool
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+
+************************************************************************************************************************
+*                             Python code saved to network_xXxNe8Rk5G5tv22RH91Ba1mqf97.py                              *
+************************************************************************************************************************
+Job Done
+Checking completion for xXxNe8Rk5G5tv22RH91Ba1mqf97
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*               Batch Checking Created Genes               *
+************************************************************
+
+**************************************************************************************************************
+*                                      SUBMITTING MODELS CREATED BY LLM                                      *
+**************************************************************************************************************
+
+
+************************************************************
+*                  Checking Model Runs: 0                  *
+************************************************************
+Checking for: SOTA_ROOT ./models/network_xXx0TXsah67aoMrAgZ06calseub.py
+	‣ Bash Script Saved to 0/xXx0TXsah67aoMrAgZ06calseub_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-01-005-5-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXx0TXsah67aoMrAgZ06calseub
+Device: cuda
+num of params: 0.5182 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 152
+    tr  loss: 1.7511      tr  acc: 0.3492
+min tr  loss: 1.7511  max tr  acc: 0.3492
+    val loss: 1.7456      val acc: 0.3630
+min val loss: 1.7456  max val acc: 0.3630
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 313
+    tr  loss: 1.3173      tr  acc: 0.5225
+min tr  loss: 1.3173  max tr  acc: 0.5225
+    val loss: 2.6050      val acc: 0.2761
+min val loss: 1.7456  max val acc: 0.3630
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.7447
+Train Acc: 0.3648
+--------------------
+Val loss: 1.7456
+Val Acc: 0.3630
+--------------------
+Test loss: 1.7178
+Test Acc: 0.3717
+--------------------
+Training time: 335.02 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXx0TXsah67aoMrAgZ06calseub
+
+results have been written to results/xXx0TXsah67aoMrAgZ06calseub_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXx0TXsah67aoMrAgZ06calseub, None
+Checking the Results for Gene: xXx0TXsah67aoMrAgZ06calseub
+	☑ LLM Job Completed Successfully.
+Checking for: SOTA_ROOT ./models/network_xXxyVyQLnOXzet3xitrRNNLwfaw.py
+	‣ Bash Script Saved to 0/xXxyVyQLnOXzet3xitrRNNLwfaw_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-01-005-5-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxyVyQLnOXzet3xitrRNNLwfaw
+Device: cuda
+num of params: 0.7142 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 136
+    tr  loss: 1.7530      tr  acc: 0.3520
+min tr  loss: 1.7530  max tr  acc: 0.3520
+    val loss: 2.4301      val acc: 0.2471
+min val loss: 2.4301  max val acc: 0.2471
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 297
+    tr  loss: 1.3445      tr  acc: 0.5117
+min tr  loss: 1.3445  max tr  acc: 0.5117
+    val loss: 1.6348      val acc: 0.3996
+min val loss: 1.6348  max val acc: 0.3996
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.6366
+Train Acc: 0.4042
+--------------------
+Val loss: 1.6348
+Val Acc: 0.3996
+--------------------
+Test loss: 1.6280
+Test Acc: 0.3970
+--------------------
+Training time: 321.33 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxyVyQLnOXzet3xitrRNNLwfaw
+
+results have been written to results/xXxyVyQLnOXzet3xitrRNNLwfaw_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxyVyQLnOXzet3xitrRNNLwfaw, None
+Checking the Results for Gene: xXxyVyQLnOXzet3xitrRNNLwfaw
+	☑ LLM Job Completed Successfully.
+Checking for: SOTA_ROOT ./models/network_xXxNe8Rk5G5tv22RH91Ba1mqf97.py
+	‣ Bash Script Saved to 0/xXxNe8Rk5G5tv22RH91Ba1mqf97_model.sh
+	‣ Output: Launching Python Evaluation
+atl1-1-01-005-5-0.pace.gatech.edu
+
+==================================================
+You are training the data: ./cifar10
+Model weight will be saved to: weight/xXxNe8Rk5G5tv22RH91Ba1mqf97
+Device: cuda
+num of params: 0.5182 M
+train num: 40000
+val num: 10000
+single data shape: torch.Size([3, 224, 224])
+==================================================
+train with auto mixed precision training!!!
+
+start training...
+
+
+Epoch 1
+----------
+tr set: 186/186
+tr time: 136
+    tr  loss: 1.7547      tr  acc: 0.3476
+min tr  loss: 1.7547  max tr  acc: 0.3476
+    val loss: 2.4296      val acc: 0.2156
+min val loss: 2.4296  max val acc: 0.2156
+LR in this epoch:  0.100000
+
+Epoch 2
+----------
+tr set: 186/186
+tr time: 291
+    tr  loss: 1.3272      tr  acc: 0.5158
+min tr  loss: 1.3272  max tr  acc: 0.5158
+    val loss: 1.3338      val acc: 0.5062
+min val loss: 1.3338  max val acc: 0.5062
+LR in this epoch:  0.100000
+
+Has loaded the best weight
+
+ --------------------------------------------------
+                     Evaluate:
+Train loss: 1.3517
+Train Acc: 0.5011
+--------------------
+Val loss: 1.3338
+Val Acc: 0.5062
+--------------------
+Test loss: 1.3342
+Test Acc: 0.5042
+--------------------
+Training time: 315.12 seconds
+Total epochs: 2
+Best weight and tensorboard is in weight/xXxNe8Rk5G5tv22RH91Ba1mqf97
+
+results have been written to results/xXxNe8Rk5G5tv22RH91Ba1mqf97_results.txt
+========================================================================================================================
+job done
+========================================================================================================================
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:19: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler()
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/sota/ExquisiteNetV2/tool.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast():
+	‣ Running py File for xXxNe8Rk5G5tv22RH91Ba1mqf97, None
+Checking the Results for Gene: xXxNe8Rk5G5tv22RH91Ba1mqf97
+	☑ LLM Job Completed Successfully.
+
+************************************************************
+*                   Evalutated All Genes                   *
+************************************************************
+
+
+**************************************************************************************************************
+*                                           STARTING GENERATION: 0                                           *
+**************************************************************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 8
+Gene: xXxgOOjY55aRakslwZlqx3OVAbp
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 31 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxleiku2lOELC2gyNL7dIyi3TJ
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 31 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx14uOTmXfOmcs3KASHmD5xldm
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 30 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx9SLLdH0JKLrjjwUN4HsmV4Ig
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 30 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXxivGJVY342zCofmDh44z0TLbO
+	‣ Fitness: None, Submission Flag: False
+	‣ Runtime: 30 min, Status: subbed file
+	‣ LLM Job-ID: None
+Gene: xXx0TXsah67aoMrAgZ06calseub
+	‣ Fitness: (0.3716999888420105, 518230.0), Submission Flag: True
+	‣ Runtime: 28 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxyVyQLnOXzet3xitrRNNLwfaw
+	‣ Fitness: (0.3969999849796295, 714214.0), Submission Flag: True
+	‣ Runtime: 27 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxNe8Rk5G5tv22RH91Ba1mqf97
+	‣ Fitness: (0.5041999816894531, 518230.0), Submission Flag: True
+	‣ Runtime: 26 min, Status: completed
+	‣ LLM Job-ID: None
+
+************************************************************
+*                     Invalid Removal                      *
+************************************************************
+
+************************************************************
+*                     Poplutation Info:                    *
+************************************************************
+🧬 Poplutation Size 🧬: 3
+Gene: xXx0TXsah67aoMrAgZ06calseub
+	‣ Fitness: (0.3716999888420105, 518230.0), Submission Flag: True
+	‣ Runtime: 28 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxyVyQLnOXzet3xitrRNNLwfaw
+	‣ Fitness: (0.3969999849796295, 714214.0), Submission Flag: True
+	‣ Runtime: 27 min, Status: completed
+	‣ LLM Job-ID: None
+Gene: xXxNe8Rk5G5tv22RH91Ba1mqf97
+	‣ Fitness: (0.5041999816894531, 518230.0), Submission Flag: True
+	‣ Runtime: 26 min, Status: completed
+	‣ LLM Job-ID: None
+
+************************************************************
+*                        Selection                         *
+************************************************************
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 900, in <module>
+    offspring = toolbox.select(population, population_size)
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 805, in true_nsga2
+    new_pop = tools.selTournamentDCD(pop, k) # mults of 4
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/lib/python3.13/site-packages/deap/tools/emo.py", line 167, in selTournamentDCD
+    raise ValueError("selTournamentDCD: k must be less than or equal to individuals length")
+ValueError: selTournamentDCD: k must be less than or equal to individuals length
+---------------------------------------
+Begin Slurm Epilog: Oct-09-2025 18:47:50
+Job ID:        3291414
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt
+Resources:     cpu=1,gres/gpu:rtx_6000=1,mem=16G,node=1
+Rsrc Used:     cput=00:32:49,vmem=0,walltime=00:32:49,mem=7228776K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-01-005-5-0
+---------------------------------------

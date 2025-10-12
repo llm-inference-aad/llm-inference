@@ -149,8 +149,7 @@ def main():
         opt,
         factor=args.lr_df,
         mode='min',
-        patience=5-1, 
-        verbose=True
+        patience=5-1
     )
     
     print()

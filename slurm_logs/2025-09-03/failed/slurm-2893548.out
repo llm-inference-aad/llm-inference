@@ -1,0 +1,36 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-03-2025 17:41:15
+Job ID:    2893548
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt_uv
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Guided Evolution with UV
+atl1-1-01-005-15-0.pace.gatech.edu
+
+CondaError: Run 'conda init' before 'conda deactivate'
+
+UV version: uv 0.8.15
+Python version: Python 3.13.7
+Current working directory: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+UV Python location: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+Traceback (most recent call last):
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/run_improved.py", line 14, in <module>
+    from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
+  File "/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/src/llm_utils.py", line 23, in <module>
+    import google.generativeai as genai
+ModuleNotFoundError: No module named 'google.generativeai'
+---------------------------------------
+Begin Slurm Epilog: Sep-03-2025 17:41:59
+Job ID:        2893548
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt_uv
+Resources:     cpu=1,gres/gpu:a100=1,mem=16G,node=1
+Rsrc Used:     cput=00:00:44,vmem=0,walltime=00:00:44,mem=804.50M,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-01-005-15-0
+---------------------------------------

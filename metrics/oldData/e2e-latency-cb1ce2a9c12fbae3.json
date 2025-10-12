@@ -1,0 +1,105 @@
+{
+  "run_hash": "cb1ce2a9c12fbae3",
+  "session_start": "2025-10-08T15:40:46.044840",
+  "model_path": "/storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+  "batch_size": 8,
+  "batch_wait_time": 2,
+  "requests": [
+    {
+      "timestamp": "2025-10-08T15:44:12.546211",
+      "prompt_length": 1042,
+      "max_new_tokens": 800,
+      "temperature": 0.15,
+      "top_p": 0.1,
+      "e2e_latency_sec": 9.9726,
+      "batch_processing_time_sec": 7.97,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0014,
+      "evaluation_score": 1.0
+    },
+    {
+      "timestamp": "2025-10-08T15:44:40.466549",
+      "prompt_length": 1249,
+      "max_new_tokens": 800,
+      "temperature": 0.21,
+      "top_p": 0.1,
+      "e2e_latency_sec": 7.3777,
+      "batch_processing_time_sec": 5.38,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0004,
+      "evaluation_score": 1.0
+    },
+    {
+      "timestamp": "2025-10-08T15:45:00.941632",
+      "prompt_length": 1519,
+      "max_new_tokens": 800,
+      "temperature": 0.26,
+      "top_p": 0.1,
+      "e2e_latency_sec": 8.6297,
+      "batch_processing_time_sec": 6.63,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0014,
+      "evaluation_score": 1.0
+    },
+    {
+      "timestamp": "2025-10-08T15:45:25.650024",
+      "prompt_length": 1543,
+      "max_new_tokens": 800,
+      "temperature": 0.35,
+      "top_p": 0.1,
+      "e2e_latency_sec": 12.9325,
+      "batch_processing_time_sec": 10.93,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0003,
+      "evaluation_score": 1.0
+    },
+    {
+      "timestamp": "2025-10-08T15:46:06.040723",
+      "prompt_length": 1284,
+      "max_new_tokens": 800,
+      "temperature": 0.21,
+      "top_p": 0.1,
+      "e2e_latency_sec": 28.6178,
+      "batch_processing_time_sec": 26.62,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0004,
+      "evaluation_score": 0.0
+    },
+    {
+      "timestamp": "2025-10-08T15:46:34.291351",
+      "prompt_length": 1781,
+      "max_new_tokens": 800,
+      "temperature": 0.19,
+      "top_p": 0.1,
+      "e2e_latency_sec": 16.3547,
+      "batch_processing_time_sec": 14.35,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0004,
+      "evaluation_score": 1.0
+    },
+    {
+      "timestamp": "2025-10-08T15:46:53.533707",
+      "prompt_length": 1189,
+      "max_new_tokens": 800,
+      "temperature": 0.15,
+      "top_p": 0.1,
+      "e2e_latency_sec": 7.5048,
+      "batch_processing_time_sec": 5.5,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0004,
+      "evaluation_score": 1.0
+    },
+    {
+      "timestamp": "2025-10-08T15:47:13.107875",
+      "prompt_length": 1394,
+      "max_new_tokens": 800,
+      "temperature": 0.1,
+      "top_p": 0.1,
+      "e2e_latency_sec": 7.9202,
+      "batch_processing_time_sec": 5.92,
+      "batch_size": 1,
+      "queue_wait_time_sec": 2.0014,
+      "evaluation_score": 1.0
+    }
+  ]
+}

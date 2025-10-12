@@ -1,0 +1,28 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-10-2025 15:54:31
+Job ID:    2950525
+User ID:   rmanimaran8
+Account:   coc
+Job name:  llm_opt_uv
+Partition: ice-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Guided Evolution with UV
+atl1-1-02-010-31-0.pace.gatech.edu
+UV version: uv 0.8.15
+Python version: Python 3.13.7
+Current working directory: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+UV Python location: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python
+slurmstepd: error: *** JOB 2950525 ON atl1-1-02-010-31-0 CANCELLED AT 2025-09-10T15:54:49 ***
+---------------------------------------
+Begin Slurm Epilog: Sep-10-2025 15:54:52
+Job ID:        2950525
+User ID:       rmanimaran8
+Account:       coc
+Job name:      llm_opt_uv
+Resources:     cpu=1,gres/gpu:v100=1,mem=16G,node=1
+Rsrc Used:     cput=00:00:18,vmem=0,walltime=00:00:18,mem=136788K,energy_used=0
+Partition:     ice-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-02-010-31-0
+---------------------------------------
