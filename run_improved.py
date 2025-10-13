@@ -179,54 +179,11 @@ def write_bash_script(python_file, input_filename_x, output_filename, gene_id_ch
         slurm_log_dir=SLURM_LOG_DIR,
     )
     return bash_script_content
-                     ):
-    
-    def fetch_gene(filepath):
-        return os.path.basename(filepath).replace('network_','').replace('.py','')
-    
-    global GLOBAL_DATA_ANCESTRY
-    
-    QC_CHECK_BOOL = PROB_QC > np.random.uniform()
-    
-    # Extract the directory path from the file path
-    dir_path = os.path.dirname(output_filename)
-    # Create the directory, ignore error if it already exists
-    os.makedirs(dir_path, exist_ok=True)
-    
-    gene_id_parent = fetch_gene(input_filename_x)
-    gene_id_child = fetch_gene(output_filename)
-    if python_file=='src/llm_mutation.py':
-        template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
-                                                    SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
-        if GEN_COUNT >= 0: # this does not need to happen at creation of population
-            GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
-                                                    mutation_type=mute_type, gene_id_parent2=None)
-            # print(gene_id_child); print(GLOBAL_DATA_ANCESTRY[gene_id_parent])
-        out_dir = str(GENERATION)
-        file_path = os.path.join(out_dir, f'{gene_id_child}_model.txt')
-        os.makedirs(out_dir, exist_ok=True)
-        with open(file_path, 'w') as file:
-            file.write(template_txt)
-            
-        temp_text = f'{python_file} {input_filename_x} {output_filename} {file_path} --top_p {top_p} --temperature {temperature}'
-        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
-        
-    elif python_file=='src/llm_crossover.py':
-        gene_id_parent2 = fetch_gene(input_filename_y)
-        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
-                                                mutation_type=None, gene_id_parent2=gene_id_parent2)
-        
-        temp_text = f"{python_file} {input_filename_x} {input_filename_y} {output_filename} --top_p {top_p} --temperature {temperature}"
-        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
-    else:
-        raise ValueError("Invalid python_file argument")
 
-    bash_script_content = LLM_BASH_SCRIPT_TEMPLATE.format(
-        gpu_constraint=gpu,
-        python_runline=python_runline,
-        slurm_log_dir=SLURM_LOG_DIR,
-    )
-    return bash_script_content
+
+def fetch_gene(filepath):
+    return os.path.basename(filepath).replace('network_','').replace('.py','')
+
 
 def create_bash_file(file_path, **kwargs):
     bash_script_content = write_bash_script(**kwargs)
