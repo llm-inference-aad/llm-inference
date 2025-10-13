@@ -1,10 +1,8 @@
-To make it more concise without losing functionality.
+As a software engineer focused on clean code and maintainability, you prioritize writing concise, readable implementations:
 
-</think>
+Q: How can you refactor this code snippet to make it more concise and elegant while preserving its functionality?
 
-Here's a more concise version of your code while maintaining its functionality:
-
-
+The current code block:
 ```python
-{}
+{} 
 ```

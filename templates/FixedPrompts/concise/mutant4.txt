@@ -1,9 +1,6 @@
-To make it more efficient, especially when dealing with large datasets.
-</think>
+Q: What changes could be made to optimize this code for better performance with large-scale datasets or improved memory efficiency?
 
-Here’s a more efficient version of the code that uses a set to track seen items, which reduces the time complexity from O(n^2) to O(n):
-
-
+The current code block:
 ```python
-{}
+{} 
 ```

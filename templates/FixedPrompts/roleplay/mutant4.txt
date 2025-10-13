@@ -1,10 +1,8 @@
-To make it more concise and readable.
+As a code reviewer who values clarity and maintainability, you advocate for readable, well-structured implementations:
 
-</think>
+Q: How can you improve the readability and structure of this code snippet while maintaining or enhancing its functionality?
 
-Here's a more concise and readable version of the code:
-
-
+The current code block:
 ```python
-{}
+{} 
 ```

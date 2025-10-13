@@ -1,15 +1,6 @@
-python
-def model(x):
-    x = Conv2D(64, (3,3), activation='relu')(x)
-    x = MaxPooling2D((2,2))(x)
-    x = Conv2D(128, (3,3), activation='relu')(x)
-    x = MaxPooling2D((2,2))(x)
-    x = Flatten()(x)
-    x = Dense(512, activation='relu')(x)
-    x = Dropout(0.5)(x)
-    x = Dense(10, activation='relu')(x)
-    return x
+Q: What architectural modifications could be made to increase model capacity and depth while potentially improving performance of this existing code snippet?
 
+The current code block:
 ```python
-{}
+{} 
 ```
