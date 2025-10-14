@@ -259,6 +259,7 @@ class LLMRequest(BaseModel):
     top_p: float = 0.8
     temperature: float = 0.7
     job_id: str = "default"
+    gene_id: str = None  # Identifier for the individual this request belongs to
 
 
 @app.post("/generate")
@@ -291,7 +292,7 @@ async def generate_text(request: LLMRequest):
                 async with aiohttp.ClientSession() as session:
                     payload = request.dict()
                     
-                    print(f"[Route] Forwarding request (job_id={request.job_id}) to {server.hostname}:{server.port}")
+                    print(f"[Route] Forwarding request (job_id={request.job_id}, gene_id={request.gene_id}) to {server.hostname}:{server.port}")
                     
                     async with session.post(
                         f"{server.url}/generate",

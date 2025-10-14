@@ -20,4 +20,5 @@ metrics/
 documentation/
 .cursor/
 notebook.md
-servers.json
+/servers.json
+/loadbalancer.log
