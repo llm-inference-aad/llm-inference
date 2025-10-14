@@ -12,6 +12,19 @@
 set -Eeuo pipefail
 
 # ==============================================================================
+# Determine Repository Root
+# ==============================================================================
+# Use SLURM_SUBMIT_DIR if running under SLURM, otherwise use script location
+if [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+  REPO_ROOT="${SLURM_SUBMIT_DIR}"
+else
+  REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+# Change to repository root to ensure all paths work correctly
+cd "${REPO_ROOT}"
+
+# ==============================================================================
 # Automatic Run Directory Setup
 # ==============================================================================
 # If RUN_ID is not set, create a new run directory automatically
@@ -22,12 +35,14 @@ if [[ -z "${RUN_ID:-}" ]]; then
 fi
 
 # Set the run directory path (absolute path to avoid issues with subprocess working directories)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RUN_DIR="${SCRIPT_DIR}/runs/${RUN_ID}"
+RUN_DIR="${REPO_ROOT}/runs/${RUN_ID}"
 
 # Validate run directory exists
 if [[ ! -d "${RUN_DIR}" ]]; then
   echo "ERROR: Run directory ${RUN_DIR} does not exist!"
+  echo "Expected path: ${RUN_DIR}"
+  echo "REPO_ROOT: ${REPO_ROOT}"
+  echo "RUN_ID: ${RUN_ID}"
   echo "Create it first with: bash scripts/create_run.sh [optional_name]"
   exit 1
 fi
