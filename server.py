@@ -27,7 +27,8 @@ BATCH_WAIT_TIME = 0  # max wait time for batch to fill in s
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
-METRICS_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "metrics" / "data"
+METRICS_BASE_PATH = os.getenv("METRICS_PATH", "./metrics")
+METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
 METRICS_FILE = METRICS_DIR / f"e2e-latency-{RUN_HASH}.json"
 
 # Ensure metrics directory exists
@@ -300,6 +301,7 @@ async def generate_text(request: LLMRequest):
         max_new_tokens (int): maximum number of tokens model should generate
         top_p (float): threshold, higher to consider wider range of words
         temperature (float): randomness, higher for more varied outputs
+        gene_id (str): identifier for the individual this request belongs to
 
     Returns:
     dict: generated_text (output of LLM), response_time, run_hash, and evaluationScore
