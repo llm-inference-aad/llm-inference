@@ -19,3 +19,4 @@ slurm-*.out
 metrics/
 documentation/
 .cursor/
+notebook.md
