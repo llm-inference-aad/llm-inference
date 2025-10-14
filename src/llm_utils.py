@@ -365,7 +365,7 @@ def mutate_prompts(n=5):
 
 def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
     """
-    Submit a request to the local FastAPI server running on PACE-ICE cluster.
+    Submit a request to the local FastAPI server or load balancer running on PACE-ICE cluster.
     
     Args:
         txt2llm (str): The prompt text to send to the LLM
@@ -375,21 +375,40 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
         gene_id (str): Identifier for the individual this request belongs to
     
     Returns:
-        str: Generated text from the local server
+        str: Generated text from the local server or load balancer
     """
     try:
-        # Read the hostname from the file written by the server
-        hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{ROOT_DIR}/hostname.log")
+        # Check if load balancer mode is enabled
+        use_load_balancer = os.getenv("USE_LOAD_BALANCER", "false").lower() in ['true', '1', 'yes']
+        
+        if use_load_balancer:
+            # Load balancer mode: connect to load balancer
+            loadbalancer_file = os.getenv("LOADBALANCER_LOG_FILE", f"{ROOT_DIR}/loadbalancer.log")
+            
+            if not os.path.exists(loadbalancer_file):
+                raise Exception("Load balancer hostname file not found. Make sure the load balancer is running.")
+            
+            with open(loadbalancer_file, 'r') as f:
+                server_hostname = f.read().strip()
+            
+            # Use load balancer port
+            server_port = os.getenv("LOAD_BALANCER_PORT", "9000")
+            api_url = f"http://{server_hostname}:{server_port}/generate"
+            print(f"[INFO] Using load balancer at {api_url}")
+        else:
+            # Single server mode: connect directly to server (backward compatible)
+            hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{ROOT_DIR}/hostname.log")
 
-        if not os.path.exists(hostname_file):
-            raise Exception("Server hostname file not found. Make sure the server is running.")
-        
-        with open(hostname_file, 'r') as f:
-            server_hostname = f.read().strip()
-        
-        # Construct the API URL
-        server_port = os.getenv("SERVER_PORT", "8000")
-        api_url = f"http://{server_hostname}:{server_port}/generate"
+            if not os.path.exists(hostname_file):
+                raise Exception("Server hostname file not found. Make sure the server is running.")
+            
+            with open(hostname_file, 'r') as f:
+                server_hostname = f.read().strip()
+            
+            # Construct the API URL
+            server_port = os.getenv("SERVER_PORT", "8000")
+            api_url = f"http://{server_hostname}:{server_port}/generate"
+            print(f"[INFO] Using single server at {api_url}")
         
         # Get job identification from environment (use Slurm job ID directly)
         # Try multiple sources to find the Slurm job ID
@@ -429,7 +448,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
         }
         
         # Make the HTTP request
-        response = requests.post(api_url, json=payload, timeout=None)  #  minute timeout
+        response = requests.post(api_url, json=payload, timeout=None)  # 5 minute timeout
         
         if response.status_code == 200:
             result = response.json()

@@ -15,3 +15,8 @@ hostname.log
 .venv/
 sota/ExquisiteNetV2/cifar-10-python.tar.gz
 sota/ExquisiteNetV2/cifar-10-python.tar.gz
+slurm-*.out
+metrics/
+documentation/
+.cursor/
+notebook.md
