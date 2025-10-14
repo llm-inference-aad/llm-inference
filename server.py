@@ -78,7 +78,7 @@ def save_latency_metrics(request_data, _time, batch_processing_time, batch_size,
 
 class LLMRequest(BaseModel):
     prompt: str
-    max_new_tokens: int = 800
+    max_new_tokens: int = 32000
     top_p: float = 0.8
     temperature: float = 0.7
     gene_id: str | None = None
@@ -149,7 +149,7 @@ class LLMModel:
             temperature=0.1,
             top_p=0.15,
             top_k=0,
-            max_new_tokens=1648,
+            max_new_tokens=32000,
             repetition_penalty=1.1,
             do_sample=True,
             batch_size=BATCH_SIZE
