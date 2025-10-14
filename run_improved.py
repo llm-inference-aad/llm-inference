@@ -451,8 +451,36 @@ def check4results(gene_id):
     if job_done is True:
         out_dir = str(GENERATION)
         # The job saves the model results to a file f'{gene_id}_results.txt'
-        # results_path = os.path.join(out_dir, f'{gene_id}_results.txt')
-        results_path = f'{SOTA_ROOT}/results/{gene_id}_results.txt'
+        # Check if we're running in a managed run directory (same logic as train.py)
+        run_dir = os.environ.get('RUN_DIR', None)
+        results_path = None
+        
+        if run_dir:
+            # Try run-specific results directory (absolute path)
+            absolute_run_path = os.path.join(ROOT_DIR, run_dir, 'results', f'{gene_id}_results.txt')
+            if os.path.exists(absolute_run_path):
+                results_path = absolute_run_path
+            else:
+                # Try relative path from SOTA directory (legacy behavior)
+                sota_relative_path = os.path.join(SOTA_ROOT, run_dir, 'results', f'{gene_id}_results.txt')
+                if os.path.exists(sota_relative_path):
+                    results_path = sota_relative_path
+        
+        # Fallback to legacy location in SOTA_ROOT/results
+        if results_path is None:
+            legacy_path = f'{SOTA_ROOT}/results/{gene_id}_results.txt'
+            if os.path.exists(legacy_path):
+                results_path = legacy_path
+        
+        if results_path is None:
+            print(f"ERROR: Results file not found for gene {gene_id}")
+            print(f"  Searched in:")
+            if run_dir:
+                print(f"    - {os.path.join(ROOT_DIR, run_dir, 'results', f'{gene_id}_results.txt')}")
+                print(f"    - {os.path.join(SOTA_ROOT, run_dir, 'results', f'{gene_id}_results.txt')}")
+            print(f"    - {SOTA_ROOT}/results/{gene_id}_results.txt")
+            raise FileNotFoundError(f"Results file not found for gene {gene_id}")
+            
         with open(results_path, 'r') as file:
             results = file.read()
         results = results.split(',')
