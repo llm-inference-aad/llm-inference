@@ -11,6 +11,31 @@
 
 set -Eeuo pipefail
 
+# ==============================================================================
+# Automatic Run Directory Setup
+# ==============================================================================
+# If RUN_ID is not set, create a new run directory automatically
+if [[ -z "${RUN_ID:-}" ]]; then
+  echo "No RUN_ID provided. Creating new run directory..."
+  RUN_ID=$(AUTOMATED_CALL=true bash scripts/create_run.sh "auto")
+  echo "Created RUN_ID: ${RUN_ID}"
+fi
+
+# Set the run directory path
+RUN_DIR="runs/${RUN_ID}"
+
+# Validate run directory exists
+if [[ ! -d "${RUN_DIR}" ]]; then
+  echo "ERROR: Run directory ${RUN_DIR} does not exist!"
+  echo "Create it first with: bash scripts/create_run.sh [optional_name]"
+  exit 1
+fi
+
+export RUN_ID
+export RUN_DIR
+echo "Using run directory: ${RUN_DIR}"
+# ==============================================================================
+
 echo "=== Launching LLM Guided Evolution ==="
 echo "Hostname: $(hostname)"
 echo "Working dir: $(pwd)"
@@ -78,8 +103,22 @@ nvidia-smi || true
 # ----------------------------
 # Run your job
 # ----------------------------
-echo "=== Running: uv run python run_improved.py first_test ==="
-uv run python run_improved.py first_test
+echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
+uv run python run_improved.py "${RUN_DIR}/checkpoints"
+
+# Update run metadata on completion
+if [[ -f "${RUN_DIR}/run_metadata.json" ]]; then
+  python3 -c "
+import json
+import sys
+with open('${RUN_DIR}/run_metadata.json', 'r') as f:
+    metadata = json.load(f)
+metadata['status'] = 'completed'
+metadata['completed_at'] = '$(date -Iseconds)'
+with open('${RUN_DIR}/run_metadata.json', 'w') as f:
+    json.dump(metadata, f, indent=2)
+"
+fi
 
 echo "=== Job complete ==="
 date

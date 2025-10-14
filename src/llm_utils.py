@@ -205,7 +205,7 @@ def llm_code_qc_hf(code_from_llm, base_code, generate_text=None):
     box_print("QC PROMPT TO LLM", print_bbox_len=120, new_line_end=False)
     print(prompt2llm)
     
-    code_from_llm = submit_mixtral_hf(prompt2llm, max_new_tokens=1500, top_p=0.1, temperature=0.1, 
+    code_from_llm = submit_mixtral_hf(prompt2llm, max_new_tokens=4096, top_p=0.1, temperature=0.1, 
                       model_id="mistralai/Mixtral-8x7B-v0.1", return_gen=False)
     box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
     print(code_from_llm)
@@ -224,8 +224,8 @@ def submit_mixtral_hf(
     return_gen=False,
     gene_id=None,
 ):
-    # Respect an env override and cap hard
-    max_new_tokens = min(int(os.getenv("MIXTRAL_MAX_NEW_TOKENS", max_new_tokens)), 2048)
+    # Respect an env override (no hard cap)
+    max_new_tokens = int(os.getenv("MIXTRAL_MAX_NEW_TOKENS", max_new_tokens))
 
     # Use the correct env var for HF token; pass it explicitly
     # (HF_API_KEY isn't used by the hub; HUGGING_FACE_HUB_TOKEN / HF_TOKEN are.)

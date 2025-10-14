@@ -277,8 +277,16 @@ def main():
     """
     Defines an Output Filename
     gene_id is a unique identifier for the experiment or model.
+    Uses RUN_DIR environment variable if available to organize by run.
     """
-    filename = f'results/{gene_id}_results.txt'
+    # Check if we're running in a managed run directory
+    run_dir = os.environ.get('RUN_DIR', None)
+    if run_dir:
+        # Write to run-specific results directory
+        filename = os.path.join(run_dir, 'results', f'{gene_id}_results.txt')
+    else:
+        # Fallback to legacy location
+        filename = f'results/{gene_id}_results.txt'
     
     dir_path = os.path.dirname(filename)
 

@@ -139,6 +139,8 @@ def write_bash_script(python_file, input_filename_x, output_filename, gene_id_ch
     Returns:
         str: A string containing the contents of the bash script.
     """
+    global GLOBAL_DATA_ANCESTRY
+    
     # Ensure SLURM log directory exists before generating scripts
     ensure_slurm_log_dir()
     
@@ -147,7 +149,14 @@ def write_bash_script(python_file, input_filename_x, output_filename, gene_id_ch
         gpu = LLM_GPU  # Use default if empty
     
     if python_file=='src/llm_mutation.py':
-        mutation_type = retrieve_base_code(template_txt)
+        # For mutation, we use a generic mutation type since the actual type
+        # is determined by the template content, not an index
+        mutation_type = "TEMPLATE_BASED"
+        
+        # Use "network" as parent for initial creation instead of non-existent "initial_creation"
+        if gene_id_parent == "initial_creation":
+            gene_id_parent = "network"
+            
         GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
                                                 mutation_type=mutation_type, gene_id_parent2=None)
         out_dir = str(GENERATION)
@@ -306,11 +315,16 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     gene_id = generate_random_string(length=24)
     # Select prompte and temp
     temperature = round(random.uniform(temp_min, temp_max), 2)
+    # Generate template for initial creation (like mutation)
+    template_txt, mute_type = generate_template(PROB_EOT, GENERATION, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
     # Assign a file path and name for the model creation bash
     file_path = os.path.join(out_dir, f'{gene_id}.sh')
     successful_sub_flag, job_id, local_output = submit_bash(file_path, 
                                               input_filename_x=f'{SOTA_ROOT}/network.py',
                                               output_filename =f'{SOTA_ROOT}/models/network_{gene_id}.py',
+                                              gene_id_child=gene_id,
+                                              gene_id_parent="network",
+                                              template_txt=template_txt,
                                               gpu=LLM_GPU,
                                               python_file='src/llm_mutation.py', 
                                               top_p=0.1, temperature=temperature)
@@ -522,7 +536,7 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
                         print_job_info(GLOBAL_DATA[gene_id])
                         all_done = False  # Some jobs are still running
         if all_done:
-            box_print("Evalutated All Genes", print_bbox_len=60)
+            box_print("Evaluated All Genes", print_bbox_len=60)
             break  # All jobs are done or timed out
             
         print('Delayed...', flush=True)
@@ -677,6 +691,9 @@ def customCrossover(ind1, ind2):
                                           input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
                                           input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
                                           output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                          gene_id_child=new_gene_id,
+                                          gene_id_parent=gene_id_1,
+                                          template_txt="",  # Not used for crossover
                                           gpu=LLM_GPU,
                                           python_file='src/llm_crossover.py', 
                                           top_p=0.1, temperature=temperature)
@@ -749,9 +766,17 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     # Name of the sh bash file
     file_path = os.path.join(str(GENERATION), f'{new_gene_id}.sh')
     temperature = round(random.uniform(temp_min, temp_max), 2)
+    
+    # Generate template for mutation
+    template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
+                                                 SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
+    
     successful_sub_flag, job_id, local_output = submit_bash(file_path, 
                                               input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
                                               output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                              gene_id_child=new_gene_id,
+                                              gene_id_parent=old_gene_id,
+                                              template_txt=template_txt,
                                               gpu=LLM_GPU,
                                               python_file='src/llm_mutation.py', 
                                               top_p=0.1, temperature=temperature)
