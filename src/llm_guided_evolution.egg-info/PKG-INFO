@@ -5,6 +5,7 @@ Summary: llm-guided-evolution, virtual environment that includes packages necess
 Requires-Python: >=3.12
 Description-Content-Type: text/markdown
 Requires-Dist: accelerate>=0.20.0
+Requires-Dist: aiohttp>=3.8.0
 Requires-Dist: deap==1.4.1
 Requires-Dist: fastapi>=0.100.0
 Requires-Dist: flake8>=7.2.0

@@ -1,0 +1,29 @@
+{
+  "servers": [
+    {
+      "hostname": "atl1-1-03-013-19-0.pace.gatech.edu",
+      "port": 8000,
+      "registered_at": "2025-10-13T23:48:07-04:00"
+    },
+    {
+      "hostname": "atl1-1-03-010-30-0.pace.gatech.edu",
+      "port": 8001,
+      "registered_at": "2025-10-13T23:48:08-04:00"
+    },
+    {
+      "hostname": "atl1-1-03-011-3-0.pace.gatech.edu",
+      "port": 8002,
+      "registered_at": "2025-10-13T23:48:09-04:00"
+    },
+    {
+      "hostname": "atl1-1-03-014-2-0.pace.gatech.edu",
+      "port": 8000,
+      "registered_at": "2025-10-13T23:51:25-04:00"
+    },
+    {
+      "hostname": "atl1-1-03-014-2-0.pace.gatech.edu",
+      "port": 8003,
+      "registered_at": "2025-10-13T23:59:02-04:00"
+    }
+  ]
+}
