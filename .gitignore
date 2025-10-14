@@ -20,3 +20,4 @@ metrics/
 documentation/
 .cursor/
 notebook.md
+servers.json

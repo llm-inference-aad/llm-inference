@@ -444,7 +444,8 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
             "max_new_tokens": max_new_tokens,
             "top_p": top_p,
             "temperature": temperature,
-            "job_id": job_id  # Add job identifier to match with slurm file
+            "job_id": job_id,  # Add job identifier to match with slurm file
+            "gene_id": gene_id  # Add gene_id to track individual
         }
         
         # Make the HTTP request

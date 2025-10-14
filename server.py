@@ -58,6 +58,7 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
         request_metrics = {
             "timestamp": datetime.now().isoformat(),
             "job_id": request_data.get("job_id", "default"),  # To match with slurm file
+            "gene_id": request_data.get("gene_id", None),  # Track gene_id for individual tracking
             "prompt_length": len(request_data["prompt"]),
             "max_new_tokens": request_data["max_new_tokens"],
             "temperature": request_data["temperature"],
@@ -84,6 +85,7 @@ class LLMRequest(BaseModel):
     top_p: float = 0.8
     temperature: float = 0.7
     job_id: str = "default"  # Add job identifier to match with slurm file
+    gene_id: str = None  # Identifier for the individual this request belongs to
 
 class LLMModel:
     _instance = None
@@ -301,6 +303,7 @@ async def generate_text(request: LLMRequest):
         max_new_tokens (int): maximum number of tokens model should generate
         top_p (float): threshold, higher to consider wider range of words
         temperature (float): randomness, higher for more varied outputs
+        job_id (str): identifier to match with slurm file
         gene_id (str): identifier for the individual this request belongs to
 
     Returns:
@@ -325,7 +328,8 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             "max_new_tokens": request.max_new_tokens,
             "top_p": request.top_p,
             "temperature": request.temperature,
-            "job_id": request.job_id  # Include job identifier
+            "job_id": request.job_id,  # Include job identifier
+            "gene_id": request.gene_id  # Include gene_id for individual tracking
         }
         
         # Get the model instance (already loaded at startup)
@@ -333,7 +337,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         
         # Track queue wait time
         queue_start_time = time.time()
-        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(e2e_start_time))} [Job: {request.job_id}]")
+        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(e2e_start_time))} [Job: {request.job_id}, Gene: {request.gene_id}]")
         
         # Submit to the batch processor and wait for result
         result = await model.generate(request_dict, queue_start_time)
