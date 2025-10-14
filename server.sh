@@ -77,7 +77,7 @@ if [ -z "$SERVER_PORT" ]; then
     # Find next available port by checking existing servers
     if [ ! -z "$SERVER_REGISTRY_FILE" ] && [ -f "$SERVER_REGISTRY_FILE" ]; then
         # Read existing servers and find highest port
-        HIGHEST_PORT=$(python3 << EOF
+        HIGHEST_PORT=$(uv run python << EOF
 import json
 import sys
 
@@ -132,7 +132,7 @@ if [ ! -z "$SERVER_REGISTRY_FILE" ]; then
         fi
         
         # Add new server to registry using Python
-        python3 << EOF
+        uv run python << EOF
 import json
 import sys
 

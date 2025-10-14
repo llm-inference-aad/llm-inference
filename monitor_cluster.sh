@@ -86,7 +86,7 @@ show_status() {
     fi
     
     # Parse and display server information using Python
-    python3 << EOF
+    uv run python << EOF
 import json
 import sys
 
@@ -141,7 +141,7 @@ EOF
     echo "-----------------------------------"
     echo ""
     echo "Commands:"
-    echo "  View registry:        cat $SERVER_REGISTRY_FILE | python3 -m json.tool"
+    echo "  View registry:        cat $SERVER_REGISTRY_FILE | uv run python -m json.tool"
     echo "  Test load balancer:   curl $LOADBALANCER_URL/"
     echo "  Check job queue:      squeue -u \$USER"
     echo ""

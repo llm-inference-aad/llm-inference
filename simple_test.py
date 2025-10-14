@@ -53,3 +53,4 @@ if __name__ == "__main__":
         print("The issue is likely with aiohttp or network connectivity.")
     else:
         print("\n❌ Load balancer core functionality failed.")
+

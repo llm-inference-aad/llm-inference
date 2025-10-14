@@ -33,7 +33,7 @@ case "$COMMAND" in
             echo "Registry file: $SERVER_REGISTRY_FILE"
             echo ""
             
-            python3 << EOF
+            uv run python << EOF
 import json
 import sys
 from datetime import datetime
@@ -142,7 +142,7 @@ EOF
         echo ""
         
         if [[ -f "$SERVER_REGISTRY_FILE" ]]; then
-            python3 << EOF
+            uv run python << EOF
 import json
 import sys
 
@@ -197,4 +197,5 @@ EOF
         echo "  $0 add 2"
         ;;
 esac
+
 

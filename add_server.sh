@@ -35,7 +35,7 @@ if [[ ! -f "$SERVER_REGISTRY_FILE" ]]; then
 fi
 
 # Check current server count
-CURRENT_SERVERS=$(python3 << EOF
+CURRENT_SERVERS=$(uv run python << EOF
 import json
 try:
     with open('$SERVER_REGISTRY_FILE', 'r') as f:
@@ -76,7 +76,7 @@ echo ""
 echo "Monitoring commands:"
 echo "  Check job status:      squeue -u \$USER"
 echo "  Monitor cluster:       ./monitor_cluster.sh"
-echo "  View server registry:  cat $SERVER_REGISTRY_FILE | python3 -m json.tool"
+echo "  View server registry:  cat $SERVER_REGISTRY_FILE | uv run python -m json.tool"
 echo ""
 echo "The servers will auto-assign ports starting from the next available port."
 echo "Wait 2-3 minutes for model loading, then check status with ./monitor_cluster.sh"
@@ -84,4 +84,5 @@ echo ""
 echo "To stop additional servers:"
 echo "  scancel ${SERVER_JOB_IDS[*]}"
 echo ""
+
 
