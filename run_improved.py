@@ -370,6 +370,7 @@ def submit_run(gene_id):
         bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(
             python_runline=python_runline,
             slurm_log_dir=SLURM_LOG_DIR,
+            root_dir=ROOT_DIR,
         )
         return bash_script_content
 

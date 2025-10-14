@@ -123,6 +123,9 @@ source "$VENV_PATH/bin/activate"
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
 
+# Change to repository root directory to ensure consistent paths
+cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
+
 # Run Python script
 {python_runline}
 """

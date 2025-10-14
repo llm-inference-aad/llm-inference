@@ -21,8 +21,9 @@ if [[ -z "${RUN_ID:-}" ]]; then
   echo "Created RUN_ID: ${RUN_ID}"
 fi
 
-# Set the run directory path
-RUN_DIR="runs/${RUN_ID}"
+# Set the run directory path (absolute path to avoid issues with subprocess working directories)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RUN_DIR="${SCRIPT_DIR}/runs/${RUN_ID}"
 
 # Validate run directory exists
 if [[ ! -d "${RUN_DIR}" ]]; then
