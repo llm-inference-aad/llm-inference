@@ -122,6 +122,26 @@ nvidia-smi || true
 echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
 uv run python run_improved.py "${RUN_DIR}/checkpoints"
 
+# Move ALL SLURM logs from this run to run directory for organization
+echo "=== Moving SLURM logs to run directory ==="
+if [[ -d "${REPO_ROOT}/slurm-results" ]]; then
+  # Move main job logs
+  if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    SLURM_OUT="${REPO_ROOT}/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
+    SLURM_ERR="${REPO_ROOT}/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
+    
+    [[ -f "${SLURM_OUT}" ]] && mv "${SLURM_OUT}" "${RUN_DIR}/logs/" && echo "Moved main job .out log"
+    [[ -f "${SLURM_ERR}" ]] && mv "${SLURM_ERR}" "${RUN_DIR}/logs/" && echo "Moved main job .err log"
+  fi
+  
+  # Move all evaluation job logs (eval-*.out, eval-*.err, llm-*.out, llm-*.err)
+  # These are created during the run and should be associated with this run
+  find "${REPO_ROOT}/slurm-results" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_DIR}/logs/" \;
+  
+  MOVED_COUNT=$(find "${RUN_DIR}/logs/" -type f -name "*.out" -o -name "*.err" | wc -l)
+  echo "Moved ${MOVED_COUNT} SLURM log files to ${RUN_DIR}/logs/"
+fi
+
 # Update run metadata on completion
 if [[ -f "${RUN_DIR}/run_metadata.json" ]]; then
   python3 -c "
@@ -131,6 +151,7 @@ with open('${RUN_DIR}/run_metadata.json', 'r') as f:
     metadata = json.load(f)
 metadata['status'] = 'completed'
 metadata['completed_at'] = '$(date -Iseconds)'
+metadata['slurm_job_id'] = '${SLURM_JOB_ID:-}'
 with open('${RUN_DIR}/run_metadata.json', 'w') as f:
     json.dump(metadata, f, indent=2)
 "

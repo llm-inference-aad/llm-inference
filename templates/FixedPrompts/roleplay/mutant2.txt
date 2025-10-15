@@ -1,8 +1,8 @@
-As a performance optimization specialist, you focus on writing efficient code that scales well with large datasets:
+python
+def train_model(model, data):
+    model.fit(data)
+    return model
 
-Q: How can you optimize this code snippet to improve its runtime performance and computational efficiency?
-
-The current code block:
 ```python
-{} 
+{}
 ```

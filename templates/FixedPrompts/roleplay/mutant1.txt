@@ -1,8 +1,17 @@
-As a software engineer focused on clean code and maintainability, you prioritize writing concise, readable implementations:
+python
+def process_data(data):
+    result = []
+    for item in data:
+        if item['status'] == 'active':
+            processed_item = {
+                'id': item['id'],
+                'name': item['name'],
+                'price': item['price'] * 1.05,
+                'category': get_category(item)
+            }
+            result.append(processed_item)
+    return result
 
-Q: How can you refactor this code snippet to make it more concise and elegant while preserving its functionality?
-
-The current code block:
 ```python
-{} 
+{}
 ```

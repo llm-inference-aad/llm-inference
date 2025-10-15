@@ -239,30 +239,36 @@ def plot_latency_vs_goodput(generations, gen_latencies, output_path, run_id):
 def main():
     parser = argparse.ArgumentParser(
         description='Plot latency vs goodput across generations',
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='If no arguments provided, defaults to the latest run.'
     )
-    parser.add_argument('--run-id', type=str, required=True,
-                       help='Run ID (e.g., my_run_20251013_143022) or "latest"')
-    parser.add_argument('--run-hash', type=str,
-                       help='Server run hash for metrics (optional)')
+    parser.add_argument('--run-id', type=str, default=None,
+                       help='Run ID (e.g., my_run_20251013_143022) or "latest". Defaults to latest.')
+    parser.add_argument('--run-hash', type=str, default=None,
+                       help='Server run hash for metrics (auto-detected if not provided)')
     parser.add_argument('--metrics-dir', type=str, default='metrics',
                        help='Metrics directory (default: metrics)')
     parser.add_argument('--runs-dir', type=str, default='runs',
                        help='Runs directory (default: runs)')
-    parser.add_argument('--output', type=str, default='latency_vs_goodput.png',
-                       help='Output filename (default: latency_vs_goodput.png)')
+    parser.add_argument('--output', type=str, default=None,
+                       help='Output filename (default: scripts/plots/latency_vs_goodput_{run_id}.png)')
     
     args = parser.parse_args()
     
-    # Resolve run directory
+    # Resolve run directory (default to latest if not specified)
     runs_dir = Path(args.runs_dir)
-    if args.run_id == 'latest':
+    if args.run_id is None or args.run_id == 'latest':
         run_dir = runs_dir / 'latest'
         if run_dir.is_symlink():
             run_dir = run_dir.resolve()
             run_id = run_dir.name
+            print(f"ℹ️  Using latest run: {run_id}")
         else:
             print("Error: runs/latest symlink not found")
+            print("Available runs:")
+            for d in sorted(runs_dir.iterdir(), reverse=True):
+                if d.is_dir() and d.name != 'latest':
+                    print(f"  - {d.name}")
             sys.exit(1)
     else:
         run_dir = runs_dir / args.run_id
@@ -272,7 +278,37 @@ def main():
         print(f"Error: Run directory not found: {run_dir}")
         sys.exit(1)
     
-    print(f"Analyzing run: {run_id}")
+    # Auto-detect run_hash from metrics directory if not provided
+    if args.run_hash is None:
+        print("ℹ️  Auto-detecting metrics hash...")
+        metrics_dir = Path(args.metrics_dir) / 'data'
+        if metrics_dir.exists():
+            # Find the most recent latency metrics file
+            latency_files = sorted(metrics_dir.glob('-latency-*.json'), 
+                                 key=lambda p: p.stat().st_mtime, reverse=True)
+            if latency_files:
+                # Extract hash from filename: -latency-{hash}.json
+                run_hash = latency_files[0].stem.split('-latency-')[1]
+                print(f"ℹ️  Detected metrics hash: {run_hash}")
+            else:
+                print("ℹ️  No latency metrics found (continuing without metrics overlay)")
+                run_hash = None
+        else:
+            print(f"ℹ️  Metrics directory not found (continuing without metrics overlay)")
+            run_hash = None
+    else:
+        run_hash = args.run_hash
+    
+    # Set default output path if not specified
+    if args.output is None:
+        output_dir = Path('scripts/plots')
+        output_dir.mkdir(parents=True, exist_ok=True)
+        args.output = str(output_dir / f'latency_vs_goodput_{run_id}.png')
+    
+    print(f"📊 Analyzing run: {run_id}")
+    if run_hash:
+        print(f"🔍 Metrics hash: {run_hash}")
+    print(f"💾 Output: {args.output}")
     
     # Load checkpoint data
     try:
@@ -284,12 +320,12 @@ def main():
     
     # Load latency data (optional)
     gen_latencies = None
-    if args.run_hash:
+    if run_hash:
         try:
-            metrics = load_latency_metrics(args.metrics_dir, args.run_hash)
+            metrics = load_latency_metrics(args.metrics_dir, run_hash)
             gene_latencies = group_latencies_by_gene(metrics)
             gen_latencies = calculate_generation_latencies(generations, gene_latencies)
-            print(f"✅ Loaded latency metrics (hash: {args.run_hash})")
+            print(f"✅ Loaded latency metrics (hash: {run_hash})")
         except FileNotFoundError as e:
             print(f"Warning: {e}")
             print("Plotting goodput only (without latency)")
