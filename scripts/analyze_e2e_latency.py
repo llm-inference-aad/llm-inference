@@ -31,33 +31,53 @@ sns.set_palette("husl")
 warnings.filterwarnings('ignore')
 
 class LatencyAnalyzer:
-    def __init__(self, metrics_dir: str | None = None):
-        if metrics_dir is None:
-            # Default to metrics/data directory relative to script location
-            script_dir = Path(__file__).parent
-            self.metrics_dir = script_dir / "data"
-        else:
+    def __init__(self, metrics_dir: str | None = None, run_id: str | None = None):
+        """
+        Initialize the latency analyzer.
+        
+        Args:
+            metrics_dir: Custom metrics directory path (legacy support)
+            run_id: Run ID to analyze (uses runs/{run_id}/metrics/)
+        """
+        if run_id:
+            # New structure: runs/{run_id}/metrics/
+            repo_root = Path(__file__).parent.parent
+            self.metrics_dir = repo_root / "runs" / run_id / "metrics"
+        elif metrics_dir:
+            # Custom directory specified
             self.metrics_dir = Path(metrics_dir)
+        else:
+            # Default to legacy metrics/data directory
+            repo_root = Path(__file__).parent.parent
+            self.metrics_dir = repo_root / "metrics" / "data"
         
         if not self.metrics_dir.exists():
             raise FileNotFoundError(f"Metrics directory not found: {self.metrics_dir}")
     
     def list_available_runs(self) -> List[str]:
         """List all available run hashes"""
-        pattern = "-latency-*.json"
-        files = list(self.metrics_dir.glob(pattern))
+        # Support both new (latency-*.json) and legacy (-latency-*.json) naming
+        files = list(self.metrics_dir.glob("latency-*.json")) + list(self.metrics_dir.glob("-latency-*.json"))
         run_hashes = []
         
         for file in files:
             # Extract run hash from filename
-            hash_part = file.stem.replace("-latency-", "")
+            if file.stem.startswith("-latency-"):
+                hash_part = file.stem.replace("-latency-", "")
+            else:
+                hash_part = file.stem.replace("latency-", "")
             run_hashes.append(hash_part)
         
         return sorted(run_hashes)
     
     def load_metrics(self, run_hash: str) -> Dict[str, Any]:
         """Load metrics for a specific run hash"""
-        metrics_file = self.metrics_dir / f"-latency-{run_hash}.json"
+        # Try new naming convention first
+        metrics_file = self.metrics_dir / f"latency-{run_hash}.json"
+        
+        if not metrics_file.exists():
+            # Fall back to legacy naming
+            metrics_file = self.metrics_dir / f"-latency-{run_hash}.json"
         
         if not metrics_file.exists():
             raise FileNotFoundError(f"Metrics file not found: {metrics_file}")
@@ -530,12 +550,13 @@ Examples:
     parser.add_argument('run_hash', nargs='?', help='Run hash to analyze')
     parser.add_argument('--list', action='store_true', help='List all available run hashes')
     parser.add_argument('--compare', nargs='+', help='Compare multiple runs')
-    parser.add_argument('--metrics-dir', help='Custom metrics directory path')
+    parser.add_argument('--run-id', help='Run ID to analyze (uses runs/{run_id}/metrics/)')
+    parser.add_argument('--metrics-dir', help='Custom metrics directory path (legacy support)')
     
     args = parser.parse_args()
     
     try:
-        analyzer = LatencyAnalyzer(args.metrics_dir)
+        analyzer = LatencyAnalyzer(metrics_dir=args.metrics_dir, run_id=args.run_id)
         
         if args.list:
             runs = analyzer.list_available_runs()
