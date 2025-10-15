@@ -1,101 +1,118 @@
-# Analysis Scripts# Plots Directory
+# Analysis Scripts
+
+This directory contains analysis and visualization scripts for LLMGE runs.
 
 
 
-This directory contains analysis and visualization scripts for LLMGE runs.This directory contains generated visualization outputs from analysis scripts.
+## Available Scripts
 
+### 1. `plot_run_summary.py` ⭐ **NEW**
 
+Generates comprehensive summary visualizations from a run's results and LLM metrics.
 
-## Available Scripts## Generated Files
+**Outputs:**
+- `run_summary.png` - 4-panel figure with accuracy distributions, training time analysis, and statistics
+- `llm_metrics.png` - 4-panel figure with LLM latency, prompt length analysis, and batching stats
 
-
-
-### 1. `plot_latency_vs_accuracy.py`- `latency_vs_accuracy_{run_id}.png` - Latency vs accuracy scatter plots
-
-Correlates LLM inference latency with model test accuracy.- `latency_vs_goodput_{run_id}.png` - Goodput over generations plots
-
-
-
-**Usage:**## Usage
+**Usage:**
 
 ```bash
+# Auto-detect latest run
+uv run python scripts/plot_run_summary.py
 
-# Auto-detect latest runPlots are automatically saved here when running the analysis scripts:
-
-python scripts/plot_latency_vs_accuracy.py
-
-```bash
-
-# Specific run# Plot latency vs accuracy (defaults to latest run)
-
-python scripts/plot_latency_vs_accuracy.py --run-id auto_20251014_191652python scripts/plot_latency_vs_accuracy.py
-
-
-
-# Custom output# Plot goodput over generations (defaults to latest run)
-
-python scripts/plot_latency_vs_accuracy.py --output my_plot.pngpython scripts/plot_latency_vs_goodput.py
-
+# Specific run
+uv run python scripts/plot_run_summary.py --run-dir runs/auto_20251014_191652
 ```
 
-# Specify a particular run
+### 2. `plot_latency_vs_accuracy.py`
 
-### 2. `plot_latency_vs_goodput.py`python scripts/plot_latency_vs_accuracy.py --run-id auto_20251014_191652
+Correlates LLM inference latency with model test accuracy for gene-level analysis.
+
+
+
+**Usage:**
+
+```bash
+# Auto-detect latest run
+uv run python scripts/plot_latency_vs_accuracy.py
+
+# Specific run
+uv run python scripts/plot_latency_vs_accuracy.py --run-id auto_20251014_191652
+
+# Custom output
+uv run python scripts/plot_latency_vs_accuracy.py --output my_plot.png
+```
+
+### 3. `plot_latency_vs_goodput.py`
 
 Analyzes goodput (successful evaluations) across generations with latency overlay.
 
-# Custom output location
+**Usage:**
 
-**Usage:**python scripts/plot_latency_vs_accuracy.py --output my_custom_plot.png
-
-```bash```
-
+```bash
 # Auto-detect latest run
+uv run python scripts/plot_latency_vs_goodput.py
 
-python scripts/plot_latency_vs_goodput.py## Organization
+# Specific run
+uv run python scripts/plot_latency_vs_goodput.py --run-id auto_20251014_191652
+```
+
+### 4. `plot_pareto_enhanced.py`
+
+Plots Pareto fronts for multi-objective optimization (accuracy vs. model size).
+
+**Usage:**
+
+```bash
+# Plot latest run
+uv run python scripts/plot_pareto_enhanced.py
+
+# Plot specific run
+uv run python scripts/plot_pareto_enhanced.py --run-id auto_20251014_191652
+
+# Compare multiple runs
+uv run python scripts/plot_pareto_enhanced.py --compare run1 run2 run3
+
+# Custom output
+uv run python scripts/plot_pareto_enhanced.py --output my_pareto.png
+```
+
+### 5. `analyze_e2e_latency.py`
 
 
+### 5. `analyze_e2e_latency.py`
 
-# Specific run- Plots are organized by run_id in their filenames
-
-python scripts/plot_latency_vs_goodput.py --run-id auto_20251014_191652- Old plots are not automatically deleted (manual cleanup if needed)
-
-```- All plots use high DPI (300) for publication quality
-
-
-### 3. `analyze_e2e_latency.py`
 Comprehensive end-to-end latency analysis with statistics and visualizations.
 
 **Usage:**
+
 ```bash
 # List available runs
-python scripts/analyze_e2e_latency.py --list
+uv run python scripts/analyze_e2e_latency.py --list
 
 # Analyze specific run by run_id
-python scripts/analyze_e2e_latency.py --run-id auto_20251014_191652
+uv run python scripts/analyze_e2e_latency.py --run-id auto_20251014_191652
 
 # Analyze by hash (legacy)
-python scripts/analyze_e2e_latency.py abc123def456
+uv run python scripts/analyze_e2e_latency.py abc123def456
 
 # Compare multiple runs
-python scripts/analyze_e2e_latency.py --compare hash1 hash2 hash3
+uv run python scripts/analyze_e2e_latency.py --compare hash1 hash2 hash3
 ```
+
+## Quick Start
+
+For a quick overview of your latest run, use:
+
+```bash
+uv run python scripts/plot_run_summary.py
+```
+
+This will generate comprehensive visualizations without needing to specify any arguments.
 
 ## Output Location
 
 All plots are saved to `scripts/plots/` by default.
-
-## Requirements
-
-All scripts require the virtual environment to be activated:
-
-```bash
-# Traditional venv
-source .venv/bin/activate
-
-# Or use uv directly
-uv run python scripts/plot_latency_vs_accuracy.py
-```
 
 ## Data Sources
 
