@@ -55,25 +55,31 @@ runs/
    - LLM job logs: `llm-*.out/err` (**only when LOCAL=False**)
 3. **Cleanup:** Old `slurm-results/` can be safely deleted once runs complete
 
-### 📝 Note: LOCAL Mode vs SLURM Mode
+### 📝 Note: LOCAL Mode vs Distributed Mode
 
 **Where are `eval-*.out` and `llm-*.out` logs?**
 
 The presence of these logs depends on the `LOCAL` setting in `src/cfg/constants.py`:
 
-- **LOCAL = True** (current default):
-  - Gene evaluations run locally with `bash` command
-  - No separate SLURM jobs submitted for eval/llm tasks
-  - Only `slurm-main-*.out/err` logs exist (from the main evolution job)
-  - Output from evaluations appears inline in main job log
+**Understanding the 2-Tier Execution:**
+- **Tier 1:** Main evolution job (run_improved.py) - ALWAYS runs via `sbatch run.sh` (on SLURM)
+- **Tier 2:** Individual gene evaluations - Distribution controlled by `LOCAL` flag
 
-- **LOCAL = False** (distributed mode):
-  - Each gene evaluation submitted as separate SLURM job
-  - Creates `eval-{job_id}.out/err` for training jobs
-  - Creates `llm-{job_id}.out/err` if LLM calls are separate jobs
-  - All these logs moved to `runs/{run_id}/logs/` at completion
+**LOCAL = True** (current default):
+- Gene evaluations run on **same SLURM node** as main job using `bash` command
+- No separate SLURM job submissions for each gene
+- Only `slurm-main-*.out/err` logs exist (all output goes here)
+- Evaluation output appears inline in main job log
+- **Simpler, easier debugging, less SLURM overhead**
 
-**Current Setup:** `LOCAL = True` → No eval/llm logs expected!
+**LOCAL = False** (distributed mode):
+- Each gene evaluation submitted as **separate SLURM job** via `sbatch`
+- Creates `eval-{job_id}.out/err` for each training job
+- Parallel evaluation of population (faster for large populations)
+- All eval logs moved to `runs/{run_id}/logs/` at completion
+- **More parallel, but higher SLURM job management overhead**
+
+**Current Setup:** `LOCAL = True` → No eval/llm logs expected (not an error!)
 
 ### Benefits
 

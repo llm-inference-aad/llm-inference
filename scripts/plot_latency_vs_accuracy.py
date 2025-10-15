@@ -29,7 +29,8 @@ def load_latency_metrics(run_id, run_hash=None, metrics_dir=None):
     3. Auto-detect most recent file in run metrics dir if run_hash not provided
     """
     # Try new structure first (run-specific)
-    run_metrics_dir = Path("runs") / run_id / "metrics"
+    repo_root = Path(__file__).parent.parent
+    run_metrics_dir = repo_root / "runs" / run_id / "metrics"
     if run_metrics_dir.exists():
         if run_hash:
             # Look for specific hash
@@ -216,6 +217,16 @@ def main():
     
     # Resolve run directory (default to latest if not specified)
     runs_dir = Path(args.runs_dir)
+    
+    # Make runs_dir absolute if relative
+    if not runs_dir.is_absolute():
+        runs_dir = Path(__file__).parent.parent / runs_dir
+    
+    if not runs_dir.exists():
+        print(f"Error: Runs directory not found: {runs_dir}")
+        print("Make sure to run this script from the repository root or specify --runs-dir")
+        sys.exit(1)
+    
     if args.run_id is None or args.run_id == 'latest':
         run_dir = runs_dir / 'latest'
         if run_dir.is_symlink():
