@@ -69,9 +69,6 @@ echo "Starting LLM server on host: $SERVER_HOSTNAME"
 SERVER_HOST=${SERVER_HOST:-$SERVER_HOSTNAME}
 SERVER_WORKERS=${SERVER_WORKERS:-1}
 
-<<<<<<< HEAD
-python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
-=======
 # ----------------------------
 # Auto-assign port if not specified
 # ----------------------------
@@ -186,4 +183,3 @@ else
 fi
 
 python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
->>>>>>> origin/new_main

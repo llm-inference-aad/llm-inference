@@ -369,7 +369,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         # Save latency metrics
         save_latency_metrics(
             request_dict, 
-            _time, 
+            e2e_time, 
             batch_processing_time, 
             batch_size, 
             queue_wait_time,
