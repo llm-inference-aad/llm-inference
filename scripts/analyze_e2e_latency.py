@@ -7,9 +7,9 @@ for LLM inference runs. It can compare metrics across different runs and display
 useful visualizations.
 
 Usage:
-    python metrics/e2e-latency.py <run_hash>
-    python metrics/e2e-latency.py --list
-    python metrics/e2e-latency.py --compare <hash1> <hash2> [<hash3> ...]
+    python metrics/-latency.py <run_hash>
+    python metrics/-latency.py --list
+    python metrics/-latency.py --compare <hash1> <hash2> [<hash3> ...]
 """
 
 import argparse
@@ -31,33 +31,53 @@ sns.set_palette("husl")
 warnings.filterwarnings('ignore')
 
 class LatencyAnalyzer:
-    def __init__(self, metrics_dir: str | None = None):
-        if metrics_dir is None:
-            # Default to metrics/data directory relative to script location
-            script_dir = Path(__file__).parent
-            self.metrics_dir = script_dir / "data"
-        else:
+    def __init__(self, metrics_dir: str | None = None, run_id: str | None = None):
+        """
+        Initialize the latency analyzer.
+        
+        Args:
+            metrics_dir: Custom metrics directory path (legacy support)
+            run_id: Run ID to analyze (uses runs/{run_id}/metrics/)
+        """
+        if run_id:
+            # New structure: runs/{run_id}/metrics/
+            repo_root = Path(__file__).parent.parent
+            self.metrics_dir = repo_root / "runs" / run_id / "metrics"
+        elif metrics_dir:
+            # Custom directory specified
             self.metrics_dir = Path(metrics_dir)
+        else:
+            # Default to legacy metrics/data directory
+            repo_root = Path(__file__).parent.parent
+            self.metrics_dir = repo_root / "metrics" / "data"
         
         if not self.metrics_dir.exists():
             raise FileNotFoundError(f"Metrics directory not found: {self.metrics_dir}")
     
     def list_available_runs(self) -> List[str]:
         """List all available run hashes"""
-        pattern = "e2e-latency-*.json"
-        files = list(self.metrics_dir.glob(pattern))
+        # Support both new (latency-*.json) and legacy (-latency-*.json) naming
+        files = list(self.metrics_dir.glob("latency-*.json")) + list(self.metrics_dir.glob("-latency-*.json"))
         run_hashes = []
         
         for file in files:
             # Extract run hash from filename
-            hash_part = file.stem.replace("e2e-latency-", "")
+            if file.stem.startswith("-latency-"):
+                hash_part = file.stem.replace("-latency-", "")
+            else:
+                hash_part = file.stem.replace("latency-", "")
             run_hashes.append(hash_part)
         
         return sorted(run_hashes)
     
     def load_metrics(self, run_hash: str) -> Dict[str, Any]:
         """Load metrics for a specific run hash"""
-        metrics_file = self.metrics_dir / f"e2e-latency-{run_hash}.json"
+        # Try new naming convention first
+        metrics_file = self.metrics_dir / f"latency-{run_hash}.json"
+        
+        if not metrics_file.exists():
+            # Fall back to legacy naming
+            metrics_file = self.metrics_dir / f"-latency-{run_hash}.json"
         
         if not metrics_file.exists():
             raise FileNotFoundError(f"Metrics file not found: {metrics_file}")
@@ -71,7 +91,7 @@ class LatencyAnalyzer:
             return {}
         
         # Extract latency data
-        e2e_latencies = [req["e2e_latency_sec"] for req in requests]
+        _latencies = [req["_latency_sec"] for req in requests]
         batch_times = [req["batch_processing_time_sec"] for req in requests]
         queue_times = [req.get("queue_wait_time_sec", 0) for req in requests if req.get("queue_wait_time_sec") is not None]
         batch_sizes = [req["batch_size"] for req in requests]
@@ -80,13 +100,13 @@ class LatencyAnalyzer:
         
         stats = {
             # End-to-end latency stats
-            "e2e_mean": np.mean(e2e_latencies),
-            "e2e_median": np.median(e2e_latencies),
-            "e2e_std": np.std(e2e_latencies),
-            "e2e_min": np.min(e2e_latencies),
-            "e2e_max": np.max(e2e_latencies),
-            "e2e_p95": np.percentile(e2e_latencies, 95),
-            "e2e_p99": np.percentile(e2e_latencies, 99),
+            "_mean": np.mean(_latencies),
+            "_median": np.median(_latencies),
+            "_std": np.std(_latencies),
+            "_min": np.min(_latencies),
+            "_max": np.max(_latencies),
+            "_p95": np.percentile(_latencies, 95),
+            "_p99": np.percentile(_latencies, 99),
             
             # Batch processing time stats
             "batch_mean": np.mean(batch_times),
@@ -111,7 +131,7 @@ class LatencyAnalyzer:
             
             # Throughput metrics
             "total_requests": len(requests),
-            "throughput_req_per_sec": len(requests) / sum(e2e_latencies) if sum(e2e_latencies) > 0 else 0
+            "throughput_req_per_sec": len(requests) / sum(_latencies) if sum(_latencies) > 0 else 0
         }
         
         return stats
@@ -142,13 +162,13 @@ class LatencyAnalyzer:
             
             # End-to-end latency analysis
             print(f"\n🚀 END-TO-END LATENCY STATISTICS:")
-            print(f"   Mean:       {stats['e2e_mean']:.3f}s")
-            print(f"   Median:     {stats['e2e_median']:.3f}s")
-            print(f"   Std Dev:    {stats['e2e_std']:.3f}s")
-            print(f"   Min:        {stats['e2e_min']:.3f}s")
-            print(f"   Max:        {stats['e2e_max']:.3f}s")
-            print(f"   95th %ile:  {stats['e2e_p95']:.3f}s")
-            print(f"   99th %ile:  {stats['e2e_p99']:.3f}s")
+            print(f"   Mean:       {stats['_mean']:.3f}s")
+            print(f"   Median:     {stats['_median']:.3f}s")
+            print(f"   Std Dev:    {stats['_std']:.3f}s")
+            print(f"   Min:        {stats['_min']:.3f}s")
+            print(f"   Max:        {stats['_max']:.3f}s")
+            print(f"   95th %ile:  {stats['_p95']:.3f}s")
+            print(f"   99th %ile:  {stats['_p99']:.3f}s")
             
             # Batch processing analysis
             print(f"\n⚡ BATCH PROCESSING STATISTICS:")
@@ -197,7 +217,7 @@ class LatencyAnalyzer:
                 sorted_genes = sorted(gene_requests.items(), key=lambda x: len(x[1]), reverse=True)
                 
                 for gene_id, gene_reqs in sorted_genes[:10]:  # Show top 10 genes
-                    gene_latencies = [req["e2e_latency_sec"] for req in gene_reqs]
+                    gene_latencies = [req["_latency_sec"] for req in gene_reqs]
                     avg_latency = np.mean(gene_latencies)
                     min_latency = np.min(gene_latencies)
                     max_latency = np.max(gene_latencies)
@@ -223,7 +243,7 @@ class LatencyAnalyzer:
         
         try:
             # Extract data for plotting
-            e2e_latencies = [req["e2e_latency_sec"] for req in requests]
+            _latencies = [req["_latency_sec"] for req in requests]
             batch_times = [req["batch_processing_time_sec"] for req in requests]
             queue_times = [req.get("queue_wait_time_sec", 0) for req in requests if req.get("queue_wait_time_sec") is not None]
             batch_sizes = [req["batch_size"] for req in requests]
@@ -234,17 +254,17 @@ class LatencyAnalyzer:
             fig.suptitle(f'Latency Analysis for Run: {run_hash}', fontsize=16, fontweight='bold')
             
             # 1. Latency distribution histogram
-            axes[0, 0].hist(e2e_latencies, bins=20, alpha=0.7, color='skyblue', edgecolor='black')
-            axes[0, 0].axvline(stats['e2e_mean'], color='red', linestyle='--', label=f'Mean: {stats["e2e_mean"]:.3f}s')
-            axes[0, 0].axvline(stats['e2e_median'], color='green', linestyle='--', label=f'Median: {stats["e2e_median"]:.3f}s')
+            axes[0, 0].hist(_latencies, bins=20, alpha=0.7, color='skyblue', edgecolor='black')
+            axes[0, 0].axvline(stats['_mean'], color='red', linestyle='--', label=f'Mean: {stats["_mean"]:.3f}s')
+            axes[0, 0].axvline(stats['_median'], color='green', linestyle='--', label=f'Median: {stats["_median"]:.3f}s')
             axes[0, 0].set_xlabel('End-to-End Latency (seconds)')
             axes[0, 0].set_ylabel('Frequency')
-            axes[0, 0].set_title('E2E Latency Distribution')
+            axes[0, 0].set_title(' Latency Distribution')
             axes[0, 0].legend()
             axes[0, 0].grid(True, alpha=0.3)
             
             # 2. Latency over time
-            axes[0, 1].plot(timestamps, e2e_latencies, 'o-', alpha=0.7, markersize=4)
+            axes[0, 1].plot(timestamps, _latencies, 'o-', alpha=0.7, markersize=4)
             axes[0, 1].set_xlabel('Time')
             axes[0, 1].set_ylabel('End-to-End Latency (seconds)')
             axes[0, 1].set_title('Latency Over Time')
@@ -252,23 +272,23 @@ class LatencyAnalyzer:
             axes[0, 1].grid(True, alpha=0.3)
             
             # 3. Batch size vs latency scatter plot
-            axes[1, 0].scatter(batch_sizes, e2e_latencies, alpha=0.6, c=batch_times, cmap='viridis')
+            axes[1, 0].scatter(batch_sizes, _latencies, alpha=0.6, c=batch_times, cmap='viridis')
             axes[1, 0].set_xlabel('Batch Size')
             axes[1, 0].set_ylabel('End-to-End Latency (seconds)')
-            axes[1, 0].set_title('Batch Size vs E2E Latency')
+            axes[1, 0].set_title('Batch Size vs  Latency')
             axes[1, 0].grid(True, alpha=0.3)
             
-            # 4. Component breakdown (E2E vs Batch processing)
+            # 4. Component breakdown ( vs Batch processing)
             if queue_times:
                 components = ['Queue Wait', 'Batch Processing', 'Other Overhead']
                 avg_queue = np.mean(queue_times)
                 avg_batch = stats['batch_mean']
-                avg_overhead = stats['e2e_mean'] - avg_batch - avg_queue
+                avg_overhead = stats['_mean'] - avg_batch - avg_queue
                 values = [avg_queue, avg_batch, max(0, avg_overhead)]
             else:
                 components = ['Batch Processing', 'Other Overhead']
                 avg_batch = stats['batch_mean']
-                avg_overhead = stats['e2e_mean'] - avg_batch
+                avg_overhead = stats['_mean'] - avg_batch
                 values = [avg_batch, max(0, avg_overhead)]
             
             axes[1, 1].pie(values, labels=components, autopct='%1.1f%%', startangle=90)
@@ -310,7 +330,7 @@ class LatencyAnalyzer:
             # Calculate gene statistics
             gene_stats = []
             for gene_id, gene_reqs in gene_requests.items():
-                latencies = [req["e2e_latency_sec"] for req in gene_reqs]
+                latencies = [req["_latency_sec"] for req in gene_reqs]
                 gene_stats.append({
                     'gene_id': gene_id,
                     'request_count': len(gene_reqs),
@@ -359,7 +379,7 @@ class LatencyAnalyzer:
             bars2 = ax2.bar(range(len(gene_names)), avg_latencies, yerr=std_latencies, 
                            alpha=0.7, color='lightcoral', edgecolor='black', capsize=3)
             ax2.set_xlabel('Gene ID')
-            ax2.set_ylabel('Average E2E Latency (seconds)')
+            ax2.set_ylabel('Average  Latency (seconds)')
             ax2.set_title('Average Latency per Gene (with std dev)')
             ax2.set_xticks(range(len(gene_names)))
             ax2.set_xticklabels(gene_names, rotation=45, ha='right')
@@ -423,7 +443,7 @@ class LatencyAnalyzer:
         
         # Display key metrics comparison
         comparison_cols = [
-            'run_hash', 'total_requests', 'e2e_mean', 'e2e_median', 'e2e_p95', 
+            'run_hash', 'total_requests', '_mean', '_median', '_p95', 
             'batch_mean', 'avg_batch_size', 'throughput_req_per_sec'
         ]
         
@@ -432,10 +452,10 @@ class LatencyAnalyzer:
         
         # Format the dataframe for better display
         display_df = df[comparison_cols].copy()
-        display_df.columns = ['Run Hash', 'Requests', 'E2E Mean', 'E2E Median', 'E2E P95', 'Batch Mean', 'Avg Batch', 'Throughput']
+        display_df.columns = ['Run Hash', 'Requests', ' Mean', ' Median', ' P95', 'Batch Mean', 'Avg Batch', 'Throughput']
         
         # Round numeric columns
-        numeric_cols = ['E2E Mean', 'E2E Median', 'E2E P95', 'Batch Mean', 'Avg Batch', 'Throughput']
+        numeric_cols = [' Mean', ' Median', ' P95', 'Batch Mean', 'Avg Batch', 'Throughput']
         for col in numeric_cols:
             if col in display_df.columns:
                 display_df[col] = display_df[col].round(3)
@@ -443,13 +463,13 @@ class LatencyAnalyzer:
         print(display_df.to_string(index=False))
         
         # Find best and worst performing runs
-        best_e2e = df.loc[df['e2e_mean'].idxmin()]
-        worst_e2e = df.loc[df['e2e_mean'].idxmax()]
+        best_ = df.loc[df['_mean'].idxmin()]
+        worst_ = df.loc[df['_mean'].idxmax()]
         best_throughput = df.loc[df['throughput_req_per_sec'].idxmax()]
         
         print(f"\n🏆 PERFORMANCE HIGHLIGHTS:")
-        print(f"   Best E2E Latency:    {best_e2e['run_hash']} ({best_e2e['e2e_mean']:.3f}s avg)")
-        print(f"   Worst E2E Latency:   {worst_e2e['run_hash']} ({worst_e2e['e2e_mean']:.3f}s avg)")
+        print(f"   Best  Latency:    {best_['run_hash']} ({best_['_mean']:.3f}s avg)")
+        print(f"   Worst  Latency:   {worst_['run_hash']} ({worst_['_mean']:.3f}s avg)")
         print(f"   Best Throughput:     {best_throughput['run_hash']} ({best_throughput['throughput_req_per_sec']:.2f} req/sec)")
         
         # Create comparison visualization
@@ -467,10 +487,10 @@ class LatencyAnalyzer:
             fig.suptitle('Run Comparison Analysis', fontsize=16, fontweight='bold')
             
             # 1. Mean latency comparison
-            axes[0, 0].bar(range(len(df)), df['e2e_mean'], alpha=0.7, color='skyblue')
+            axes[0, 0].bar(range(len(df)), df['_mean'], alpha=0.7, color='skyblue')
             axes[0, 0].set_xlabel('Run')
-            axes[0, 0].set_ylabel('Mean E2E Latency (seconds)')
-            axes[0, 0].set_title('Mean E2E Latency Comparison')
+            axes[0, 0].set_ylabel('Mean  Latency (seconds)')
+            axes[0, 0].set_title('Mean  Latency Comparison')
             axes[0, 0].set_xticks(range(len(df)))
             axes[0, 0].set_xticklabels([h[:8] + '...' for h in df['run_hash']], rotation=45)
             axes[0, 0].grid(True, alpha=0.3)
@@ -485,9 +505,9 @@ class LatencyAnalyzer:
             axes[0, 1].grid(True, alpha=0.3)
             
             # 3. P95 latency comparison
-            axes[1, 0].bar(range(len(df)), df['e2e_p95'], alpha=0.7, color='coral')
+            axes[1, 0].bar(range(len(df)), df['_p95'], alpha=0.7, color='coral')
             axes[1, 0].set_xlabel('Run')
-            axes[1, 0].set_ylabel('P95 E2E Latency (seconds)')
+            axes[1, 0].set_ylabel('P95  Latency (seconds)')
             axes[1, 0].set_title('P95 Latency Comparison')
             axes[1, 0].set_xticks(range(len(df)))
             axes[1, 0].set_xticklabels([h[:8] + '...' for h in df['run_hash']], rotation=45)
@@ -521,21 +541,22 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python metrics/e2e-latency.py abc123def456      # Analyze specific run
-  python metrics/e2e-latency.py --list            # List all available runs  
-  python metrics/e2e-latency.py --compare run1 run2 run3  # Compare multiple runs
+  python metrics/-latency.py abc123def456      # Analyze specific run
+  python metrics/-latency.py --list            # List all available runs  
+  python metrics/-latency.py --compare run1 run2 run3  # Compare multiple runs
         """
     )
     
     parser.add_argument('run_hash', nargs='?', help='Run hash to analyze')
     parser.add_argument('--list', action='store_true', help='List all available run hashes')
     parser.add_argument('--compare', nargs='+', help='Compare multiple runs')
-    parser.add_argument('--metrics-dir', help='Custom metrics directory path')
+    parser.add_argument('--run-id', help='Run ID to analyze (uses runs/{run_id}/metrics/)')
+    parser.add_argument('--metrics-dir', help='Custom metrics directory path (legacy support)')
     
     args = parser.parse_args()
     
     try:
-        analyzer = LatencyAnalyzer(args.metrics_dir)
+        analyzer = LatencyAnalyzer(metrics_dir=args.metrics_dir, run_id=args.run_id)
         
         if args.list:
             runs = analyzer.list_available_runs()

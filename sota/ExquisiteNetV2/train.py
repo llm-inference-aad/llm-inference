@@ -45,8 +45,10 @@ def get_args():
 
 
 def main():
-    # ADDED FOR LLM
-    os.chdir('./sota/ExquisiteNetV2')
+    # ADDED FOR LLM - change to ExquisiteNetV2 directory if not already there
+    if not os.path.basename(os.getcwd()) == 'ExquisiteNetV2':
+        if os.path.exists('./sota/ExquisiteNetV2'):
+            os.chdir('./sota/ExquisiteNetV2')
 
     args = get_args()
 
@@ -274,8 +276,16 @@ def main():
     """
     Defines an Output Filename
     gene_id is a unique identifier for the experiment or model.
+    Uses RUN_DIR environment variable if available to organize by run.
     """
-    filename = f'results/{gene_id}_results.txt'
+    # Check if we're running in a managed run directory
+    run_dir = os.environ.get('RUN_DIR', None)
+    if run_dir:
+        # Write to run-specific results directory
+        filename = os.path.join(run_dir, 'results', f'{gene_id}_results.txt')
+    else:
+        # Fallback to legacy location
+        filename = f'results/{gene_id}_results.txt'
     
     dir_path = os.path.dirname(filename)
 

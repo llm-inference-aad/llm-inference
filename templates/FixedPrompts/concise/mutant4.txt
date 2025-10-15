@@ -1,0 +1,6 @@
+Q: What changes could be made to optimize this code for better performance with large-scale datasets or improved memory efficiency?
+
+The current code block:
+```python
+{} 
+```

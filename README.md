@@ -28,6 +28,15 @@ The effectiveness of the Guided Evolution (GE) framework is showcased in the evo
 
 Our research subteam is specifically focused on leveraging genetic programming techniques to optimize Large Language Model (LLM) inference time. By applying evolutionary algorithms to neural network architectures and inference pipelines, we aim to discover novel optimizations that can significantly reduce computational overhead while maintaining or improving model performance. This work extends the core Guided Evolution framework to address one of the most critical challenges in modern AI deployment: making powerful language models more efficient and accessible through intelligent architectural evolution.
 
+### Output Files
+
+During a run, the system generates several output files. The primary results are stored in `*_results.txt` files, where each file corresponds to an individual in the population. The format of these files is a single line of four comma-separated values:
+
+1.  **Test Accuracy**: The accuracy of the model on the test dataset (a value to be maximized).
+2.  **Total Parameters**: The total number of parameters in the model (a value to be minimized).
+3.  **Validation Accuracy**: The accuracy of the model on the validation dataset.
+4.  **Train Time**: The time taken to train the model, in seconds.
+
 ---
 
 ### Setup

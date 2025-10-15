@@ -27,15 +27,27 @@ BATCH_WAIT_TIME = 0  # max wait time for batch to fill in s
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
+
+# Get RUN_ID from environment (set by run.sh) or use "server-only" if running standalone
+RUN_ID = os.getenv("RUN_ID", "server-only")
+
+# Organize metrics by run_id
 METRICS_BASE_PATH = os.getenv("METRICS_PATH", "./metrics")
-METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
-METRICS_FILE = METRICS_DIR / f"e2e-latency-{RUN_HASH}.json"
+if RUN_ID == "server-only":
+    # Standalone server mode: use old flat structure for backwards compatibility
+    METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
+else:
+    # Evolution run mode: organize by run_id
+    METRICS_DIR = Path("./runs") / RUN_ID / "metrics"
+    
+METRICS_FILE = METRICS_DIR / f"latency-{RUN_HASH}.json"
 
 # Ensure metrics directory exists
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize metrics file with metadata
 metrics_metadata = {
+    "run_id": RUN_ID,
     "run_hash": RUN_HASH,
     "session_start": datetime.now().isoformat(),
     "model_path": MODEL_PATH,
@@ -63,7 +75,7 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
             "max_new_tokens": request_data["max_new_tokens"],
             "temperature": request_data["temperature"],
             "top_p": request_data["top_p"],
-            "e2e_latency_sec": round(e2e_time, 4),
+            "_latency_sec": round(e2e_time, 4),
             "batch_processing_time_sec": round(batch_processing_time, 4),
             "batch_size": batch_size,
             "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None,
@@ -81,7 +93,7 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
 
 class LLMRequest(BaseModel):
     prompt: str
-    max_new_tokens: int = 100000
+    max_new_tokens: int = 8192  # Reasonable default for DeepSeek (130k context, but practical limit)
     top_p: float = 0.8
     temperature: float = 0.7
     job_id: str = "default"  # Add job identifier to match with slurm file
@@ -153,7 +165,7 @@ class LLMModel:
             temperature=0.1,
             top_p=0.15,
             top_k=0,
-            max_new_tokens=100000,
+            max_new_tokens=8192,  # Reasonable default for DeepSeek
             repetition_penalty=1.1,
             do_sample=True,
             batch_size=BATCH_SIZE
@@ -309,7 +321,7 @@ async def generate_text(request: LLMRequest):
     Returns:
     dict: generated_text (output of LLM), response_time, run_hash, and evaluationScore
     """
-    e2e_start_time = time.time()
+    _start_time = time.time()
     
     try:
         # Add system prompt to all requests (configurable via environment variable)
@@ -337,13 +349,13 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         
         # Track queue wait time
         queue_start_time = time.time()
-        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(e2e_start_time))} [Job: {request.job_id}, Gene: {request.gene_id}]")
+        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(_start_time))} [Job: {request.job_id}, Gene: {request.gene_id}]")
         
         # Submit to the batch processor and wait for result
         result = await model.generate(request_dict, queue_start_time)
         
         # Calculate end-to-end latency
-        e2e_time = time.time() - e2e_start_time
+        e2e_time = time.time() - _start_time
         
         # Extract batch processing time and queue wait time from result
         batch_processing_time = result.get("response_time_sec", 0)
@@ -367,6 +379,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")
         
         # Add run hash, e2e latency, and evaluation score to response
+        result["_latency_sec"] = round(e2e_time, 4)
         result["e2e_latency_sec"] = round(e2e_time, 4)
         result["run_hash"] = RUN_HASH
         result["evaluationScore"] = evaluation_score

@@ -9,7 +9,8 @@ from cfg.constants import *
 from utils.print_utils import box_print
 from llm_utils import (split_file, submit_mixtral, submit_mixtral_hf, 
                        llm_code_qc, str2bool, generate_augmented_code, 
-                       extract_note, clean_code_from_llm, retrieve_base_code)
+                       extract_note, clean_code_from_llm, retrieve_base_code,
+                       validate_module_source)
 from pathlib import Path
 
 
@@ -21,6 +22,7 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
     augment_idx = np.random.randint(1, len(parts))
     # select code to be augmented randomly 
     code2llm = parts[augment_idx]
+    original_parts = parts[:]
     # prompt_templates = glob.glob(f'{ROOT_DIR}/templates/FixedPrompts/*/*.txt')
     # template_path = np.random.choice(prompt_templates)
     # template_path = f'{ROOT_DIR}/templates/{fname}'
@@ -29,13 +31,51 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
         template_txt = file.read()
     # add code to be augmented 
     txt2llm = template_txt.format(code2llm.strip())
-    code_from_llm = generate_augmented_code(txt2llm, augment_idx-1, apply_quality_control,
-                                            top_p, temperature, inference_submission=inference_submission, gene_id=gene_id)
     note_txt = extract_note(code2llm)
-    parts[augment_idx] = f"\n{note_txt}{code_from_llm}\n"
-    # prompt_log = f'# Parent Prompt: {template_path} Root Code: {input_filename}\n'
-    # python_network_txt = prompt_log + '# --OPTION--'.join(parts)
-    python_network_txt = '# --OPTION--'.join(parts)
+
+    fallback_reason = None
+    candidate_txt = None
+    # Surya: Validate assembled module; fallback to parent if all retries fail
+    for attempt in range(LLM_GENERATION_MAX_RETRIES):
+        try:
+            code_from_llm = generate_augmented_code(
+                txt2llm,
+                augment_idx-1,
+                apply_quality_control,
+                top_p,
+                temperature,
+                inference_submission=inference_submission,
+                gene_id=gene_id,
+            )
+        except Exception as exc:
+            fallback_reason = str(exc)
+            break
+
+        candidate_parts = parts[:]
+        candidate_parts[augment_idx] = f"\n{note_txt}{code_from_llm}\n"
+        candidate_txt = '# --OPTION--'.join(candidate_parts)
+        try:
+            # Surya: Execute module to catch runtime errors before evaluation
+            validate_module_source(
+                candidate_txt,
+                output_filename,
+                module_name=f"_llmge_{gene_id}" if gene_id else None,
+            )
+            fallback_reason = None
+            break
+        except Exception as exc:
+            fallback_reason = str(exc)
+            box_print("Generated module failed validation", print_bbox_len=80, new_line_end=False)
+            print(f"Attempt {attempt + 1} validation error: {fallback_reason}")
+            candidate_txt = None
+
+    # Surya: Fallback guarantees every individual yields a loadable module
+    if fallback_reason is not None or candidate_txt is None:
+        box_print("Fallback to parent code triggered", print_bbox_len=80, new_line_end=False)
+        print(f"Reason: {fallback_reason}")
+        python_network_txt = '# --OPTION--'.join(original_parts)
+    else:
+        python_network_txt = candidate_txt
     # Write the text to the file
     file = Path(output_filename)
     file.parent.mkdir(parents=True, exist_ok=True)

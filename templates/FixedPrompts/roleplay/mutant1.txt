@@ -1,0 +1,8 @@
+As a software engineer focused on clean code and maintainability, you prioritize writing concise, readable implementations:
+
+Q: How can you refactor this code snippet to make it more concise and elegant while preserving its functionality?
+
+The current code block:
+```python
+{} 
+```
