@@ -164,17 +164,23 @@ def write_bash_script(python_file, input_filename_x, output_filename, gene_id_ch
         os.makedirs(out_dir, exist_ok=True)
         with open(file_path, 'w') as file:
             file.write(template_txt)
+        
+        # Sample QC check based on PROB_QC probability
+        qc_check = random.random() < PROB_QC
             
         temp_text = f'{python_file} {input_filename_x} {output_filename} {file_path} --top_p {top_p} --temperature {temperature}'
-        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
+        python_runline = f"python {temp_text} --apply_quality_control '{qc_check}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
         
     elif python_file=='src/llm_crossover.py':
         gene_id_parent2 = fetch_gene(input_filename_y)
         GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
                                                 mutation_type=None, gene_id_parent2=gene_id_parent2)
         
+        # Sample QC check based on PROB_QC probability
+        qc_check = random.random() < PROB_QC
+        
         temp_text = f"{python_file} {input_filename_x} {input_filename_y} {output_filename} --top_p {top_p} --temperature {temperature}"
-        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
+        python_runline = f"python {temp_text} --apply_quality_control '{qc_check}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
     else:
         raise ValueError("Invalid python_file argument")
 
@@ -279,7 +285,11 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
             return state
 
     start_time = time.time()
-    output_file = f'slurm-{job_id}.out'
+    # Use correct log path based on LOCAL mode
+    if LOCAL:
+        output_file = f'slurm-{job_id}.out'
+    else:
+        output_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.out')
 
     while True:
         # Check if the timeout is reached
@@ -436,7 +446,8 @@ def check4results(gene_id):
             else:
                 return state
         # there is no local output, so process with slurm
-        output_file = f'slurm-{job_id}.out'
+        # Use correct log path for evaluation jobs
+        output_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.out')
         # Check if the output file exists
         if os.path.exists(output_file):
             with open(output_file, 'r') as file:

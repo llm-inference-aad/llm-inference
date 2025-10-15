@@ -205,7 +205,7 @@ def llm_code_qc_hf(code_from_llm, base_code, generate_text=None):
     box_print("QC PROMPT TO LLM", print_bbox_len=120, new_line_end=False)
     print(prompt2llm)
     
-    code_from_llm = submit_mixtral_hf(prompt2llm, max_new_tokens=32000, top_p=0.1, temperature=0.1, 
+    code_from_llm = submit_mixtral_hf(prompt2llm, max_new_tokens=4096, top_p=0.1, temperature=0.1, 
                       model_id="mistralai/Mixtral-8x7B-v0.1", return_gen=False)
     box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
     print(code_from_llm)
@@ -217,7 +217,7 @@ def llm_code_qc_hf(code_from_llm, base_code, generate_text=None):
 
 def submit_mixtral_hf(
     txt2mixtral,
-    max_new_tokens=32000,
+    max_new_tokens=4096,
     top_p=0.15,
     temperature=0.1,
     model_id="mistralai/Mixtral-8x7B-Instruct-v0.1",
@@ -274,7 +274,7 @@ def submit_mixtral_hf(
             # Anything else -> bubble up
             raise
     
-def submit_llama3_hf(txt2llama, max_new_tokens=32000, top_p=0.15, temperature=0.1, 
+def submit_llama3_hf(txt2llama, max_new_tokens=4096, top_p=0.15, temperature=0.1, 
                       model_id="meta-llama/Meta-Llama-3.1-70B-Instruct", return_gen=False, gene_id=None):
     """
     This function submits a model prompt to Llama3 through the HuggingFace Inference API
@@ -348,9 +348,9 @@ def submit_gemini_api(txt2gemini, gene_id=None, **kwargs):
 
 
 
-def submit_mixtral(txt2mixtral, max_new_tokens=32000, top_p=0.15, temperature=0.1, 
+def submit_mixtral(txt2mixtral, max_new_tokens=4096, top_p=0.15, temperature=0.1, 
                    model_id="gpt2", return_gen=False, gene_id=None):
-    max_new_tokens = np.random.randint(20000, 32000)
+    max_new_tokens = np.random.randint(2048, 4096)
     print(f'max_new_tokens: {max_new_tokens}')
     start_time = time.time()
     model = transformers.AutoModelForCausalLM.from_pretrained(
@@ -412,13 +412,13 @@ def mutate_prompts(n=5):
             file.write(output)
 
 
-def submit_local_server(txt2llm, max_new_tokens=32000, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
+def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
     """
     Submit a request to the local FastAPI server running on PACE-ICE cluster.
     
     Args:
         txt2llm (str): The prompt text to send to the LLM
-        max_new_tokens (int): Maximum number of tokens to generate
+        max_new_tokens (int): Maximum number of tokens to generate (default 8192, suitable for DeepSeek)
         top_p (float): Nucleus sampling parameter
         temperature (float): Sampling temperature
         gene_id (str): Identifier for the individual this request belongs to
