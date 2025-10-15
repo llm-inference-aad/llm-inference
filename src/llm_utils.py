@@ -299,7 +299,7 @@ def submit_llama3_hf(txt2llama, max_new_tokens=4096, top_p=0.15, temperature=0.1
     str
         Model's output from inference
     """    
-    max_new_tokens = np.random.randint(20000, 32000)
+    max_new_tokens = np.random.randint(2048, 4096)
     # Use environment variable for HF API key
     # Set HF_TOKEN or HUGGING_FACE_HUB_TOKEN environment variable
     huggingface_hub.login(new_session=False)
