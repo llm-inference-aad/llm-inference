@@ -13,7 +13,8 @@ SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
 SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
-LOCAL = True
+# For BASELINE run: Set to False for parallel evaluation (better for inference optimization experiments)
+LOCAL = False
 if LOCAL:
 	RUN_COMMAND = 'bash'
 	DELAYED_CHECK = False
@@ -62,19 +63,30 @@ GENERATION = 0
 PROB_QC = 0.0
 PROB_EOT = 0.25
 
+# =============================================================================
+# BASELINE CONFIGURATION FOR LLM INFERENCE OPTIMIZATION
+# =============================================================================
+# Recommended settings for establishing baseline metrics before applying
+# optimization techniques (RAG, speculative decoding, etc.)
+#
+# For baseline run:
+# - num_generations: 10-15 (enough for statistical significance)
+# - population_size: 8-16 (matches batch size for efficient batching)
+# - LOCAL: False (parallel evaluation, better for throughput measurement)
+# =============================================================================
+
 #: Number of generations to run for
-num_generations = 10  # Number of generations
+num_generations = 10  # BASELINE: 10 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 8
-# start_population_size = 144   # Size of the population 124=72
-#population_size = 44 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
+start_population_size = 8  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
-population_size = 8 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
+population_size = 8  # BASELINE: Keep consistent with start_population_size
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual
+
 #: Number of elites to consider
 num_elites = 8
 #: Number of individuals to keep in the hall of fame across the optimization
