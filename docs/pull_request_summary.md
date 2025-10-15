@@ -52,17 +52,37 @@ This pull request introduces a massive overhaul of the LLMGE project, focusing o
 
 ---
 
-## 🐛 Bug Fixes & Stability Improvements
+## 🐛 Critical Bug Fixes & Stability Improvements
 
-### 1. Critical Path & SLURM Log Fixes
-- **Absolute Paths**: Fixed a critical bug where `RUN_DIR` was a relative path, causing results to be written to incorrect, nested locations. `RUN_DIR` is now an absolute path, ensuring stability.
-- **SLURM Log Migration**: The `run.sh` script now automatically moves all SLURM logs into the run-specific `logs/` directory upon completion, making each run fully self-contained.
-- **Working Directory Consistency**: Ensured that all training scripts execute from the repository root, preventing path-related errors.
-- **Robust `check4results()`**: The fitness checking function was updated to search multiple possible locations for results files, making it resilient to path issues and backward compatible.
+This release includes several critical, blocking bug fixes that significantly improve the stability and correctness of the framework, especially for distributed runs.
 
-### 2. LLM & Evolution Robustness
-- **Removed Hard Token Cap**: Fixed a critical stability issue by removing the hard-coded `2048` token limit on LLM responses. This prevents the model from returning truncated, invalid code and was a major source of `SyntaxError`.
-- **Restored Mutant Prompt Templates**: Corrected the prompt templates to provide the LLM with a clearer, code-centric context, improving the quality of generated code.
+### 1. ✅ SLURM Log Polling & Pathing (Blocking)
+- **Problem**: The system was unable to track the status of distributed jobs (`LOCAL = False`) because it was looking for SLURM logs in the wrong directory.
+- **Fix**:
+    - **Correct Log Polling**: Modified `run_improved.py` to correctly poll for logs in the `slurm-results/` directory, unblocking all distributed runs.
+    - **Absolute `RUN_DIR` Path**: Ensured `RUN_DIR` is an absolute path to prevent results from being written to incorrect, nested locations.
+    - **Automated Log Migration**: The `run.sh` script now automatically moves all SLURM logs from `slurm-results/` into the run-specific `runs/{run_id}/logs/` directory upon completion.
+
+### 2. ✅ LLM Prompt & Token Limit Fixes (Blocking)
+- **Problem**: Malformed prompts and excessively high token limits were causing API errors and producing poor-quality, truncated code.
+- **Fix**:
+    - **Restored Roleplay Prompts**: Restored the 5 `mutant*.txt` templates to their correct persona-based format, improving mutation quality.
+    - **Corrected Token Limits**: Reduced the default `max_new_tokens` from 32,000 to `8192` for the local DeepSeek server and `4096` for Hugging Face endpoints, preventing API errors and improving performance.
+
+### 3. ✅ Probabilistic Quality Control (Major)
+- **Problem**: The `PROB_QC` constant was non-functional, as the decision to run a quality control check was not being sampled for each job.
+- **Fix**: Re-implemented probabilistic sampling in `run_improved.py`. The system now correctly uses the `PROB_QC` value to determine whether to run a QC check for each mutation and crossover operation.
+
+### 5. Server-Side Request Batching
+- **Problem**: The inference server processed requests one by one, leading to inefficient GPU utilization and lower throughput.
+- **Fix**: Implemented an `asyncio` request queue in `server.py`. The server now collects incoming requests and processes them in batches, significantly improving inference throughput and overall system performance.
+
+### 4. Robust Fallback & Retry Logic
+- **Problem**: A single invalid code generation from the LLM (e.g., a `SyntaxError`) could crash an entire evolution run.
+- **Fix**: Implemented a multi-layered validation and retry system in `src/llm_utils.py`.
+    - **3-Layer Validation**: All generated code is validated for block extraction, syntax correctness (`compile()`), and runtime safety (`exec()`).
+    - **Retry Loop**: If validation fails, the system re-prompts the LLM up to `MAX_RETRIES` times.
+    - **Fallback to Original**: If all retries fail, the system discards the invalid code and returns the original, un-mutated individual, ensuring the evolution process always continues.
 
 ---
 
