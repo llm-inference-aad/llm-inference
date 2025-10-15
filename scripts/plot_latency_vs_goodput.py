@@ -75,15 +75,41 @@ def load_checkpoints(run_dir):
     
     return sorted(generations, key=lambda x: x['generation'])
 
-def load_latency_metrics(metrics_dir, run_hash):
-    """Load latency metrics from JSON"""
-    metrics_file = Path(metrics_dir) / "data" / f"-latency-{run_hash}.json"
+def load_latency_metrics(run_id, run_hash=None, metrics_dir=None):
+    """
+    Load latency metrics from JSON.
     
-    if not metrics_file.exists():
-        raise FileNotFoundError(f"Metrics file not found: {metrics_file}")
+    Search order:
+    1. runs/{run_id}/metrics/latency-{run_hash}.json (new structure)
+    2. metrics/data/-latency-{run_hash}.json (legacy structure)
+    3. Auto-detect most recent file in run metrics dir if run_hash not provided
+    """
+    # Try new structure first (run-specific)
+    run_metrics_dir = Path("runs") / run_id / "metrics"
+    if run_metrics_dir.exists():
+        if run_hash:
+            # Look for specific hash
+            metrics_file = run_metrics_dir / f"latency-{run_hash}.json"
+            if metrics_file.exists():
+                with open(metrics_file, 'r') as f:
+                    return json.load(f)
+        else:
+            # Auto-detect most recent metrics file
+            metrics_files = sorted(run_metrics_dir.glob("latency-*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+            if metrics_files:
+                print(f"Auto-detected metrics file: {metrics_files[0].name}")
+                with open(metrics_files[0], 'r') as f:
+                    return json.load(f)
     
-    with open(metrics_file, 'r') as f:
-        return json.load(f)
+    # Fall back to legacy structure
+    if metrics_dir and run_hash:
+        metrics_file = Path(metrics_dir) / "data" / f"-latency-{run_hash}.json"
+        if metrics_file.exists():
+            print(f"Using legacy metrics file: {metrics_file}")
+            with open(metrics_file, 'r') as f:
+                return json.load(f)
+    
+    raise FileNotFoundError(f"Metrics file not found for run_id={run_id}, run_hash={run_hash}")
 
 def group_latencies_by_gene(metrics):
     """Group latency measurements by gene_id"""
@@ -278,27 +304,6 @@ def main():
         print(f"Error: Run directory not found: {run_dir}")
         sys.exit(1)
     
-    # Auto-detect run_hash from metrics directory if not provided
-    if args.run_hash is None:
-        print("ℹ️  Auto-detecting metrics hash...")
-        metrics_dir = Path(args.metrics_dir) / 'data'
-        if metrics_dir.exists():
-            # Find the most recent latency metrics file
-            latency_files = sorted(metrics_dir.glob('-latency-*.json'), 
-                                 key=lambda p: p.stat().st_mtime, reverse=True)
-            if latency_files:
-                # Extract hash from filename: -latency-{hash}.json
-                run_hash = latency_files[0].stem.split('-latency-')[1]
-                print(f"ℹ️  Detected metrics hash: {run_hash}")
-            else:
-                print("ℹ️  No latency metrics found (continuing without metrics overlay)")
-                run_hash = None
-        else:
-            print(f"ℹ️  Metrics directory not found (continuing without metrics overlay)")
-            run_hash = None
-    else:
-        run_hash = args.run_hash
-    
     # Set default output path if not specified
     if args.output is None:
         output_dir = Path('scripts/plots')
@@ -306,8 +311,8 @@ def main():
         args.output = str(output_dir / f'latency_vs_goodput_{run_id}.png')
     
     print(f"📊 Analyzing run: {run_id}")
-    if run_hash:
-        print(f"🔍 Metrics hash: {run_hash}")
+    if args.run_hash:
+        print(f"🔍 Metrics hash: {args.run_hash}")
     print(f"💾 Output: {args.output}")
     
     # Load checkpoint data
@@ -318,20 +323,18 @@ def main():
         print(f"Error: {e}")
         sys.exit(1)
     
-    # Load latency data (optional)
+    # Load latency data (optional, will auto-detect if not provided)
     gen_latencies = None
-    if run_hash:
-        try:
-            metrics = load_latency_metrics(args.metrics_dir, run_hash)
-            gene_latencies = group_latencies_by_gene(metrics)
-            gen_latencies = calculate_generation_latencies(generations, gene_latencies)
-            print(f"✅ Loaded latency metrics (hash: {run_hash})")
-        except FileNotFoundError as e:
-            print(f"Warning: {e}")
-            print("Plotting goodput only (without latency)")
-            gen_latencies = None
-    else:
-        print("Note: No run-hash provided, plotting goodput only")
+    try:
+        metrics = load_latency_metrics(run_id, args.run_hash, args.metrics_dir)
+        gene_latencies = group_latencies_by_gene(metrics)
+        gen_latencies = calculate_generation_latencies(generations, gene_latencies)
+        print(f"✅ Loaded latency metrics")
+        if 'run_hash' in metrics:
+            print(f"🔍 Using metrics hash: {metrics['run_hash']}")
+    except FileNotFoundError as e:
+        print(f"ℹ️  {e}")
+        print("Plotting goodput only (without latency)")
         gen_latencies = [None] * len(generations)
     
     # Plot

@@ -26,15 +26,27 @@ BATCH_WAIT_TIME = 2  # max wait time for batch to fill in s
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
+
+# Get RUN_ID from environment (set by run.sh) or use "server-only" if running standalone
+RUN_ID = os.getenv("RUN_ID", "server-only")
+
+# Organize metrics by run_id
 METRICS_BASE_PATH = os.getenv("METRICS_PATH", "./metrics")
-METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
-METRICS_FILE = METRICS_DIR / f"-latency-{RUN_HASH}.json"
+if RUN_ID == "server-only":
+    # Standalone server mode: use old flat structure for backwards compatibility
+    METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
+else:
+    # Evolution run mode: organize by run_id
+    METRICS_DIR = Path("./runs") / RUN_ID / "metrics"
+    
+METRICS_FILE = METRICS_DIR / f"latency-{RUN_HASH}.json"
 
 # Ensure metrics directory exists
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize metrics file with metadata
 metrics_metadata = {
+    "run_id": RUN_ID,
     "run_hash": RUN_HASH,
     "session_start": datetime.now().isoformat(),
     "model_path": MODEL_PATH,

@@ -19,15 +19,41 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 
-def load_latency_metrics(metrics_dir, run_hash):
-    """Load latency metrics from JSON"""
-    metrics_file = Path(metrics_dir) / "data" / f"-latency-{run_hash}.json"
+def load_latency_metrics(run_id, run_hash=None, metrics_dir=None):
+    """
+    Load latency metrics from JSON.
     
-    if not metrics_file.exists():
-        raise FileNotFoundError(f"Metrics file not found: {metrics_file}")
+    Search order:
+    1. runs/{run_id}/metrics/latency-{run_hash}.json (new structure)
+    2. metrics/data/-latency-{run_hash}.json (legacy structure)
+    3. Auto-detect most recent file in run metrics dir if run_hash not provided
+    """
+    # Try new structure first (run-specific)
+    run_metrics_dir = Path("runs") / run_id / "metrics"
+    if run_metrics_dir.exists():
+        if run_hash:
+            # Look for specific hash
+            metrics_file = run_metrics_dir / f"latency-{run_hash}.json"
+            if metrics_file.exists():
+                with open(metrics_file, 'r') as f:
+                    return json.load(f)
+        else:
+            # Auto-detect most recent metrics file
+            metrics_files = sorted(run_metrics_dir.glob("latency-*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+            if metrics_files:
+                print(f"Auto-detected metrics file: {metrics_files[0].name}")
+                with open(metrics_files[0], 'r') as f:
+                    return json.load(f)
     
-    with open(metrics_file, 'r') as f:
-        return json.load(f)
+    # Fall back to legacy structure
+    if metrics_dir and run_hash:
+        metrics_file = Path(metrics_dir) / "data" / f"-latency-{run_hash}.json"
+        if metrics_file.exists():
+            print(f"Using legacy metrics file: {metrics_file}")
+            with open(metrics_file, 'r') as f:
+                return json.load(f)
+    
+    raise FileNotFoundError(f"Metrics file not found for run_id={run_id}, run_hash={run_hash}")
 
 def load_accuracy_results(run_dir):
     """Load accuracy results from run directory"""
@@ -211,27 +237,6 @@ def main():
         print(f"Error: Run directory not found: {run_dir}")
         sys.exit(1)
     
-    # Auto-detect run_hash from metrics directory if not provided
-    if args.run_hash is None:
-        print("ℹ️  Auto-detecting metrics hash...")
-        metrics_dir = Path(args.metrics_dir) / 'data'
-        if metrics_dir.exists():
-            # Find the most recent latency metrics file
-            latency_files = sorted(metrics_dir.glob('-latency-*.json'), 
-                                 key=lambda p: p.stat().st_mtime, reverse=True)
-            if latency_files:
-                # Extract hash from filename: -latency-{hash}.json
-                run_hash = latency_files[0].stem.split('-latency-')[1]
-                print(f"ℹ️  Detected metrics hash: {run_hash}")
-            else:
-                print("Error: No latency metrics files found in metrics/data/")
-                sys.exit(1)
-        else:
-            print(f"Error: Metrics directory not found: {metrics_dir}")
-            sys.exit(1)
-    else:
-        run_hash = args.run_hash
-    
     # Set default output path if not specified
     if args.output is None:
         output_dir = Path('scripts/plots')
@@ -239,13 +244,16 @@ def main():
         args.output = str(output_dir / f'latency_vs_accuracy_{run_id}.png')
     
     print(f"📊 Analyzing run: {run_id}")
-    print(f"🔍 Metrics hash: {run_hash}")
+    if args.run_hash:
+        print(f"🔍 Metrics hash: {args.run_hash}")
     print(f"💾 Output: {args.output}")
     
-    # Load metrics
+    # Load metrics (will auto-detect hash if not provided)
     try:
-        metrics = load_latency_metrics(args.metrics_dir, run_hash)
+        metrics = load_latency_metrics(run_id, args.run_hash, args.metrics_dir)
         print(f"✅ Loaded {len(metrics.get('requests', []))} metric requests")
+        if 'run_hash' in metrics:
+            print(f"🔍 Using metrics hash: {metrics['run_hash']}")
     except FileNotFoundError as e:
         print(f"Error: {e}")
         sys.exit(1)
