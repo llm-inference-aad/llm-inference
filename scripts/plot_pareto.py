@@ -164,8 +164,13 @@ def main() -> None:
         print(f"No result files found in {results_dir}. Nothing to plot.")
         return
 
+    # Create plots directory inside the parent of the results dir
+    plot_dir = results_dir.parent / "plots"
+    plot_dir.mkdir(exist_ok=True)
+    output_path = plot_dir / args.output.name
+
     front = pareto_front(records)
-    plot_front(records, front, args.output, show=args.show)
+    plot_front(records, front, output_path, show=args.show)
 
 
 if __name__ == "__main__":

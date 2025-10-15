@@ -27,3 +27,4 @@ documentation/
 notebook.md
 /servers.json
 /loadbalancer.log
+plots/
