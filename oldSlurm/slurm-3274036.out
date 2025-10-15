@@ -1,0 +1,66 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-08-2025 16:29:18
+Job ID:    3274036
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-010-15-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+Activating virtual environment at: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/.venv
+Writing server hostname 'atl1-1-03-010-15-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-010-15-0.pace.gatech.edu
+INFO:     Started server process [1181307]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: 8a7676d33e6168a3
+Metrics will be saved to: /storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/metrics/data/e2e-latency-8a7676d33e6168a3.json
+[2025-10-08 16:29:22] ===== SERVER STARTUP INITIATED =====
+[2025-10-08 16:29:22] Starting LLM server...
+[2025-10-08 16:29:22] Loading model during startup...
+[2025-10-08 16:29:22] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-08 16:29:22] ===== MODEL LOADING STARTED =====
+[2025-10-08 16:29:22] Initializing model components...
+[2025-10-08 16:29:22] Model path: /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-10-08 16:29:22] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:01<00:09,  1.35s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:02<00:07,  1.32s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [00:03<00:06,  1.30s/it]Loading checkpoint shards:  50%|█████     | 4/8 [00:05<00:05,  1.29s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [00:06<00:03,  1.29s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [00:07<00:02,  1.28s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [00:09<00:01,  1.28s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:09<00:00,  1.06s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:09<00:00,  1.20s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://atl1-1-03-010-15-0.pace.gatech.edu:8000 (Press CTRL+C to quit)
+[2025-10-08 16:29:33] Model weights loaded in 11.92 seconds
+[2025-10-08 16:29:33] Loading tokenizer...
+[2025-10-08 16:29:34] Tokenizer loaded in 0.35 seconds
+[2025-10-08 16:29:34] Configuring tokenizer for batching...
+[2025-10-08 16:29:34] Creating text generation pipeline...
+[2025-10-08 16:29:34] Pipeline created in 0.09 seconds
+[2025-10-08 16:29:34] Initializing async batching components...
+[2025-10-08 16:29:34] ===== MODEL LOADING COMPLETED =====
+[2025-10-08 16:29:34] Total loading time: 12.36 seconds
+[2025-10-08 16:29:34] Model is ready to serve requests!
+[2025-10-08 16:29:34] Server-side batching enabled with batch_size=8
+[2025-10-08 16:29:34] ===== SERVER STARTUP COMPLETE =====
+[2025-10-08 16:29:34] Server is ready to accept requests!
+[2025-10-08 16:29:34] Available endpoints: /generate (POST), / (GET)
+Request received at 16:38:23 [Job: 3274037]
+Processing batch of 1 requests
+Request completed in 12.19s (E2E), 10.19s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:45990 - "POST /generate HTTP/1.1" 200 OK
+slurmstepd: error: *** JOB 3274036 ON atl1-1-03-010-15-0 CANCELLED AT 2025-10-08T16:38:52 ***
+---------------------------------------
+Begin Slurm Epilog: Oct-08-2025 16:38:55
+Job ID:        3274036
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=02:33:04,vmem=0,walltime=00:09:34,mem=1547428K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-010-15-0
+---------------------------------------

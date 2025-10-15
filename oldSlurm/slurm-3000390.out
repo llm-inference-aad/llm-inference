@@ -1,0 +1,26 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-15-2025 19:42:00
+Job ID:    3000390
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-014-30-0.pace.gatech.edu
+Writing server hostname 'atl1-1-03-014-30-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-014-30-0.pace.gatech.edu
+/storage/ice1/8/6/rmanimaran8/llm-inference/llm-inference/.venv/bin/python: No module named uvicorn
+---------------------------------------
+Begin Slurm Epilog: Sep-15-2025 19:42:01
+Job ID:        3000390
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h200=1,mem=160G,node=1
+Rsrc Used:     cput=00:00:32,vmem=0,walltime=00:00:02,mem=14756K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-014-30-0
+---------------------------------------

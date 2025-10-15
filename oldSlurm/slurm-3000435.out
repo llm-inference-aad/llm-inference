@@ -1,0 +1,83 @@
+---------------------------------------
+Begin Slurm Prolog: Sep-15-2025 19:46:11
+Job ID:    3000435
+User ID:   rmanimaran8
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-014-30-0.pace.gatech.edu
+Writing server hostname 'atl1-1-03-014-30-0.pace.gatech.edu' to file: /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-014-30-0.pace.gatech.edu
+INFO:     Started server process [1209589]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://atl1-1-03-014-30-0.pace.gatech.edu:8000 (Press CTRL+C to quit)
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it for the first time
+INFO:     172.27.150.93:54820 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:46:47
+INFO:     172.27.150.93:48818 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:46:55
+INFO:     172.27.150.93:34348 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:48:30
+INFO:     128.61.254.123:44492 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:48:44
+INFO:     128.61.254.123:33724 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:49:02
+INFO:     128.61.254.123:55064 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:49:18
+INFO:     128.61.254.123:44640 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:49:26
+INFO:     128.61.254.123:39312 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:49:35
+INFO:     128.61.254.123:52530 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:49:44
+INFO:     128.61.254.123:54772 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:49:53
+INFO:     128.61.254.123:42568 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:01
+INFO:     128.61.254.123:60420 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:10
+INFO:     128.61.254.123:60436 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:21
+INFO:     128.61.254.123:42418 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:28
+INFO:     172.27.150.93:50406 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:29
+INFO:     128.61.254.123:42424 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:37
+INFO:     172.27.150.93:42994 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:38
+INFO:     128.61.254.123:40372 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:45
+INFO:     172.27.150.93:45170 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:47
+INFO:     128.61.254.123:49876 - "POST /generate HTTP/1.1" 500 Internal Server Error
+INFO:     128.61.254.123:46822 - "GET / HTTP/1.1" 200 OK
+Request received at 19:50:53
+INFO:     172.27.150.93:45186 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:54
+INFO:     128.61.254.123:46824 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:50:56
+INFO:     128.61.254.123:46830 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:02
+INFO:     172.27.150.93:59768 - "POST /generate HTTP/1.1" 500 Internal Server Error
+Request received at 19:51:10
+INFO:     172.27.150.93:33992 - "POST /generate HTTP/1.1" 500 Internal Server Error
+slurmstepd: error: *** JOB 3000435 ON atl1-1-03-014-30-0 CANCELLED AT 2025-09-15T19:51:12 ***
+---------------------------------------
+Begin Slurm Epilog: Sep-15-2025 19:51:12
+Job ID:        3000435
+User ID:       rmanimaran8
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h200=1,mem=160G,node=1
+Rsrc Used:     cput=01:20:16,vmem=0,walltime=00:05:01,mem=422664K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-014-30-0
+---------------------------------------
