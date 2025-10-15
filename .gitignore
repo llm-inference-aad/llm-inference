@@ -12,9 +12,11 @@ tests/*/outputs
 slurm-*.out
 slurm-*.err
 slurm-results/
+runs/
 setup_uv.sh
 uv.lock
 .env
 hostname.log
 .venv/
+.venv-backup*/
 .vscode/
