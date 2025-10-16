@@ -12,6 +12,7 @@ tests/*/outputs
 slurm-*.out
 slurm-*.err
 slurm-results/
+slurm_logs/
 runs/
 setup_uv.sh
 uv.lock
