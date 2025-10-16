@@ -13,6 +13,7 @@ slurm-*.out
 slurm-*.err
 slurm-results/
 slurm_logs/
+oldSlurm/
 runs/
 setup_uv.sh
 uv.lock
