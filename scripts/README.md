@@ -2,7 +2,26 @@
 
 This directory contains analysis and visualization scripts for LLMGE runs.
 
+## Utility Scripts
 
+### `migrate_slurm_logs.sh` 🛠️
+
+Manually migrate SLURM logs to a specific run directory when automatic migration fails (e.g., due to job timeout or cancellation).
+
+**Usage:**
+
+```bash
+# With job ID
+./scripts/migrate_slurm_logs.sh auto_20251015_180811 3403227
+
+# Auto-detect job ID from metadata
+./scripts/migrate_slurm_logs.sh auto_20251015_180811
+```
+
+**When to use:**
+- Job was cancelled due to time limit
+- Job failed before log migration step
+- Manual cleanup after debugging
 
 ## Available Scripts
 

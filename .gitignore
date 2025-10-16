@@ -12,7 +12,10 @@ tests/*/outputs
 slurm-*.out
 slurm-*.err
 slurm-results/
-runs/
+slurm_logs/
+oldSlurm/
+runs/*
+!runs/.gitkeep
 setup_uv.sh
 uv.lock
 .env
