@@ -14,7 +14,8 @@ slurm-*.err
 slurm-results/
 slurm_logs/
 oldSlurm/
-runs/
+runs/*
+!runs/.gitkeep
 setup_uv.sh
 uv.lock
 .env
