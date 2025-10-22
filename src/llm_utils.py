@@ -404,7 +404,7 @@ def mutate_prompts(n=5):
             llm_code_generator = submit_local_server
         else:
             llm_code_generator = submit_mixtral_hf  # fallback
-        output = llm_code_generator(prompt, temperature=temp).strip()
+        output = llm_code_generator(prompt, temperature=temp, gene_id="mutate_prompts").strip()
         if "```" in output:
             output = output.split("```")[0]
         output = output + "\n```python\n{}\n```"
@@ -415,16 +415,8 @@ def mutate_prompts(n=5):
 def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
     """
     Submit a request to the local FastAPI server or load balancer running on PACE-ICE cluster.
-    
-    Args:
-        txt2llm (str): The prompt text to send to the LLM
-        max_new_tokens (int): Maximum number of tokens to generate (default 8192, suitable for DeepSeek)
-        top_p (float): Nucleus sampling parameter
-        temperature (float): Sampling temperature
-        gene_id (str): Identifier for the individual this request belongs to
-    
-    Returns:
-        str: Generated text from the local server or load balancer
+    This helper now includes retry logic and an optional remote fallback to keep evolution moving
+    even when the primary gateway is down.
     """
     try:
         # Check if load balancer mode is enabled
@@ -497,14 +489,67 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
             "gene_id": gene_id  # Add gene_id to track individual
         }
         
-        # Make the HTTP request
-        response = requests.post(api_url, json=payload, timeout=None)  #  minute timeout
+        timeout_seconds = float(os.getenv("LOCAL_SERVER_TIMEOUT", 300))
+        max_retries = int(os.getenv("LOCAL_SERVER_MAX_RETRIES", 3))
+        enable_remote_fallback = os.getenv("ENABLE_LLM_REMOTE_FALLBACK", "false").lower() in {"1", "true", "yes"}
+        fallback_target = os.getenv("LLM_REMOTE_FALLBACK_TARGET", "mixtral_hf")
+        last_exception: Exception | None = None
         
-        if response.status_code == 200:
-            result = response.json()
-            return result.get("generated_text", "")
-        else:
-            raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+        for attempt in range(1, max_retries + 1):
+            try:
+                response = requests.post(api_url, json=payload, timeout=timeout_seconds)
+                if response.status_code == 200:
+                    result = response.json()
+                    return result.get("generated_text", "")
+                else:
+                    raise Exception(f"Server returned status code {response.status_code}: {response.text}")
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
+                last_exception = exc
+                print(f"[WARN] Local server attempt {attempt}/{max_retries} failed: {exc}")
+            except Exception as exc:
+                last_exception = exc
+                print(f"[WARN] Local server attempt {attempt}/{max_retries} failed: {exc}")
+                # Non-transient error; exit retry loop
+                break
+            
+            if attempt < max_retries:
+                backoff = min(5 * attempt, 30)
+                print(f"[INFO] Retrying local server in {backoff} seconds...")
+                time.sleep(backoff)
+        
+        if last_exception and enable_remote_fallback:
+            print(f"[WARN] Falling back to remote LLM due to local server failure: {last_exception}")
+            safe_tokens = min(max_new_tokens, 4096)
+            try:
+                if fallback_target == "mixtral_hf":
+                    return submit_mixtral_hf(
+                        txt2llm,
+                        max_new_tokens=safe_tokens,
+                        top_p=top_p,
+                        temperature=temperature,
+                        return_gen=False,
+                        gene_id=gene_id,
+                    )
+                elif fallback_target == "mixtral":
+                    return submit_mixtral(
+                        txt2llm,
+                        max_new_tokens=safe_tokens,
+                        top_p=top_p,
+                        temperature=temperature,
+                        return_gen=False,
+                        gene_id=gene_id,
+                    )
+                else:
+                    raise Exception(f"Unknown fallback target '{fallback_target}'")
+            except Exception as fallback_exc:
+                raise Exception(
+                    f"Local server failed after {max_retries} attempts and remote fallback "
+                    f"also failed: {fallback_exc}"
+                ) from fallback_exc
+        
+        if last_exception:
+            raise Exception(f"Error calling local server after {max_retries} attempts: {last_exception}")
+        raise Exception("Unhandled error calling local server.")
             
     except requests.exceptions.ConnectionError:
         raise Exception("Could not connect to local server. Make sure the server is running.")

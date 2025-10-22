@@ -133,6 +133,11 @@ Located in `runs/<run_id>/results/`, these files provide a concise summary of ea
 -   **Symptom**: The `llm-*.out` log contains the message `Fallback to parent code triggered`.
 -   **Cause**: This indicates that the LLM operation (mutation or crossover) failed repeatedly. The script attempted to generate code up to `LLM_GENERATION_MAX_RETRIES` times, and each attempt resulted in an error (e.g., it produced unrunnable code, timed out, or returned an empty response).
 -   **Impact**: The resulting individual is a clone of its parent, leading to the "Identical Fitness Scores" issue described above.
+-   **Optimization**: As of October 17, 2025, the system implements **fitness inheritance** - fallback clones automatically inherit their parent's fitness without re-evaluation, saving GPU time. You'll see log messages like:
+    ```
+    ⚠️  Gene xXx789def is a fallback clone of parent xXx456abc
+       Inheriting fitness (0.8521, 518230) instead of re-evaluating...
+    ```
 -   **How to Debug**:
     1.  Examine the prompts in the `llm-*.out` file to see if they are too restrictive or ambiguous.
     2.  Check the corresponding `llm-*.err` file for timeout errors. If timeouts are frequent, consider increasing the time allocation for LLM jobs in `src/cfg/constants.py`.

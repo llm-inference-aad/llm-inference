@@ -70,11 +70,21 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
             candidate_txt = None
 
     # Surya: Fallback guarantees every individual yields a loadable module
+    fallback_marker = Path(f"{output_filename}.fallback")
     if fallback_reason is not None or candidate_txt is None:
         box_print("Fallback to parent code triggered", print_bbox_len=80, new_line_end=False)
         print(f"Reason: {fallback_reason}")
         python_network_txt = '# --OPTION--'.join(original_parts)
+        try:
+            fallback_marker.write_text((fallback_reason or "unknown").strip() or "unknown")
+        except OSError as marker_exc:
+            print(f"[WARN] Unable to write fallback marker for {output_filename}: {marker_exc}")
     else:
+        if fallback_marker.exists():
+            try:
+                fallback_marker.unlink()
+            except OSError as marker_exc:
+                print(f"[WARN] Unable to remove fallback marker for {output_filename}: {marker_exc}")
         python_network_txt = candidate_txt
     # Write the text to the file
     file = Path(output_filename)

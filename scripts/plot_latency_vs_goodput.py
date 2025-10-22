@@ -3,7 +3,7 @@
 Plot latency vs goodput across generations.
 
 Goodput is defined as the percentage of individuals per generation
-that successfully obtained fitness scores (valid evaluations).
+that produced novel code (i.e., the LLM did not fall back to the parent).
 
 Usage:
     python scripts/plot_latency_vs_goodput.py --run-id my_run_20251013_143022 --run-hash abc123
@@ -48,6 +48,7 @@ def load_checkpoints(run_dir):
         
         # Calculate goodput: individuals with valid fitness
         valid_fitness_count = 0
+        fallback_count = 0
         total_count = len(population)
         
         for ind in population:
@@ -55,7 +56,11 @@ def load_checkpoints(run_dir):
                 continue
             gene_id = ind[0] if isinstance(ind, (list, tuple)) else None
             if gene_id and gene_id in global_data:
-                fitness = global_data[gene_id].get('fitness')
+                record = global_data[gene_id]
+                if record.get('fallback'):
+                    fallback_count += 1
+
+                fitness = record.get('fitness')
                 # Check if fitness is valid (not None and has valid values)
                 if fitness is not None:
                     if isinstance(fitness, (tuple, list)) and len(fitness) > 0:
@@ -64,12 +69,15 @@ def load_checkpoints(run_dir):
                     elif isinstance(fitness, (int, float)):
                         valid_fitness_count += 1
         
-        goodput = (valid_fitness_count / total_count * 100) if total_count > 0 else 0
+        fallback_percent = (fallback_count / total_count * 100) if total_count > 0 else 0
+        goodput = max(0.0, 100.0 - fallback_percent) if total_count > 0 else 0
         
         generations.append({
             'generation': gen_num,
             'population_size': total_count,
             'valid_fitness_count': valid_fitness_count,
+            'fallback_count': fallback_count,
+            'fallback_percent': fallback_percent,
             'goodput_percent': goodput
         })
     
@@ -217,8 +225,8 @@ def plot_latency_vs_goodput(generations, gen_latencies, output_path, run_id):
     print(f"Run ID: {run_id}\n")
     
     print(f"📊 GENERATION-BY-GENERATION BREAKDOWN:")
-    print(f"{'Gen':<6} {'Pop Size':<10} {'Valid':<8} {'Goodput':<10} {'Status':<15}")
-    print(f"{'-'*60}")
+    print(f"{'Gen':<6} {'Pop Size':<10} {'Valid':<8} {'Fallbacks':<10} {'Goodput':<10} {'Status':<15}")
+    print(f"{'-'*70}")
     
     for gen in generations:
         status = "✅ Perfect" if gen['goodput_percent'] == 100 else \
@@ -226,6 +234,7 @@ def plot_latency_vs_goodput(generations, gen_latencies, output_path, run_id):
                  "❌ Poor"
         print(f"{gen['generation']:<6} {gen['population_size']:<10} "
               f"{gen['valid_fitness_count']:<8} "
+              f"{gen['fallback_count']:<10} "
               f"{gen['goodput_percent']:<10.1f} {status:<15}")
     
     print(f"\n📈 SUMMARY STATISTICS:")
@@ -233,6 +242,8 @@ def plot_latency_vs_goodput(generations, gen_latencies, output_path, run_id):
     print(f"  Average goodput: {mean_goodput:.1f}%")
     print(f"  Best generation: Gen {gen_nums[np.argmax(goodputs)]} ({max(goodputs):.1f}%)")
     print(f"  Worst generation: Gen {gen_nums[np.argmin(goodputs)]} ({min(goodputs):.1f}%)")
+    mean_fallback = np.mean([gen['fallback_percent'] for gen in generations])
+    print(f"  Average fallback rate: {mean_fallback:.1f}%")
     
     if gen_latencies and any(lat is not None for lat in gen_latencies):
         valid_lats = [lat for lat in gen_latencies if lat is not None]

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=LLMGE01_Server
-#SBATCH -t 16:00:00
+#SBATCH -t 12:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --mem 160G
 #SBATCH -c 16
@@ -63,6 +63,12 @@ HOSTNAME_FILE=${HOSTNAME_LOG_FILE:-"${LLM_INFERENCE_ROOT_DIR}/hostname.log"}
 
 echo "Writing server hostname '$SERVER_HOSTNAME' to file: $HOSTNAME_FILE"
 echo "$SERVER_HOSTNAME" > "$HOSTNAME_FILE"
+
+# Write server job ID for automatic shutdown tracking
+SERVER_JOB_FILE="${HOSTNAME_FILE%.log}_server_job.txt"
+echo "Writing server job ID '${SLURM_JOB_ID}' to file: $SERVER_JOB_FILE"
+echo "${SLURM_JOB_ID}" > "$SERVER_JOB_FILE"
+
 echo "Starting LLM server on host: $SERVER_HOSTNAME"
 
 # Use environment variables for server configuration

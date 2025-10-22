@@ -1,6 +1,18 @@
-Q: What algorithmic optimizations or data structure improvements could be implemented to enhance computational efficiency of this existing code snippet?
+python
+def calculate_score(text):
+    words = text.split()
+    word_count = len(words)
+    score = 0
+    for word in words:
+        if word.lower() == 'good':
+            score += 1
+        elif word.lower() == 'bad':
+            score -= 1
+    return (score / word_count) * 100
 
-The current code block:
+text = "This is a good sentence. Another bad example."
+print(calculate_score(text))
+
 ```python
-{} 
+{}
 ```

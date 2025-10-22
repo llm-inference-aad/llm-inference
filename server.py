@@ -96,8 +96,8 @@ class LLMRequest(BaseModel):
     max_new_tokens: int = 8192  # Reasonable default for DeepSeek (130k context, but practical limit)
     top_p: float = 0.8
     temperature: float = 0.7
-    job_id: str = "default"  # Add job identifier to match with slurm file
-    gene_id: str = None  # Identifier for the individual this request belongs to
+    job_id: str | None = "default"  # Add job identifier to match with slurm file
+    gene_id: str | None = None  # Identifier for the individual this request belongs to
 
 class LLMModel:
     _instance = None

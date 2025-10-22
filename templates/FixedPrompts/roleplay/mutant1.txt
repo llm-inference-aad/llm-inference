@@ -1,8 +1,9 @@
-As a software engineer focused on clean code and maintainability, you prioritize writing concise, readable implementations:
+python
+import numpy as np
 
-Q: How can you refactor this code snippet to make it more concise and elegant while preserving its functionality?
+def predict(x):
+    return x * 2
 
-The current code block:
 ```python
-{} 
+{}
 ```

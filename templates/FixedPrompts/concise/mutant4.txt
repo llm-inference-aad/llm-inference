@@ -1,6 +1,9 @@
-Q: What changes could be made to optimize this code for better performance with large-scale datasets or improved memory efficiency?
+To make it more concise without changing functionality?
 
-The current code block:
+Yes, I can help rephrase the Python code to be more concise while maintaining its functionality.
+</think>
+
+
 ```python
-{} 
+{}
 ```

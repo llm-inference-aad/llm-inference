@@ -341,7 +341,8 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     # Log data
     GLOBAL_DATA[gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
                             'status':'subbed file', 'fitness':None, 'start_time':time.time()}
-    GLOBAL_DATA_ANCESTRY[gene_id] = {'GENES':[gene_id], 'MUTATE_TYPE':["CREATED"]}
+    # FIX: Initial individuals are created from "network" seed, not from themselves
+    GLOBAL_DATA_ANCESTRY[gene_id] = {'GENES':['network'], 'MUTATE_TYPE':["CREATED"]}
     
     individual = container([gene_id])  # Assign a file ID
     
@@ -432,6 +433,78 @@ def check4model2run(gene_id):
     print(f'Checking for: SOTA_ROOT ./models/network_{gene_id}.py')
     model_path = f'{SOTA_ROOT}/models/network_{gene_id}.py'
     if os.path.exists(model_path):
+        fallback_marker = f'{model_path}.fallback'
+        if os.path.exists(fallback_marker):
+            try:
+                with open(fallback_marker, 'r') as marker_file:
+                    fallback_reason = marker_file.read().strip() or "unknown"
+            except OSError:
+                fallback_reason = "unknown"
+            GLOBAL_DATA[gene_id]['fallback'] = True
+            GLOBAL_DATA[gene_id]['fallback_reason'] = fallback_reason
+            
+            # Fitness Inheritance Optimization: Skip re-evaluation of fallback clones
+            # Since fallback genes are identical to their parent, we can copy fitness directly
+            if gene_id in GLOBAL_DATA_ANCESTRY and 'GENES' in GLOBAL_DATA_ANCESTRY[gene_id]:
+                parent_genes = GLOBAL_DATA_ANCESTRY[gene_id]['GENES']
+                # Parent is the first gene in the ancestry list (before the current gene)
+                if len(parent_genes) > 0:
+                    parent_gene_id = parent_genes[0]
+                    
+                    # Special case: seed network (parent_gene_id == 'network')
+                    # Load fitness from seed network results file if available
+                    if parent_gene_id == 'network':
+                        seed_results_file = os.path.join(SOTA_ROOT, 'results', 'network_results.txt')
+                        if os.path.exists(seed_results_file):
+                            try:
+                                with open(seed_results_file, 'r') as f:
+                                    content = f.read().strip().split(',')
+                                    if len(content) >= 4:
+                                        test_acc = float(content[0])
+                                        num_params = float(content[1])
+                                        seed_fitness = (test_acc, -num_params)
+                                        
+                                        print(f'⚠️  Gene {gene_id} is a fallback clone of seed network')
+                                        print(f'   Inheriting fitness {seed_fitness} from seed results...')
+                                        
+                                        # Copy fitness from seed network
+                                        GLOBAL_DATA[gene_id]['fitness'] = seed_fitness
+                                        GLOBAL_DATA[gene_id]['status'] = 'fitness inherited from seed'
+                                        GLOBAL_DATA[gene_id]['inherited_from'] = parent_gene_id
+                                        
+                                        # No need to submit evaluation job
+                                        return
+                            except (ValueError, OSError) as e:
+                                print(f'⚠️  Gene {gene_id} is a fallback of seed, but could not load seed fitness: {e}')
+                                print(f'   Will evaluate normally')
+                        else:
+                            print(f'⚠️  Gene {gene_id} is a fallback of seed, but seed results file not found')
+                            print(f'   Will evaluate normally')
+                    # Standard case: parent is another evolved gene
+                    elif parent_gene_id in GLOBAL_DATA and GLOBAL_DATA[parent_gene_id].get('fitness') is not None:
+                        parent_fitness = GLOBAL_DATA[parent_gene_id]['fitness']
+                        
+                        # Verify fitness is valid (not placeholder or invalid)
+                        if parent_fitness != PLACEHOLDER_FITNESS and parent_fitness != INVALID_FITNESS_MAX:
+                            print(f'⚠️  Gene {gene_id} is a fallback clone of parent {parent_gene_id}')
+                            print(f'   Inheriting fitness {parent_fitness} instead of re-evaluating...')
+                            
+                            # Copy fitness from parent
+                            GLOBAL_DATA[gene_id]['fitness'] = parent_fitness
+                            GLOBAL_DATA[gene_id]['status'] = 'fitness inherited from parent'
+                            GLOBAL_DATA[gene_id]['inherited_from'] = parent_gene_id
+                            
+                            # No need to submit evaluation job
+                            return
+                        else:
+                            print(f'⚠️  Gene {gene_id} is a fallback, but parent fitness is invalid/placeholder')
+                    else:
+                        print(f'⚠️  Gene {gene_id} is a fallback, but parent {parent_gene_id} not yet evaluated')
+                        print(f'   Will evaluate (parent and child may be in same generation)')
+        else:
+            GLOBAL_DATA[gene_id]['fallback'] = False
+            if 'fallback_reason' in GLOBAL_DATA[gene_id]:
+                del GLOBAL_DATA[gene_id]['fallback_reason']
         if GLOBAL_DATA[gene_id]['status'] != 'running eval':
             submit_run(gene_id)
             

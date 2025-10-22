@@ -76,10 +76,10 @@ PROB_EOT = 0.25
 # =============================================================================
 
 #: Number of generations to run for
-num_generations = 10  # BASELINE: 10 generations for initial experiments
+num_generations = 8  # BASELINE: 10 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 8  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
 population_size = 8  # BASELINE: Keep consistent with start_population_size

@@ -1,8 +1,15 @@
-As a performance optimization specialist, you focus on writing efficient code that scales well with large datasets:
+python
+import numpy as np
 
-Q: How can you optimize this code snippet to improve its runtime performance and computational efficiency?
+def compute_loss(y_true, y_pred):
+    return np.mean(np.abs(y_true - y_pred))
 
-The current code block:
+y_true = np.array([1.0, 2.0, 3.0])
+y_pred = np.array([1.5, 2.5, 3.5])
+
+loss = compute_loss(y_true, y_pred)
+print(f"Loss: {loss}")
+
 ```python
-{} 
+{}
 ```

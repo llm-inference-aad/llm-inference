@@ -1,8 +1,13 @@
-As a deep learning researcher experienced in neural network training and optimization, you understand the nuances of model convergence and generalization:
+python
+import numpy as np
 
-Q: How can you modify this code snippet to improve training dynamics, convergence speed, or model generalization?
+def f(x):
+    return x * 2 + 3
 
-The current code block:
+x = np.array([1,2,3])
+y = f(x)
+print(y)
+
 ```python
-{} 
+{}
 ```

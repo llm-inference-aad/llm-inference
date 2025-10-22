@@ -1,6 +1,7 @@
 import os
 import argparse
 import random
+from pathlib import Path
 from cfg.constants import *
 from utils.print_utils import box_print
 from llm_utils import (split_file, submit_mixtral, submit_mixtral_hf, 
@@ -90,6 +91,14 @@ def write_augmented_code(output_filename, parts_x, parts_y):
 
     with open(output_filename, 'w') as file:
         file.write(python_network_txt)
+
+    # Ensure any stale fallback marker from prior runs is removed
+    fallback_marker = Path(f"{output_filename}.fallback")
+    if fallback_marker.exists():
+        try:
+            fallback_marker.unlink()
+        except OSError as marker_exc:
+            print(f"[WARN] Unable to remove fallback marker for {output_filename}: {marker_exc}")
 
 
 if __name__ == "__main__":

@@ -157,5 +157,52 @@ with open('${RUN_DIR}/run_metadata.json', 'w') as f:
 "
 fi
 
+# =============================================================================
+# Automatic LLM Server Shutdown and Log Collection
+# =============================================================================
+echo "=== Shutting down LLM server ==="
+SERVER_JOB_FILE="${REPO_ROOT}/hostname_server_job.txt"
+
+if [[ -f "${SERVER_JOB_FILE}" ]]; then
+  SERVER_JOB_ID=$(cat "${SERVER_JOB_FILE}" 2>/dev/null || echo "")
+  
+  if [[ -n "${SERVER_JOB_ID}" && "${SERVER_JOB_ID}" != "null" ]]; then
+    echo "Canceling server job: ${SERVER_JOB_ID}"
+    scancel "${SERVER_JOB_ID}" || echo "Warning: Could not cancel server job ${SERVER_JOB_ID} (may have already finished)"
+    
+    # Wait for server to shut down and logs to flush
+    echo "Waiting for server shutdown and log flush..."
+    sleep 15
+    
+    # Move server logs to run directory
+    echo "Moving server logs to run directory..."
+    SERVER_OUT_LOG="${REPO_ROOT}/slurm-results/slurm-server-${SERVER_JOB_ID}.out"
+    SERVER_ERR_LOG="${REPO_ROOT}/slurm-results/slurm-server-${SERVER_JOB_ID}.err"
+    
+    if [[ -f "${SERVER_OUT_LOG}" ]]; then
+      mv "${SERVER_OUT_LOG}" "${RUN_DIR}/logs/" && echo "✅ Moved server .out log"
+    else
+      echo "⚠️  Server .out log not found: ${SERVER_OUT_LOG}"
+    fi
+    
+    if [[ -f "${SERVER_ERR_LOG}" ]]; then
+      mv "${SERVER_ERR_LOG}" "${RUN_DIR}/logs/" && echo "✅ Moved server .err log"
+    else
+      echo "⚠️  Server .err log not found: ${SERVER_ERR_LOG}"
+    fi
+    
+    # Clean up tracking files
+    rm -f "${SERVER_JOB_FILE}"
+    rm -f "${REPO_ROOT}/hostname.log"
+    
+    echo "✅ Server shutdown and cleanup complete"
+  else
+    echo "⚠️  No valid server job ID found in ${SERVER_JOB_FILE}"
+  fi
+else
+  echo "⚠️  Server job tracking file not found: ${SERVER_JOB_FILE}"
+  echo "   Server may need to be shut down manually"
+fi
+
 echo "=== Job complete ==="
 date
