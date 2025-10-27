@@ -1046,7 +1046,7 @@ if __name__ == "__main__":
         
         # Handle edge case: population smaller than target size after invalid removal
         if len(population) == 0:
-            box_print("⚠️  CRITICAL: All genes failed evaluation - recreating population", new_line_end=False)
+            box_print("⚠️  Warning: All genes failed evaluation - recreating population", new_line_end=False)
             for i in range(5):
                 createPopulation()
                 if len(population) > 0:
