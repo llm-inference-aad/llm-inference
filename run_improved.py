@@ -1043,26 +1043,34 @@ if __name__ == "__main__":
         # Remove individuals with placeholder fitness
         population = [ind for ind in population if ind.fitness.values != INVALID_FITNESS_MAX]
         print_population(population, GLOBAL_DATA)
+        
+        # Handle edge case: population smaller than target size after invalid removal
+        if len(population) == 0:
+            box_print("⚠️  CRITICAL: All genes failed evaluation - recreating population", new_line_end=False)
+            for i in range(5):
+                createPopulation()
+                if len(population) > 0:
+                    break
+            if len(population) == 0:
+                print("ERROR: Unable to create valid population after 5 attempts. Exiting.")
+                exit(1)
+        
+        # Adjust selection sizes based on actual population size
+        actual_pop_size = len(population)
+        target_num_elites = min(num_elites, actual_pop_size)
+        target_offspring_size = min(population_size, actual_pop_size)
+        
+        if actual_pop_size < population_size:
+            box_print(f"⚠️  Population shrinkage detected: {actual_pop_size}/{population_size} genes survived", new_line_end=False)
+            box_print(f"   Adjusting selection: elites={target_num_elites}, offspring={target_offspring_size}", new_line_end=False)
+        
         # Select the next generation's parents
         box_print(f"Selection", print_bbox_len=60, new_line_end=False)
-        # These bypass the mutation and cross-over so we dont lose them
         
-        # This Line right here is causing the error
-        # Add Condtional here to check population size
-        count = 0
-        for i in range(5):
-            if len(population) == 0:
-                createPopulation()
-            else:
-                break
+        elites = tools.selSPEA2(population, target_num_elites)
 
-        if len(population) == 0:
-            exit() 
-        
-        elites = tools.selSPEA2(population, num_elites)
-
-        # Select the next generation's parents
-        offspring = toolbox.select(population, population_size)
+        # Select the next generation's parents - use adjusted size
+        offspring = toolbox.select(population, target_offspring_size)
         
         print_population(offspring, GLOBAL_DATA)
         
