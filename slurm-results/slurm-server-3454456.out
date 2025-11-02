@@ -1,0 +1,947 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-23-2025 12:56:29
+Job ID:    3454456
+User ID:   jgil37
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-011-3-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+  SERVER_PORT override detected: 8001
+  HOSTNAME_LOG_FILE override detected: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-011-3-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Writing server job ID '3454456' to file: /home/hice1/jgil37/scratch/llm-inference/hostname_server_job.txt
+Starting LLM server on host: atl1-1-03-011-3-0.pace.gatech.edu
+Using specified port: 8001
+SERVER_REGISTRY_FILE not set, skipping load balancer registration
+Server running with server-side batching!
+Run Hash: 3648df74da833051
+Metrics will be saved to: metrics/data/latency-3648df74da833051.json
+[2025-10-23 12:57:24] ===== SERVER STARTUP INITIATED =====
+[2025-10-23 12:57:24] Starting LLM server...
+[2025-10-23 12:57:24] Loading model during startup...
+[2025-10-23 12:57:24] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-23 12:57:24] ===== MODEL LOADING STARTED =====
+[2025-10-23 12:57:24] Initializing model components...
+[2025-10-23 12:57:24] Model path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-23 12:57:24] Loading model weights and configuration...
+[2025-10-23 12:58:30] Model weights loaded in 66.19 seconds
+[2025-10-23 12:58:30] Loading tokenizer...
+[2025-10-23 12:58:31] Tokenizer loaded in 1.19 seconds
+[2025-10-23 12:58:31] Configuring tokenizer for batching...
+[2025-10-23 12:58:31] Creating text generation pipeline...
+[2025-10-23 12:58:32] Pipeline created in 0.82 seconds
+[2025-10-23 12:58:32] Initializing async batching components...
+[2025-10-23 12:58:32] ===== MODEL LOADING COMPLETED =====
+[2025-10-23 12:58:32] Total loading time: 68.20 seconds
+[2025-10-23 12:58:32] Model is ready to serve requests!
+[2025-10-23 12:58:32] Server-side batching enabled with batch_size=1
+[2025-10-23 12:58:32] ===== SERVER STARTUP COMPLETE =====
+[2025-10-23 12:58:32] Server is ready to accept requests!
+[2025-10-23 12:58:32] Available endpoints: /generate (POST), / (GET)
+Request received at 12:58:32 [Job: 3454454, Gene: xXx8jBArjoLk6qCox44rRCK0xQM]
+Processing batch of 1 requests
+Request completed in 15.77s (E2E), 15.77s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38260 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:58:48 [Job: 3454454, Gene: xXx8jBArjoLk6qCox44rRCK0xQM]
+Processing batch of 1 requests
+Request completed in 1.93s (E2E), 1.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48984 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:58:50 [Job: 3454454, Gene: xXx8jBArjoLk6qCox44rRCK0xQM]
+Processing batch of 1 requests
+Request completed in 1.93s (E2E), 1.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48986 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:05 [Job: 3454454, Gene: xXxn05LedD2hi8lfl7nIOqZAPkj]
+Processing batch of 1 requests
+Request completed in 0.32s (E2E), 0.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40616 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:05 [Job: 3454454, Gene: xXxn05LedD2hi8lfl7nIOqZAPkj]
+Processing batch of 1 requests
+Request completed in 0.19s (E2E), 0.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40632 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:05 [Job: 3454454, Gene: xXxn05LedD2hi8lfl7nIOqZAPkj]
+Processing batch of 1 requests
+Request completed in 0.19s (E2E), 0.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40638 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:18 [Job: 3454454, Gene: xXxS8l2MYN4rkY6Ykw4XQay3f1K]
+Processing batch of 1 requests
+Request completed in 0.75s (E2E), 0.75s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:58918 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:18 [Job: 3454454, Gene: xXxS8l2MYN4rkY6Ykw4XQay3f1K]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:58930 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:18 [Job: 3454454, Gene: xXxS8l2MYN4rkY6Ykw4XQay3f1K]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:58934 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:31 [Job: 3454454, Gene: xXxjeDHeu3heWiLuEmGHSdw8jBh]
+Processing batch of 1 requests
+Request completed in 4.96s (E2E), 4.96s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42808 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:36 [Job: 3454454, Gene: xXxjeDHeu3heWiLuEmGHSdw8jBh]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57404 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:36 [Job: 3454454, Gene: xXxjeDHeu3heWiLuEmGHSdw8jBh]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57408 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:48 [Job: 3454454, Gene: xXxkDy2pWXMWuQcbenDvkyrLmQw]
+Processing batch of 1 requests
+Request completed in 4.31s (E2E), 4.31s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:56048 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:53 [Job: 3454454, Gene: xXxkDy2pWXMWuQcbenDvkyrLmQw]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38802 - "POST /generate HTTP/1.1" 200 OK
+Request received at 12:59:53 [Job: 3454454, Gene: xXxkDy2pWXMWuQcbenDvkyrLmQw]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38818 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:05 [Job: 3454454, Gene: xXxg0sRskTJi07p5hM1F2yzYf9u]
+Processing batch of 1 requests
+Request completed in 0.89s (E2E), 0.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48982 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:06 [Job: 3454454, Gene: xXxg0sRskTJi07p5hM1F2yzYf9u]
+Processing batch of 1 requests
+Request completed in 3.76s (E2E), 3.75s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48998 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:10 [Job: 3454454, Gene: xXxg0sRskTJi07p5hM1F2yzYf9u]
+Processing batch of 1 requests
+Request completed in 4.28s (E2E), 4.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49014 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:27 [Job: 3454454, Gene: xXxw7HfVAd3tjgZBy7sv1DcWXR4]
+Processing batch of 1 requests
+Request completed in 2.09s (E2E), 2.09s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:43588 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:29 [Job: 3454454, Gene: xXxw7HfVAd3tjgZBy7sv1DcWXR4]
+Processing batch of 1 requests
+Request completed in 6.70s (E2E), 6.69s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:43594 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:35 [Job: 3454454, Gene: xXxw7HfVAd3tjgZBy7sv1DcWXR4]
+Processing batch of 1 requests
+Request completed in 7.18s (E2E), 7.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52868 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:55 [Job: 3454454, Gene: xXx9JFVQYNts5Sj4hMjFxCnbiYE]
+Processing batch of 1 requests
+Request completed in 0.36s (E2E), 0.36s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35048 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:55 [Job: 3454454, Gene: xXx9JFVQYNts5Sj4hMjFxCnbiYE]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35054 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:00:55 [Job: 3454454, Gene: xXx9JFVQYNts5Sj4hMjFxCnbiYE]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35070 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:08 [Job: 3454454, Gene: xXx1B5CYFPbILzOuQmdxWwR7gZw]
+Processing batch of 1 requests
+Request completed in 0.58s (E2E), 0.58s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37976 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:09 [Job: 3454454, Gene: xXx1B5CYFPbILzOuQmdxWwR7gZw]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37980 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:09 [Job: 3454454, Gene: xXx1B5CYFPbILzOuQmdxWwR7gZw]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37996 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:21 [Job: 3454454, Gene: xXxR0yztvJYdekHzmp338YkUUcE]
+Processing batch of 1 requests
+Request completed in 4.32s (E2E), 4.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54786 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:25 [Job: 3454454, Gene: xXxR0yztvJYdekHzmp338YkUUcE]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:39946 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:25 [Job: 3454454, Gene: xXxR0yztvJYdekHzmp338YkUUcE]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:39956 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:51 [Job: 3454454, Gene: xXxV8A470teDp7RCHXTbzNsooot]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46544 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:51 [Job: 3454454, Gene: xXxV8A470teDp7RCHXTbzNsooot]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46550 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:01:51 [Job: 3454454, Gene: xXxV8A470teDp7RCHXTbzNsooot]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46554 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:03 [Job: 3454454, Gene: xXxosRbU8BdLknnmnsIfbn0F4cd]
+Processing batch of 1 requests
+Request completed in 2.29s (E2E), 2.29s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:32782 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:05 [Job: 3454454, Gene: xXxosRbU8BdLknnmnsIfbn0F4cd]
+Processing batch of 1 requests
+Request completed in 1.07s (E2E), 1.07s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:32792 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:06 [Job: 3454454, Gene: xXxosRbU8BdLknnmnsIfbn0F4cd]
+Processing batch of 1 requests
+Request completed in 1.07s (E2E), 1.06s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:32806 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:20 [Job: 3454454, Gene: xXxsfAmr841GCI436VgeQLfIF4v]
+Processing batch of 1 requests
+Request completed in 0.92s (E2E), 0.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55218 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:21 [Job: 3454454, Gene: xXxsfAmr841GCI436VgeQLfIF4v]
+Processing batch of 1 requests
+Request completed in 2.78s (E2E), 2.78s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55232 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:24 [Job: 3454454, Gene: xXxsfAmr841GCI436VgeQLfIF4v]
+Processing batch of 1 requests
+Request completed in 2.79s (E2E), 2.78s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40454 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:39 [Job: 3454454, Gene: xXx5WErIGRieHjWjswEv8cdIQ5h]
+Processing batch of 1 requests
+Request completed in 2.72s (E2E), 2.72s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52572 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:42 [Job: 3454454, Gene: xXx5WErIGRieHjWjswEv8cdIQ5h]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52580 - "POST /generate HTTP/1.1" 200 OK
+Request received at 13:02:42 [Job: 3454454, Gene: xXx5WErIGRieHjWjswEv8cdIQ5h]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52596 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:20:37 [Job: 3454454, Gene: xXxsElq05jjFZ0IIacxUBH5mpLs]
+Processing batch of 1 requests
+Request completed in 10.55s (E2E), 10.55s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:36892 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:20:47 [Job: 3454454, Gene: xXxsElq05jjFZ0IIacxUBH5mpLs]
+Processing batch of 1 requests
+Request completed in 1.04s (E2E), 1.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49980 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:20:48 [Job: 3454454, Gene: xXxsElq05jjFZ0IIacxUBH5mpLs]
+Processing batch of 1 requests
+Request completed in 1.05s (E2E), 1.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49986 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:02 [Job: 3454454, Gene: xXxSbe36omp4BJkn2MYH0uFudPm]
+Processing batch of 1 requests
+Request completed in 7.20s (E2E), 7.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57118 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:09 [Job: 3454454, Gene: xXxSbe36omp4BJkn2MYH0uFudPm]
+Processing batch of 1 requests
+Request completed in 0.64s (E2E), 0.64s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59098 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:09 [Job: 3454454, Gene: xXxSbe36omp4BJkn2MYH0uFudPm]
+Processing batch of 1 requests
+Request completed in 0.64s (E2E), 0.64s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59112 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:23 [Job: 3454454, Gene: xXxli6iRFaWEkWAIaY7QhWjGAK0]
+Processing batch of 1 requests
+Request completed in 3.40s (E2E), 3.40s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49160 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:26 [Job: 3454454, Gene: xXxli6iRFaWEkWAIaY7QhWjGAK0]
+Processing batch of 1 requests
+Request completed in 2.63s (E2E), 2.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49168 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:29 [Job: 3454454, Gene: xXxli6iRFaWEkWAIaY7QhWjGAK0]
+Processing batch of 1 requests
+Request completed in 2.63s (E2E), 2.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49180 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:44 [Job: 3454454, Gene: xXxHiCTMkFVDENvvoS1WjxK8f6z]
+Processing batch of 1 requests
+Request completed in 0.27s (E2E), 0.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51956 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:44 [Job: 3454454, Gene: xXxHiCTMkFVDENvvoS1WjxK8f6z]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51960 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:44 [Job: 3454454, Gene: xXxHiCTMkFVDENvvoS1WjxK8f6z]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51976 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:57 [Job: 3454454, Gene: xXxlNfgp73lK6YV195A4Hkj2pUH]
+Processing batch of 1 requests
+Request completed in 1.21s (E2E), 1.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60408 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:58 [Job: 3454454, Gene: xXxlNfgp73lK6YV195A4Hkj2pUH]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60420 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:21:58 [Job: 3454454, Gene: xXxlNfgp73lK6YV195A4Hkj2pUH]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60434 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:10 [Job: 3454454, Gene: xXx9aIvxfpmm8jYI123EVhLAmjp]
+Processing batch of 1 requests
+Request completed in 0.57s (E2E), 0.57s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47426 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:11 [Job: 3454454, Gene: xXx9aIvxfpmm8jYI123EVhLAmjp]
+Processing batch of 1 requests
+Request completed in 4.63s (E2E), 4.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47428 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:16 [Job: 3454454, Gene: xXx9aIvxfpmm8jYI123EVhLAmjp]
+Processing batch of 1 requests
+Request completed in 5.31s (E2E), 5.31s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40488 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:33 [Job: 3454454, Gene: xXxyjWwvAzvnLhJnZHzz3uSqKmt]
+Processing batch of 1 requests
+Request completed in 0.14s (E2E), 0.14s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47096 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:34 [Job: 3454454, Gene: xXxyjWwvAzvnLhJnZHzz3uSqKmt]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47098 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:34 [Job: 3454454, Gene: xXxyjWwvAzvnLhJnZHzz3uSqKmt]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47110 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:46 [Job: 3454454, Gene: xXxJVklNX5Y07cLGAo1MXtpLKrW]
+Processing batch of 1 requests
+Request completed in 4.08s (E2E), 4.08s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52376 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:50 [Job: 3454454, Gene: xXxJVklNX5Y07cLGAo1MXtpLKrW]
+Processing batch of 1 requests
+Request completed in 4.97s (E2E), 4.97s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52390 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:22:55 [Job: 3454454, Gene: xXxJVklNX5Y07cLGAo1MXtpLKrW]
+Processing batch of 1 requests
+Request completed in 5.52s (E2E), 5.52s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59676 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:23:13 [Job: 3454454, Gene: xXxNan7QlaT7BFtQ3ocuj7IjGSm]
+Processing batch of 1 requests
+Request completed in 0.17s (E2E), 0.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59348 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:23:14 [Job: 3454454, Gene: xXxNan7QlaT7BFtQ3ocuj7IjGSm]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59358 - "POST /generate HTTP/1.1" 200 OK
+Request received at 15:23:14 [Job: 3454454, Gene: xXxNan7QlaT7BFtQ3ocuj7IjGSm]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59374 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:29 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 12.33s (E2E), 12.33s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60684 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:41 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 4.37s (E2E), 4.37s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:50836 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:45 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 2.19s (E2E), 2.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52614 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:48 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 2.40s (E2E), 2.40s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52616 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:50 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 1.28s (E2E), 1.28s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52632 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:06 [Job: 3454454, Gene: xXxeCJMFHjbaHv8JTc3x8PVUC7w]
+Processing batch of 1 requests
+Request completed in 0.86s (E2E), 0.86s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51488 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:07 [Job: 3454454, Gene: xXxeCJMFHjbaHv8JTc3x8PVUC7w]
+Processing batch of 1 requests
+Request completed in 1.05s (E2E), 1.05s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51500 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:08 [Job: 3454454, Gene: xXxeCJMFHjbaHv8JTc3x8PVUC7w]
+Processing batch of 1 requests
+Request completed in 1.05s (E2E), 1.05s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51510 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:22 [Job: 3454454, Gene: xXxGWnkKN94KlNLDBjPPYiKrC2z]
+Processing batch of 1 requests
+Request completed in 0.09s (E2E), 0.09s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55110 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:22 [Job: 3454454, Gene: xXxGWnkKN94KlNLDBjPPYiKrC2z]
+Processing batch of 1 requests
+Request completed in 5.96s (E2E), 5.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55112 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:28 [Job: 3454454, Gene: xXxGWnkKN94KlNLDBjPPYiKrC2z]
+Processing batch of 1 requests
+Request completed in 5.17s (E2E), 5.16s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38996 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:45 [Job: 3454454, Gene: xXxKFMtqNoxJz5TJZAA3oPVYl3p]
+Processing batch of 1 requests
+Request completed in 5.60s (E2E), 5.60s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55586 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:51 [Job: 3454454, Gene: xXxKFMtqNoxJz5TJZAA3oPVYl3p]
+Processing batch of 1 requests
+Request completed in 6.17s (E2E), 6.16s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55588 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:57 [Job: 3454454, Gene: xXxKFMtqNoxJz5TJZAA3oPVYl3p]
+Processing batch of 1 requests
+Request completed in 6.18s (E2E), 6.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37730 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:16 [Job: 3454454, Gene: xXxcMPK8dXil0aEH1rshDU6bb2d]
+Processing batch of 1 requests
+Request completed in 4.61s (E2E), 4.61s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:41458 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:32 [Job: 3454454, Gene: xXxqmpsCd9lJsG6qYbVGBkn72YM]
+Processing batch of 1 requests
+Request completed in 0.07s (E2E), 0.07s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40616 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:32 [Job: 3454454, Gene: xXxqmpsCd9lJsG6qYbVGBkn72YM]
+Processing batch of 1 requests
+Request completed in 3.80s (E2E), 3.79s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40626 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:36 [Job: 3454454, Gene: xXxqmpsCd9lJsG6qYbVGBkn72YM]
+Processing batch of 1 requests
+Request completed in 3.80s (E2E), 3.80s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:58392 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:52 [Job: 3454454, Gene: xXxoUBdixoalIN1JdCvBXDwQQht]
+Processing batch of 1 requests
+Request completed in 0.27s (E2E), 0.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57128 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:53 [Job: 3454454, Gene: xXxoUBdixoalIN1JdCvBXDwQQht]
+Processing batch of 1 requests
+Request completed in 7.95s (E2E), 7.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40450 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:01 [Job: 3454454, Gene: xXxoUBdixoalIN1JdCvBXDwQQht]
+Processing batch of 1 requests
+Request completed in 4.83s (E2E), 4.82s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:40456 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:18 [Job: 3454454, Gene: xXxxIRFsKzKPuyUmb5Bmyn6MWsu]
+Processing batch of 1 requests
+Request completed in 0.81s (E2E), 0.81s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55028 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:19 [Job: 3454454, Gene: xXxxIRFsKzKPuyUmb5Bmyn6MWsu]
+Processing batch of 1 requests
+Request completed in 0.70s (E2E), 0.70s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55038 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:20 [Job: 3454454, Gene: xXxxIRFsKzKPuyUmb5Bmyn6MWsu]
+Processing batch of 1 requests
+Request completed in 0.70s (E2E), 0.70s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55048 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:33 [Job: 3454454, Gene: xXxtsDoM4tJIk6XKBMmlNP6NRz6]
+Processing batch of 1 requests
+Request completed in 0.82s (E2E), 0.82s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:39152 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:33 [Job: 3454454, Gene: xXxtsDoM4tJIk6XKBMmlNP6NRz6]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:41386 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:33 [Job: 3454454, Gene: xXxtsDoM4tJIk6XKBMmlNP6NRz6]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:41400 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:46 [Job: 3454454, Gene: xXxfLUiFRKQqO9ftvockPyNfgp4]
+Processing batch of 1 requests
+Request completed in 0.89s (E2E), 0.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42326 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:47 [Job: 3454454, Gene: xXxfLUiFRKQqO9ftvockPyNfgp4]
+Processing batch of 1 requests
+Request completed in 4.30s (E2E), 4.30s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42338 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:51 [Job: 3454454, Gene: xXxfLUiFRKQqO9ftvockPyNfgp4]
+Processing batch of 1 requests
+Request completed in 2.93s (E2E), 2.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42350 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:06 [Job: 3454454, Gene: xXxgRQ8XoRm4v2ODmWw9pp7fDez]
+Processing batch of 1 requests
+Request completed in 0.83s (E2E), 0.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45688 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:07 [Job: 3454454, Gene: xXxgRQ8XoRm4v2ODmWw9pp7fDez]
+Processing batch of 1 requests
+Request completed in 0.61s (E2E), 0.60s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45702 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:08 [Job: 3454454, Gene: xXxgRQ8XoRm4v2ODmWw9pp7fDez]
+Processing batch of 1 requests
+Request completed in 0.61s (E2E), 0.60s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45718 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:21 [Job: 3454454, Gene: xXxBveAa6jv7IAFWlUIqVCE1HGL]
+Processing batch of 1 requests
+Request completed in 0.40s (E2E), 0.40s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57366 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:21 [Job: 3454454, Gene: xXxBveAa6jv7IAFWlUIqVCE1HGL]
+Processing batch of 1 requests
+Request completed in 5.18s (E2E), 5.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57374 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:26 [Job: 3454454, Gene: xXxBveAa6jv7IAFWlUIqVCE1HGL]
+Processing batch of 1 requests
+Request completed in 4.95s (E2E), 4.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:58902 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:44 [Job: 3454454, Gene: xXxvDHAgcHMa8c4yrjgEhEiLkAo]
+Processing batch of 1 requests
+Request completed in 0.92s (E2E), 0.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47602 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:45 [Job: 3454454, Gene: xXxvDHAgcHMa8c4yrjgEhEiLkAo]
+Processing batch of 1 requests
+Request completed in 0.25s (E2E), 0.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47614 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:45 [Job: 3454454, Gene: xXxvDHAgcHMa8c4yrjgEhEiLkAo]
+Processing batch of 1 requests
+Request completed in 0.25s (E2E), 0.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47616 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:58 [Job: 3454454, Gene: xXxxXKo3XZ4u9ba66RsyhJk0f1t]
+Processing batch of 1 requests
+Request completed in 2.45s (E2E), 2.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44170 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:00 [Job: 3454454, Gene: xXxxXKo3XZ4u9ba66RsyhJk0f1t]
+Processing batch of 1 requests
+Request completed in 1.08s (E2E), 1.07s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44184 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:01 [Job: 3454454, Gene: xXxxXKo3XZ4u9ba66RsyhJk0f1t]
+Processing batch of 1 requests
+Request completed in 1.08s (E2E), 1.07s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44190 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:14 [Job: 3454454, Gene: xXxpt8XmpmpCowXuGbAWrxs9J0F]
+Processing batch of 1 requests
+Request completed in 2.92s (E2E), 2.92s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59152 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:17 [Job: 3454454, Gene: xXxpt8XmpmpCowXuGbAWrxs9J0F]
+Processing batch of 1 requests
+Request completed in 5.52s (E2E), 5.52s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59158 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:23 [Job: 3454454, Gene: xXxpt8XmpmpCowXuGbAWrxs9J0F]
+Processing batch of 1 requests
+Request completed in 5.53s (E2E), 5.52s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45644 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:46:22 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 15.99s (E2E), 15.99s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35204 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:46:38 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 3.01s (E2E), 3.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52228 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:46:41 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 4.63s (E2E), 4.63s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52238 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:46:46 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 3.46s (E2E), 3.46s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54404 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:46:49 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 4.83s (E2E), 4.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54412 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:47:30 [Job: 3454454, Gene: xXxjZEPhUNmaFvF1N6itPfGZDCC]
+Processing batch of 1 requests
+Request completed in 0.28s (E2E), 0.28s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:36192 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:47:31 [Job: 3454454, Gene: xXxjZEPhUNmaFvF1N6itPfGZDCC]
+Processing batch of 1 requests
+Request completed in 7.71s (E2E), 7.71s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:36194 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:47:38 [Job: 3454454, Gene: xXxjZEPhUNmaFvF1N6itPfGZDCC]
+Processing batch of 1 requests
+Request completed in 5.84s (E2E), 5.84s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:47800 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:47:57 [Job: 3454454, Gene: xXxQAAufouuo5ma7AvlsCwbngTa]
+Processing batch of 1 requests
+Request completed in 5.39s (E2E), 5.39s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:50420 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:02 [Job: 3454454, Gene: xXxQAAufouuo5ma7AvlsCwbngTa]
+Processing batch of 1 requests
+Request completed in 0.45s (E2E), 0.44s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:50426 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:03 [Job: 3454454, Gene: xXxQAAufouuo5ma7AvlsCwbngTa]
+Processing batch of 1 requests
+Request completed in 0.45s (E2E), 0.44s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:36476 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:16 [Job: 3454454, Gene: xXxJH1jUOLlE46xbPi5LnXXwHlE]
+Processing batch of 1 requests
+Request completed in 0.88s (E2E), 0.88s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45216 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:17 [Job: 3454454, Gene: xXxJH1jUOLlE46xbPi5LnXXwHlE]
+Processing batch of 1 requests
+Request completed in 0.43s (E2E), 0.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45232 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:18 [Job: 3454454, Gene: xXxJH1jUOLlE46xbPi5LnXXwHlE]
+Processing batch of 1 requests
+Request completed in 0.43s (E2E), 0.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:45236 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:30 [Job: 3454454, Gene: xXx8MVxvvf0tDmaVLlaXkDAbAth]
+Processing batch of 1 requests
+Request completed in 1.74s (E2E), 1.74s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57296 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:32 [Job: 3454454, Gene: xXx8MVxvvf0tDmaVLlaXkDAbAth]
+Processing batch of 1 requests
+Request completed in 0.43s (E2E), 0.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57298 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:32 [Job: 3454454, Gene: xXx8MVxvvf0tDmaVLlaXkDAbAth]
+Processing batch of 1 requests
+Request completed in 0.43s (E2E), 0.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57308 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:45 [Job: 3454454, Gene: xXxvwzOf239ES3fFH5lnTC7riF4]
+Processing batch of 1 requests
+Request completed in 10.30s (E2E), 10.30s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:43732 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:55 [Job: 3454454, Gene: xXxvwzOf239ES3fFH5lnTC7riF4]
+Processing batch of 1 requests
+Request completed in 0.27s (E2E), 0.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54322 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:48:56 [Job: 3454454, Gene: xXxvwzOf239ES3fFH5lnTC7riF4]
+Processing batch of 1 requests
+Request completed in 0.27s (E2E), 0.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54338 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:08 [Job: 3454454, Gene: xXx7Ir1FxKfyCK84SzcyrXDy26F]
+Processing batch of 1 requests
+Request completed in 0.76s (E2E), 0.76s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60556 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:09 [Job: 3454454, Gene: xXx7Ir1FxKfyCK84SzcyrXDy26F]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60560 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:09 [Job: 3454454, Gene: xXx7Ir1FxKfyCK84SzcyrXDy26F]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60574 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:22 [Job: 3454454, Gene: xXxfA7KojUukNPheSKwD48PIF4y]
+Processing batch of 1 requests
+Request completed in 2.82s (E2E), 2.82s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46802 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:25 [Job: 3454454, Gene: xXxfA7KojUukNPheSKwD48PIF4y]
+Processing batch of 1 requests
+Request completed in 0.94s (E2E), 0.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42908 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:25 [Job: 3454454, Gene: xXxfA7KojUukNPheSKwD48PIF4y]
+Processing batch of 1 requests
+Request completed in 0.94s (E2E), 0.94s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42912 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:39 [Job: 3454454, Gene: xXxolgKZCDVkSiACJhEHL69XK4X]
+Processing batch of 1 requests
+Request completed in 1.26s (E2E), 1.26s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49250 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:40 [Job: 3454454, Gene: xXxolgKZCDVkSiACJhEHL69XK4X]
+Processing batch of 1 requests
+Request completed in 0.26s (E2E), 0.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49256 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:40 [Job: 3454454, Gene: xXxolgKZCDVkSiACJhEHL69XK4X]
+Processing batch of 1 requests
+Request completed in 0.26s (E2E), 0.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49268 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:53 [Job: 3454454, Gene: xXxr5XKvkBe0mWz8RPmLPcJXOdT]
+Processing batch of 1 requests
+Request completed in 1.24s (E2E), 1.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55060 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:49:54 [Job: 3454454, Gene: xXxr5XKvkBe0mWz8RPmLPcJXOdT]
+Processing batch of 1 requests
+Request completed in 6.23s (E2E), 6.22s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55066 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:50:00 [Job: 3454454, Gene: xXxr5XKvkBe0mWz8RPmLPcJXOdT]
+Processing batch of 1 requests
+Request completed in 6.38s (E2E), 6.38s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55080 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:39 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 3.73s (E2E), 3.73s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38266 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:43 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 3.45s (E2E), 3.45s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44078 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:46 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 0.49s (E2E), 0.49s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44090 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:47 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 0.08s (E2E), 0.08s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44098 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:47 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 5.69s (E2E), 5.69s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44102 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:06 [Job: 3454454, Gene: xXxEaulaBiHYh7eBNN2P6PcYz3A]
+Processing batch of 1 requests
+Request completed in 4.51s (E2E), 4.51s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:41204 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:11 [Job: 3454454, Gene: xXxEaulaBiHYh7eBNN2P6PcYz3A]
+Processing batch of 1 requests
+Request completed in 0.62s (E2E), 0.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:41210 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:11 [Job: 3454454, Gene: xXxEaulaBiHYh7eBNN2P6PcYz3A]
+Processing batch of 1 requests
+Request completed in 0.63s (E2E), 0.62s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:41214 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:24 [Job: 3454454, Gene: xXx79n0DGv0iBd3VcWpKVTVtu06]
+Processing batch of 1 requests
+Request completed in 11.61s (E2E), 11.61s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54414 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:36 [Job: 3454454, Gene: xXx79n0DGv0iBd3VcWpKVTVtu06]
+Processing batch of 1 requests
+Request completed in 3.14s (E2E), 3.14s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34916 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:39 [Job: 3454454, Gene: xXx79n0DGv0iBd3VcWpKVTVtu06]
+Processing batch of 1 requests
+Request completed in 3.13s (E2E), 3.13s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34918 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:54 [Job: 3454454, Gene: xXxkYKRCRt6FFUsCS32Pxeo1k9U]
+Processing batch of 1 requests
+Request completed in 0.57s (E2E), 0.57s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35146 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:55 [Job: 3454454, Gene: xXxkYKRCRt6FFUsCS32Pxeo1k9U]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35150 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:37:55 [Job: 3454454, Gene: xXxkYKRCRt6FFUsCS32Pxeo1k9U]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:35154 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:07 [Job: 3454454, Gene: xXxz9vt7BT3LAgeYLdvgxp4cAK1]
+Processing batch of 1 requests
+Request completed in 0.25s (E2E), 0.25s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34044 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:08 [Job: 3454454, Gene: xXxz9vt7BT3LAgeYLdvgxp4cAK1]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34046 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:08 [Job: 3454454, Gene: xXxz9vt7BT3LAgeYLdvgxp4cAK1]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34050 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:20 [Job: 3454454, Gene: xXxjK6ueqjPg3KgprmdT7V3qBrh]
+Processing batch of 1 requests
+Request completed in 1.01s (E2E), 1.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37620 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:21 [Job: 3454454, Gene: xXxjK6ueqjPg3KgprmdT7V3qBrh]
+Processing batch of 1 requests
+Request completed in 0.69s (E2E), 0.68s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37630 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:22 [Job: 3454454, Gene: xXxjK6ueqjPg3KgprmdT7V3qBrh]
+Processing batch of 1 requests
+Request completed in 0.69s (E2E), 0.68s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37636 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:35 [Job: 3454454, Gene: xXxHMIqKLqkwZZYKeCQgxIB6psS]
+Processing batch of 1 requests
+Request completed in 0.83s (E2E), 0.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59952 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:36 [Job: 3454454, Gene: xXxHMIqKLqkwZZYKeCQgxIB6psS]
+Processing batch of 1 requests
+Request completed in 7.79s (E2E), 7.78s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59960 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:38:43 [Job: 3454454, Gene: xXxHMIqKLqkwZZYKeCQgxIB6psS]
+Processing batch of 1 requests
+Request completed in 4.22s (E2E), 4.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52562 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:00 [Job: 3454454, Gene: xXxK9eUgR68yFuNDEUx9ERk6Llk]
+Processing batch of 1 requests
+Request completed in 6.06s (E2E), 6.06s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:43310 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:06 [Job: 3454454, Gene: xXxK9eUgR68yFuNDEUx9ERk6Llk]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:36274 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:06 [Job: 3454454, Gene: xXxK9eUgR68yFuNDEUx9ERk6Llk]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:36288 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:19 [Job: 3454454, Gene: xXx39VyGrvawicmrTXS62G0RQU8]
+Processing batch of 1 requests
+Request completed in 0.41s (E2E), 0.41s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49900 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:19 [Job: 3454454, Gene: xXx39VyGrvawicmrTXS62G0RQU8]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49916 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:39:19 [Job: 3454454, Gene: xXx39VyGrvawicmrTXS62G0RQU8]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49920 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:33:52 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 16.03s (E2E), 16.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57034 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:08 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 3.30s (E2E), 3.30s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48002 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:11 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 6.52s (E2E), 6.52s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48004 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:18 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 4.48s (E2E), 4.48s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38198 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:22 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 5.49s (E2E), 5.49s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38204 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:42 [Job: 3454454, Gene: xXxjWqWbnNG8DwqnIo7qdGaaKe5]
+Processing batch of 1 requests
+Request completed in 1.64s (E2E), 1.64s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:55522 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:43 [Job: 3454454, Gene: xXxjWqWbnNG8DwqnIo7qdGaaKe5]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:33270 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:44 [Job: 3454454, Gene: xXxjWqWbnNG8DwqnIo7qdGaaKe5]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:33282 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:56 [Job: 3454454, Gene: xXxxyJSkWkcuPOikrXwkywsvtWR]
+Processing batch of 1 requests
+Request completed in 0.36s (E2E), 0.36s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46286 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:56 [Job: 3454454, Gene: xXxxyJSkWkcuPOikrXwkywsvtWR]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46296 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:34:56 [Job: 3454454, Gene: xXxxyJSkWkcuPOikrXwkywsvtWR]
+Processing batch of 1 requests
+Request completed in 0.05s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:46310 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:09 [Job: 3454454, Gene: xXxyiZFXk0BSpQeNY0z6XJxaTbA]
+Processing batch of 1 requests
+Request completed in 0.96s (E2E), 0.96s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54902 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:10 [Job: 3454454, Gene: xXxyiZFXk0BSpQeNY0z6XJxaTbA]
+Processing batch of 1 requests
+Request completed in 3.55s (E2E), 3.55s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:54906 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:13 [Job: 3454454, Gene: xXxyiZFXk0BSpQeNY0z6XJxaTbA]
+Processing batch of 1 requests
+Request completed in 3.56s (E2E), 3.56s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48282 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:29 [Job: 3454454, Gene: xXxBheC8je5zaMNV51AxSi0nNwY]
+Processing batch of 1 requests
+Request completed in 0.52s (E2E), 0.52s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:50970 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:29 [Job: 3454454, Gene: xXxBheC8je5zaMNV51AxSi0nNwY]
+Processing batch of 1 requests
+Request completed in 3.00s (E2E), 2.99s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:50976 - "POST /generate HTTP/1.1" 200 OK
+Request received at 19:35:32 [Job: 3454454, Gene: xXxBheC8je5zaMNV51AxSi0nNwY]
+Processing batch of 1 requests
+Request completed in 2.99s (E2E), 2.99s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:50990 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:11:48 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 22.43s (E2E), 22.42s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34764 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:10 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 2.13s (E2E), 2.13s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34376 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:13 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 0.17s (E2E), 0.17s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34384 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:13 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 3.95s (E2E), 3.95s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51206 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:17 [Job: 3454454, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:51218 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:31 [Job: 3454454, Gene: xXxhKO5ug5ZJkLUTjGqH3eSwqEU]
+Processing batch of 1 requests
+Request completed in 0.10s (E2E), 0.10s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42900 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:31 [Job: 3454454, Gene: xXxhKO5ug5ZJkLUTjGqH3eSwqEU]
+Processing batch of 1 requests
+Request completed in 3.70s (E2E), 3.69s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42916 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:34 [Job: 3454454, Gene: xXxhKO5ug5ZJkLUTjGqH3eSwqEU]
+Processing batch of 1 requests
+Request completed in 3.70s (E2E), 3.70s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34846 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:12:51 [Job: 3454454, Gene: xXxTB3ulpjWM6QD7wGngTOxadXQ]
+Processing batch of 1 requests
+Request completed in 7.83s (E2E), 7.83s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:57256 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:11 [Job: 3454454, Gene: xXxTsnV3NIVq2b1Ynsb9ZVxMdw5]
+Processing batch of 1 requests
+Request completed in 0.26s (E2E), 0.26s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:39842 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:11 [Job: 3454454, Gene: xXxTsnV3NIVq2b1Ynsb9ZVxMdw5]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:39852 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:12 [Job: 3454454, Gene: xXxTsnV3NIVq2b1Ynsb9ZVxMdw5]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:39866 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:24 [Job: 3454454, Gene: xXxqCDQRP5Ngy0h5KGBtyBbguQV]
+Processing batch of 1 requests
+Request completed in 0.90s (E2E), 0.90s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48186 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:25 [Job: 3454454, Gene: xXxqCDQRP5Ngy0h5KGBtyBbguQV]
+Processing batch of 1 requests
+Request completed in 0.24s (E2E), 0.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48188 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:25 [Job: 3454454, Gene: xXxqCDQRP5Ngy0h5KGBtyBbguQV]
+Processing batch of 1 requests
+Request completed in 0.24s (E2E), 0.24s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:48194 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:38 [Job: 3454454, Gene: xXxj06qUjpqiTIO3en41iJjIzmn]
+Processing batch of 1 requests
+Request completed in 1.29s (E2E), 1.29s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34978 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:40 [Job: 3454454, Gene: xXxj06qUjpqiTIO3en41iJjIzmn]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34980 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:40 [Job: 3454454, Gene: xXxj06qUjpqiTIO3en41iJjIzmn]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:34988 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:52 [Job: 3454454, Gene: xXxcdKgHswlbRNcybM2cKiBxBuX]
+Processing batch of 1 requests
+Request completed in 5.40s (E2E), 5.40s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:60008 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:57 [Job: 3454454, Gene: xXxcdKgHswlbRNcybM2cKiBxBuX]
+Processing batch of 1 requests
+Request completed in 0.03s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37318 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:13:57 [Job: 3454454, Gene: xXxcdKgHswlbRNcybM2cKiBxBuX]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:37324 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:10 [Job: 3454454, Gene: xXx0QOHy3qngpIjQb28IqtmHZBi]
+Processing batch of 1 requests
+Request completed in 7.74s (E2E), 7.74s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:52302 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:18 [Job: 3454454, Gene: xXx0QOHy3qngpIjQb28IqtmHZBi]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44530 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:18 [Job: 3454454, Gene: xXx0QOHy3qngpIjQb28IqtmHZBi]
+Processing batch of 1 requests
+Request completed in 0.04s (E2E), 0.04s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:44546 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:31 [Job: 3454454, Gene: xXxf7938M2BqyuVYdI5o2N1ljeB]
+Processing batch of 1 requests
+Request completed in 2.40s (E2E), 2.40s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:58114 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:33 [Job: 3454454, Gene: xXxf7938M2BqyuVYdI5o2N1ljeB]
+Processing batch of 1 requests
+Request completed in 1.44s (E2E), 1.44s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59866 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:34 [Job: 3454454, Gene: xXxf7938M2BqyuVYdI5o2N1ljeB]
+Processing batch of 1 requests
+Request completed in 1.44s (E2E), 1.43s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:59872 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:49 [Job: 3454454, Gene: xXxfUiTU8Rg1m8xMpMtslTAxfJD]
+Processing batch of 1 requests
+Request completed in 1.08s (E2E), 1.08s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42042 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:50 [Job: 3454454, Gene: xXxfUiTU8Rg1m8xMpMtslTAxfJD]
+Processing batch of 1 requests
+Request completed in 1.67s (E2E), 1.67s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42050 - "POST /generate HTTP/1.1" 200 OK
+Request received at 20:14:51 [Job: 3454454, Gene: xXxfUiTU8Rg1m8xMpMtslTAxfJD]
+Processing batch of 1 requests
+Request completed in 1.68s (E2E), 1.67s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:42058 - "POST /generate HTTP/1.1" 200 OK
+---------------------------------------
+Begin Slurm Epilog: Oct-24-2025 00:56:43
+Job ID:        3454456
+User ID:       jgil37
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=8-00:03:44,vmem=0,walltime=12:00:14,mem=18671060K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-011-3-0
+---------------------------------------

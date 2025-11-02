@@ -1,0 +1,10 @@
+   Building llm-guided-evolution @ file:///storage/ice1/5/5/jgil37/llm-inference
+Downloading aiohttp (1.7MiB)
+ Downloading aiohttp
+      Built llm-guided-evolution @ file:///storage/ice1/5/5/jgil37/llm-inference
+Uninstalled 1 package in 21ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 9 packages in 508ms
+slurmstepd: error: *** JOB 3454454 ON atl1-1-01-002-6-0 CANCELLED AT 2025-10-23T20:56:42 DUE TO TIME LIMIT ***

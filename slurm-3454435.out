@@ -1,0 +1,50 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-23-2025 12:53:00
+Job ID:    3454435
+User ID:   jgil37
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-010-10-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+  SERVER_PORT override detected: 8001
+  HOSTNAME_LOG_FILE override detected: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-010-10-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-010-10-0.pace.gatech.edu
+INFO:     Started server process [3984184]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: 04af134b2b666426
+Metrics will be saved to: metrics/data/e2e-latency-04af134b2b666426.json
+[2025-10-23 12:54:07] ===== SERVER STARTUP INITIATED =====
+[2025-10-23 12:54:07] Starting LLM server...
+[2025-10-23 12:54:07] Loading model during startup...
+[2025-10-23 12:54:07] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-23 12:54:07] ===== MODEL LOADING STARTED =====
+[2025-10-23 12:54:07] Initializing model components...
+[2025-10-23 12:54:07] Model path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-23 12:54:07] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:12<00:37, 12.66s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:24<00:24, 12.34s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:36<00:12, 12.26s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:42<00:00,  9.42s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:42<00:00, 10.50s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+slurmstepd: error: *** JOB 3454435 ON atl1-1-03-010-10-0 CANCELLED AT 2025-10-24T04:53:14 DUE TO TIME LIMIT ***
+---------------------------------------
+Begin Slurm Epilog: Oct-24-2025 04:53:16
+Job ID:        3454435
+User ID:       jgil37
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=10-16:03:44,vmem=0,walltime=16:00:14,mem=17735848K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-010-10-0
+---------------------------------------

@@ -1,0 +1,257 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-12-2025 15:51:32
+Job ID:    3337007
+User ID:   jgil37
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-011-13-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+  SERVER_PORT override detected: 8001
+  HOSTNAME_LOG_FILE override detected: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-011-13-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-011-13-0.pace.gatech.edu
+INFO:     Started server process [3488921]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: 8925fb8a5c052d23
+Metrics will be saved to: metrics/data/e2e-latency-8925fb8a5c052d23.json
+[2025-10-12 15:51:35] ===== SERVER STARTUP INITIATED =====
+[2025-10-12 15:51:35] Starting LLM server...
+[2025-10-12 15:51:35] Loading model during startup...
+[2025-10-12 15:51:35] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-12 15:51:35] ===== MODEL LOADING STARTED =====
+[2025-10-12 15:51:35] Initializing model components...
+[2025-10-12 15:51:35] Model path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-12 15:51:35] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.28it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.31it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.33it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.73it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:02<00:00,  1.55it/s]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+[2025-10-12 15:51:40] Model weights loaded in 4.82 seconds
+[2025-10-12 15:51:40] Loading tokenizer...
+[2025-10-12 15:51:41] Tokenizer loaded in 0.61 seconds
+[2025-10-12 15:51:41] Configuring tokenizer for batching...
+[2025-10-12 15:51:41] Creating text generation pipeline...
+[2025-10-12 15:51:41] Pipeline created in 0.09 seconds
+[2025-10-12 15:51:41] Initializing async batching components...
+[2025-10-12 15:51:41] ===== MODEL LOADING COMPLETED =====
+[2025-10-12 15:51:41] Total loading time: 5.52 seconds
+[2025-10-12 15:51:41] Model is ready to serve requests!
+[2025-10-12 15:51:41] Server-side batching enabled with batch_size=1
+[2025-10-12 15:51:41] ===== SERVER STARTUP COMPLETE =====
+[2025-10-12 15:51:41] Server is ready to accept requests!
+[2025-10-12 15:51:41] Available endpoints: /generate (POST), / (GET)
+Request received at 16:25:26 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 8.70s (E2E), 8.70s (batch), evaluation: 0.0, tokens: 54 out @ 6.2 tok/s
+INFO:     172.27.144.15:51450 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:25:51 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.50s (E2E), 0.50s (batch), evaluation: 0.0, tokens: 33 out @ 66.0 tok/s
+INFO:     172.27.144.15:54324 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:04 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 6.58s (E2E), 6.58s (batch), evaluation: 0.0, tokens: 455 out @ 69.1 tok/s
+INFO:     172.27.144.15:37012 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:23 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.63s (E2E), 0.63s (batch), evaluation: 0.0, tokens: 43 out @ 68.3 tok/s
+INFO:     172.27.144.15:43956 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:36 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.44s (E2E), 0.44s (batch), evaluation: 0.0, tokens: 30 out @ 68.2 tok/s
+INFO:     172.27.144.15:53794 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:26:49 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.57s (E2E), 0.57s (batch), evaluation: 0.0, tokens: 38 out @ 66.7 tok/s
+INFO:     172.27.144.15:59058 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:02 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 5.29s (E2E), 5.29s (batch), evaluation: 0.0, tokens: 383 out @ 72.4 tok/s
+INFO:     172.27.144.15:45998 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:27:20 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 5.48s (E2E), 5.48s (batch), evaluation: 0.0, tokens: 385 out @ 70.3 tok/s
+INFO:     172.27.144.15:35400 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:35 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 4.34s (E2E), 4.34s (batch), evaluation: 0.0, tokens: 301 out @ 69.4 tok/s
+INFO:     172.27.144.15:52114 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:28:51 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 7.68s (E2E), 7.68s (batch), evaluation: 0.0, tokens: 538 out @ 70.1 tok/s
+INFO:     172.27.144.15:53856 - "POST /generate HTTP/1.1" 200 OK
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+Request received at 16:29:11 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 5.86s (E2E), 5.86s (batch), evaluation: 0.0, tokens: 402 out @ 68.6 tok/s
+INFO:     172.27.144.15:60230 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:29 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 5.79s (E2E), 5.79s (batch), evaluation: 0.0, tokens: 426 out @ 73.6 tok/s
+INFO:     172.27.144.15:35316 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:29:47 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.51s (E2E), 0.51s (batch), evaluation: 0.0, tokens: 34 out @ 66.7 tok/s
+INFO:     172.27.144.15:38528 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:00 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.33s (E2E), 0.33s (batch), evaluation: 0.0, tokens: 22 out @ 66.7 tok/s
+INFO:     172.27.144.15:60994 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:13 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.78s (E2E), 0.78s (batch), evaluation: 0.0, tokens: 53 out @ 67.9 tok/s
+INFO:     172.27.144.15:39670 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:25 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 7.83s (E2E), 7.83s (batch), evaluation: 0.0, tokens: 543 out @ 69.3 tok/s
+INFO:     172.27.144.15:41542 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:45 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.33s (E2E), 0.33s (batch), evaluation: 0.0, tokens: 22 out @ 66.7 tok/s
+INFO:     172.27.144.15:60004 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:30:58 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 2.54s (E2E), 2.54s (batch), evaluation: 0.0, tokens: 176 out @ 69.3 tok/s
+INFO:     172.27.144.15:56750 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:13 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.82s (E2E), 0.82s (batch), evaluation: 0.0, tokens: 56 out @ 68.3 tok/s
+INFO:     172.27.144.15:60278 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:26 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.47s (E2E), 0.47s (batch), evaluation: 0.0, tokens: 32 out @ 68.1 tok/s
+INFO:     172.27.144.15:49098 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:38 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.15s (E2E), 0.15s (batch), evaluation: 0.0, tokens: 9 out @ 60.0 tok/s
+INFO:     172.27.144.15:34734 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:31:50 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 4.09s (E2E), 4.09s (batch), evaluation: 0.0, tokens: 285 out @ 69.7 tok/s
+INFO:     172.27.144.15:60400 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:32:07 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 1.58s (E2E), 1.58s (batch), evaluation: 0.0, tokens: 109 out @ 69.0 tok/s
+INFO:     172.27.144.15:36486 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:32:21 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 3.07s (E2E), 3.07s (batch), evaluation: 0.0, tokens: 213 out @ 69.4 tok/s
+INFO:     172.27.144.15:39814 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:32:36 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.58s (E2E), 0.58s (batch), evaluation: 0.0, tokens: 39 out @ 67.2 tok/s
+INFO:     172.27.144.15:39386 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:32:49 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 3.66s (E2E), 3.66s (batch), evaluation: 0.0, tokens: 257 out @ 70.2 tok/s
+INFO:     172.27.144.15:34516 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:33:05 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.55s (E2E), 0.55s (batch), evaluation: 0.0, tokens: 37 out @ 67.3 tok/s
+INFO:     172.27.144.15:53606 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:33:18 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.56s (E2E), 0.56s (batch), evaluation: 0.0, tokens: 38 out @ 67.9 tok/s
+INFO:     172.27.144.15:45524 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:33:30 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 5.03s (E2E), 5.03s (batch), evaluation: 0.0, tokens: 349 out @ 69.4 tok/s
+INFO:     172.27.144.15:54604 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:33:48 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.53s (E2E), 0.53s (batch), evaluation: 0.0, tokens: 36 out @ 67.9 tok/s
+INFO:     172.27.144.15:55126 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:34:00 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 7.50s (E2E), 7.50s (batch), evaluation: 0.0, tokens: 523 out @ 69.7 tok/s
+INFO:     172.27.144.15:52266 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:34:20 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.66s (E2E), 0.66s (batch), evaluation: 0.0, tokens: 45 out @ 68.2 tok/s
+INFO:     172.27.144.15:46330 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:34:33 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 1.29s (E2E), 1.29s (batch), evaluation: 0.0, tokens: 89 out @ 69.0 tok/s
+INFO:     172.27.144.15:34990 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:34:47 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.95s (E2E), 0.95s (batch), evaluation: 0.0, tokens: 65 out @ 68.4 tok/s
+INFO:     172.27.144.15:52636 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:00 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 2.98s (E2E), 2.98s (batch), evaluation: 0.0, tokens: 205 out @ 68.8 tok/s
+INFO:     172.27.144.15:37072 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:15 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 4.08s (E2E), 4.08s (batch), evaluation: 0.0, tokens: 303 out @ 74.3 tok/s
+INFO:     172.27.144.15:59152 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:31 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 6.27s (E2E), 6.27s (batch), evaluation: 0.0, tokens: 432 out @ 68.9 tok/s
+INFO:     172.27.144.15:57778 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:50 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.24s (E2E), 0.24s (batch), evaluation: 0.0, tokens: 16 out @ 66.7 tok/s
+INFO:     172.27.144.15:38822 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:02 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.98s (E2E), 0.98s (batch), evaluation: 0.0, tokens: 67 out @ 68.4 tok/s
+INFO:     172.27.144.15:57444 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:16 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 8.02s (E2E), 8.02s (batch), evaluation: 0.0, tokens: 558 out @ 69.6 tok/s
+INFO:     172.27.144.15:34186 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:36 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.70s (E2E), 0.70s (batch), evaluation: 0.0, tokens: 47 out @ 67.1 tok/s
+INFO:     172.27.144.15:48368 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:49 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 11.51s (E2E), 11.51s (batch), evaluation: 0.0, tokens: 799 out @ 69.4 tok/s
+INFO:     172.27.144.15:60230 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:37:12 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.70s (E2E), 0.70s (batch), evaluation: 0.0, tokens: 47 out @ 67.1 tok/s
+INFO:     172.27.144.15:58052 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:37:25 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 3.83s (E2E), 3.83s (batch), evaluation: 0.0, tokens: 264 out @ 68.9 tok/s
+INFO:     172.27.144.15:53194 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:37:42 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.78s (E2E), 0.78s (batch), evaluation: 0.0, tokens: 53 out @ 67.9 tok/s
+INFO:     172.27.144.15:33238 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:37:55 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 1.32s (E2E), 1.32s (batch), evaluation: 0.0, tokens: 91 out @ 68.9 tok/s
+INFO:     172.27.144.15:48136 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:38:08 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 2.66s (E2E), 2.66s (batch), evaluation: 0.0, tokens: 185 out @ 69.5 tok/s
+INFO:     172.27.144.15:43746 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:38:23 [Job: 3337695]
+Processing batch of 1 requests
+Request completed in 0.48s (E2E), 0.48s (batch), evaluation: 0.0, tokens: 33 out @ 68.8 tok/s
+INFO:     172.27.144.15:38624 - "POST /generate HTTP/1.1" 200 OK
+slurmstepd: error: *** JOB 3337007 ON atl1-1-03-011-13-0 CANCELLED AT 2025-10-13T07:51:33 DUE TO TIME LIMIT ***
+---------------------------------------
+Begin Slurm Epilog: Oct-13-2025 07:51:33
+Job ID:        3337007
+User ID:       jgil37
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=10-16:00:16,vmem=0,walltime=16:00:01,mem=1931304K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-011-13-0
+---------------------------------------

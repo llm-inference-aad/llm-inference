@@ -1,0 +1,65 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-12-2025 15:44:39
+Job ID:    3336948
+User ID:   jgil37
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-011-13-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+  SERVER_PORT override detected: 8000
+  HOSTNAME_LOG_FILE override detected: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-011-13-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-011-13-0.pace.gatech.edu
+INFO:     Started server process [3487167]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: 2838c49b31180f6a
+Metrics will be saved to: metrics/data/e2e-latency-2838c49b31180f6a.json
+[2025-10-12 15:45:43] ===== SERVER STARTUP INITIATED =====
+[2025-10-12 15:45:43] Starting LLM server...
+[2025-10-12 15:45:43] Loading model during startup...
+[2025-10-12 15:45:43] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-12 15:45:43] ===== MODEL LOADING STARTED =====
+[2025-10-12 15:45:43] Initializing model components...
+[2025-10-12 15:45:43] Model path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-12 15:45:43] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:12<00:38, 12.99s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:24<00:24, 12.40s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:36<00:12, 12.18s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:42<00:00,  9.41s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:42<00:00, 10.52s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): [errno 98] address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+[2025-10-12 15:46:45] Model weights loaded in 61.30 seconds
+[2025-10-12 15:46:45] Loading tokenizer...
+[2025-10-12 15:46:46] Tokenizer loaded in 1.36 seconds
+[2025-10-12 15:46:46] Configuring tokenizer for batching...
+[2025-10-12 15:46:46] Creating text generation pipeline...
+[2025-10-12 15:46:47] Pipeline created in 0.94 seconds
+[2025-10-12 15:46:47] Initializing async batching components...
+[2025-10-12 15:46:47] ===== MODEL LOADING COMPLETED =====
+[2025-10-12 15:46:47] Total loading time: 63.60 seconds
+[2025-10-12 15:46:47] Model is ready to serve requests!
+[2025-10-12 15:46:47] Server-side batching enabled with batch_size=1
+[2025-10-12 15:46:47] ===== SERVER STARTUP COMPLETE =====
+[2025-10-12 15:46:47] Server is ready to accept requests!
+[2025-10-12 15:46:47] Available endpoints: /generate (POST), / (GET)
+---------------------------------------
+Begin Slurm Epilog: Oct-12-2025 15:46:53
+Job ID:        3336948
+User ID:       jgil37
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=00:35:28,vmem=0,walltime=00:02:13,mem=17798760K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-011-13-0
+---------------------------------------

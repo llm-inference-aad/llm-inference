@@ -1,0 +1,257 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-27-2025 17:21:33
+Job ID:    3467767
+User ID:   jgil37
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-013-19-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+  SERVER_PORT override detected: 8001
+  HOSTNAME_LOG_FILE override detected: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-013-19-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-013-19-0.pace.gatech.edu
+INFO:     Started server process [1962177]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: 4c0a50e10a6e2a51
+Metrics will be saved to: metrics/data/e2e-latency-4c0a50e10a6e2a51.json
+[2025-10-27 17:22:52] ===== SERVER STARTUP INITIATED =====
+[2025-10-27 17:22:52] Starting LLM server...
+[2025-10-27 17:22:52] Loading model during startup...
+[2025-10-27 17:22:52] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-27 17:22:52] ===== MODEL LOADING STARTED =====
+[2025-10-27 17:22:52] Initializing model components...
+[2025-10-27 17:22:52] Model path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-27 17:22:52] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:15<00:46, 15.66s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:31<00:31, 15.77s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:47<00:15, 15.65s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:53<00:00, 12.00s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:53<00:00, 13.35s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+[2025-10-27 17:24:10] Model weights loaded in 78.02 seconds
+[2025-10-27 17:24:10] Loading tokenizer...
+[2025-10-27 17:24:11] Tokenizer loaded in 1.35 seconds
+[2025-10-27 17:24:11] Configuring tokenizer for batching...
+[2025-10-27 17:24:11] Creating text generation pipeline...
+[2025-10-27 17:24:12] Pipeline created in 1.42 seconds
+[2025-10-27 17:24:12] Initializing async batching components...
+[2025-10-27 17:24:12] ===== MODEL LOADING COMPLETED =====
+[2025-10-27 17:24:12] Total loading time: 80.78 seconds
+[2025-10-27 17:24:12] Model is ready to serve requests!
+[2025-10-27 17:24:12] Server-side batching enabled with batch_size=1
+[2025-10-27 17:24:12] ===== SERVER STARTUP COMPLETE =====
+[2025-10-27 17:24:12] Server is ready to accept requests!
+[2025-10-27 17:24:12] Available endpoints: /generate (POST), / (GET)
+Request received at 17:24:14 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 15.01s (E2E), 15.01s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:49798 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:24:39 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.54s (E2E), 0.54s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:59300 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:24:49 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.57s (E2E), 0.57s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:43834 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:24:59 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.31s (E2E), 0.31s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:53640 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:25:33 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.33s (E2E), 0.33s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:46912 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:25:43 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 3.67s (E2E), 3.67s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:49902 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:25:57 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 7.19s (E2E), 7.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:56452 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:26:13 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.67s (E2E), 0.67s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:47936 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:26:24 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.03s (E2E), 4.03s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:36886 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:26:38 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.89s (E2E), 4.89s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:43854 - "POST /generate HTTP/1.1" 200 OK
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+Request received at 17:26:52 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 5.91s (E2E), 5.91s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:49476 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:27:08 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.60s (E2E), 0.60s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:56130 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:27:18 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.27s (E2E), 0.27s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:50900 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:27:29 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.63s (E2E), 0.63s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:33918 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:27:39 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.33s (E2E), 0.33s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:41482 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:27:49 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 2.21s (E2E), 2.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:56922 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:28:01 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 6.97s (E2E), 6.97s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:53352 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:28:18 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.97s (E2E), 0.97s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:33250 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:28:29 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 8.18s (E2E), 8.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:38108 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:28:47 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.28s (E2E), 4.28s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:55652 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:29:01 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 2.56s (E2E), 2.56s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:36100 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:29:13 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.19s (E2E), 4.19s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:41372 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:29:27 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.97s (E2E), 0.97s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:42716 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:29:38 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.51s (E2E), 0.51s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:53634 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:29:48 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.77s (E2E), 0.77s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:52710 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:29:58 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.21s (E2E), 0.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:43516 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:08 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 7.55s (E2E), 7.55s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:41348 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:25 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.21s (E2E), 0.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:36632 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:35 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 5.72s (E2E), 5.72s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:54570 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:50 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.31s (E2E), 0.31s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:35760 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:31:00 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.18s (E2E), 4.18s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:40612 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:31:13 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.58s (E2E), 0.58s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:35068 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:31:23 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.21s (E2E), 0.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:38548 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:31:33 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.57s (E2E), 0.57s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:33770 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:31:43 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 8.43s (E2E), 8.43s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:55074 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:32:00 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.51s (E2E), 0.51s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:34468 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:32:10 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.57s (E2E), 0.57s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:47190 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:32:20 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.36s (E2E), 0.36s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:34930 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:32:29 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 0.78s (E2E), 0.78s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:34942 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:32:40 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.32s (E2E), 4.32s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:35358 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:32:53 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 2.05s (E2E), 2.05s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:48242 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:33:05 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 5.76s (E2E), 5.76s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:35004 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:33:20 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 4.34s (E2E), 4.34s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:47940 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:33:34 [Job: 3467768]
+Processing batch of 1 requests
+Request completed in 10.21s (E2E), 10.21s (batch processing), evaluation score: 0.0
+INFO:     172.27.149.177:37738 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42588 - "HEAD /.aws/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42600 - "HEAD /.ada/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42616 - "HEAD /.ssh/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42626 - "HEAD /.midway/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58840 - "HEAD /.aws/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58842 - "HEAD /.ada/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58856 - "HEAD /.ssh/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58868 - "HEAD /.midway/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53432 - "HEAD /.aws/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53434 - "HEAD /.ada/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53438 - "HEAD /.ssh/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53448 - "HEAD /.midway/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41532 - "HEAD /.aws/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41544 - "HEAD /.ada/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41556 - "HEAD /.ssh/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41564 - "HEAD /.midway/ HTTP/1.1" 404 Not Found
+slurmstepd: error: *** JOB 3467767 ON atl1-1-03-013-19-0 CANCELLED AT 2025-10-28T09:21:46 DUE TO TIME LIMIT ***
+---------------------------------------
+Begin Slurm Epilog: Oct-28-2025 09:21:48
+Job ID:        3467767
+User ID:       jgil37
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h200=1,mem=160G,node=1
+Rsrc Used:     cput=10-16:03:28,vmem=0,walltime=16:00:13,mem=18679056K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-013-19-0
+---------------------------------------

@@ -1,0 +1,8 @@
+{
+  "run_hash": "40c29e25d6311610",
+  "session_start": "2025-10-12T15:40:15.496942",
+  "model_path": "/storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8",
+  "batch_size": 1,
+  "batch_wait_time": 0,
+  "requests": []
+}

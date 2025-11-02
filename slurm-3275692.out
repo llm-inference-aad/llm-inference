@@ -1,0 +1,254 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-08-2025 17:53:53
+Job ID:    3275692
+User ID:   jgil37
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-010-25-0.pace.gatech.edu
+Loading environment variables from .env file
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-010-25-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/hostname.log
+Starting LLM server on host: atl1-1-03-010-25-0.pace.gatech.edu
+INFO:     Started server process [828200]
+INFO:     Waiting for application startup.
+`torch_dtype` is deprecated! Use `dtype` instead!
+Server running with server-side batching!
+Run Hash: 5c7b75940e7e64e9
+Metrics will be saved to: /storage/ice1/5/5/jgil37/llm-inference/metrics/data/e2e-latency-5c7b75940e7e64e9.json
+[2025-10-08 17:54:55] ===== SERVER STARTUP INITIATED =====
+[2025-10-08 17:54:55] Starting LLM server...
+[2025-10-08 17:54:55] Loading model during startup...
+[2025-10-08 17:54:55] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-08 17:54:55] ===== MODEL LOADING STARTED =====
+[2025-10-08 17:54:55] Initializing model components...
+[2025-10-08 17:54:55] Model path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it/snapshots/d90101470e35a7d46d7f6d3e351b2ee1f2b2eaa8
+[2025-10-08 17:54:55] Loading model weights and configuration...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:13<00:40, 13.38s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:25<00:25, 12.92s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:38<00:12, 12.75s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:44<00:00,  9.96s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:44<00:00, 11.05s/it]
+Device set to use cuda:0
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+[2025-10-08 17:56:02] Model weights loaded in 66.90 seconds
+[2025-10-08 17:56:02] Loading tokenizer...
+[2025-10-08 17:56:03] Tokenizer loaded in 1.06 seconds
+[2025-10-08 17:56:03] Configuring tokenizer for batching...
+[2025-10-08 17:56:03] Creating text generation pipeline...
+[2025-10-08 17:56:04] Pipeline created in 0.99 seconds
+[2025-10-08 17:56:04] Initializing async batching components...
+[2025-10-08 17:56:04] ===== MODEL LOADING COMPLETED =====
+[2025-10-08 17:56:04] Total loading time: 68.96 seconds
+[2025-10-08 17:56:04] Model is ready to serve requests!
+[2025-10-08 17:56:04] Server-side batching enabled with batch_size=8
+[2025-10-08 17:56:04] ===== SERVER STARTUP COMPLETE =====
+[2025-10-08 17:56:04] Server is ready to accept requests!
+[2025-10-08 17:56:04] Available endpoints: /generate (POST), / (GET)
+Request received at 18:24:12
+Processing batch of 1 requests
+Request completed in 11.65s (E2E), 9.65s (batch processing)
+INFO:     172.27.150.89:38438 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:24:36
+Processing batch of 1 requests
+Request completed in 4.91s (E2E), 2.91s (batch processing)
+INFO:     172.27.150.89:43988 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:24:50
+Processing batch of 1 requests
+Request completed in 7.93s (E2E), 5.93s (batch processing)
+INFO:     172.27.150.89:32814 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:25:06
+Processing batch of 1 requests
+Request completed in 6.01s (E2E), 4.01s (batch processing)
+INFO:     172.27.150.89:33288 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:25:21
+Processing batch of 1 requests
+Request completed in 6.49s (E2E), 4.49s (batch processing)
+INFO:     172.27.150.89:49338 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:25:36
+Processing batch of 1 requests
+Request completed in 6.82s (E2E), 4.82s (batch processing)
+INFO:     172.27.150.89:51560 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:25:52
+Processing batch of 1 requests
+Request completed in 6.30s (E2E), 4.30s (batch processing)
+INFO:     172.27.150.89:53218 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:26:07
+Processing batch of 1 requests
+Request completed in 6.40s (E2E), 4.40s (batch processing)
+INFO:     172.27.150.89:47888 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:27:03
+Processing batch of 1 requests
+Request completed in 7.83s (E2E), 5.83s (batch processing)
+INFO:     172.27.150.89:34146 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:27:20
+Processing batch of 1 requests
+Request completed in 5.28s (E2E), 3.28s (batch processing)
+INFO:     172.27.150.89:57664 - "POST /generate HTTP/1.1" 200 OK
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+Request received at 18:27:34
+Processing batch of 1 requests
+Request completed in 6.44s (E2E), 4.44s (batch processing)
+INFO:     172.27.150.89:34110 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:27:49
+Processing batch of 1 requests
+Request completed in 11.57s (E2E), 9.57s (batch processing)
+INFO:     172.27.150.89:54188 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:28:09
+Processing batch of 1 requests
+Request completed in 5.70s (E2E), 3.70s (batch processing)
+INFO:     172.27.150.89:45974 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:28:23
+Processing batch of 1 requests
+Request completed in 6.66s (E2E), 4.66s (batch processing)
+INFO:     172.27.150.89:50000 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:28:38
+Processing batch of 1 requests
+Request completed in 5.06s (E2E), 3.06s (batch processing)
+INFO:     172.27.150.89:35466 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:28:52
+Processing batch of 1 requests
+Request completed in 3.46s (E2E), 1.45s (batch processing)
+INFO:     172.27.150.89:35326 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:29:04
+Processing batch of 1 requests
+Request completed in 8.44s (E2E), 6.44s (batch processing)
+INFO:     172.27.150.89:50870 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:29:21
+Processing batch of 1 requests
+Request completed in 5.31s (E2E), 3.31s (batch processing)
+INFO:     172.27.150.89:36346 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:29:35
+Processing batch of 1 requests
+Request completed in 4.85s (E2E), 2.85s (batch processing)
+INFO:     172.27.150.89:58782 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:29:49
+Processing batch of 1 requests
+Request completed in 6.19s (E2E), 4.19s (batch processing)
+INFO:     172.27.150.89:35626 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:30:03
+Processing batch of 1 requests
+Request completed in 7.33s (E2E), 5.33s (batch processing)
+INFO:     172.27.150.89:35924 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:30:19
+Processing batch of 1 requests
+Request completed in 8.15s (E2E), 6.15s (batch processing)
+INFO:     172.27.150.89:55986 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:30:36
+Processing batch of 1 requests
+Request completed in 4.73s (E2E), 2.73s (batch processing)
+INFO:     172.27.150.89:59680 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:30:50
+Processing batch of 1 requests
+Request completed in 4.36s (E2E), 2.36s (batch processing)
+INFO:     172.27.150.89:51680 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:31:03
+Processing batch of 1 requests
+Request completed in 6.67s (E2E), 4.67s (batch processing)
+INFO:     172.27.150.89:45006 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:31:19
+Processing batch of 1 requests
+Request completed in 5.88s (E2E), 3.88s (batch processing)
+INFO:     172.27.150.89:52710 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:31:33
+Processing batch of 1 requests
+Request completed in 5.35s (E2E), 3.35s (batch processing)
+INFO:     172.27.150.89:48494 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:31:47
+Processing batch of 1 requests
+Request completed in 5.34s (E2E), 3.34s (batch processing)
+INFO:     172.27.150.89:36856 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:32:02
+Processing batch of 1 requests
+Request completed in 10.01s (E2E), 8.01s (batch processing)
+INFO:     172.27.150.89:39328 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:32:21
+Processing batch of 1 requests
+Request completed in 5.60s (E2E), 3.59s (batch processing)
+INFO:     172.27.150.89:43268 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:32:35
+Processing batch of 1 requests
+Request completed in 5.98s (E2E), 3.98s (batch processing)
+INFO:     172.27.150.89:39390 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:32:50
+Processing batch of 1 requests
+Request completed in 6.51s (E2E), 4.51s (batch processing)
+INFO:     172.27.150.89:45642 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:33:05
+Processing batch of 1 requests
+Request completed in 3.64s (E2E), 1.64s (batch processing)
+INFO:     172.27.150.89:41250 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:33:17
+Processing batch of 1 requests
+Request completed in 6.84s (E2E), 4.84s (batch processing)
+INFO:     172.27.150.89:40994 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:33:33
+Processing batch of 1 requests
+Request completed in 6.61s (E2E), 4.61s (batch processing)
+INFO:     172.27.150.89:44692 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:33:49
+Processing batch of 1 requests
+Request completed in 5.61s (E2E), 3.61s (batch processing)
+INFO:     172.27.150.89:60924 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:34:03
+Processing batch of 1 requests
+Request completed in 6.95s (E2E), 4.95s (batch processing)
+INFO:     172.27.150.89:41864 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:34:19
+Processing batch of 1 requests
+Request completed in 8.48s (E2E), 6.48s (batch processing)
+INFO:     172.27.150.89:50950 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:34:36
+Processing batch of 1 requests
+Request completed in 6.58s (E2E), 4.58s (batch processing)
+INFO:     172.27.150.89:54610 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:34:52
+Processing batch of 1 requests
+Request completed in 5.45s (E2E), 3.45s (batch processing)
+INFO:     172.27.150.89:33674 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:35:06
+Processing batch of 1 requests
+Request completed in 6.16s (E2E), 4.16s (batch processing)
+INFO:     172.27.150.89:39524 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:35:21
+Processing batch of 1 requests
+Request completed in 6.01s (E2E), 4.01s (batch processing)
+INFO:     172.27.150.89:36082 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:35:36
+Processing batch of 1 requests
+Request completed in 7.19s (E2E), 5.19s (batch processing)
+INFO:     172.27.150.89:35132 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:35:52
+Processing batch of 1 requests
+Request completed in 6.34s (E2E), 4.34s (batch processing)
+INFO:     172.27.150.89:55576 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:07
+Processing batch of 1 requests
+Request completed in 4.88s (E2E), 2.88s (batch processing)
+INFO:     172.27.150.89:43210 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:21
+Processing batch of 1 requests
+Request completed in 8.02s (E2E), 6.02s (batch processing)
+INFO:     172.27.150.89:42802 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:38
+Processing batch of 1 requests
+Request completed in 9.19s (E2E), 7.19s (batch processing)
+INFO:     172.27.150.89:45086 - "POST /generate HTTP/1.1" 200 OK
+Request received at 18:36:56
+Processing batch of 1 requests
+Request completed in 8.48s (E2E), 6.48s (batch processing)
+INFO:     172.27.150.89:41112 - "POST /generate HTTP/1.1" 200 OK
+slurmstepd: error: *** JOB 3275692 ON atl1-1-03-010-25-0 CANCELLED AT 2025-10-09T09:53:58 DUE TO TIME LIMIT ***
+---------------------------------------
+Begin Slurm Epilog: Oct-09-2025 09:54:00
+Job ID:        3275692
+User ID:       jgil37
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h100=1,mem=160G,node=1
+Rsrc Used:     cput=10-16:01:04,vmem=0,walltime=16:00:04,mem=17722552K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-010-25-0
+---------------------------------------
