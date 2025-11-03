@@ -98,9 +98,6 @@ uv run python scripts/plot_pareto_enhanced.py --output my_pareto.png
 
 ### 5. `analyze_e2e_latency.py`
 
-
-### 5. `analyze_e2e_latency.py`
-
 Comprehensive end-to-end latency analysis with statistics and visualizations.
 
 **Usage:**
@@ -118,6 +115,58 @@ uv run python scripts/analyze_e2e_latency.py abc123def456
 # Compare multiple runs
 uv run python scripts/analyze_e2e_latency.py --compare hash1 hash2 hash3
 ```
+
+### 6. `create_finetuning_dataset.py`
+
+Extracts successful mutation examples from completed runs to create a training dataset for model finetuning.
+
+**Outputs:**
+- `finetuning_dataset.jsonl` - JSONL file with prompt-completion pairs from successful architectures
+
+**Usage:**
+
+```bash
+# Extract from latest run
+python scripts/create_finetuning_dataset.py --run-id latest
+
+# Extract from specific run with quality threshold
+python scripts/create_finetuning_dataset.py --run-id auto_20251017_175557 --min-accuracy 0.7
+
+# Custom output file
+python scripts/create_finetuning_dataset.py --run-id latest --output my_dataset.jsonl
+```
+
+### 7. `finetune_model.py`
+
+Finetunes open-source code generation models (Gemma, DeepSeek-Coder, CodeLlama) using LoRA on your successful mutations.
+
+**Usage:**
+
+```bash
+# Finetune DeepSeek-Coder (recommended for code)
+python scripts/finetune_model.py \
+    --model deepseek-ai/deepseek-coder-6.7b-instruct \
+    --dataset finetuning_dataset.jsonl \
+    --output finetuned_deepseek \
+    --epochs 3
+
+# Finetune Gemma-2 (Google's open model)
+python scripts/finetune_model.py \
+    --model google/gemma-2-9b-it \
+    --dataset finetuning_dataset.jsonl \
+    --output finetuned_gemma
+
+# Full finetuning (not LoRA, requires more memory)
+python scripts/finetune_model.py \
+    --model deepseek-ai/deepseek-coder-6.7b-instruct \
+    --full-finetune \
+    --epochs 5
+```
+
+**After finetuning:**
+1. Update `MODEL_PATH` in `.env` to point to your finetuned model directory
+2. Set `LLM_MODEL='local_server'` in `src/cfg/constants.py`
+3. Start the server: `sbatch server.sh`
 
 ## Quick Start
 
