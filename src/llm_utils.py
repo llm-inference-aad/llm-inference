@@ -21,6 +21,7 @@ import textwrap
 from transformers import AutoTokenizer
 from google import genai
 from google.genai import types
+from openai import OpenAI
 
 
 from huggingface_hub.utils import HfHubHTTPError
@@ -107,6 +108,8 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
     if inference_submission is False:
         if LLM_MODEL == 'local_server':
             llm_code_generator = submit_local_server
+        elif LLM_MODEL == 'deepseek':
+            llm_code_generator = submit_deepseek_api
         else:
             llm_code_generator = submit_mixtral
         qc_func = llm_code_qc
@@ -117,6 +120,8 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
             llm_code_generator = submit_llama3_hf
         elif LLM_MODEL == 'gemini':
             llm_code_generator = submit_gemini_api
+        elif LLM_MODEL == 'deepseek':
+            llm_code_generator = submit_deepseek_api
         qc_func = llm_code_qc_hf
 
     last_error = ""
@@ -347,6 +352,61 @@ def submit_gemini_api(txt2gemini, gene_id=None, **kwargs):
     return response.text
 
 
+def submit_deepseek_api(
+    txt2deepseek,
+    max_new_tokens=8192,
+    top_p=0.8,
+    temperature=0.7,
+    model_id="deepseek-chat",
+    gene_id=None,
+    **kwargs
+):
+    """
+    This function submits a request to DeepSeek API.
+    It's Open-AI compatible, so we use the OpenAI client.
+    
+    Parameters
+    ----------
+    txt2deepseek : str
+        Prompt that will be sent to DeepSeek
+    max_new_tokens : int, optional
+        Maximum number of tokens to generate, by default 8192
+    top_p : float, optional
+        Nucleus sampling parameter, by default 0.8
+    temperature : float, optional
+        Sampling temperature, by default 0.7
+    model_id : str, optional
+        DeepSeek model to use, by default "deepseek-chat"
+        Options: "deepseek-chat", "deepseek-coder", "deepseek-reasoner"
+    gene_id : str, optional
+        Identifier for the individual that this request will belong to
+    
+    Returns
+    -------
+    str
+        Model's output from inference
+    """
+    client = OpenAI(
+        api_key=DEEPSEEK_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
+    
+    messages = [{"role": "user", "content": txt2deepseek}]
+    if system_prompt := os.getenv("SYSTEM_PROMPT"):
+        messages.insert(0, {"role": "system", "content": system_prompt})
+    
+    response = client.chat.completions.create(
+        model=model_id,
+        messages=messages,
+        max_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+        stream=False
+    )
+    
+    return response.choices[0].message.content
+
+
 
 def submit_mixtral(txt2mixtral, max_new_tokens=4096, top_p=0.15, temperature=0.1, 
                    model_id="gpt2", return_gen=False, gene_id=None):
@@ -402,6 +462,8 @@ def mutate_prompts(n=5):
             llm_code_generator = submit_llama3_hf
         elif LLM_MODEL == 'local_server':
             llm_code_generator = submit_local_server
+        elif LLM_MODEL == 'deepseek':
+            llm_code_generator = submit_deepseek_api
         else:
             llm_code_generator = submit_mixtral_hf  # fallback
         output = llm_code_generator(prompt, temperature=temp, gene_id="mutate_prompts").strip()

@@ -34,12 +34,19 @@ else:
 
 #LLM_MODEL = 'mixtral'
 #LLM_MODEL = 'llama3'
-#: LLM Model to use. Choices currently include ['gemini', 'mixtral', 'llama3', 'local_server']
-LLM_MODEL = 'local_server'
+#LLM_MODEL = 'deepseek'
+#LLM_MODEL = 'local_server'
+#: LLM Model to use. Choices currently include ['gemini', 'mixtral', 'llama3', 'local_server', 'deepseek']
+LLM_MODEL = 'gemini'
 try:
 	GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
 except:
 	GEMINI_API_KEY = ''
+
+try:
+	DEEPSEEK_API_KEY = os.environ['DEEPSEEK_API_KEY']
+except:
+	DEEPSEEK_API_KEY = ''
 # Surya: Retry budget for LLM code generation (tune to trade off diversity vs. reliability)
 LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3))
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
