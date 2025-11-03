@@ -363,7 +363,7 @@ def mutate_prompts(n=5):
             file.write(output)
 
 
-def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
+def submit_local_server(txt2llm, max_new_tokens=130000, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
     """
     Submit a request to the local FastAPI server running on PACE-ICE cluster.
     
@@ -401,7 +401,7 @@ def submit_local_server(txt2llm, max_new_tokens=800, top_p=0.8, temperature=0.7,
         }
         
         # Make the HTTP request
-        response = requests.post(api_url, json=payload, timeout=300)  # 5 minute timeout
+        response = requests.post(api_url, json=payload, timeout=3000)  # 50 minute timeout
         
         if response.status_code == 200:
             result = response.json()
