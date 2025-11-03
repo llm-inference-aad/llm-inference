@@ -352,15 +352,7 @@ def submit_gemini_api(txt2gemini, gene_id=None, **kwargs):
     return response.text
 
 
-def submit_deepseek_api(
-    txt2deepseek,
-    max_new_tokens=8192,
-    top_p=0.8,
-    temperature=0.7,
-    model_id="deepseek-chat",
-    gene_id=None,
-    **kwargs
-):
+def submit_deepseek_api(txt2deepseek, max_new_tokens=8192, top_p=0.8, temperature=0.7, model_id="deepseek-chat", gene_id=None):
     """
     This function submits a request to DeepSeek API.
     It's Open-AI compatible, so we use the OpenAI client.
@@ -369,16 +361,16 @@ def submit_deepseek_api(
     ----------
     txt2deepseek : str
         Prompt that will be sent to DeepSeek
-    max_new_tokens : int, optional
-        Maximum number of tokens to generate, by default 8192
-    top_p : float, optional
-        Nucleus sampling parameter, by default 0.8
-    temperature : float, optional
-        Sampling temperature, by default 0.7
-    model_id : str, optional
-        DeepSeek model to use, by default "deepseek-chat"
-        Options: "deepseek-chat", "deepseek-coder", "deepseek-reasoner"
-    gene_id : str, optional
+    max_new_tokens : int
+        Max # of tokens to generate
+    top_p : float   
+        Nucleus sampling parameter
+    temperature : float
+        Sampling temperature
+    model_id : str
+        DeepSeek model to use
+        We also have other options like: "deepseek-chat", "deepseek-coder", "deepseek-reasoner"
+    gene_id : str
         Identifier for the individual that this request will belong to
     
     Returns
@@ -386,16 +378,16 @@ def submit_deepseek_api(
     str
         Model's output from inference
     """
-    client = OpenAI(
+    client = OpenAI( # Use OpenAI client to submit req to DeepSeek API
         api_key=DEEPSEEK_API_KEY,
         base_url="https://api.deepseek.com"
     )
     
-    messages = [{"role": "user", "content": txt2deepseek}]
+    messages = [{"role": "user", "content": txt2deepseek}] # Add user prompt to messages
     if system_prompt := os.getenv("SYSTEM_PROMPT"):
         messages.insert(0, {"role": "system", "content": system_prompt})
     
-    response = client.chat.completions.create(
+    response = client.chat.completions.create( # Creates the chat completion
         model=model_id,
         messages=messages,
         max_tokens=max_new_tokens,

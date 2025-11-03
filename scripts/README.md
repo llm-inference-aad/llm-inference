@@ -118,7 +118,7 @@ uv run python scripts/analyze_e2e_latency.py --compare hash1 hash2 hash3
 
 ### 6. `create_finetuning_dataset.py`
 
-Extracts successful mutation examples from completed runs to create a training dataset for model finetuning.
+Extracts successful mutation examples from completed runs -> creates a training dataset for model finetuning.
 
 **Outputs:**
 - `finetuning_dataset.jsonl` - JSONL file with prompt-completion pairs from successful architectures
@@ -138,19 +138,19 @@ python scripts/create_finetuning_dataset.py --run-id latest --output my_dataset.
 
 ### 7. `finetune_model.py`
 
-Finetunes open-source code generation models (Gemma, DeepSeek-Coder, CodeLlama) using LoRA on your successful mutations.
+Finetuning open-source code generation models (Gemma, DeepSeek-Coder, CodeLlama, etc.) using LoRA on successful mutations.
 
 **Usage:**
 
 ```bash
-# Finetune DeepSeek-Coder (recommended for code)
+# Finetune DeepSeek-Coder 
 python scripts/finetune_model.py \
     --model deepseek-ai/deepseek-coder-6.7b-instruct \
     --dataset finetuning_dataset.jsonl \
     --output finetuned_deepseek \
     --epochs 3
 
-# Finetune Gemma-2 (Google's open model)
+# Finetune Gemma-2 
 python scripts/finetune_model.py \
     --model google/gemma-2-9b-it \
     --dataset finetuning_dataset.jsonl \
@@ -164,8 +164,8 @@ python scripts/finetune_model.py \
 ```
 
 **After finetuning:**
-1. Update `MODEL_PATH` in `.env` to point to your finetuned model directory
-2. Set `LLM_MODEL='local_server'` in `src/cfg/constants.py`
+1. Update `MODEL_PATH` in `.env` to point to the appropriate finetuned model directory
+2. Set `LLM_MODEL='local_server'` back in `src/cfg/constants.py`
 3. Start the server: `sbatch server.sh`
 
 ## Quick Start
