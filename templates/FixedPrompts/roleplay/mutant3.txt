@@ -2,11 +2,19 @@ python
 import numpy as np
 
 def f(x):
-    return x * 2 + 3
+    return x**2 - 4*x + 3
 
-x = np.array([1,2,3])
+x = np.linspace(-10, 10, 50)
 y = f(x)
-print(y)
+
+# Plotting the function
+plt.plot(x, y, label='f(x)')
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.title('Graph of f(x) = x² -4x +3')
+plt.legend()
+plt.grid(True)
+plt.show()
 
 ```python
 {}

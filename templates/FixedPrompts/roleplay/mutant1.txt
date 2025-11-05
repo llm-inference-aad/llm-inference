@@ -1,8 +1,5 @@
-python
-import numpy as np
+</think>
 
-def predict(x):
-    return x * 2
 
 ```python
 {}

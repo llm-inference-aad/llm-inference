@@ -1,8 +1,15 @@
-To make it more concise without changing functionality?
+python
+import numpy as np
 
-Yes, I can help rephrase the Python code to be more concise while maintaining its functionality.
-</think>
+def compute_something(a, b):
+    c = a + b
+    d = a * b
+    return c, d
 
+x = 5
+y = 3
+result_c, result_d = compute_something(x, y)
+print(f"Result c: {result_c}, Result d: {result_d}")
 
 ```python
 {}

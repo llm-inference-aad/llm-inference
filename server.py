@@ -59,7 +59,7 @@ metrics_metadata = {
 with open(METRICS_FILE, 'w') as f:
     json.dump(metrics_metadata, f, indent=2)
 
-def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None):
+def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None, prompt=None, generated_text=None):
     """Save end-to-end latency metrics to JSON file"""
     try:
         # Read current metrics
@@ -79,7 +79,9 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
             "batch_processing_time_sec": round(batch_processing_time, 4),
             "batch_size": batch_size,
             "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None,
-            "evaluation_score": evaluation_score
+            "evaluation_score": evaluation_score,
+            "prompt": prompt,
+            "generated_text": generated_text
         }
         
         metrics["requests"].append(request_metrics)
@@ -373,7 +375,9 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             batch_processing_time, 
             batch_size, 
             queue_wait_time,
-            evaluation_score
+            evaluation_score,
+            prompt=request.prompt,
+            generated_text=generated_text
         )
         
         print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")
