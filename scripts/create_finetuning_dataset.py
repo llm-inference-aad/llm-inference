@@ -54,9 +54,12 @@ def extract_training_data(run_dir, min_accuracy=0.5, output_file="finetuning_dat
                 if test_acc < min_accuracy:
                     continue
                 
-                # Find corresponding network file
-                network_file = run_path / "population" / f"network_{gene_id}.py"
+                # Find corresponding network file in sota/ExquisiteNetV2/models/
+                # The gene_id from results file like "xXxABC123_results.txt" has the gene ID as "xXxABC123"
+                project_root = Path(__file__).parent.parent
+                network_file = project_root / "sota" / "ExquisiteNetV2" / "models" / f"network_{gene_id}.py"
                 if not network_file.exists():
+                    print(f"[WARN] Network file not found: {network_file}")
                     continue
                 
                 # Read the generated code

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Finetune a code generation model for successful mutations.
+Finetune a code generation model for successful mutations. 
+This one currently finetunes Gemma-2-9B
 
 Usage:
     python scripts/finetune_model.py --model deepseek-ai/deepseek-coder-6.7b-instruct

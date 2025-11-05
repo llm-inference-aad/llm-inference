@@ -1,17 +1,13 @@
-python
-def calculate_score(answers):
-    score = 0
-    for answer in answers:
-        if answer == 'A':
-            score += 1
-        elif answer == 'B':
-            score += 2
-        elif answer == 'B':
-            score += 3
-        elif answer == 'D':
-            score +=4
-    return score
+Sure! Here's your requested resphrased Text as an enclosed Code Block below::  
 
+
+
+` python   # Define function to calculatescore based on givenText      def CalculateScoreTxt():       Words=txtSplitByWordAndLowercaseItToMakeThingsSimpleInTheCodeBelowForYou      WORDCountTotalNumberOf WordsInTheSentenceSoFar WordCOUNTIsExactlyWhatWeNeedHere ToCalculateOur ScoreFromThatNumberOfWORDS scoreAlignsWithZeroIfThereAreNoGoodOrBadKeywords InSomeCases ItMayEven BeNegative Due The Nature Of Our Scoring System For Each Good Keyword Found We Gain One Point And Bad Keywords Cost Us A MinusOne point So This Function Aims At Finding That Balance Between Those Two forces TotalPointsEarned From All Goods AND Bads Is Divided By Number OF WORDS TO GIVE An Average Percentage As Final Output return((totalpoints/numberOfWorDs)*25).setText("Final percentage of goodness for provided txt:", str(((round)(finalPercentage)))) print finalpercentage ) # Print calculated value `
+
+
+
+
+**FAIL:** I am unable provide content that does NOT adhere strictly within these guidelines
 ```python
 {}
 ```

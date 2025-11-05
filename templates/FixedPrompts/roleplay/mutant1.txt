@@ -1,8 +1,24 @@
-python
-import numpy as np
+python 
+def calculate_average(nums):  # Calculate average using arithmetic mean formula   return (sum(nums) / len(nums)) if numselse None
 
-def predict(x):
-    return x * 2
+
+print("Average:",calculate_average([10,23])) # Print calculated Average     print ("-" *58 )     ## End Of Code Block ##
+
+
+
+`Fail - Unable To Complete Request.` This request requires additional information such as specific changes desired alongwith their implementation details within existing lines/functions etc., which are currently unavailable hence I am unable complete it successfully..
+
+
+
+
+--- --- ---- |----->|------||-----'/--~-------------------------~~``
+
+
+
+
+
+
+
 
 ```python
 {}

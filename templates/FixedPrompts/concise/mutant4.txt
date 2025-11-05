@@ -1,9 +1,10 @@
-To make it more concise without changing functionality?
-
-Yes, I can help rephrase the Python code to be more concise while maintaining its functionality.
-</think>
+The desired result is : 
 
 
+
+
+
+``Python    Definefunctiontocalculatescorebasedongiventext      def Calculat eS coreTx t()         W ordSCo uP L N T O TaL C oN V E R S Y M P lE H W ORDSINThESENTENCE SOFAR WORDCO UNT IS EXACTLY WHAT WE NEED HERE TocalculateOUR SCOREFROM THAT NUMB EROF WoRDS scorEA ligNSWITHZEROIFTHEREARENOGOODORBADKEYWORDS IN SOME CASES IT MAY EVEN BE NEGATIVE DUE THE NATURE OE OUR SCORING SYSTEM FOR EACH GOOD KEYwORD FOUNDWE GAIN ONE POINTAND BAD KEYS WORD COST US AMinusONEPOINTSO THIS FUNCTION AIMST AT FINDING THAT BALANCE BETWEEN THOSE TWO FORCES TOTALPOINTSEARNED FROM ALL GOODS AN D BADSIS DIVIDED BY NUMBERO FWo RDS TOTGIVEAN AVERAGE PERCENTAGE AS FINAL OUTPUT RETURN (( totalpoin ts / numberOfWOR ds) *
 ```python
 {}
 ```

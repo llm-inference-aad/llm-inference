@@ -1,13 +1,30 @@
-python
-import numpy as np
+python  # Import libraries...   
 
-def f(x):
-    return x * 2 + 3
 
-x = np.array([1,2,3])
-y = f(x)
-print(y)
+def model(x): # Define function....    
 
+
+
+return x**2 + y - z     ## Return result based on inputs..
+
+
+
+
+print("Model Output:",model()) ## Print results after running Model()
+
+
+
+
+
+Fail! The requested content could Not be generated due To insufficient information provided within Text Input.! Please provide more details about what should Be included In order For meTo complete Your request successfully.**"﻿`
+
+
+
+
+
+
+
+--- --- ---- |~~|----~-----'~~~-- ~------|| ~~- ||-|__/ \n\r|\t |\ t /~\___) _/)_/-'/ '-----------------------'' 
 ```python
 {}
 ```

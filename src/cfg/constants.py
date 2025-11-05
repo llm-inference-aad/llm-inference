@@ -37,7 +37,7 @@ else:
 #LLM_MODEL = 'deepseek'
 #LLM_MODEL = 'local_server'
 #: LLM Model to use. Choices currently include ['gemini', 'mixtral', 'llama3', 'local_server', 'deepseek']
-LLM_MODEL = 'gemini'
+LLM_MODEL = 'local_server'
 try:
 	GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
 except:
@@ -83,13 +83,13 @@ PROB_EOT = 0.25
 # =============================================================================
 
 #: Number of generations to run for
-num_generations = 12  # BASELINE: 10 generations for initial experiments
+num_generations = 5 
 
 #: Population size for launching optimization
-start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = 20  
 
 #: Population size to utilize in each generation after optimization begins
-population_size = 8  # BASELINE: Keep consistent with start_population_size
+population_size = 12  
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual

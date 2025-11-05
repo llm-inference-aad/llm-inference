@@ -1,17 +1,24 @@
-python
-def calculate_score(text):
-    words = text.split()
-    word_count = len(words)
-    score = 0
-    for word in words:
-        if word.lower() == 'good':
-            score += 1
-        elif word.lower() == 'bad':
-            score -= 1
-    return (score / word_count) * 100
+python 
+# Import libraries ...   (some imports)
 
-text = "This is a good sentence. Another bad example."
-print(calculate_score(text))
+
+def function_a():   .... (code logic here)...
+
+
+
+function _main__ ():    ..... # Main execution flow...
+
+
+
+
+if __name__ == '__main__':     ...... Do something in main....
+
+
+
+
+
+
+
 
 ```python
 {}
