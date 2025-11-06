@@ -1,0 +1,171 @@
+---------------------------------------
+Begin Slurm Prolog: Nov-05-2025 15:47:12
+Job ID:    3500414
+User ID:   kbhavsar31
+Account:   coc
+Job name:  LLMGE01_Server
+Partition: coe-gpu
+QOS:       coe-ice
+---------------------------------------
+launching LLM Server
+atl1-1-03-013-26-0.pace.gatech.edu
+Loading environment variables from .env file
+Checking for environment overrides...
+  SERVER_PORT override detected: 8000
+  HOSTNAME_LOG_FILE override detected: /home/hice1/kbhavsar31/scratch/llm-inference/hostname.log
+Activating virtual environment at: /home/hice1/kbhavsar31/scratch/llm-inference/.venv
+Writing server hostname 'atl1-1-03-013-26-0.pace.gatech.edu' to file: /home/hice1/kbhavsar31/scratch/llm-inference/hostname.log
+Writing server job ID '3500414' to file: /home/hice1/kbhavsar31/scratch/llm-inference/hostname_server_job.txt
+Starting LLM server on host: atl1-1-03-013-26-0.pace.gatech.edu
+Using specified port: 8000
+SERVER_REGISTRY_FILE not set, skipping load balancer registration
+Server running with server-side batching!
+Run Hash: b4b2180a5bdbdda3
+Metrics will be saved to: metrics/data/latency-b4b2180a5bdbdda3.json
+[2025-11-05 15:48:29] ===== SERVER STARTUP INITIATED =====
+[2025-11-05 15:48:29] Starting LLM server...
+[2025-11-05 15:48:29] Loading model during startup...
+[2025-11-05 15:48:29] This may take several minutes depending on model size...
+Loading model at /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-11-05 15:48:29] ===== MODEL LOADING STARTED =====
+[2025-11-05 15:48:29] Initializing model components...
+[2025-11-05 15:48:29] Model path: /storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[2025-11-05 15:48:29] Loading model weights and configuration...
+[2025-11-05 15:52:11] Model weights loaded in 222.49 seconds
+[2025-11-05 15:52:11] Loading tokenizer...
+[2025-11-05 15:52:13] Tokenizer loaded in 1.22 seconds
+[2025-11-05 15:52:13] Configuring tokenizer for batching...
+[2025-11-05 15:52:13] Creating text generation pipeline...
+[2025-11-05 15:52:14] Pipeline created in 1.01 seconds
+[2025-11-05 15:52:14] Initializing async batching components...
+[2025-11-05 15:52:14] ===== MODEL LOADING COMPLETED =====
+[2025-11-05 15:52:14] Total loading time: 224.72 seconds
+[2025-11-05 15:52:14] Model is ready to serve requests!
+[2025-11-05 15:52:14] Server-side batching enabled with batch_size=1
+[2025-11-05 15:52:14] ===== SERVER STARTUP COMPLETE =====
+[2025-11-05 15:52:14] Server is ready to accept requests!
+[2025-11-05 15:52:14] Available endpoints: /generate (POST), / (GET)
+Request received at 16:33:58 [Job: 3500521, Gene: xXxTTlDgJxU2nWBzN1ToDEx1EPF]
+Processing batch of 1 requests
+Request completed in 53.60s (E2E), 53.60s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:50458 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:11 [Job: 3500521, Gene: xXxgD2f5u3m1v7gPA0QLK0kGhp2]
+Processing batch of 1 requests
+Request completed in 26.82s (E2E), 26.82s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:33518 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:35:50 [Job: 3500521, Gene: xXxcmvWV5qkcycAuzaWWjismAHa]
+Processing batch of 1 requests
+Request completed in 34.79s (E2E), 34.79s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:60368 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:36:38 [Job: 3500521, Gene: xXxWk911Q2jSp5MbQ8s4oBEpGCi]
+Processing batch of 1 requests
+Request completed in 55.72s (E2E), 55.72s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:39076 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:37:47 [Job: 3500521, Gene: xXxeTnBYWkg85TbDseBzx61EdzT]
+Processing batch of 1 requests
+Request completed in 24.28s (E2E), 24.28s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:36522 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:38:27 [Job: 3500521, Gene: xXx3aGS32HNMPLD9qZ0woJPLWoN]
+Processing batch of 1 requests
+Request completed in 45.77s (E2E), 45.77s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:42024 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:39:26 [Job: 3500521, Gene: xXxk0uplnd3yOvHmi4oK5XpoVxC]
+Processing batch of 1 requests
+Request completed in 45.81s (E2E), 45.81s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:55086 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:40:37 [Job: 3500521, Gene: xXx2hHkbfuqbakVI3a7RiqR4yao]
+Processing batch of 1 requests
+Request completed in 38.45s (E2E), 38.45s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:42780 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:20 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 11.88s (E2E), 11.88s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:41548 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:32 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 6.06s (E2E), 6.06s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:39908 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:38 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 5.73s (E2E), 5.73s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:55392 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:43 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 11.89s (E2E), 11.89s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:55398 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:51:55 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 2.15s (E2E), 2.15s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:38408 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:52:10 [Job: 3500521, Gene: xXxuMghW8dYB4puywmdJIgIyePI]
+Processing batch of 1 requests
+Request completed in 35.43s (E2E), 35.43s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:54676 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:52:58 [Job: 3500521, Gene: xXxACgcIlmFWKkOTSoWbPZ2c3ui]
+Processing batch of 1 requests
+Request completed in 25.52s (E2E), 25.52s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:52800 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:53:36 [Job: 3500521, Gene: xXxxQE4g9SdqMuup0OMf6yldkmO]
+Processing batch of 1 requests
+Request completed in 56.91s (E2E), 56.91s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:39534 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:54:46 [Job: 3500521, Gene: xXxMufZ0vpGLO4eu7KpvZxu9HMB]
+Processing batch of 1 requests
+Request completed in 29.72s (E2E), 29.72s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:56654 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:55:28 [Job: 3500521, Gene: xXxgP7bfsQ8AjQpuFmIyMrCGG4d]
+Processing batch of 1 requests
+Request completed in 24.31s (E2E), 24.31s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:44754 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:56:06 [Job: 3500521, Gene: xXxEmYNCiulUn7ePmWcFRLSpHMe]
+Processing batch of 1 requests
+Request completed in 43.57s (E2E), 43.57s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:40302 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:57:02 [Job: 3500521, Gene: xXxdqsaL21HnHdzL1MAwfO5PpBh]
+Processing batch of 1 requests
+Request completed in 68.69s (E2E), 68.69s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:41416 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:58:24 [Job: 3500521, Gene: xXx9SAfTSxUq4lRSqqGIQc9IPj0]
+Processing batch of 1 requests
+Request completed in 63.90s (E2E), 63.90s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:38492 - "POST /generate HTTP/1.1" 200 OK
+Request received at 16:59:42 [Job: 3500521, Gene: xXxVayXia04nMdjecNv7Nff7YIO]
+Processing batch of 1 requests
+Request completed in 38.99s (E2E), 38.99s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:58916 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:00:34 [Job: 3500521, Gene: xXxCfrLzdxCYXkieKVDV9mGNdYj]
+Processing batch of 1 requests
+Request completed in 56.98s (E2E), 56.98s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:37018 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:32 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 2.18s (E2E), 2.18s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:49398 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:34 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 2.21s (E2E), 2.20s (batch processing), evaluation score: 0.0
+INFO:     172.27.144.15:49410 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:36 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 0.42s (E2E), 0.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:49414 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:36 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 4.50s (E2E), 4.50s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:49418 - "POST /generate HTTP/1.1" 200 OK
+Request received at 17:30:41 [Job: 3500521, Gene: mutate_prompts]
+Processing batch of 1 requests
+Request completed in 0.43s (E2E), 0.42s (batch processing), evaluation score: 1.0
+INFO:     172.27.144.15:55708 - "POST /generate HTTP/1.1" 200 OK
+---------------------------------------
+Begin Slurm Epilog: Nov-05-2025 17:30:44
+Job ID:        3500414
+User ID:       kbhavsar31
+Account:       coc
+Job name:      LLMGE01_Server
+Resources:     cpu=16,gres/gpu:h200=1,mem=160G,node=1
+Rsrc Used:     cput=1-03:36:00,vmem=0,walltime=01:43:30,mem=65212612K,energy_used=0
+Partition:     coe-gpu
+QOS:           coe-ice
+Nodes:         atl1-1-03-013-26-0
+---------------------------------------

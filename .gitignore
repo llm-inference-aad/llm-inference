@@ -30,3 +30,4 @@ notebook.md
 plots/
 !runs/auto_20251103_210131/
 !runs/auto_20251103_210131/plots
+!runs/auto_20251103_210131/logs/slurm-*
