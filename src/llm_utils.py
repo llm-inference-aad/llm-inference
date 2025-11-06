@@ -550,26 +550,26 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
                             txt2llm,
                             max_new_tokens=safe_tokens,
                             top_p=top_p,
-                        temperature=temperature,
-                        return_gen=False,
-                        gene_id=gene_id,
-                    )
-                else:
-                    raise Exception(f"Unknown fallback target '{fallback_target}'")
-            except Exception as fallback_exc:
+                            temperature=temperature,
+                            return_gen=False,
+                            gene_id=gene_id,
+                        )
+                    else:
+                        raise Exception(f"Unknown fallback target '{fallback_target}'")
+                except Exception as fallback_exc:
+                    raise Exception(
+                        f"Local server failed after {max_retries} attempts and remote fallback "
+                        f"also failed: {fallback_exc}"
+                    ) from fallback_exc
+            else:
+                # FAIL FAST: No fallback enabled - immediately fail to ensure baseline consistency
                 raise Exception(
-                    f"Local server failed after {max_retries} attempts and remote fallback "
-                    f"also failed: {fallback_exc}"
-                ) from fallback_exc
+                    f"[BASELINE MODE] Local server failed after {max_retries} attempts. "
+                    f"No remote fallback configured (ENABLE_LLM_REMOTE_FALLBACK=false). "
+                    f"This ensures model consistency for baselines. "
+                    f"Last error: {last_exception}"
+                ) from last_exception
         
-        if last_exception:
-            # FAIL FAST: No fallback enabled - immediately fail to ensure baseline consistency
-            raise Exception(
-                f"[BASELINE MODE] Local server failed after {max_retries} attempts. "
-                f"No remote fallback configured (ENABLE_LLM_REMOTE_FALLBACK=false). "
-                f"This ensures model consistency for baselines. "
-                f"Last error: {last_exception}"
-            ) from last_exception
         raise Exception("Unhandled error calling local server.")
             
     except requests.exceptions.ConnectionError:
