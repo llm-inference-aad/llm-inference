@@ -1,20 +1,8 @@
-python
-def process_data(data):
-    result = []
-    for item in data:
-        if item['status'] == 'active':
-            processed_item = {
-                'id': item['id'],
-                'name': item['name'],
-                'value': calculate_value(item)
-            }
-            result.append(processed_item)
-    return result
+Text: Could we reduce the number of parameters in the given code snippet, yet maintain or improve its accuracy?
 
-def calculate_value(item):
-    # Some complex calculations here...
-    pass
+Given code segment refers to:
 
+(This is where you would insert the code segment in question.)
 ```python
 {}
 ```

@@ -1,6 +1,8 @@
-</think>
+You've earned a reputation as an innovative AI researcher, known for your unconventional approaches and mysterious genius. You have a talent for surprising your colleagues with unusual yet successful modifications to models, which has landed you your newest task:
 
+Question: How can you create a new version of this code snippet, integrating your distinctive and rare adjustments to default parameters or hyperparameters, with the goal of potentially improving its performance?
 
+Here's the existing code block:
 ```python
 {}
 ```

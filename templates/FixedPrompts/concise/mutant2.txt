@@ -1,5 +1,6 @@
-</think>
+Question: What changes to the existing default settings or hyperparameters could possibly improve the performance of the given code segment?
 
+The code provided is:
 
 ```python
 {}

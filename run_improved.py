@@ -8,11 +8,118 @@ import pickle
 import argparse
 import subprocess
 import numpy as np
+from pathlib import Path
 from deap import base, creator, tools
 from deap.tools import HallOfFame
 from src.utils.print_utils import print_population, print_scores, box_print, print_job_info
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
 from src.cfg.constants import *
+
+
+def train_seed_network_baseline():
+    """
+    Train the seed network to establish a baseline fitness value.
+    This ensures fitness inheritance works correctly for genes that fall back to seed code.
+    
+    Returns
+    -------
+    tuple or None
+        (test_accuracy, num_parameters) if training succeeds, None if results already exist
+    """
+    # Check if seed network results already exist
+    seed_results_file = os.path.join(SOTA_ROOT, 'results', 'network_results.txt')
+    
+    if os.path.exists(seed_results_file):
+        box_print("SEED NETWORK BASELINE EXISTS", print_bbox_len=60, new_line_end=False)
+        with open(seed_results_file, 'r') as f:
+            results = f.read().strip()
+        print(f"  Existing results: {results}")
+        # Parse and return the fitness tuple
+        try:
+            parts = results.split(',')
+            test_acc = float(parts[0])
+            num_params = float(parts[1])
+            print(f"  ✓ Seed fitness: ({test_acc:.4f}, {num_params:.0f})")
+            return (test_acc, num_params)
+        except Exception as e:
+            print(f"  ⚠️  Warning: Could not parse existing results: {e}")
+            print(f"  Will retrain seed network...")
+    else:
+        box_print("TRAINING SEED NETWORK BASELINE", print_bbox_len=60, new_line_end=False)
+        print(f"  Seed results file not found: {seed_results_file}")
+        print(f"  Training seed network to establish baseline...")
+    
+    # Train the seed network
+    train_script = os.path.join(SOTA_ROOT, 'train.py')
+    
+    if not os.path.exists(train_script):
+        print(f"  ✗ ERROR: Training script not found: {train_script}")
+        return None
+    
+    # Prepare training command
+    # Use minimal epochs for baseline (adjust as needed)
+    train_cmd = [
+        'python', train_script,
+        '-data', DATA_PATH,
+        '-epoch', '2',  # Minimal training for baseline
+        '-network', 'network',  # Use the seed network
+        '-save_dir', 'weight'
+    ]
+    
+    print(f"  Running: {' '.join(train_cmd)}")
+    print(f"  This may take several minutes...")
+    
+    try:
+        # Change to SOTA directory for training
+        original_cwd = os.getcwd()
+        os.chdir(SOTA_ROOT)
+        
+        # Run training
+        result = subprocess.run(
+            train_cmd,
+            capture_output=True,
+            text=True,
+            timeout=1800  # 30 minute timeout
+        )
+        
+        # Change back to original directory
+        os.chdir(original_cwd)
+        
+        if result.returncode != 0:
+            print(f"  ✗ ERROR: Seed network training failed!")
+            print(f"  stdout: {result.stdout[-500:]}")  # Last 500 chars
+            print(f"  stderr: {result.stderr[-500:]}")
+            return None
+        
+        # Verify results file was created
+        if os.path.exists(seed_results_file):
+            with open(seed_results_file, 'r') as f:
+                results = f.read().strip()
+            print(f"  ✓ Seed network trained successfully!")
+            print(f"  Results: {results}")
+            
+            # Parse and return the fitness tuple
+            try:
+                parts = results.split(',')
+                test_acc = float(parts[0])
+                num_params = float(parts[1])
+                print(f"  ✓ Seed fitness: ({test_acc:.4f}, {num_params:.0f})")
+                return (test_acc, num_params)
+            except Exception as e:
+                print(f"  ⚠️  Warning: Could not parse results: {e}")
+                return None
+        else:
+            print(f"  ✗ ERROR: Results file not created: {seed_results_file}")
+            return None
+            
+    except subprocess.TimeoutExpired:
+        print(f"  ✗ ERROR: Seed network training timed out after 30 minutes")
+        os.chdir(original_cwd)
+        return None
+    except Exception as e:
+        print(f"  ✗ ERROR: Unexpected error during training: {e}")
+        os.chdir(original_cwd)
+        return None
 
 def print_ancestry(data):
     for gene in data.keys():
@@ -1010,6 +1117,7 @@ if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
     print(DNA_TXT)
+    
     checkpoint, start_gen = load_checkpoint(folder_name=args.checkpoints)
     if checkpoint:
         box_print("LOADING CHECKPOINT")
@@ -1018,9 +1126,23 @@ if __name__ == "__main__":
         GLOBAL_DATA_ANCESTRY = checkpoint["GLOBAL_DATA_ANCESTRY"]
         population = checkpoint["population"]
         hof = checkpoint["hof"]
+        print("  ✓ Checkpoint restored - skipping seed network baseline training")
     else:
         # Create an initial population
         start_gen = 0
+        
+        # BASELINE SETUP: Train seed network before creating population
+        # This ensures we have a baseline fitness for fitness inheritance
+        # Only runs on fresh starts, not when resuming from checkpoint
+        box_print("BASELINE INITIALIZATION", print_bbox_len=80, new_line_end=False)
+        seed_fitness = train_seed_network_baseline()
+        if seed_fitness is None:
+            print("⚠️  Warning: Seed network baseline training failed or was skipped.")
+            print("   Fitness inheritance for fallback genes may not work optimally.")
+        else:
+            print(f"  ✓ Seed network baseline established: accuracy={seed_fitness[0]:.4f}, params={seed_fitness[1]:.0f}")
+        print()  # Add spacing
+        
         box_print("CREATING POPULATION FROM SEED CODE")
         population = toolbox.population(n=start_population_size)
         box_print("Batch Checking Created Genes", print_bbox_len=60, new_line_end=False)
