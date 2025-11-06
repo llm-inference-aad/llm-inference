@@ -1,0 +1,252 @@
+
+# ========== Start: GeneCrossed
+
+# ========== End:
+
+# ========== Start: GeneCrossed
+
+# ========== End:
+# --PROMPT LOG--
+
+import collections
+import argparse
+
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+from torchvision.models import *
+from torch.optim import SGD
+# Adding some modules that llama3 seems to favor
+import random
+import math
+
+# https://github.com/lessw2020/Ranger-Deep-Learning-Optimizer
+#from ranger import RangerQH  
+#from ranger import RangerVA  
+#from ranger import Ranger
+#from ranger21 import Ranger21
+
+# --OPTION--
+import torch.optim as optim
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):
+    if weight_decay!= 0:
+        g0, g1, g2 = [], [], []
+        for v in model.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):
+                g1.append(v.weight)
+        
+        opt = optim.AdamW([
+            {'params': g0, 'lr': lr},
+            {'params': g1, 'lr': lr, 'weight_decay': weight_decay},
+            {'params': g2, 'lr': lr * 2}
+        ], lr=lr, weight_decay=weight_decay)
+    else:
+        opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=nesterov)
+    
+    scheduler = CosineAnnealingWarmRestarts(opt, T_0=10, T_mult=1, eta_min=lr/10)
+    return opt, scheduler
+# --OPTION--
+import torch.nn as nn
+
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))
+        self.fc1 = nn.Linear(cin, cin // 2)
+        self.ln = nn.LayerNorm(cin // 2)
+        self.relu = nn.ReLU(inplace=True)
+        self.fc2 = nn.Linear(cin // 2, cin)
+        self.act = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.fc1(x)
+        x = self.ln(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        return x * y
+# --OPTION--
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.act = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        return x*y
+# --OPTION--
+# -- NOTE --
+# Note: The classes SE_LN and SE used in this architecture are pre-existing and fully implemented elsewhere. 
+# It is not necessary to create new implementations or modify these classes for this architecture. They should be used as-is.# -- NOTE --
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.conv = nn.Conv2d(4*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        mp = self.maxpool(x)
+        mn = self.minpool(x)
+        dw = self.dw(x)
+        x = torch.cat((mp, mn, dw), 1)
+        x = self.conv(x)
+        x = self.bn(x)
+        return x
+# --OPTION--
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+
+# --OPTION--
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+
+# --OPTION--
+class ME(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.pw = nn.Conv2d(cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+# --OPTION--
+def pad_num_y(k_s):
+    pad_per_side = int((k_s-1)*0.5)
+    return pad_per_side
+    
+class DW(nn.Module):
+    def __init__(self, cin, dw_s):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, dw_s, 1, pad_num_y(dw_s), groups=cin)
+        self.act = nn.Hardswish()
+
+    def forward(self, x):
+        x = self.dw(x)
+        x = self.act(x)
+        return x
+
+# --OPTION--
+
+# -- NOTE --
+# Note: The classes FCT, EVE, ME, and DFSEBV2 used in this architecture are pre-existing and fully implemented elsewhere. 
+# It is not necessary to create new implementations or modify these classes for this architecture. They should be used as-is. 
+# -- NOTE --
+
+class ExquisiteNetV2(nn.Module):
+    def __init__(self, class_num, img_channels):
+        super().__init__()
+        self.FCT = FCT(img_channels, 12)
+        self.DFSEB1 = DFSEBV2(12, 3, True) #
+        self.EVE = EVE(12, 48)  
+        self.DFSEB2 = DFSEBV2(48, 3, True) #
+        self.ME3 = ME(48, 96)  
+        self.DFSEB3 = DFSEBV2(96, 3, True) #
+        self.ME4 = ME(96, 192)  
+        self.DFSEB4 = DFSEBV2(192, 3, True) #
+        self.ME5 = ME(192, 384)  
+        self.DFSEB5 = DFSEBV2(384, 3, True) #
+        self.DW = DW(384, 3)                #
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))
+        self.drop = nn.Dropout(0.5)
+        self.fc = nn.Linear(384, class_num)
+                        
+    def forward(self, x):
+        x = self.FCT(x)
+        x = self.DFSEB1(x) #
+        x = self.EVE(x)  
+        x = self.DFSEB2(x) #
+        x = self.ME3(x)  
+        x = self.DFSEB3(x) #
+        x = self.ME4(x)  
+        x = self.DFSEB4(x) #
+        x = self.ME5(x)  
+        x = self.DFSEB5(x) #
+        x = self.DW(x)     #
+        x = self.gavg(x)
+        x = self.drop(x)
+        x = x.view(-1, x.size(1))
+        x = self.fc(x)
+        return x

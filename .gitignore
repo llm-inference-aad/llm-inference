@@ -28,4 +28,5 @@ notebook.md
 /servers.json
 /loadbalancer.log
 plots/
-
+!runs/auto_20251103_210131/
+!runs/auto_20251103_210131/plots

@@ -1,0 +1,52 @@
+Example of the modified code: 
+```python
+import torch.optim as optim
+from torch import nn
+
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):
+    if weight_decay!= 0:
+        g0, g1, g2 = [], [], []
+        for v in model.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):
+                g2.append(v.bias)
+            if isinstance(v, nn.BatchNorm2d):
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):
+                g1.append(v.weight)
+        optimizer = optim.SGD(g0, lr, 0.9, nesterov=nesterov)
+        optimizer.add_param_group({'params': g1, 'weight_decay': weight_decay})
+        optimizer.add_param_group({'params': g2})
+    else:
+        optimizer = optim.SGD(model.parameters(), lr, 0.9, nesterov=nesterov)
+    return optimizer 
+```
+Example of the initial code:
+```python
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):  
+    if weight_decay != 0:
+        g0, g1, g2 = [], [], []  # optimizer parameter groups
+        for v in model.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):  # bias
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):  # weight (no decay)
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):  # weight (with decay)
+                g1.append(v.weight)
+        
+        opt = SGD(g0, lr, 0.9, nesterov=nesterov)
+        opt.add_param_group({'params': g1, 'weight_decay': weight_decay})  # add g1 with weight_decay
+        opt.add_param_group({'params': g2})  # add g2 (biases)
+    else:
+        opt = SGD(model.parameters(), lr, 0.9, nesterov=nesterov)
+    return opt 
+```
+
+Q1: Very concisely, let's explore step by step how modifying this code segment enhanced its scoring metrics performance.
+Q2: With the insights from Q1 in mind, can we apply the same principles in a concise manner to update the code snippet below, ensuring the input and output tensor sizes remain unchanged?
+
+Snippet to be augmented:
+```python
+{} 
+```
+
+A1: Let us think step by step

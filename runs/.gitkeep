@@ -1,2 +1,4 @@
 # This file ensures the runs/ directory exists in the repository
 # All run data is ignored by .gitignore
+
+auto_20251103_210131/*
