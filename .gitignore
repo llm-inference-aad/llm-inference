@@ -28,6 +28,7 @@ notebook.md
 /servers.json
 /loadbalancer.log
 plots/
-!runs/auto_20251103_210131/
-!runs/auto_20251103_210131/plots
-!runs/auto_20251103_210131/logs/slurm-*
+!runs/auto_20251105_173037/
+!runs/auto_20251105_173037/plots
+!runs/auto_20251105_173037/logs/slurm-*
+

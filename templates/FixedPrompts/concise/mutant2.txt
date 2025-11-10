@@ -1,16 +1,11 @@
 python
-def calculate_score(answers):
-    score = 0
-    for answer in answers:
-        if answer == 'A':
-            score += 1
-        elif answer == 'B':
-            score += 2
-        elif answer == 'B':
-            score += 3
-        elif answer == 'D':
-            score +=4
-    return score
+def process_data(data):
+    result = []
+    for item in data:
+        processed_item = some_function(item)
+        if processed_item is not None:
+            result.append(processed_item)
+    return result
 
 ```python
 {}

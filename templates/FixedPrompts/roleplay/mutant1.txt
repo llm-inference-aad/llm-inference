@@ -1,8 +1,6 @@
-python
-import numpy as np
+To make it more efficient? I'm using TensorFlow 2.9.1.
+</think>
 
-def predict(x):
-    return x * 2
 
 ```python
 {}
