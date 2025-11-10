@@ -1,17 +1,14 @@
 python
-def calculate_score(text):
-    words = text.split()
-    word_count = len(words)
-    score = 0
-    for word in words:
-        if word.lower() == 'good':
-            score += 1
-        elif word.lower() == 'bad':
-            score -= 1
-    return (score / word_count) * 100
+def calculate_sum(numbers):
+    total = 0
+    for num in numbers:
+        if isinstance(num, (int, float)):
+            total += num
+    return total
 
-text = "This is a good sentence. Another bad example."
-print(calculate_score(text))
+numbers_list = [1, 2.5, 'a', 3]
+result = calculate_sum(numbers_list)
+print(result)  # Output: 6.5
 
 ```python
 {}

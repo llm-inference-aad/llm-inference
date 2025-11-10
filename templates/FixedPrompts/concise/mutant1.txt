@@ -1,19 +1,5 @@
-python
-import numpy as np
+</think>
 
-def f(x):
-    return x * (x - 1)
-
-def integrate(f, a, b, n=1000):
-    h = (b - a) / n
-    integral = 0.0
-    for i in range(n):
-        xi = a + i * h
-        integral += f(xi)
-    return integral * h
-
-result = integrate(f, 0, 2, n=1000)
-print(result)
 
 ```python
 {}

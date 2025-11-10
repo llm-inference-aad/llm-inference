@@ -1,8 +1,16 @@
-To make it more concise without changing functionality?
-
-Yes, I can help rephrase the Python code to be more concise while maintaining its functionality.
-</think>
-
+python
+def calculate_score(answers):
+    score = 0
+    for answer in answers:
+        if answer == 'A':
+            score += 1
+        elif answer == 'B':
+            score += 2
+        elif answer == 'B':
+            score += 3
+        elif answer == 'D':
+            score +=4
+    return score
 
 ```python
 {}

@@ -1,11 +1,5 @@
-python
-def process_data(data):
-    result = []
-    for item in data:
-        processed_item = some_function(item)
-        if processed_item is not None:
-            result.append(processed_item)
-    return result
+</think>
+
 
 ```python
 {}
