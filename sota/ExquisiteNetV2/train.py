@@ -27,7 +27,7 @@ def get_args():
     parser.add_argument('-weight', type=str, default=None, help="path of pretrained weight")
     parser.add_argument('-amp', action="store_true", help="auto mixed precision training")
     # won't really run 1000 epochs, when lr less than end_lr, training will be stopped
-    parser.add_argument('-epoch', type=int, default=2)
+    parser.add_argument('-epoch', type=int, default=1000)
     parser.add_argument('-save_dir', type=str, default="weight", help="path where the weight will be saved")
     parser.add_argument('-bs', type=int, default=192)
     parser.add_argument('-opt', type=str, default="sgd", help="optimizer")
