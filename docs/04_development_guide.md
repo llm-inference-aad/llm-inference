@@ -1,116 +1,66 @@
 # 04 - Development Guide & Best Practices
 
-This guide outlines standard procedures for development: branching, commits, validation, debugging, and workflow enforcement. It now consolidates the Git workflow rules from `GIT_WORKFLOW.md` for a single source of truth.
+This guide outlines the standard procedures for development, including version control, coding conventions, and debugging.
 
-## 1. Branch & Integration Strategy
+## 1. Branch Strategy & Workflow
 
-All non-trivial work happens off `new_main` in short‑lived branches. Keep `new_main` green and reproducible.
+### 1.1 Branch Roles
+- **`new_main`**: Production-ready branch. Only merge thoroughly reviewed work here.
+- **`develop`** *(optional)*: Integration branch when coordinating multiple feature efforts.
+- **Feature branches**: Short-lived branches per unit of work, e.g., `feature/rag-indexing` or `fix/seed-fallback`.
 
-### Primary Branches
-| Branch | Purpose |
-|--------|---------|
-| `new_main` | Stable, production evolution + inference code |
-| `develop` (optional) | Staging integration if running multiple parallel features |
-
-### Branch Types & Naming
-- `feat/<short-kebab-desc>` – New capabilities (e.g. `feat/rag-pipeline`)
-- `fix/<issue>` – Bug fixes (e.g. `fix/seed-fallback-fitness`)
-- `refactor/<scope>` – Structural/quality changes without behavior change
-- `docs/<topic>` – Documentation-only
-- `test/<area>` – Test infra or coverage expansion
-
-### Golden Rules
-1. Branch from an up‑to‑date remote: `git checkout new_main && git pull --ff-only origin new_main`
-2. Keep commits atomic & logically grouped
-3. Prefer merging with `--no-ff` to preserve feature history
-4. Delete stale merged branches locally after merge
-5. Never force‑push shared history (`git push -f`) unless coordinated
-
-### Creating a Feature Branch
-
-1. **Create a Branch**: Always start from an up-to-date `new_main` branch.
+### 1.2 Naming & Creation Checklist
+1. Sync with the latest stable base:
     ```bash
-    # Get the latest code
     git checkout new_main
     git pull origin new_main
-
-    # Create your feature branch
-    git checkout -b feat/my-new-feature
     ```
-
-2. **Commit Changes**: Make small, atomic commits using Conventional Commits.
-    - **`feat:`**: A new feature.
-    - **`fix:`**: A bug fix.
-    - **`docs:`**: Documentation changes.
-    - **`refactor:`**: Code changes that neither add a feature nor fix a bug.
-    - **`test:`**: Adding or correcting tests.
-    - **`chore:`**: Build process or auxiliary tool changes.
-
-    *Example:*
+2. Create a focused branch with the appropriate prefix:
     ```bash
-    git commit -m "feat: add user authentication endpoint"
+    git checkout -b feature/<concise-scope>
+    # other prefixes: fix/, docs/, refactor/, test/, chore/
     ```
 
-3. **PR / Merge**: For collaborative work open a PR; for solo, still prefer PR for reviewability. Use:
-```bash
-git checkout new_main
-git pull origin new_main
-git merge --no-ff feat/my-new-feature -m "Merge feat/my-new-feature: <summary>"
-```
+### 1.3 Day-to-Day Workflow
+1. **Implement & test** changes locally. Keep scope small to avoid merge pain.
+2. **Stage intentionally**:
+    ```bash
+    git status
+    git add <files>
+    ```
+3. **Commit with Conventional Commits** (see §2). Example:
+    ```bash
+    git commit -m "feat: add auto seed baseline"
+    ```
+4. **Validate before merge**. Run syntax checks or targeted tests relevant to the change.
+5. **Merge via PR** against `new_main` using `--no-ff` to preserve history:
+    ```bash
+    git checkout new_main
+    git pull origin new_main
+    git merge --no-ff feature/<concise-scope> -m "Merge feature/<concise-scope>: summary"
+    ```
+6. **Delete stale branches** after merge (`git branch -d feature/<concise-scope>`).
 
-### Commit Message Standard (Conventional Commits)
-Format:
-```
-<type>: <subject>\n\n<body>
-```
-Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
+### 1.4 Conflict Resolution
+1. Fetch latest remote state: `git fetch origin`.
+2. Rebase or merge as appropriate, resolve `<<<<<<<` blocks carefully, then `git add` each resolved file.
+3. Commit with context, e.g., `git commit -m "Merge: resolve conflicts in run_improved.py"`.
+4. Re-run validation/tests affected by the conflict.
 
-Good:
-```
-feat: add auto seed network training
+## 2. Commit Hygiene & Tooling
 
-- Train seed network before evolution runs
-- Skip when resuming checkpoints
-```
-Bad: `update stuff`, `fixing code`.
+- **Conventional Commit types**:
+  - `feat`: new functionality
+  - `fix`: bug fix
+  - `docs`: documentation-only changes
+  - `refactor`: structural change without behavior shift
+  - `test`: adds or updates tests
+  - `chore`: tooling/build updates
+- **Commit body**: Bullet the *why* and highlight breaking changes if any.
+- **Pre-commit hook**: `.git/hooks/pre-commit` runs `python -m py_compile` to stop syntax regressions. Never bypass it; fix the issue instead.
+- **Pull Requests**: Always open a PR for review, linking tickets and test evidence. Use the provided checklist template.
 
-### Pre-Commit Hook Enforcement
-Location: `.git/hooks/pre-commit`
-- Runs Python syntax compilation: prevents broken pushes
-- Extendable (add linting, formatting) – ensure fast execution
-
-To reinstall (if lost):
-```bash
-cp scripts/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
-```
-
-### Conflict Resolution Flow
-```bash
-git status              # Identify conflicted paths
-vim <file>              # Resolve <<<<<<< >>>>>>> markers
-git add <file>
-git commit              # Finalize merge
-```
-
-### Emergency Recovery
-```bash
-git log --oneline -n 10
-git revert <commit>      # Safe undo (creates new commit)
-git reset --hard <hash>  # Destructive rollback (use with caution)
-```
-
-### Best Practices Summary
-| ✅ Do | ❌ Avoid |
-|------|---------|
-| Feature branches | Direct large edits on `new_main` |
-| Atomic commits | Vague messages |
-| `--no-ff` merges | Long-lived unmerged branches |
-| Pre-commit checks | Force pushing shared branches |
-| Delete merged branches | Accumulating stale branches |
-
----
-
-## 2. LLM Output Validation
+## 3. LLM Output Validation
 
 A critical part of the system is hardening it against invalid code generated by the LLM. A multi-layer validation pipeline is used to ensure every individual is a valid, executable module.
 
@@ -120,62 +70,7 @@ A critical part of the system is hardening it against invalid code generated by 
 
 If validation fails, a retry loop with progressively more specific prompts is initiated. If all retries fail, the system falls back to the parent's code to guarantee a valid individual, ensuring the evolution does not crash.
 
-## 3. Debugging on PACE-ICE
-## 4. Evolution Run Integrity & Reproducibility
-
-| Aspect | Mechanism | Purpose |
-|--------|-----------|---------|
-| Seed Fitness Inheritance | Baseline results cached (`network_results.txt`) | Ensures fallback genes get valid fitness |
-| Port Allocation | Safe selective process kill (uvicorn/python only) | Prevents accidental unrelated process termination |
-| Fail-Fast Mode | Optional disable external HF fallback | Ensures baseline purity & reproducibility |
-| Checkpoint Resume | Skips seed retrain on resume | Avoids duplicated baseline computation |
-| Ancestry Tracking | `src/evolution/ancestry.py` | Mutation lineage & auditability |
-
-## 5. Metrics & Analysis Toolkit
-
-Scripts under `scripts/` & `metrics/` provide:
-- Pareto front visualization (`plot_pareto.py`, `plot_pareto_enhanced.py`)
-- Latency vs accuracy correlation (`plot_latency_vs_accuracy.py`)
-- Run summary distributions (`plot_run_summary.py`)
-
-Standard result file: `*_results.txt` → `test_acc,total_params,val_acc,train_time`
-
-## 6. Preparing for RAG Pipeline Integration
-
-Recommended preparatory steps before implementing Retrieval-Augmented Generation for mutation guidance:
-1. Normalize template prompts (restore any corrupted templates before indexing)
-2. Define mutation event schema: `{gene_id, parent_ids, prompt_used, code_delta, fitness_delta}`
-3. Persist structured mutation logs to `runs/<run_id>/mutation_log.jsonl`
-4. Build lightweight vector index (e.g. FAISS) over `code_delta + prompt_used`
-5. Add enhancement hook inside `mutate_prompts()` to retrieve top-K similar successful patterns
-6. Track impact: mutation success rate, generations to reach threshold accuracy, Pareto front size.
-
-Data fields to index initially:
-| Field | Source | Notes |
-|-------|--------|-------|
-| `parent_fitness` | Parsed from parent results file | Guides retrieval weighting |
-| `mutation_type` | Template path or EoT vs FixedPrompt | Enables stratified analysis |
-| `code_diff` | Unified diff vs parent | Token-level embedding optional |
-| `test_acc_delta` | Child - parent | Effect magnitude |
-
-Minimal schema example:
-```json
-{
-    "run_id": "run_20251114_120312",
-    "gene_id": "abc123",
-    "parents": ["seed"],
-    "mutation_type": "EoT",
-    "prompt": "...",
-    "code_diff": "@@ ...",
-    "parent_fitness": {"test_acc": 0.9252, "params": 510000},
-    "child_fitness": {"test_acc": 0.9310, "params": 505000},
-    "timestamp": "2025-11-14T12:05:22Z"
-}
-```
-
----
-
-This consolidated guide supersedes duplicated workflow notes. Keep `new_main` stable; iterate rapidly in feature branches.
+## 4. Debugging on PACE-ICE
 
 Here are some essential commands for debugging on the cluster.
 
@@ -211,3 +106,9 @@ Here are some essential commands for debugging on the cluster.
     # Cancel all your jobs
     scancel -u $USER
     ```
+
+## 5. Best Practices Recap
+- Work on feature branches; never commit directly to `new_main` except for urgent hotfixes.
+- Keep commits atomic and descriptive; push frequently and open PRs early for feedback.
+- Let the pre-commit hook guard syntax; add additional linters/tests as scope expands.
+- Keep documentation updated whenever workflow or functionality changes to avoid drift.
