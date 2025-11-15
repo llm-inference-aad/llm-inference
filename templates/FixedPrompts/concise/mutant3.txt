@@ -1,6 +1,5 @@
-Question: What complex adjustments can be considered to possibly improve the performance of the following existing code segment?
-
-Here is the current code:
+python
+print("Hello, World!")
 
 ```python
 {}

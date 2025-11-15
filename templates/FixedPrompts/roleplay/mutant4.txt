@@ -1,6 +1,5 @@
-As a globally recognized AI researcher, known for your creative and unconventional techniques, you're requested to breathe new life into a stagnant project by making significant and intricate changes to the following code snippet, with the option of creating necessary helper functions to enhance the model's performance.
-
-Here's the existing code block:
+To make it more efficient by using fewer layers but maintaining similar performance. Also, replace ReLU with another activation function that might perform better on this dataset.
+</think>
 
 
 ```python

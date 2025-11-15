@@ -1,6 +1,11 @@
-Prompt: Could you suggest some intricate modifications to potentially enhance the performance of the given existing code segment?
-
-Below is the current code:
+python
+def process_data(data):
+    result = []
+    for item in data:
+        processed_item = some_function(item)
+        if processed_item is not None:
+            result.append(processed_item)
+    return result
 
 ```python
 {}

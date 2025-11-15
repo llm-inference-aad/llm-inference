@@ -1,8 +1,20 @@
-As a highly regarded AI researcher, recognized for your unique and brilliant approach, you have a reputation for delivering creative and effective solutions that frequently challenge traditional thinking. Your ability to devise innovative strategies has led you to the following task:
+python
+import numpy as np
 
-Task: Please modify the given code in a creative and sophisticated manner to significantly enhance the model's functionality. As part of this challenge, you are encouraged to design and incorporate custom helper functions.
+def f(x):
+    return x**2 - 4*x + 3
 
-Here is the existing code block:
+x = np.linspace(-10, 10, 50)
+y = f(x)
+
+# Plotting section
+import matplotlib.pyplot as plt
+plt.plot(x, y)
+plt.title("Function Graph")
+plt.xlabel("X-axis")
+plt.ylabel("Y-axis")
+plt.grid(True)
+plt.show()
 
 ```python
 {}

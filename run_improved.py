@@ -1,227 +1,23 @@
 import os
-import copy
-import glob
 import time
 import string
 import random
 import pickle
 import argparse
 import subprocess
-import numpy as np
 from pathlib import Path
 from deap import base, creator, tools
 from deap.tools import HallOfFame
 from src.utils.print_utils import print_population, print_scores, box_print, print_job_info
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
+from src.evolution import (
+    generate_template,
+    print_ancestry,
+    train_seed_network_baseline,
+    update_ancestry,
+)
 from src.cfg.constants import *
 
-
-def train_seed_network_baseline():
-    """
-    Train the seed network to establish a baseline fitness value.
-    This ensures fitness inheritance works correctly for genes that fall back to seed code.
-    
-    Returns
-    -------
-    tuple or None
-        (test_accuracy, num_parameters) if training succeeds, None if results already exist
-    """
-    # Check if seed network results already exist
-    seed_results_file = os.path.join(SOTA_ROOT, 'results', 'network_results.txt')
-    
-    if os.path.exists(seed_results_file):
-        box_print("SEED NETWORK BASELINE EXISTS", print_bbox_len=60, new_line_end=False)
-        with open(seed_results_file, 'r') as f:
-            results = f.read().strip()
-        print(f"  Existing results: {results}")
-        # Parse and return the fitness tuple
-        try:
-            parts = results.split(',')
-            test_acc = float(parts[0])
-            num_params = float(parts[1])
-            print(f"  ✓ Seed fitness: ({test_acc:.4f}, {num_params:.0f})")
-            return (test_acc, num_params)
-        except Exception as e:
-            print(f"  ⚠️  Warning: Could not parse existing results: {e}")
-            print(f"  Will retrain seed network...")
-    else:
-        box_print("TRAINING SEED NETWORK BASELINE", print_bbox_len=60, new_line_end=False)
-        print(f"  Seed results file not found: {seed_results_file}")
-        print(f"  Training seed network to establish baseline...")
-    
-    # Train the seed network
-    train_script = os.path.join(SOTA_ROOT, 'train.py')
-    
-    if not os.path.exists(train_script):
-        print(f"  ✗ ERROR: Training script not found: {train_script}")
-        return None
-    
-    # Prepare training command
-    # Use minimal epochs for baseline (adjust as needed)
-    train_cmd = [
-        'python', train_script,
-        '-data', DATA_PATH,
-        '-epoch', '2',  # Minimal training for baseline
-        '-network', 'network',  # Use the seed network
-        '-save_dir', 'weight'
-    ]
-    
-    print(f"  Running: {' '.join(train_cmd)}")
-    print(f"  This may take several minutes...")
-    
-    try:
-        # Change to SOTA directory for training
-        original_cwd = os.getcwd()
-        os.chdir(SOTA_ROOT)
-        
-        # Run training
-        result = subprocess.run(
-            train_cmd,
-            capture_output=True,
-            text=True,
-            timeout=1800  # 30 minute timeout
-        )
-        
-        # Change back to original directory
-        os.chdir(original_cwd)
-        
-        if result.returncode != 0:
-            print(f"  ✗ ERROR: Seed network training failed!")
-            print(f"  stdout: {result.stdout[-500:]}")  # Last 500 chars
-            print(f"  stderr: {result.stderr[-500:]}")
-            return None
-        
-        # Verify results file was created
-        if os.path.exists(seed_results_file):
-            with open(seed_results_file, 'r') as f:
-                results = f.read().strip()
-            print(f"  ✓ Seed network trained successfully!")
-            print(f"  Results: {results}")
-            
-            # Parse and return the fitness tuple
-            try:
-                parts = results.split(',')
-                test_acc = float(parts[0])
-                num_params = float(parts[1])
-                print(f"  ✓ Seed fitness: ({test_acc:.4f}, {num_params:.0f})")
-                return (test_acc, num_params)
-            except Exception as e:
-                print(f"  ⚠️  Warning: Could not parse results: {e}")
-                return None
-        else:
-            print(f"  ✗ ERROR: Results file not created: {seed_results_file}")
-            return None
-            
-    except subprocess.TimeoutExpired:
-        print(f"  ✗ ERROR: Seed network training timed out after 30 minutes")
-        os.chdir(original_cwd)
-        return None
-    except Exception as e:
-        print(f"  ✗ ERROR: Unexpected error during training: {e}")
-        os.chdir(original_cwd)
-        return None
-
-def print_ancestry(data):
-    for gene in data.keys():
-        print(f'gene: {gene}')
-        print(f"\t{data[gene]['GENES']}")
-        print(f"\t{data[gene]['MUTATE_TYPE']}")
-        
-def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None, gene_id_parent2=None):
-    """
-    Updates the ancestry data for a given child gene based on its parent(s).
-
-    Parameters
-    ----------
-    gene_id_child: 
-        The ID of the child gene.
-    gene_id_parent: 
-        The ID of the first parent gene.
-    ancestry: dict 
-        The global data structure for ancestry.
-    mutation_type: 
-        The type of mutation (for the first part of the code). Default is None.
-    gene_id_parent2: 
-        The ID of the second parent gene (for the second part of the code). Default is None.
-
-    Returns
-    -------
-    dict
-        Ancestry dictionary
-    """
-    # Common part for both functionalities
-    ancestry[gene_id_child] = copy.deepcopy(ancestry[gene_id_parent])
-
-    # Handle the specifics for either part 1 or part 2
-    if gene_id_parent2 is None:
-        # Part 1 functionality
-        ancestry[gene_id_child]['GENES'] = copy.deepcopy(ancestry[gene_id_parent]['GENES']) + [gene_id_child]
-        ancestry[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestry[gene_id_parent]['MUTATE_TYPE']) + [mutation_type]
-    else:
-        # Part 2 functionality
-        cross_id = f'P:{gene_id_parent2}-C:{gene_id_child}'
-        ancestry[gene_id_child]['GENES'] = copy.deepcopy(ancestry[gene_id_parent]['GENES']) + [cross_id]
-        ancestry[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestry[gene_id_parent]['MUTATE_TYPE']) + ["CrossOver"]
-
-    return ancestry
-
-
-def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR):
-    """
-    Generates a template based on given probabilities and gene information.
-    
-    Parameters
-    ----------
-    PROB_EOT: float
-        Probability for End of Tree (EoT) operation.
-    GEN_COUNT: 
-        Current generation count.
-    TOP_N_GENES: list
-        List of top N genes.
-    SOTA_ROOT: 
-        Directory path for state-of-the-art root.
-    SEED_NETWORK: 
-        Seed network file path.
-    ROOT_DIR: 
-        Root directory for templates.
-    
-    Returns
-    -------
-    template_txt : str
-        The template text for the mutation
-    mutation_type : str
-        The type of mutation generated
-    """
-
-    if (PROB_EOT > np.random.uniform()) and (GEN_COUNT > 0):
-        print("\t‣ EoT")
-        top_gene = np.random.choice([x[0] for x in TOP_N_GENES])
-        parts_x = split_file(f"{SOTA_ROOT}/models/network_{top_gene}.py")
-        parts_y = split_file(SEED_NETWORK)
-        parts = [(x.strip(), y.strip(), idx) for idx, (x, y) in enumerate(zip(parts_x[1:], parts_y[1:]))]
-        random.shuffle(parts)
-        for x, y, augment_idx in parts:
-            if x.strip() != y.strip():
-                break
-                
-        eot_template_path = os.path.join(ROOT_DIR, 'templates/EoT/EoT.txt')
-        with open(eot_template_path, 'r') as file:
-            eot_template_txt = file.read()
-            
-        template_txt = eot_template_txt.format(x, y, "{}")
-        mute_type = "EoT"
-    else:
-        print("\t‣ FixedPrompts")
-        prompt_templates = glob.glob(f'{ROOT_DIR}/templates/FixedPrompts/*/*.txt')
-        template_path = np.random.choice(prompt_templates)
-        mute_type = os.path.basename(template_path).split('.')[0]  # Assuming the file extension needs to be removed
-        with open(template_path, 'r') as file:
-            template_txt = file.read()
-        with open(f'{ROOT_DIR}/templates/ConstantRules.txt', 'r') as file:
-            rules_txt = file.read()
-        template_txt = f'{template_txt}\n{rules_txt}'
-
-    return template_txt, mute_type
 
 
 def write_bash_script(python_file, input_filename_x, output_filename, gene_id_child, gene_id_parent, temperature, top_p, template_txt, input_filename_y=None, gpu=LLM_GPU):
