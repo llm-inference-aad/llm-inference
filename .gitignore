@@ -2,8 +2,6 @@ sota/Data
 sota/PNPP
 sota/Point-Transformers
 __pycache__/
-xXx*
-network_xXx*
 sota/ExquisiteNetV2/cifar-10-python
 sota/ExquisiteNetV2/cifar-10
 *.bmp
@@ -35,3 +33,5 @@ notebook.md
 /loadbalancer.log
 plots/
 hostname_server_job.txt
+# Whitelist previously auto-generated run directories can be added as needed; removing hardcoded examples
+venv/

@@ -449,6 +449,7 @@ def submit_run(gene_id):
         if not MACOS:
             tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -amp -epoch {TRAIN_EPOCHS}"
         else:
+            # MacOS path – keep env-driven epochs for consistency
             tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -epoch {TRAIN_EPOCHS}"
 
         # python_runline = f'python {train_file} -bs 216 -epoch {TRAIN_EPOCHS} -network "models.network_{gene_id}" {tmp}'

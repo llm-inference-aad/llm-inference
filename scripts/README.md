@@ -25,7 +25,54 @@ Manually migrate SLURM logs to a specific run directory when automatic migration
 
 ## Available Scripts
 
-### 1. `plot_run_summary.py` ⭐ **NEW**
+### 1. `retries_vs_generation.py` 📊
+
+Analyzes and plots retry attempts and failures per generation from SLURM logs.
+
+**Features:**
+- Counts LLM retry attempts per generation
+- Optionally tracks final failures after all retries exhausted
+- Supports "latest" run or specific run_id
+- Exports plots to file or displays interactively
+
+**Usage:**
+
+```bash
+# Analyze latest run
+python scripts/retries_vs_generation.py latest
+
+# Analyze specific run
+python scripts/retries_vs_generation.py auto_20251103_210131
+
+# Include final failures in the plot
+python scripts/retries_vs_generation.py latest --include-failures
+
+# Save plot to file
+python scripts/retries_vs_generation.py latest --output retries.png
+
+# Full example
+python scripts/retries_vs_generation.py latest --include-failures --output plots/retries.png
+```
+
+**Output:**
+- Console: Statistics table showing retries (and failures) per generation
+- Plot: Bar chart of retry counts vs generation number
+
+### 2. `accuracy_vs_generation.py`
+
+Plots average accuracy vs generation number for evolution runs.
+
+**Usage:**
+
+```bash
+# Analyze latest run
+python scripts/accuracy_vs_generation.py latest
+
+# Analyze specific run
+python scripts/accuracy_vs_generation.py auto_20251103_210131
+```
+
+### 3. `plot_run_summary.py` ⭐ **NEW**
 
 Generates comprehensive summary visualizations from a run's results and LLM metrics.
 
@@ -43,7 +90,7 @@ uv run python scripts/plot_run_summary.py
 uv run python scripts/plot_run_summary.py --run-dir runs/auto_20251014_191652
 ```
 
-### 2. `plot_latency_vs_accuracy.py`
+### 4. `plot_latency_vs_accuracy.py`
 
 Correlates LLM inference latency with model test accuracy for gene-level analysis.
 
@@ -62,7 +109,7 @@ uv run python scripts/plot_latency_vs_accuracy.py --run-id auto_20251014_191652
 uv run python scripts/plot_latency_vs_accuracy.py --output my_plot.png
 ```
 
-### 3. `plot_latency_vs_goodput.py`
+### 5. `plot_latency_vs_goodput.py`
 
 Analyzes goodput (successful evaluations) across generations with latency overlay.
 
@@ -76,7 +123,7 @@ uv run python scripts/plot_latency_vs_goodput.py
 uv run python scripts/plot_latency_vs_goodput.py --run-id auto_20251014_191652
 ```
 
-### 4. `plot_pareto_enhanced.py`
+### 6. `plot_pareto_enhanced.py`
 
 Plots Pareto fronts for multi-objective optimization (accuracy vs. model size).
 
@@ -96,7 +143,7 @@ uv run python scripts/plot_pareto_enhanced.py --compare run1 run2 run3
 uv run python scripts/plot_pareto_enhanced.py --output my_pareto.png
 ```
 
-### 5. `analyze_e2e_latency.py`
+### 7. `analyze_e2e_latency.py`
 
 
 ### 5. `analyze_e2e_latency.py`

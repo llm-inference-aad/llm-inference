@@ -1,5 +1,4 @@
-</think>
-
+To make it more efficient? I'm using TensorFlow 2.9.1.
 
 ```python
 {}
