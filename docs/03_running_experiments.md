@@ -28,6 +28,24 @@ MUTPB = 0.5
 # --- End Recommended Baseline Configuration ---
 ```
 
+## 1.1. RAG Bootstrapping
+
+The RAG-enhanced prompts rely on a **local** vector database kept outside of version control. Before launching any runs:
+
+1. Populate the corpus with historical checkpoints and CIFAR-10 research notes:
+   ```bash
+   uv run python scripts/setup_rag.py
+   ```
+   - The script scans `runs/`, extracts successful mutations, and stores them under `rag_data/`.
+   - Research PDFs in `rag_corpus/` are chunked and indexed automatically.
+2. Verify `rag_data/` stays local-only (already gitignored) so every engineer can build their own cache.
+3. Optional environment overrides live in `src/cfg/constants.py`:
+   - `RAG_ENABLED` – flip to `false` to compare against the legacy baseline.
+   - `RAG_CODE_EMBED_MODEL` / `RAG_TEXT_EMBED_MODEL` – swap embedding models.
+   - `RAG_TOP_K`, `RAG_MIN_ACCURACY`, `RAG_MAX_PARAMETERS` – tune retrieval focus.
+
+The evolution loop now automatically logs every successful mutation back into the vector store, so rerunning `setup_rag.py` is only required when you clone the repo or purge `rag_data/`.
+
 ## 2. Launching a Run
 
 The entire workflow is launched with two commands.

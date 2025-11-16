@@ -46,7 +46,7 @@ LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3)
 try:
 	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '2').strip())
 except Exception:
-	TRAIN_EPOCHS = 2
+	TRAIN_EPOCHS = 30
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
 
 
@@ -103,10 +103,10 @@ PROB_EOT = 0.25
 num_generations = 12  # BASELINE: 10 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = 32  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
-population_size = 8  # BASELINE: Keep consistent with start_population_size
+population_size = 16  # BASELINE: Keep consistent with start_population_size
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual

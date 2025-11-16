@@ -20,11 +20,14 @@ setup_uv.sh
 uv.lock
 .env
 hostname.log
+.gitignore
+.DS_Store
 .venv/
 .venv-backup*/
 .vscode/
 sota/ExquisiteNetV2/cifar-10-python.tar.gz
 metrics/
+rag_data/
 documentation/
 .cursor/
 notebook.md
