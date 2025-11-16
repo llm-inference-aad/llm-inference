@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import copy
 import glob
 import time
@@ -12,6 +13,9 @@ from deap import base, creator, tools
 from deap.tools import HallOfFame
 from src.utils.print_utils import print_population, print_scores, box_print, print_job_info
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
+from utils.rag_metrics import record_metric
+from rag.data_ingestion import build_mutation_description, calculate_fitness_improvement
+from rag.runtime import get_runtime
 from src.cfg.constants import *
 
 def print_ancestry(data):
@@ -59,6 +63,83 @@ def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None,
     return ancestry
 
 
+def _apply_rag_context(template_txt: str, mutation_type: str | None, query_code: str | None = None) -> str:
+    runtime = get_runtime()
+    if runtime is None:
+        return template_txt
+    start = time.perf_counter()
+    augmented_template, mutations = runtime.enhance_template(
+        template=template_txt,
+        mutation_type=mutation_type,
+        query_code=query_code,
+    )
+    duration_ms = (time.perf_counter() - start) * 1000
+    record_metric(
+        "rag_generation_context",
+        {
+            "mutation_type": mutation_type,
+            "retrieved_mutations": len(mutations),
+            "retrieval_ms": duration_ms,
+            "prompt_tokens": len(augmented_template.split()),
+        },
+    )
+    return augmented_template
+
+
+def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
+    runtime = get_runtime()
+    if runtime is None:
+        return
+    
+    # Filter: Only log mutations that meet minimum quality threshold
+    from cfg.constants import RAG_MIN_ACCURACY
+    if not fitness or len(fitness) == 0:
+        return
+    accuracy = float(fitness[0]) if fitness else 0.0
+    if accuracy < RAG_MIN_ACCURACY:
+        # Mutation doesn't meet quality threshold - skip logging
+        return
+    
+    code_path = os.path.join(SOTA_ROOT, f"models/network_{gene_id}.py")
+    if not os.path.exists(code_path):
+        return
+    ancestry_info = GLOBAL_DATA_ANCESTRY.get(gene_id, {})
+    genes = ancestry_info.get("GENES") or []
+    mutation_types = ancestry_info.get("MUTATE_TYPE") or []
+    parent_gene_id = genes[-2] if len(genes) >= 2 else (genes[0] if genes else None)
+    mutation_type = mutation_types[-1] if mutation_types else None
+    parent_fitness = None
+    if parent_gene_id and parent_gene_id in GLOBAL_DATA:
+        parent_fitness = GLOBAL_DATA[parent_gene_id].get("fitness")
+    improvement = calculate_fitness_improvement(fitness, parent_fitness)
+    description = build_mutation_description(gene_id, mutation_type, fitness, improvement)
+    try:
+        code = Path(code_path).read_text(encoding="utf-8")
+    except OSError:
+        return
+    metadata = {
+        "gene_id": gene_id,
+        "parent_gene_id": parent_gene_id,
+        "mutation_type": mutation_type,
+        "fitness": fitness,
+        "improvement": improvement,
+        "description": description,
+        "source": "runtime_log",
+    }
+    runtime.log_mutation_code(content=f"{description}\n\nCode:\n{code.strip()}", metadata=metadata)
+    record_metric(
+        "rag_mutation_logged",
+        {
+            "gene_id": gene_id,
+            "mutation_type": mutation_type,
+            "accuracy": float(fitness[0]) if fitness else None,
+            "parameters": float(fitness[1]) if len(fitness) > 1 else None,
+            "accuracy_delta": improvement.get("accuracy_delta") if improvement else None,
+            "parameters_delta": improvement.get("parameters_delta") if improvement else None,
+        },
+    )
+
+
 def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR):
     """
     Generates a template based on given probabilities and gene information.
@@ -103,6 +184,7 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
             
         template_txt = eot_template_txt.format(x, y, "{}")
         mute_type = "EoT"
+        template_txt = _apply_rag_context(template_txt, mute_type, query_code=x)
     else:
         print("\t‣ FixedPrompts")
         prompt_templates = glob.glob(f'{ROOT_DIR}/templates/FixedPrompts/*/*.txt')
@@ -113,6 +195,7 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
         with open(f'{ROOT_DIR}/templates/ConstantRules.txt', 'r') as file:
             rules_txt = file.read()
         template_txt = f'{template_txt}\n{rules_txt}'
+        template_txt = _apply_rag_context(template_txt, mute_type)
 
     return template_txt, mute_type
 
@@ -364,11 +447,11 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
 def submit_run(gene_id):
     def write_bash_script_py(gene_id, train_file='./sota/ExquisiteNetV2/train.py'):
         if not MACOS:
-            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -amp"
+            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -amp -epoch {TRAIN_EPOCHS}"
         else:
-            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -epoch 2"
+            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -epoch {TRAIN_EPOCHS}"
 
-        # python_runline = f'python {train_file} -bs 216 -epoch 2 -network "models.network_{gene_id}" {tmp}'
+        # python_runline = f'python {train_file} -bs 216 -epoch {TRAIN_EPOCHS} -network "models.network_{gene_id}" {tmp}'
         python_runline = f'python {train_file} -bs 216 -network "models.network_{gene_id}" {tmp}'
         
         # Ensure SLURM log directory exists before generating scripts
@@ -635,6 +718,13 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
                     # Process results and assign fitness
                     fitness_tuple = GLOBAL_DATA[gene_id]['fitness']  # Implement this function
                     ind.fitness.values = fitness_tuple
+                    if (
+                        fitness_tuple
+                        and fitness_tuple != INVALID_FITNESS_MAX
+                        and fitness_tuple != PLACEHOLDER_FITNESS
+                        and not GLOBAL_DATA[gene_id].get("fallback", False)
+                    ):
+                        _log_mutation_result(gene_id, fitness_tuple)
                 elif time.time() - GLOBAL_DATA[gene_id]['start_time'] > timeout:
                     print(f"Timeout for gene ID {gene_id}")
                     ind.fitness.values = INVALID_FITNESS_MAX 
