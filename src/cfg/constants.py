@@ -44,7 +44,7 @@ except:
 LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3))
 # Centralized epoch configuration (overrides scattered hard-coded values)
 try:
-	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '30').strip())
+	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '2').strip())
 except Exception:
 	TRAIN_EPOCHS = 30
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
