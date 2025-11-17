@@ -28,9 +28,6 @@ notebook.md
 /servers.json
 /loadbalancer.log
 plots/
-!runs/auto_20251105_173037/
-!runs/auto_20251105_173037/plots
-!runs/auto_20251105_173037/logs/slurm-*
 sota/ExquisiteNetV2/models/
 sota/ExquisiteNetV2/weight/
 0/

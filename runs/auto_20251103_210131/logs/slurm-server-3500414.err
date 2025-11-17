@@ -1,9 +1,0 @@
-INFO:     Started server process [2564211]
-INFO:     Waiting for application startup.
-`torch_dtype` is deprecated! Use `dtype` instead!
-Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:25<02:58, 25.52s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:54<02:45, 27.63s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [01:21<02:16, 27.31s/it]Loading checkpoint shards:  50%|█████     | 4/8 [01:48<01:48, 27.23s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [02:15<01:21, 27.06s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [02:40<00:52, 26.40s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [03:06<00:26, 26.37s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:18<00:00, 21.69s/it]Loading checkpoint shards: 100%|██████████| 8/8 [03:18<00:00, 24.82s/it]
-Device set to use cuda:0
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
-slurmstepd: error: *** JOB 3500414 ON atl1-1-03-013-26-0 CANCELLED AT 2025-11-05T17:30:43 ***
