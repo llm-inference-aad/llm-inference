@@ -33,7 +33,21 @@ def load_results(results_dir):
     return pd.DataFrame(results)
 
 def load_metrics(metrics_dir):
-    """Load metrics from a run."""
+    """Load metrics from a run.
+    
+    Tries to load from metrics.json first (new format),
+    falls back to latency-*.json files (old format).
+    """
+    # First try new format (metrics.json in run directory)
+    metrics_file = metrics_dir.parent / "metrics.json" if metrics_dir.name == "metrics" else metrics_dir / "metrics.json"
+    
+    if metrics_file.exists():
+        with open(metrics_file, 'r') as f:
+            data = json.load(f)
+        requests_df = pd.DataFrame(data['requests'])
+        return requests_df
+    
+    # Fall back to old format (latency-*.json in metrics subdirectory)
     metrics_files = list(metrics_dir.glob("latency-*.json"))
     if not metrics_files:
         return None

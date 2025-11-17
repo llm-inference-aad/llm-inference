@@ -24,13 +24,21 @@ def load_latency_metrics(run_id, run_hash=None, metrics_dir=None):
     Load latency metrics from JSON.
     
     Search order:
-    1. runs/{run_id}/metrics/latency-{run_hash}.json (new structure)
-    2. metrics/data/-latency-{run_hash}.json (legacy structure)
-    3. Auto-detect most recent file in run metrics dir if run_hash not provided
+    1. runs/{run_id}/metrics.json (current structure)
+    2. runs/{run_id}/metrics/latency-{run_hash}.json (old structure)
+    3. metrics/data/-latency-{run_hash}.json (legacy structure)
     """
-    # Try new structure first (run-specific)
+    # Try new structure first (metrics.json in run folder)
     repo_root = Path(__file__).parent.parent
-    run_metrics_dir = repo_root / "runs" / run_id / "metrics"
+    run_dir = repo_root / "runs" / run_id
+    metrics_file = run_dir / "metrics.json"
+    
+    if metrics_file.exists():
+        with open(metrics_file, 'r') as f:
+            return json.load(f)
+    
+    # Fall back to old run structure (metrics subfolder)
+    run_metrics_dir = run_dir / "metrics"
     if run_metrics_dir.exists():
         if run_hash:
             # Look for specific hash

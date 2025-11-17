@@ -56,9 +56,28 @@ class LatencyAnalyzer:
     
     def list_available_runs(self) -> List[str]:
         """List all available run hashes"""
-        # Support both new (latency-*.json) and legacy (-latency-*.json) naming
-        files = list(self.metrics_dir.glob("latency-*.json")) + list(self.metrics_dir.glob("-latency-*.json"))
+        # Check for new format (metrics.json in run directories)
+        repo_root = Path(__file__).parent.parent
+        runs_dir = repo_root / "runs"
+        
         run_hashes = []
+        
+        if runs_dir.exists():
+            for run_dir in runs_dir.iterdir():
+                if run_dir.is_dir():
+                    metrics_file = run_dir / "metrics.json"
+                    if metrics_file.exists():
+                        # Read the metrics file to get the run hash(es)
+                        try:
+                            with open(metrics_file, 'r') as f:
+                                data = json.load(f)
+                                # Add the run_id as an identifier
+                                run_hashes.append(run_dir.name)
+                        except:
+                            pass
+        
+        # Fall back to old format if in legacy metrics directory
+        files = list(self.metrics_dir.glob("latency-*.json")) + list(self.metrics_dir.glob("-latency-*.json"))
         
         for file in files:
             # Extract run hash from filename
@@ -68,11 +87,20 @@ class LatencyAnalyzer:
                 hash_part = file.stem.replace("latency-", "")
             run_hashes.append(hash_part)
         
-        return sorted(run_hashes)
+        return sorted(set(run_hashes))
     
     def load_metrics(self, run_hash: str) -> Dict[str, Any]:
-        """Load metrics for a specific run hash"""
-        # Try new naming convention first
+        """Load metrics for a specific run hash or run_id"""
+        # Try new format first (metrics.json in run directory)
+        repo_root = Path(__file__).parent.parent
+        run_dir = repo_root / "runs" / run_hash
+        metrics_file = run_dir / "metrics.json"
+        
+        if metrics_file.exists():
+            with open(metrics_file, 'r') as f:
+                return json.load(f)
+        
+        # Try old naming convention (in metrics directory)
         metrics_file = self.metrics_dir / f"latency-{run_hash}.json"
         
         if not metrics_file.exists():
