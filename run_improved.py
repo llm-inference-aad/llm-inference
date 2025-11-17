@@ -340,7 +340,8 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
                                               top_p=0.1, temperature=temperature)
     # Log data
     GLOBAL_DATA[gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
-                            'status':'subbed file', 'fitness':None, 'start_time':time.time()}
+                            'status':'subbed file', 'fitness':None, 'start_time':time.time(),
+                            'retry_count': 0}  # New individuals start with 0 retries
     # FIX: Initial individuals are created from "network" seed, not from themselves
     GLOBAL_DATA_ANCESTRY[gene_id] = {'GENES':['network'], 'MUTATE_TYPE':["CREATED"]}
     
@@ -689,6 +690,11 @@ def update_individual(ind, new_gene_id, old_gene_id=None, process_success=True, 
         # GLOBAL_DATA_ANCESTRY[new_gene_id] = {'SCORES':[], 'GENES':[], 'CROSS_OVERS':{}, 'MUTATE_TYPE':[]}
     else:
         print(f'\t☠ Failed {operation}: {new_gene_id}')
+        # Track this failed attempt in retry stats for current generation
+        if GEN_COUNT not in RETRY_STATS:
+            RETRY_STATS[GEN_COUNT] = {'total_retries': 0, 'successful_individuals': 0, 'failed_attempts': 0}
+        RETRY_STATS[GEN_COUNT]['failed_attempts'] += 1
+        
         if new_gene_id in GLOBAL_DATA.keys():
             del GLOBAL_DATA[new_gene_id]
         if old_gene_id is not None:
@@ -793,6 +799,10 @@ def customCrossover(ind1, ind2):
         # Retrieve gene IDs from the individuals
         gene_id_1 = ind1[0]
         gene_id_2 = ind2[0]
+        # Get retry counts from both parents and use the max
+        parent1_retry_count = GLOBAL_DATA.get(gene_id_1, {}).get('retry_count', 0)
+        parent2_retry_count = GLOBAL_DATA.get(gene_id_2, {}).get('retry_count', 0)
+        parent_retry_count = max(parent1_retry_count, parent2_retry_count)
         # Generate the crossover query
         print(f'Mating: {gene_id_1} and {gene_id_2}')
         temperature = round(random.uniform(temp_min, temp_max), 2)
@@ -811,9 +821,10 @@ def customCrossover(ind1, ind2):
                                           python_file='src/llm_crossover.py', 
                                           top_p=0.1, temperature=temperature)
 
-        # Update global data for the new individual
+        # Update global data for the new individual (inherit max retry count from parents + 1)
         GLOBAL_DATA[new_gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
-                                    'status':'subbed file', 'fitness':None, 'start_time':time.time()}
+                                    'status':'subbed file', 'fitness':None, 'start_time':time.time(),
+                                    'retry_count': parent_retry_count + 1}
         
         if DELAYED_CHECK:
             GLOBAL_DATA[new_gene_id]['status'] = 'DELAYED_CHECK'
@@ -873,6 +884,8 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     # if random.random() < indpb: # TODO: connect this to temp
     out_dir = str(GENERATION)
     old_gene_id = individual[0]
+    # Get retry count from parent (or 0 if not available)
+    parent_retry_count = GLOBAL_DATA.get(old_gene_id, {}).get('retry_count', 0)
     # Generate a new gene ID
     new_gene_id = generate_random_string(length=24)
     print(f'Mutating: {old_gene_id} and Replaceing with: {new_gene_id}')
@@ -896,9 +909,10 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     
     # Update the individual with the new gene ID
     # individual[0] = new_gene_id
-    # Update the global data with the new task
+    # Update the global data with the new task (inherit retry count from parent + 1 for this attempt)
     GLOBAL_DATA[new_gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
-                                'status':'subbed file', 'fitness':None, 'start_time':time.time()}
+                                'status':'subbed file', 'fitness':None, 'start_time':time.time(),
+                                'retry_count': parent_retry_count + 1}
     
     if DELAYED_CHECK:
         LINKED_GENES[new_gene_id] = individual[0]
@@ -937,12 +951,37 @@ def remove_duplicates(population):
 # --- Checkpoint Functions --- #
 def save_checkpoint(gen, folder_name="checkpoints"):
     os.makedirs(folder_name, exist_ok=True)
+    
+    # Calculate retry statistics for this generation
+    if gen not in RETRY_STATS:
+        RETRY_STATS[gen] = {'total_retries': 0, 'successful_individuals': 0, 'failed_attempts': 0}
+    
+    # Count successful individuals and their retry counts for this generation
+    gen_individuals = [ind for ind in population if ind.fitness.values != INVALID_FITNESS_MAX]
+    for ind in gen_individuals:
+        gene_id = ind[0]
+        if gene_id in GLOBAL_DATA:
+            retry_count = GLOBAL_DATA[gene_id].get('retry_count', 0)
+            RETRY_STATS[gen]['total_retries'] += retry_count
+            RETRY_STATS[gen]['successful_individuals'] += 1
+    
+    # Calculate average retries per successful individual
+    gen_stats = RETRY_STATS[gen]
+    avg_retries = gen_stats['total_retries'] / gen_stats['successful_individuals'] if gen_stats['successful_individuals'] > 0 else 0
+    
+    print(f"\n📊 Generation {gen} Retry Statistics:")
+    print(f"   Successful individuals: {gen_stats['successful_individuals']}")
+    print(f"   Total retries (cumulative): {gen_stats['total_retries']}")
+    print(f"   Failed attempts (this gen): {gen_stats['failed_attempts']}")
+    print(f"   Average retries per individual: {avg_retries:.2f}\n")
+    
     checkpoint_data = {
         "GLOBAL_DATA": GLOBAL_DATA,
         "GLOBAL_DATA_HIST": GLOBAL_DATA_HIST,
         "population": population,
         "hof": hof,
-        "GLOBAL_DATA_ANCESTRY":GLOBAL_DATA_ANCESTRY,
+        "GLOBAL_DATA_ANCESTRY": GLOBAL_DATA_ANCESTRY,
+        "RETRY_STATS": RETRY_STATS,
     }
     filename = os.path.join(folder_name, f'checkpoint_gen_{gen}.pkl')
     with open(filename, 'wb') as file:
@@ -1002,6 +1041,9 @@ GLOBAL_DATA_HIST = {}
 GLOBAL_DATA_ANCESTRY = {}
 # Initialize the seed network entry
 GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
+
+# Retry tracking: maps generation -> {total_retries, successful_individuals, failed_attempts}
+RETRY_STATS = {}
 # Main Evolution Loop
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Generation')
@@ -1018,6 +1060,8 @@ if __name__ == "__main__":
         GLOBAL_DATA_ANCESTRY = checkpoint["GLOBAL_DATA_ANCESTRY"]
         population = checkpoint["population"]
         hof = checkpoint["hof"]
+        # Load retry stats if available (backwards compatible)
+        RETRY_STATS = checkpoint.get("RETRY_STATS", {})
     else:
         # Create an initial population
         start_gen = 0
