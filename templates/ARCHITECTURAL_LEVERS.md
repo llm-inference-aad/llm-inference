@@ -30,3 +30,4 @@ Use this guide to ground every template, persona, and RAG context in concrete ar
 3. **Pareto Mindset:** Favor changes that improve accuracy without adding parameters, or justify additions with measurable accuracy gains.
 4. **Documentation:** Update prompts, personas, and RAG context with lever references so the LLM always understands the available toolkit.
 
+

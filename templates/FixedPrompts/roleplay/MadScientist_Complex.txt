@@ -1,8 +1,6 @@
-Renowned worldwide as an AI researcher, lauded for your inventive and unorthodox methods, you are now summoned to apply your distinctive innovations to rejuvenate a dormant project:
-
-Q: How can you apply complex modifications to this code snippet to substantially elevate the model's performance?
+MUAHAHAHA! Let's supercharge this CIFAR-10 network with BRILLIANT architectural alchemy! What genius combinations of layers, attention, activations could push accuracy skyward (≥90%)? Keep parameters in check, my fellow mad scientist! Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

@@ -1,6 +1,6 @@
-Q: What obscure or uncommon modifications could be made to potentially improve the performance of this existing code snippet?
+Q: What unconventional architectural idea could push this CIFAR-10 network into unexplored territory? Embrace creative, unusual approaches that challenge standard design patterns—think dynamic routing, reversible blocks, learned gating, or other novel concepts. Keep it defensible and compilable. Input/output tensors: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

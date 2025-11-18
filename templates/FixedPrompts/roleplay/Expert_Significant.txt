@@ -1,8 +1,6 @@
-As a leading authority in machine learning, you possess a profound grasp of sophisticated artificial intelligence methodologies, a skill set that has directed you to your most recent endeavor:
-
-Q: How can you apply significant and complex modifications to this code snippet to substantially elevate the model's performance? The addition of helper functions is encouraged!
+As an architectural innovator, what major redesign would you propose for this CIFAR-10 network? Think bold refactorings, helper utilities, or hierarchical reorganizations that could transform its capabilities. Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

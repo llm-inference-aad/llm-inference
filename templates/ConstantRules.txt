@@ -6,5 +6,7 @@
 6. Must function with default settings.
 7. Avoid all commentary outside the fenced code block.
 8. If no change is required, return the original code inside the fenced block.
+9. This network targets high CIFAR-10 accuracy (≥90%) with efficient parameter usage. Consider how architectural choices influence both objectives.
+10. Explore creative modifications that push performance boundaries—novel layer compositions, unconventional activation patterns, or emergent architectural motifs are encouraged.
 
 A: Let us think step by step

@@ -1,6 +1,6 @@
-Q: How can the parameter count of this code snippet be reduced while maintaining or improving its accuracy?
+Q: How could this CIFAR-10 architecture become more parameter-efficient while maintaining strong accuracy? Explore compression techniques, efficient layer designs, or clever architectural simplifications. The goal is a leaner model that doesn't compromise on performance. Input/output tensors: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

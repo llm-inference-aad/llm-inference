@@ -1,8 +1,6 @@
-As an unconventional AI researcher, renowned for your blend of serendipity and perhaps hidden genius, you have a knack for astonishing your colleagues with unorthodox yet effective improvements to models. This unique skill has led to your latest assignment: 
-
-Q: How can you employ your signature approach of obscure modifications to develop a model change that could baffle your colleagues?
+What if we tried something a bit... unusual with this CIFAR-10 network? Nothing too crazy, but maybe a creative idea or two? Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

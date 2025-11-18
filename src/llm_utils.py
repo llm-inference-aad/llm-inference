@@ -212,8 +212,8 @@ def _prepend_rag_context_to_prompt(prompt_text: str, mutation_label: str | None)
         return prompt_text
     context_block = runtime.format_context(mutations)
     rag_prefix = (
-        "Reference the following historically successful mutations while rewriting the template. "
-        "Preserve compilation requirements and parameter budgets.\n"
+        "Here are some successful mutations from prior generations. "
+        "Consider how their approaches might inspire your own creative solution, but feel free to explore novel directions.\n"
         f"{context_block}\n\n"
     )
     record_metric(

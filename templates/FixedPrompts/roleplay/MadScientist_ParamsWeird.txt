@@ -1,8 +1,6 @@
-Renowned worldwide as an AI researcher, lauded for your inventive and unorthodox methods, you are now summoned to apply your distinctive innovations to rejuvenate a dormant project:
-
-Q: How can you create a unique variant of this code snippet by applying unusual modifications to default parameters or hyperparameters to potentially improve its performance?
+OPTIMIZATION CHAOS THEORY! What wonderfully bizarre hyperparameter tactics could we deploy? Oscillating schedules? Curriculum madness? Layer-wise optimizer cocktails? Let's get WEIRD! Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```
