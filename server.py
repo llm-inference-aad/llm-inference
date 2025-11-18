@@ -9,6 +9,7 @@ import asyncio
 import json
 import hashlib
 import uuid
+import re
 from datetime import datetime
 from pathlib import Path
 from src.cfg.constants import *
@@ -58,6 +59,28 @@ metrics_metadata = {
 
 with open(METRICS_FILE, 'w') as f:
     json.dump(metrics_metadata, f, indent=2)
+
+def strip_thinking_tokens(text: str) -> str:
+    """
+    Remove thinking/reasoning tokens from LLM output and extract only the code.
+    Handles models like DeepSeek-R1 that output thinking tokens before the actual response.
+    Returns only the code content from fenced code blocks, not the reasoning text.
+    """
+    if not text:
+        return text
+    
+    # Remove everything before and including </think> tag
+    if "</think>" in text:
+        text = text.split("</think>")[-1].strip()
+    
+    # Extract code from fenced blocks using regex (similar to clean_code_from_llm)
+    fenced_blocks = re.findall(r"```(?:python)?\s*(.*?)```", text, flags=re.IGNORECASE | re.DOTALL)
+    if fenced_blocks:
+        # Return the last code block (most likely the final answer)
+        return fenced_blocks[-1].strip()
+    
+    # If no fenced blocks found, return the text as-is (might already be code)
+    return text.strip()
 
 def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None, prompt=None, generated_text=None):
     """Save end-to-end latency metrics to JSON file"""
@@ -368,6 +391,9 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         generated_text = result.get("generated_text", "")
         evaluation_score = OutputEvaluator.calculate_evaluation_score(generated_text)
         
+        # Strip thinking tokens before logging
+        generated_text_for_logging = strip_thinking_tokens(generated_text)
+        
         # Save latency metrics
         save_latency_metrics(
             request_dict, 
@@ -377,7 +403,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             queue_wait_time,
             evaluation_score,
             prompt=request.prompt,
-            generated_text=generated_text
+            generated_text=generated_text_for_logging
         )
         
         print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")

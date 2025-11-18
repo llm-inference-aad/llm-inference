@@ -14,7 +14,7 @@ SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 # For BASELINE run: Set to False for parallel evaluation (better for inference optimization experiments)
-LOCAL = True
+LOCAL = False
 if LOCAL:
 	RUN_COMMAND = 'bash'
 	DELAYED_CHECK = False
