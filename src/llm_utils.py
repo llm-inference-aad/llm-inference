@@ -10,6 +10,8 @@ import transformers
 from torch import bfloat16
 from cfg.constants import *
 from utils.print_utils import box_print
+from utils.rag_metrics import record_metric
+from rag.runtime import get_runtime
 
 from typing import Optional
 #import fire
@@ -168,6 +170,62 @@ def split_file(filename):
     parts = re.split(pattern, content)
 
     return parts
+
+
+def _augment_template_with_rag(template_text: str, mutation_label: str | None, query_code: str | None = None) -> str:
+    """
+    Inject RAG context into a template when the runtime is enabled.
+    """
+    runtime = get_runtime()
+    if runtime is None:
+        return template_text
+    start = time.perf_counter()
+    augmented_template, mutations = runtime.enhance_template(
+        template=template_text,
+        mutation_type=mutation_label,
+        query_code=query_code,
+    )
+    duration_ms = (time.perf_counter() - start) * 1000
+    record_metric(
+        "rag_prompt_enhancement",
+        {
+            "mutation_type": mutation_label,
+            "retrieval_ms": duration_ms,
+            "retrieved_mutations": len(mutations),
+            "prompt_tokens": len(augmented_template.split()),
+        },
+    )
+    return augmented_template
+
+
+def _prepend_rag_context_to_prompt(prompt_text: str, mutation_label: str | None) -> str:
+    """
+    Build an instruction prefix that references top-performing mutations.
+    """
+    runtime = get_runtime()
+    if runtime is None or not mutation_label:
+        return prompt_text
+    start = time.perf_counter()
+    mutations = runtime.collect_context(mutation_type=mutation_label)
+    duration_ms = (time.perf_counter() - start) * 1000
+    if not mutations:
+        return prompt_text
+    context_block = runtime.format_context(mutations)
+    rag_prefix = (
+        "Reference the following historically successful mutations while rewriting the template. "
+        "Preserve compilation requirements and parameter budgets.\n"
+        f"{context_block}\n\n"
+    )
+    record_metric(
+        "rag_prompt_rephrase_context",
+        {
+            "mutation_type": mutation_label,
+            "retrieval_ms": duration_ms,
+            "retrieved_mutations": len(mutations),
+            "prompt_tokens": len(prompt_text.split()),
+        },
+    )
+    return f"{rag_prefix}{prompt_text}"
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -394,7 +452,16 @@ def mutate_prompts(n=5):
         with open(template, 'r') as file:
             prompt_text = file.read()
         prompt_text = prompt_text.split("```")[0].strip()
-        prompt = "Can you rephrase this text:\n```\n{}\n```".format(prompt_text)
+        mutation_label = os.path.splitext(filename)[0]
+        prompt_base = (
+            "Rephrase the following prompt template text. "
+            "Return ONLY the rephrased prompt text, do NOT include any code examples or code blocks. "
+            "The output should be a prompt template that can be used to instruct an LLM to modify code. "
+            "Preserve the placeholder {} where code should be inserted.\n\n"
+            "Original prompt template:\n```\n{}\n```\n\n"
+            "Rephrased prompt template (text only, no code):"
+        ).format(prompt_text)
+        prompt = _prepend_rag_context_to_prompt(prompt_base, mutation_label)
         temp = np.random.uniform(0.01, 0.4)
         if LLM_MODEL == 'mixtral':
             llm_code_generator = submit_mixtral_hf
@@ -405,9 +472,16 @@ def mutate_prompts(n=5):
         else:
             llm_code_generator = submit_mixtral_hf  # fallback
         output = llm_code_generator(prompt, temperature=temp, gene_id="mutate_prompts").strip()
+        # Remove any code blocks that LLM might have generated
         if "```" in output:
-            output = output.split("```")[0]
-        output = output + "\n```python\n{}\n```"
+            # Extract text before first code block
+            output = output.split("```")[0].strip()
+        # Ensure output ends with the code placeholder
+        if "{}" not in output:
+            output = output + "\n```python\n{}\n```"
+        elif not output.rstrip().endswith("```"):
+            # If {} exists but doesn't end with code block, add it
+            output = output.rstrip() + "\n```python\n{}\n```"
         with open(os.path.join(path, "mutant{}.txt".format(i)), 'w') as file:
             file.write(output)
 

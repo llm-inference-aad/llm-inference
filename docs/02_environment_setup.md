@@ -44,6 +44,19 @@ HF_TOKEN=your_actual_token_here
 HUGGING_FACE_HUB_TOKEN=your_actual_token_here
 ```
 
+### 3. Download the CIFAR-10 dataset
+
+The ExquisiteNetV2 experiments expect CIFAR-10 to live under `sota/ExquisiteNetV2/cifar10`. Download and unpack the canonical archive with:
+
+```bash
+wget https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz -P sota/ExquisiteNetV2
+tar -xzf sota/ExquisiteNetV2/cifar-10-python.tar.gz -C sota/ExquisiteNetV2
+python sota/ExquisiteNetV2/split.py
+rm sota/ExquisiteNetV2/cifar-10-python.tar.gz
+```
+
+The `split.py` step converts the python archive into raw images and recreates `sota/ExquisiteNetV2/cifar10`, so you only need to keep that directory after extraction.
+
 ## Environment Variables Reference
 
 ### Required Variables

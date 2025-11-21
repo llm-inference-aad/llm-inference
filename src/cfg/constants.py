@@ -42,7 +42,31 @@ except:
 	GEMINI_API_KEY = ''
 # Surya: Retry budget for LLM code generation (tune to trade off diversity vs. reliability)
 LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3))
+# Centralized epoch configuration (overrides scattered hard-coded values)
+try:
+	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '30').strip())
+except Exception:
+	TRAIN_EPOCHS = 30
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
+
+
+def _parse_optional_float(value: str | None) -> float | None:
+	if value is None or value == "":
+		return None
+	try:
+		return float(value)
+	except ValueError:
+		return None
+
+
+#: Retrieval-Augmented Generation (RAG) configuration
+RAG_ENABLED = os.environ.get("RAG_ENABLED", "true").lower() in {"1", "true", "yes"}
+RAG_DATA_DIR = os.environ.get("RAG_DATA_DIR", os.path.join(ROOT_DIR, "rag_data"))
+RAG_CODE_EMBED_MODEL = os.environ.get("RAG_CODE_EMBED_MODEL", "microsoft/codebert-base")
+RAG_TEXT_EMBED_MODEL = os.environ.get("RAG_TEXT_EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+RAG_TOP_K = int(os.environ.get("RAG_TOP_K", 5))
+RAG_MIN_ACCURACY = float(os.environ.get("RAG_MIN_ACCURACY", 0.9))
+RAG_MAX_PARAMETERS = _parse_optional_float(os.environ.get("RAG_MAX_PARAMETERS"))
 
 # Evolution Constants/Params
 # --------------------------
@@ -79,10 +103,10 @@ PROB_EOT = 0.25
 num_generations = 12  # BASELINE: 10 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = 32  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
-population_size = 8  # BASELINE: Keep consistent with start_population_size
+population_size = 16  # BASELINE: Keep consistent with start_population_size
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual
