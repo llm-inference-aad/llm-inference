@@ -76,46 +76,151 @@ SERVER_HOST=${SERVER_HOST:-$SERVER_HOSTNAME}
 SERVER_WORKERS=${SERVER_WORKERS:-1}
 
 # ----------------------------
-# Auto-assign port if not specified
+# Safe Port Assignment: Check availability and find free port if needed
 # ----------------------------
-if [ -z "$SERVER_PORT" ]; then
-    echo "SERVER_PORT not specified, auto-assigning next available port..."
-    
-    # Set base port from environment or default
-    SERVER_BASE_PORT=${SERVER_BASE_PORT:-8000}
-    
-    # Find next available port by checking existing servers
-    if [ ! -z "$SERVER_REGISTRY_FILE" ] && [ -f "$SERVER_REGISTRY_FILE" ]; then
-        # Read existing servers and find highest port
-        HIGHEST_PORT=$(uv run python << EOF
-import json
-import sys
+function is_port_available() {
+    local port=$1
+    # Check if port is in use (returns 0 if available, 1 if taken)
+    ! ss -tln | grep -q ":${port} "
+}
 
-try:
-    with open('$SERVER_REGISTRY_FILE', 'r') as f:
-        registry = json.load(f)
-    
-    servers = registry.get('servers', [])
-    if servers:
-        ports = [s.get('port', $SERVER_BASE_PORT) for s in servers]
-        highest = max(ports)
-        print(highest + 1)
-    else:
-        print($SERVER_BASE_PORT)
-except Exception as e:
-    print($SERVER_BASE_PORT)
-EOF
-        )
-        SERVER_PORT=$HIGHEST_PORT
-        echo "  Auto-assigned port: $SERVER_PORT"
+function find_free_port() {
+    local start_port=$1
+    local max_attempts=50
+    for ((i=0; i<max_attempts; i++)); do
+        local candidate=$((start_port + i))
+        if is_port_available $candidate; then
+            echo $candidate
+            return 0
+        fi
+    done
+    echo "ERROR: Could not find free port in range ${start_port}-$((start_port + max_attempts))" >&2
+    return 1
+}
+
+# Check if our previous server is still running (zombie prevention)
+if [ -f "$SERVER_JOB_FILE" ]; then
+    OLD_JOB_ID=$(cat "$SERVER_JOB_FILE" 2>/dev/null)
+    if [ ! -z "$OLD_JOB_ID" ] && [ "$OLD_JOB_ID" != "${SLURM_JOB_ID}" ]; then
+        # Check if old job is still running
+        if squeue -j "$OLD_JOB_ID" &>/dev/null; then
+            echo "WARNING: Previous server job $OLD_JOB_ID is still running!"
+            echo "  This may cause port conflicts. Consider canceling it: scancel $OLD_JOB_ID"
+        fi
+    fi
+fi
+
+# ----------------------------
+# Port availability check and cleanup
+# ----------------------------
+check_port_available() {
+    local port=$1
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+        return 1  # Port is in use
     else
-        # No registry file, use base port
-        SERVER_PORT=$SERVER_BASE_PORT
-        echo "  Using base port: $SERVER_PORT"
+        return 0  # Port is available
+    fi
+}
+
+kill_port_process() {
+    local port=$1
+    echo "  Attempting to free port $port..."
+    local pids=$(lsof -ti:$port 2>/dev/null)
+    if [ ! -z "$pids" ]; then
+        echo "  Found processes using port $port: $pids"
+        # Only kill if it's a uvicorn/python server process (safety check)
+        for pid in $pids; do
+            local cmd=$(ps -p $pid -o comm= 2>/dev/null)
+            if [[ "$cmd" == "python"* ]] || [[ "$cmd" == "uvicorn"* ]]; then
+                echo "  Killing $cmd process (PID: $pid)"
+                kill -9 $pid 2>/dev/null
+                sleep 1
+            else
+                echo "  WARNING: Process $pid ($cmd) is not a Python/uvicorn server - skipping"
+            fi
+        done
+    fi
+}
+
+# ----------------------------
+# Smart Port Assignment: Use specified port or find free one
+# ----------------------------
+SERVER_BASE_PORT=${SERVER_BASE_PORT:-8000}
+
+if [ -z "$SERVER_PORT" ]; then
+    echo "SERVER_PORT not specified, using base port: $SERVER_BASE_PORT"
+    SERVER_PORT=$SERVER_BASE_PORT
+else
+    echo "SERVER_PORT specified as: $SERVER_PORT"
+fi
+
+# Check if the target port is available
+if ! is_port_available $SERVER_PORT; then
+    echo "WARNING: Port $SERVER_PORT is already in use!"
+    
+    # Try to find what's using it (for debugging)
+    echo "Process using port $SERVER_PORT:"
+    ss -tlnp | grep ":${SERVER_PORT} " || echo "  (could not determine process)"
+    
+    # Auto-assign a free port
+    echo "Auto-assigning next available port..."
+    FREE_PORT=$(find_free_port $SERVER_BASE_PORT)
+    if [ $? -eq 0 ]; then
+        SERVER_PORT=$FREE_PORT
+        echo "  ✓ Assigned free port: $SERVER_PORT"
+    else
+        echo "  ✗ FATAL: Could not find free port. Exiting."
+        exit 1
     fi
 else
-    echo "Using specified port: $SERVER_PORT"
+    echo "✓ Port $SERVER_PORT is available"
 fi
+
+# Define port file path (will write after validation)
+SERVER_PORT_FILE="${HOSTNAME_FILE%.log}_server_port.txt"
+
+# ----------------------------
+# Verify port is available and clean up if needed
+# ----------------------------
+echo "Checking port availability: $SERVER_PORT"
+if ! check_port_available $SERVER_PORT; then
+    echo "  Port $SERVER_PORT is already in use"
+    kill_port_process $SERVER_PORT
+    sleep 2
+    
+    # Verify port is now free
+    if ! check_port_available $SERVER_PORT; then
+        echo "  ERROR: Port $SERVER_PORT still in use after cleanup attempt"
+        echo "  Trying to find next available port..."
+        
+        # Try up to 10 sequential ports
+        for offset in {1..10}; do
+            CANDIDATE_PORT=$((SERVER_PORT + offset))
+            echo "  Checking port $CANDIDATE_PORT..."
+            if check_port_available $CANDIDATE_PORT; then
+                echo "  Found available port: $CANDIDATE_PORT"
+                SERVER_PORT=$CANDIDATE_PORT
+                break
+            fi
+        done
+        
+        # Final check
+        if ! check_port_available $SERVER_PORT; then
+            echo "  FATAL: Could not find available port in range $SERVER_PORT-$((SERVER_PORT+10))"
+            exit 1
+        fi
+    else
+        echo "  Port $SERVER_PORT is now available"
+    fi
+else
+    echo "  Port $SERVER_PORT is available"
+fi
+
+# ----------------------------
+# Write final port to file after all validation and reassignment
+# ----------------------------
+echo "Writing server port '$SERVER_PORT' to file: $SERVER_PORT_FILE"
+echo "$SERVER_PORT" > "$SERVER_PORT_FILE"
 
 # ----------------------------
 # Register with load balancer (if SERVER_REGISTRY_FILE is set)

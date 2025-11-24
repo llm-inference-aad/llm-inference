@@ -1,16 +1,5 @@
 python
-def train_model():
-    model = Model()
-    optimizer = optim.SGD(model.parameters(), lr=0.01)
-    criterion = nn.CrossEntropyLoss()
-    for epoch in range(5):
-        for inputs, labels in dataloader:
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-    return model
+print("Hello, World!")
 
 ```python
 {}

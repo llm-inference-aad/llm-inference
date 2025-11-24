@@ -1,19 +1,6 @@
-python
-def process_data(data):
-    result = []
-    for item in data:
-        if item['status'] == 'active':
-            processed_item = {
-                'id': item['id'],
-                'name': item['name'],
-                'value': calculate_value(item)
-            }
-            result.append(processed_item)
-    return result
+To make it more concise using list comprehensions?
+</think>
 
-def calculate_value(item):
-    # Some complex calculations here...
-    pass
 
 ```python
 {}

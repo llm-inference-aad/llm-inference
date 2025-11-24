@@ -446,8 +446,17 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
             with open(hostname_file, 'r') as f:
                 server_hostname = f.read().strip()
             
+            # Read port from file if available (handles auto-assigned ports), fallback to env/default
+            server_port_file = hostname_file.replace(".log", "_server_port.txt")
+            if os.path.exists(server_port_file):
+                with open(server_port_file, 'r') as f:
+                    server_port = f.read().strip()
+                print(f"[INFO] Read server port from file: {server_port}")
+            else:
+                server_port = os.getenv("SERVER_PORT", "8000")
+                print(f"[INFO] Using default/env server port: {server_port}")
+            
             # Construct the API URL
-            server_port = os.getenv("SERVER_PORT", "8000")
             api_url = f"http://{server_hostname}:{server_port}/generate"
             print(f"[INFO] Using single server at {api_url}")
         
@@ -491,6 +500,10 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
         
         timeout_seconds = float(os.getenv("LOCAL_SERVER_TIMEOUT", 300))
         max_retries = int(os.getenv("LOCAL_SERVER_MAX_RETRIES", 3))
+        
+        # BASELINE MODE: Remote fallback DISABLED by default for consistent model baselines
+        # This ensures we fail fast if local server dies, maintaining reproducibility
+        # Set ENABLE_LLM_REMOTE_FALLBACK=true only for production runs where uptime > model consistency
         enable_remote_fallback = os.getenv("ENABLE_LLM_REMOTE_FALLBACK", "false").lower() in {"1", "true", "yes"}
         fallback_target = os.getenv("LLM_REMOTE_FALLBACK_TARGET", "mixtral_hf")
         last_exception: Exception | None = None
@@ -517,38 +530,46 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
                 print(f"[INFO] Retrying local server in {backoff} seconds...")
                 time.sleep(backoff)
         
-        if last_exception and enable_remote_fallback:
-            print(f"[WARN] Falling back to remote LLM due to local server failure: {last_exception}")
-            safe_tokens = min(max_new_tokens, 4096)
-            try:
-                if fallback_target == "mixtral_hf":
-                    return submit_mixtral_hf(
-                        txt2llm,
-                        max_new_tokens=safe_tokens,
-                        top_p=top_p,
-                        temperature=temperature,
-                        return_gen=False,
-                        gene_id=gene_id,
-                    )
-                elif fallback_target == "mixtral":
-                    return submit_mixtral(
-                        txt2llm,
-                        max_new_tokens=safe_tokens,
-                        top_p=top_p,
-                        temperature=temperature,
-                        return_gen=False,
-                        gene_id=gene_id,
-                    )
-                else:
-                    raise Exception(f"Unknown fallback target '{fallback_target}'")
-            except Exception as fallback_exc:
-                raise Exception(
-                    f"Local server failed after {max_retries} attempts and remote fallback "
-                    f"also failed: {fallback_exc}"
-                ) from fallback_exc
-        
+        # Handle fallback or fail-fast based on configuration
         if last_exception:
-            raise Exception(f"Error calling local server after {max_retries} attempts: {last_exception}")
+            if enable_remote_fallback:
+                print(f"[WARN] Falling back to remote LLM due to local server failure: {last_exception}")
+                safe_tokens = min(max_new_tokens, 4096)
+                try:
+                    if fallback_target == "mixtral_hf":
+                        return submit_mixtral_hf(
+                            txt2llm,
+                            max_new_tokens=safe_tokens,
+                            top_p=top_p,
+                            temperature=temperature,
+                            return_gen=False,
+                            gene_id=gene_id,
+                        )
+                    elif fallback_target == "mixtral":
+                        return submit_mixtral(
+                            txt2llm,
+                            max_new_tokens=safe_tokens,
+                            top_p=top_p,
+                            temperature=temperature,
+                            return_gen=False,
+                            gene_id=gene_id,
+                        )
+                    else:
+                        raise Exception(f"Unknown fallback target '{fallback_target}'")
+                except Exception as fallback_exc:
+                    raise Exception(
+                        f"Local server failed after {max_retries} attempts and remote fallback "
+                        f"also failed: {fallback_exc}"
+                    ) from fallback_exc
+            else:
+                # FAIL FAST: No fallback enabled - immediately fail to ensure baseline consistency
+                raise Exception(
+                    f"[BASELINE MODE] Local server failed after {max_retries} attempts. "
+                    f"No remote fallback configured (ENABLE_LLM_REMOTE_FALLBACK=false). "
+                    f"This ensures model consistency for baselines. "
+                    f"Last error: {last_exception}"
+                ) from last_exception
+        
         raise Exception("Unhandled error calling local server.")
             
     except requests.exceptions.ConnectionError:
