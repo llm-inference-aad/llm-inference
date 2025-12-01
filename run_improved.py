@@ -13,6 +13,7 @@ from deap.tools import HallOfFame
 from src.utils.print_utils import print_population, print_scores, box_print, print_job_info
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
 from src.cfg.constants import *
+from collections import defaultdict
 
 def print_ancestry(data):
     for gene in data.keys():
@@ -100,8 +101,61 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
         eot_template_path = os.path.join(ROOT_DIR, 'templates/EoT/EoT.txt')
         with open(eot_template_path, 'r') as file:
             eot_template_txt = file.read()
-            
-        template_txt = eot_template_txt.format(x, y, "{}")
+
+        # Build a compact prior-results snapshot (markdown table) and top-elites list
+        def compact_prior_results(num_rows=5):
+            # Prefer historical ordered data if available, fall back to GLOBAL_DATA
+            keys = list(GLOBAL_DATA_HIST.keys()) if isinstance(GLOBAL_DATA_HIST, dict) and len(GLOBAL_DATA_HIST) > 0 else list(GLOBAL_DATA.keys())
+            if not keys:
+                return "No recent results available."
+            recent = keys[-num_rows:]
+            # Markdown table header
+            table = ["| gene_id | metric1 | params | runtime |", "|---|---:|---:|---:|"]
+            for k in reversed(recent):
+                entry = GLOBAL_DATA_HIST.get(k, GLOBAL_DATA.get(k, {})) if isinstance(GLOBAL_DATA_HIST, dict) else GLOBAL_DATA.get(k, {})
+                fitness = entry.get('fitness', None)
+                metric1 = ''
+                params = ''
+                if isinstance(fitness, (list, tuple)) and len(fitness) >= 1:
+                    metric1 = fitness[0]
+                if isinstance(fitness, (list, tuple)) and len(fitness) >= 2:
+                    try:
+                        params = -fitness[1]
+                    except Exception:
+                        params = fitness[1]
+                runtime = entry.get('runtime', entry.get('run_time', ''))
+                table.append(f"| {k} | {metric1} | {params} | {runtime} |")
+            return "\n".join(table)
+
+        def compact_top_elites(top_n, top_n_genes):
+            lines = []
+            if not top_n_genes:
+                return "No elites available."
+            for i, t in enumerate(top_n_genes[:top_n]):
+                gid = t[0] if isinstance(t, (list, tuple)) else str(t)
+                entry = GLOBAL_DATA.get(gid, {})
+                fitness = entry.get('fitness', '')
+                runtime = entry.get('runtime', entry.get('run_time', ''))
+                lines.append(f"{i+1}. `{gid}` — fitness: {fitness} runtime: {runtime}")
+            return "\n".join(lines)
+
+        # safe format to avoid KeyError when templates include optional placeholders
+        def safe_format(template, mapping):
+            return template.format_map(defaultdict(str, mapping))
+
+        prior_results_text = compact_prior_results(num_rows=5)
+        top_elites_text = compact_top_elites(NUM_EOT_ELITES, TOP_N_GENES)
+
+        mapping = {
+            'part_x': x,
+            'part_y': y,
+            'params': '{}',
+            'prior_results': prior_results_text,
+            'top_elites': top_elites_text,
+            'num_elites': NUM_EOT_ELITES,
+        }
+
+        template_txt = safe_format(eot_template_txt, mapping)
         mute_type = "EoT"
     else:
         print("\t‣ FixedPrompts")

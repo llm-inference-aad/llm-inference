@@ -1,3 +1,22 @@
+-- Evolution-Of-Thought Prompt --
+Context: We are evolving network code. Use the seed and the patch below to propose a safe improvement.
+
+Seed snippet:
+{part_y}
+
+Candidate snippet to replace / augment:
+{part_x}
+
+Parameters:
+{params}
+
+Recent run summary (most recent results):
+{prior_results}
+
+Top {num_elites} elites:
+{top_elites}
+
+Task: Propose a concise code modification that improves validation performance while keeping parameter count low. Return only the code block to replace the snippet and a one-line rationale.
 Example of the modified code: 
 ```python
 {} 
