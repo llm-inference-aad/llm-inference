@@ -188,4 +188,22 @@ else
     echo "SERVER_REGISTRY_FILE not set, skipping load balancer registration"
 fi
 
+# ----------------------------
+# CUDA libs for uv environment (best-effort)
+# ----------------------------
+# Some clusters need nvjitlink visible to the Python env used by uv.
+UV_SITE_PKGS="$(uv run python - <<'PY'
+import site
+print(site.getsitepackages()[0])
+PY
+)"
+export LD_LIBRARY_PATH="$UV_SITE_PKGS/nvidia/nvjitlink/lib:${LD_LIBRARY_PATH:-}"
+echo "LD_LIBRARY_PATH updated for nvjitlink (best-effort)."
+
+# ----------------------------
+# Final info dump
+# ----------------------------
+echo "UV Python path: $(uv run which python)"
+nvidia-smi || true
+
 python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS

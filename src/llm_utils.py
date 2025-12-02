@@ -102,7 +102,7 @@ def validate_module_source(source_code: str, module_path: str, module_name: Opti
 def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None):
     """Generate augmented code with retry loop: validates syntax before accepting LLM output."""
     box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
-    print(txt2llm)
+    print(txt2llm, flush=True)
 
     if inference_submission is False:
         if LLM_MODEL == 'local_server':
@@ -132,7 +132,7 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         else:
             raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
             box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
-            print(raw_response)
+            print(raw_response, flush=True)
             candidate_code = clean_code_from_llm(raw_response)
 
         candidate_code = clean_code_from_llm(candidate_code)
@@ -140,12 +140,12 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         is_valid, validation_error = _validate_python_snippet(candidate_code)
         if is_valid:
             box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
-            print(candidate_code)
+            print(candidate_code, flush=True)
             return candidate_code
 
         last_error = validation_error or "unable to extract python code"
         box_print("INVALID LLM OUTPUT", print_bbox_len=60, new_line_end=False)
-        print(f"Attempt {attempt + 1} failed validation: {last_error}")
+        print(f"Attempt {attempt + 1} failed validation: {last_error}", flush=True)
 
     raise RuntimeError(
         f"LLM failed to provide valid Python after {LLM_GENERATION_MAX_RETRIES} attempts. Last error: {last_error}"
@@ -489,7 +489,6 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
             "gene_id": gene_id  # Add gene_id to track individual
         }
         
-        timeout_seconds = float(os.getenv("LOCAL_SERVER_TIMEOUT", 300))
         max_retries = int(os.getenv("LOCAL_SERVER_MAX_RETRIES", 3))
         enable_remote_fallback = os.getenv("ENABLE_LLM_REMOTE_FALLBACK", "false").lower() in {"1", "true", "yes"}
         fallback_target = os.getenv("LLM_REMOTE_FALLBACK_TARGET", "mixtral_hf")
@@ -497,7 +496,7 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
         
         for attempt in range(1, max_retries + 1):
             try:
-                response = requests.post(api_url, json=payload, timeout=timeout_seconds)
+                response = requests.post(api_url, json=payload)
                 if response.status_code == 200:
                     result = response.json()
                     return result.get("generated_text", "")

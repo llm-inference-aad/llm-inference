@@ -258,7 +258,7 @@ def check_contents_for_error(contents):
     else:
         return None
         
-def check4job_completion(job_id, local_output=None, check_interval=60, timeout=120): # 3600 * 3
+def check4job_completion(job_id, local_output=None, check_interval=60, timeout=900): # 3600 * 3
     """
     Check for the completion of a job by searching for its output file and scanning for errors.
 

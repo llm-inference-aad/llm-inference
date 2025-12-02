@@ -14,7 +14,7 @@ SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 # For BASELINE run: Set to False for parallel evaluation (better for inference optimization experiments)
-LOCAL = True
+LOCAL = False
 if LOCAL:
 	RUN_COMMAND = 'bash'
 	DELAYED_CHECK = False
@@ -147,10 +147,8 @@ cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
 LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=llm_oper
 #SBATCH -t 8:00:00
-#SBATCH --gres=gpu:1
-#SBATCH -C {gpu_constraint}
-#SBATCH --mem-per-gpu 16G
-#SBATCH -n 12
+#SBATCH --mem 4G
+#SBATCH -n 2
 #SBATCH -N 1
 #SBATCH --output={slurm_log_dir}/llm-%j.out
 #SBATCH --error={slurm_log_dir}/llm-%j.err

@@ -22,8 +22,8 @@ MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/mode
 # Note: Security middleware removed for compatibility
 # The 404 errors from malicious requests will still be logged by FastAPI
 
-BATCH_SIZE = 1  # num of LLM requests to process at once
-BATCH_WAIT_TIME = 0  # max wait time for batch to fill in s
+BATCH_SIZE = 8  # num of LLM requests to process at once
+BATCH_WAIT_TIME = 1  # max wait time for batch to fill in s
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
