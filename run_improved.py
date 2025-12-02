@@ -522,6 +522,16 @@ def check4results(gene_id):
         # there is no local output, so process with slurm
         # Use correct log path for evaluation jobs
         output_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.out')
+        error_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.err')
+        
+        # Check stderr file first for errors
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as file:
+                contents = file.read()
+                if "traceback" in contents.lower():
+                    print("\t☠ Error Found in Eval Job stderr.", flush=True)
+                    return False
+        
         # Check if the output file exists
         if os.path.exists(output_file):
             with open(output_file, 'r') as file:

@@ -89,7 +89,7 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
             json.dump(metrics, f, indent=2)
             
     except Exception as e:
-        print(f"Error saving latency metrics: {str(e)}")
+        print(f"Error saving latency metrics: {str(e)}", flush=True)
 
 class LLMRequest(BaseModel):
     prompt: str
@@ -107,7 +107,7 @@ class LLMModel:
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
-                    print(f"Loading model at {MODEL_PATH}")
+                    print(f"Loading model at {MODEL_PATH}", flush=True)
                     cls._instance = super(LLMModel, cls).__new__(cls)
                     cls._instance._initialize()
         return cls._instance
@@ -116,12 +116,12 @@ class LLMModel:
         """Load the model immediately during initialization"""
         start_time = time.time()
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] ===== MODEL LOADING STARTED =====")
-        print(f"[{timestamp}] Initializing model components...")
-        print(f"[{timestamp}] Model path: {MODEL_PATH}")
+        print(f"[{timestamp}] ===== MODEL LOADING STARTED =====", flush=True)
+        print(f"[{timestamp}] Initializing model components...", flush=True)
+        print(f"[{timestamp}] Model path: {MODEL_PATH}", flush=True)
         
         # Load model
-        print(f"[{timestamp}] Loading model weights and configuration...")
+        print(f"[{timestamp}] Loading model weights and configuration...", flush=True)
         model_load_start = time.time()
         
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
@@ -134,27 +134,27 @@ class LLMModel:
         
         model_load_time = time.time() - model_load_start
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] Model weights loaded in {model_load_time:.2f} seconds")
+        print(f"[{timestamp}] Model weights loaded in {model_load_time:.2f} seconds", flush=True)
 
         # Load tokenizer
-        print(f"[{timestamp}] Loading tokenizer...")
+        print(f"[{timestamp}] Loading tokenizer...", flush=True)
         tokenizer_start = time.time()
         
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_PATH)
         
         tokenizer_time = time.time() - tokenizer_start
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] Tokenizer loaded in {tokenizer_time:.2f} seconds")
+        print(f"[{timestamp}] Tokenizer loaded in {tokenizer_time:.2f} seconds", flush=True)
         
         # Set pad tokens for batching
-        print(f"[{timestamp}] Configuring tokenizer for batching...")
+        print(f"[{timestamp}] Configuring tokenizer for batching...", flush=True)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
             self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-            print(f"[{timestamp}] Set pad_token to eos_token")
+            print(f"[{timestamp}] Set pad_token to eos_token", flush=True)
         
         # Create pipeline
-        print(f"[{timestamp}] Creating text generation pipeline...")
+        print(f"[{timestamp}] Creating text generation pipeline...", flush=True)
         pipeline_start = time.time()
         
         self.pipeline = transformers.pipeline(
@@ -173,10 +173,10 @@ class LLMModel:
         
         pipeline_time = time.time() - pipeline_start
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] Pipeline created in {pipeline_time:.2f} seconds")
+        print(f"[{timestamp}] Pipeline created in {pipeline_time:.2f} seconds", flush=True)
         
         # Initialize async components for batching
-        print(f"[{timestamp}] Initializing async batching components...")
+        print(f"[{timestamp}] Initializing async batching components...", flush=True)
         self.request_queue = asyncio.Queue()
         self.batch_task = None
         self.batch_lock = asyncio.Lock()
@@ -184,10 +184,10 @@ class LLMModel:
         
         total_time = time.time() - start_time
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] ===== MODEL LOADING COMPLETED =====")
-        print(f"[{timestamp}] Total loading time: {total_time:.2f} seconds")
-        print(f"[{timestamp}] Model is ready to serve requests!")
-        print(f"[{timestamp}] Server-side batching enabled with batch_size={BATCH_SIZE}")
+        print(f"[{timestamp}] ===== MODEL LOADING COMPLETED =====", flush=True)
+        print(f"[{timestamp}] Total loading time: {total_time:.2f} seconds", flush=True)
+        print(f"[{timestamp}] Model is ready to serve requests!", flush=True)
+        print(f"[{timestamp}] Server-side batching enabled with batch_size={BATCH_SIZE}", flush=True)
     
     async def start_batch_processor(self):
         """Start the batch processor if it's not already running"""
@@ -224,7 +224,7 @@ class LLMModel:
                     
                     batch_size = len(batch)
                     batch_processing_start = time.time()
-                    print(f"Processing batch of {batch_size} requests")
+                    print(f"Processing batch of {batch_size} requests", flush=True)
                     
                     prompts = [req["prompt"] for req in batch]
                     
@@ -263,7 +263,7 @@ class LLMModel:
                         self.request_queue.task_done()
                 
                 except Exception as e:
-                    print(f"Error processing batch: {str(e)}")
+                    print(f"Error processing batch: {str(e)}", flush=True)
                     for future in futures:
                         if not future.done():
                             future.set_exception(e)
@@ -277,9 +277,9 @@ class LLMModel:
                     await asyncio.sleep(0.01)
         
         except asyncio.CancelledError:
-            print("Batch processor cancelled")
+            print("Batch processor cancelled", flush=True)
         except Exception as e:
-            print(f"Unexpected error in batch processor: {str(e)}")
+            print(f"Unexpected error in batch processor: {str(e)}", flush=True)
         finally:
             async with self.batch_lock:
                 self.is_processing = False
@@ -349,7 +349,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         
         # Track queue wait time
         queue_start_time = time.time()
-        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(_start_time))} [Job: {request.job_id}, Gene: {request.gene_id}]")
+        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(_start_time))} [Job: {request.job_id}, Gene: {request.gene_id}]", flush=True)
         
         # Submit to the batch processor and wait for result
         result = await model.generate(request_dict, queue_start_time)
@@ -376,7 +376,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             evaluation_score
         )
         
-        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")
+        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}", flush=True)
         
         # Add run hash, e2e latency, and evaluation score to response
         result["_latency_sec"] = round(e2e_time, 4)
@@ -396,19 +396,19 @@ async def root():
 async def startup_event():
     """Initialize the model when the server starts"""
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    print(f"[{timestamp}] ===== SERVER STARTUP INITIATED =====")
-    print(f"[{timestamp}] Starting LLM server...")
-    print(f"[{timestamp}] Loading model during startup...")
-    print(f"[{timestamp}] This may take several minutes depending on model size...")
+    print(f"[{timestamp}] ===== SERVER STARTUP INITIATED =====", flush=True)
+    print(f"[{timestamp}] Starting LLM server...", flush=True)
+    print(f"[{timestamp}] Loading model during startup...", flush=True)
+    print(f"[{timestamp}] This may take several minutes depending on model size...", flush=True)
     
     # This will trigger the detailed model loading process
     model = LLMModel()
     
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    print(f"[{timestamp}] ===== SERVER STARTUP COMPLETE =====")
-    print(f"[{timestamp}] Server is ready to accept requests!")
-    print(f"[{timestamp}] Available endpoints: /generate (POST), / (GET)")
+    print(f"[{timestamp}] ===== SERVER STARTUP COMPLETE =====", flush=True)
+    print(f"[{timestamp}] Server is ready to accept requests!", flush=True)
+    print(f"[{timestamp}] Available endpoints: /generate (POST), / (GET)", flush=True)
 
-print('Server running with server-side batching!')
-print(f'Run Hash: {RUN_HASH}')
-print(f'Metrics will be saved to: {METRICS_FILE}')
+print('Server running with server-side batching!', flush=True)
+print(f'Run Hash: {RUN_HASH}', flush=True)
+print(f'Metrics will be saved to: {METRICS_FILE}', flush=True)
