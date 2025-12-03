@@ -49,7 +49,12 @@ class PromptEnhancer:
         deduped: dict[str, RetrievedMutation] = {}
         for mutation in mutations:
             deduped.setdefault(mutation.gene_id, mutation)
-        return list(deduped.values())
+        
+        # Sort by score (descending) to ensure best mutations are shown first
+        # This helps the LLM focus on the most relevant examples
+        result = list(deduped.values())
+        result.sort(key=lambda m: m.score, reverse=True)
+        return result
 
     def enhance_template(
         self,

@@ -27,6 +27,9 @@ class RetrievalService:
     def __init__(self, store: VectorStoreManager, embeddings: EmbeddingService):
         self.store = store
         self.embeddings = embeddings
+        # Simple embedding cache to avoid redundant computations
+        self._embedding_cache: dict[str, np.ndarray] = {}
+        self._max_cache_size = 500  # Limit cache to prevent memory issues
 
     # ------------------------------------------------------------------ #
     # Indexing helpers
@@ -53,7 +56,19 @@ class RetrievalService:
         if not query_code.strip():
             return []
 
-        query_embedding = self.embeddings.embed_code(query_code)
+        # Check cache first to avoid redundant embedding computation
+        cache_key = query_code.strip()
+        if cache_key in self._embedding_cache:
+            query_embedding = self._embedding_cache[cache_key]
+        else:
+            query_embedding = self.embeddings.embed_code(query_code)[0]
+            # Cache the embedding (with simple size limit)
+            if len(self._embedding_cache) >= self._max_cache_size:
+                # Remove oldest entry (simple FIFO)
+                oldest_key = next(iter(self._embedding_cache))
+                del self._embedding_cache[oldest_key]
+            self._embedding_cache[cache_key] = query_embedding
+
         results = self.store.search_code(query_embedding, top_k=top_k)
         return [self._to_mutation(result) for result in results]
 
@@ -113,9 +128,25 @@ class RetrievalService:
             fitness = mutation.metadata.get("fitness") or []
             accuracy = f"{fitness[0]:.4f}" if fitness else "unknown"
             params = f"{int(fitness[1])}" if len(fitness) > 1 else "unknown"
+            
+            # Show improvement deltas if available (helps LLM understand what made mutations successful)
+            improvement = mutation.metadata.get("improvement") or {}
+            acc_delta = improvement.get("accuracy_delta")
+            params_delta = improvement.get("parameters_delta")
+            
+            improvement_str = ""
+            if acc_delta is not None or params_delta is not None:
+                delta_parts = []
+                if acc_delta is not None:
+                    delta_parts.append(f"ΔAcc: {acc_delta:+.4f}")
+                if params_delta is not None:
+                    delta_parts.append(f"ΔParams: {params_delta:+.0f}")
+                if delta_parts:
+                    improvement_str = f" | {' | '.join(delta_parts)}"
+            
             lines.append(
                 f"- Gene {mutation.gene_id} (score {mutation.score:.3f}) "
-                f"Accuracy {accuracy}, Params {params}\n"
+                f"Accuracy {accuracy}, Params {params}{improvement_str}\n"
                 f"{mutation.description}"
             )
         return "\n".join(lines)
