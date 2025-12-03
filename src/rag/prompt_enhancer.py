@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, List, Sequence
 
+from cfg.constants import RAG_MIN_SIMILARITY
+
 from .retrieval import RetrievedMutation, RetrievalService
 
 
@@ -30,7 +32,11 @@ class PromptEnhancer:
         mutations: list[RetrievedMutation] = []
 
         if query_code:
-            mutations.extend(self.retrieval.retrieve_similar_mutations(query_code, top_k=self.config.top_k))
+            mutations.extend(
+                self.retrieval.retrieve_similar_mutations(
+                    query_code, top_k=self.config.top_k, min_similarity=RAG_MIN_SIMILARITY
+                )
+            )
 
         if mutation_type and len(mutations) < self.config.top_k:
             extra = self.retrieval.retrieve_by_mutation_type(

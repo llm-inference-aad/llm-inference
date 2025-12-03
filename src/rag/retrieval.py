@@ -52,7 +52,17 @@ class RetrievalService:
     # ------------------------------------------------------------------ #
     # Retrieval helpers
     # ------------------------------------------------------------------ #
-    def retrieve_similar_mutations(self, query_code: str, top_k: int = 5) -> List[RetrievedMutation]:
+    def retrieve_similar_mutations(
+        self, query_code: str, top_k: int = 5, min_similarity: float = 0.3
+    ) -> List[RetrievedMutation]:
+        """
+        Retrieve mutations similar to query code.
+        
+        Args:
+            query_code: Code to find similar mutations for
+            top_k: Number of mutations to retrieve
+            min_similarity: Minimum similarity score threshold (0.0-1.0) to filter irrelevant results
+        """
         if not query_code.strip():
             return []
 
@@ -69,8 +79,14 @@ class RetrievalService:
                 del self._embedding_cache[oldest_key]
             self._embedding_cache[cache_key] = query_embedding
 
-        results = self.store.search_code(query_embedding, top_k=top_k)
-        return [self._to_mutation(result) for result in results]
+        # Retrieve more candidates than needed, then filter by similarity threshold
+        candidate_k = top_k * 2  # Get extra candidates to filter
+        results = self.store.search_code(query_embedding, top_k=candidate_k)
+        
+        # Filter by minimum similarity threshold to avoid irrelevant results
+        filtered_results = [r for r in results if r.score >= min_similarity]
+        
+        return [self._to_mutation(result) for result in filtered_results[:top_k]]
 
     def retrieve_high_performers(
         self,

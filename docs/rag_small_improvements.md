@@ -130,14 +130,15 @@ mutations = [high_score_mut, medium_score_mut, low_score_mut]
 
 ## Summary
 
-These three small changes provide:
+These four small changes provide:
 
 1. **Performance**: 500-1000x faster for cached queries
 2. **Context Quality**: Richer information (improvement deltas)
 3. **Consistency**: Best mutations always shown first
+4. **Relevance**: Filters out irrelevant mutations (similarity threshold)
 
 **Total Code Changes:**
-- ~15 lines added/modified
+- ~25 lines added/modified
 - No breaking changes
 - Backward compatible
 - Minimal memory overhead (~1.5MB)
@@ -147,4 +148,47 @@ These three small changes provide:
 - Cache works transparently
 - Sorting ensures deterministic output
 - Formatting gracefully handles missing improvement data
+
+---
+
+## 4. Minimum Similarity Threshold Filtering 🎯
+
+**What Changed:**
+- Added `min_similarity` parameter to `retrieve_similar_mutations()` (default: 0.3)
+- Filters out mutations with similarity scores below the threshold
+- Prevents irrelevant results from being included in context
+
+**Location:** `src/rag/retrieval.py` - `RetrievalService.retrieve_similar_mutations()`
+
+**How It Helps:**
+1. **Quality Control**: Filters out mutations that are too dissimilar to be useful
+   - Similarity scores below 0.3 typically indicate unrelated code
+   - Prevents LLM from seeing irrelevant examples that could confuse it
+   - Ensures only genuinely similar mutations are shown
+
+2. **Better Context**: LLM receives more focused, relevant examples
+   - Reduces noise in the context
+   - Improves mutation generation quality
+   - Faster processing (fewer mutations to format)
+
+3. **Configurable**: Can be tuned via `RAG_MIN_SIMILARITY` environment variable
+   - Lower threshold (0.2): More permissive, includes more mutations
+   - Higher threshold (0.5): More strict, only very similar mutations
+   - Default (0.3): Balanced approach
+
+**Example:**
+```python
+# Without threshold: Might retrieve mutation with 0.15 similarity (unrelated)
+# With threshold (0.3): Only retrieves mutations with >= 0.3 similarity (relevant)
+```
+
+**Configuration:**
+```bash
+export RAG_MIN_SIMILARITY=0.3  # Default: 0.3 (30% similarity minimum)
+```
+
+**Impact:**
+- Higher quality context (only relevant mutations)
+- Reduced prompt size (fewer irrelevant examples)
+- Better mutation generation (LLM sees only useful patterns)
 
