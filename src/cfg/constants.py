@@ -67,6 +67,7 @@ RAG_TEXT_EMBED_MODEL = os.environ.get("RAG_TEXT_EMBED_MODEL", "sentence-transfor
 RAG_TOP_K = int(os.environ.get("RAG_TOP_K", 5))
 RAG_MIN_ACCURACY = float(os.environ.get("RAG_MIN_ACCURACY", 0.9))
 RAG_MAX_PARAMETERS = _parse_optional_float(os.environ.get("RAG_MAX_PARAMETERS"))
+RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", 0.3))  # Minimum similarity threshold for filtering irrelevant results
 
 # Evolution Constants/Params
 # --------------------------
