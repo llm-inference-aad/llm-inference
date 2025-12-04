@@ -1,46 +1,18 @@
 python
-import numpy as np
+def train_model(model, X_train, y_train, epochs=10, batch_size=32, learning_rate=0.001):
+    optimizer = tf.keras.optimizers.Adam(learning_rate)
+    model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    history = model.compile.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1)
+    return model, history
 
-def compute_loss(y_true, y_pred):
-    return np.mean(np.square(y_true - y_pred))
+model = Sequential()
+model.add(Dense(64, activation='relu', input_shape=(784,)))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(10, activation='softmax'))
 
-class Model:
-    def __init__(self, learning_rate=0.01, batch_size=32):
-        self.learning_rate = learning_rate
-        self.batch_size = batch_size
-        self.weights = None
-        self.bias = None
+X_train, y_train = load_data()
 
-    def fit(self, X, y, epochs=100):
-        # Initialize weights and bias
-        n_features = X.shape[1]
-        self.weights = np.random.randn(n_features)
-        self.bias = 0
-
-        for epoch in range(epochs):
-            # Shuffle data
-            indices = np.random.permutation(len(X))
-            X_shuffled = X[indices]
-            y_shuffled = y[indices]
-
-            # Split into batches
-            for i in range(0, len(X), self.batch_size):
-                batch_X = X_shuffled[i:i + self.batch_size]
-                batch_y = y_shuffled[i:i + self_batch_size]
-
-                # Compute predictions
-                preds = np.dot(batch_X, self.weights) + self.bias
-
-                # Compute loss gradient
-                dW = (2 / self.batch_size) * np.dot(batch_X.T, (preds - batch_y))
-                db = (2 / self.batch_size) * np.sum((preds - batch_y))
-
-                # Update weights and bias
-                self.weights -= self.learning_rate * dW
-                self.bias -= self.learning_rate * db
-
-    def predict(self, X):
-        return np.dot(X, self.weights) + self.bias
+model, history = train_model(model, X_train, y_train, epochs=5, batch_size=32, learning_rate=0.001)
 
 ```python
 {}

@@ -105,12 +105,48 @@ def is_pareto_efficient(points: np.ndarray) -> np.ndarray:
     
     return is_efficient
 
-def plot_pareto(objs: np.ndarray, labels: list[str], out_path: Path):
+def compute_pareto_area(pareto_pts: np.ndarray) -> float:
+    """Compute the area under the Pareto front using step-wise integration.
+    
+    The Pareto front is treated as a step function where we go horizontally
+    first (constant y), then vertically down to the next point.
+    
+    pareto_pts: (N, 2) array of Pareto-efficient points (obj1, obj2).
+    returns: area under the step-wise Pareto front curve.
+    """
+    if pareto_pts.shape[0] == 0:
+        return 0.0
+    
+    # Sort by obj1 (x-axis) in increasing order
+    order = np.argsort(pareto_pts[:, 0])
+    sorted_pts = pareto_pts[order]
+    
+    if sorted_pts.shape[0] == 1:
+        # Single point - no area under curve in a meaningful sense
+        return 0.0
+    
+    # Calculate area using step function (horizontal-then-vertical)
+    # For each segment from point i to point i+1:
+    # We go horizontally from x_i to x_{i+1} at height y_i
+    # Area of rectangle = (x_{i+1} - x_i) * y_i
+    area = 0.0
+    for i in range(len(sorted_pts) - 1):
+        x_i, y_i = sorted_pts[i]
+        x_next, _ = sorted_pts[i + 1]
+        # Rectangle width * height (y_i is the height for horizontal step)
+        area += (x_next - x_i) * y_i
+    
+    return area
+
+
+def plot_pareto(objs: np.ndarray, labels: list[str], out_path: Path) -> float:
     """Scatter plot of objectives and highlight Pareto front.
 
     objs: (N,2) array where both columns are minimization objectives.
     labels: list of gene ids, length N
     out_path: path to save png
+    
+    returns: area under the Pareto front
     """
     if objs.size == 0:
         raise ValueError("No objective points to plot")
@@ -119,19 +155,25 @@ def plot_pareto(objs: np.ndarray, labels: list[str], out_path: Path):
     mask = is_pareto_efficient(objs)
     pareto_pts = objs[mask]
 
+    # Compute area under Pareto front
+    area = compute_pareto_area(pareto_pts)
+
     plt.figure(figsize=(8, 6))
     plt.scatter(objs[:, 0], objs[:, 1], c="C0", alpha=0.6, label="Individuals")
     plt.scatter(pareto_pts[:, 0], pareto_pts[:, 1], c="C3", s=80, label="Pareto front")
 
-    # Optionally connect pareto points in increasing order of obj1
+    # Connect pareto points with step-wise lines (horizontal then vertical)
     if pareto_pts.shape[0] > 1:
         order = np.argsort(pareto_pts[:, 0])
         sorted_pts = pareto_pts[order]
-        plt.plot(sorted_pts[:, 0], sorted_pts[:, 1], c="C3", linestyle="--", alpha=0.8)
+        # Use step function: 'post' means horizontal line first, then vertical drop
+        plt.step(sorted_pts[:, 0], sorted_pts[:, 1], c="C3", linestyle="--", 
+                 alpha=0.8, where='post')
 
     plt.xlabel("Objective 1: 1 - test_accuracy")
     plt.ylabel("Objective 2: total_parameters")
-    plt.title("Pareto Front (minimize both objectives)")
+    plt.yscale('log')
+    plt.title(f"Pareto Front (minimize both objectives)\nArea under front: {area:.4e}")
     plt.grid(alpha=0.25)
     plt.legend()
 
@@ -139,6 +181,8 @@ def plot_pareto(objs: np.ndarray, labels: list[str], out_path: Path):
     plt.tight_layout()
     plt.savefig(out_path, dpi=200)
     plt.close()
+    
+    return area
 
 
 def main():
@@ -173,11 +217,12 @@ def main():
     objs = np.stack([obj1, obj2], axis=1)
 
     out_png = Path(args.out) if args.out else (run_dir / "pareto_front.png")
-    plot_pareto(objs, gene_ids, out_png)
+    area = plot_pareto(objs, gene_ids, out_png)
 
     n = objs.shape[0]
     pareto_mask = is_pareto_efficient(objs)
     print(f"Plotted {n} individuals, pareto front size: {pareto_mask.sum()}")
+    print(f"Area under Pareto front: {area:.4e}")
     print(f"Saved plot to: {out_png}")
 
 

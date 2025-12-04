@@ -1,11 +1,17 @@
 python
-def process_data(data):
-    result = []
-    for item in data:
-        processed_item = some_function(item)
-        if processed_item is not None:
-            result.append(processed_item)
-    return result
+import numpy as np
+
+def compute_loss(y_true, y_pred):
+    return np.mean(np.square(y_true - y_pred))
+
+X = np.array([[1], [2], [3]])
+y = np.array([2, 4, 6])
+
+model = LinearRegression()
+model.fit(X, y)
+y_pred = model.predict(X)
+
+print("Loss:", compute_loss(y, y_pred))
 
 ```python
 {}

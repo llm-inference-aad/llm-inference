@@ -1,16 +1,10 @@
 python
-def calculate_score(answers):
-    score = 0
-    for answer in answers:
-        if answer == 'A':
-            score += 1
-        elif answer == 'B':
-            score += 2
-        elif answer == 'B':
-            score += 3
-        elif answer == 'D':
-            score +=4
-    return score
+def calculate_sum(numbers):
+    total = 0
+    for num in numbers:
+        if isinstance(num, (int, float)):
+            total += num
+    return total
 
 ```python
 {}

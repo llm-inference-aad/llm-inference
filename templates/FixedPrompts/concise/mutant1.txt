@@ -1,5 +1,13 @@
-</think>
+python
+def calculate_sum(numbers):
+    total = 0
+    for num in numbers:
+        if isinstance(num, (int, float)):
+            total += num
+    return total
 
+numbers_list = [1, 2.5, 'a', 3]
+print(calculate_sum(numbers_list))
 
 ```python
 {}

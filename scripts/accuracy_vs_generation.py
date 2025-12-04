@@ -126,12 +126,18 @@ def main():
     
     print(f"Found {len(gene_to_generation)} unique genes across all logs")
     
+    # Count total population per generation (all genes assigned to each generation)
+    generation_population = defaultdict(set)
+    for gene_id, gen in gene_to_generation.items():
+        generation_population[gen].add(gene_id)
+    
     # Parse results files
     results_dir = run_dir / "results"
     if not results_dir.exists():
         raise ValueError(f"Results directory not found: {results_dir}")
     
     generation_accuracies = defaultdict(list)
+    generation_valid_genes = defaultdict(set)
     
     for results_file in results_dir.glob("*_results.txt"):
         # Extract gene ID from filename
@@ -150,6 +156,7 @@ def main():
         results = parse_results_file(results_file)
         if results and results['valid']:
             generation_accuracies[generation].append(results['test_acc'])
+            generation_valid_genes[generation].add(gene_id)
     
     if not generation_accuracies:
         print("No valid results found!")
@@ -161,7 +168,8 @@ def main():
     std_accuracies = []
     min_accuracies = []
     max_accuracies = []
-    counts = []
+    valid_counts = []
+    population_counts = []
     
     for gen in generations:
         accs = generation_accuracies[gen]
@@ -169,17 +177,26 @@ def main():
         std_accuracies.append(np.std(accs))
         min_accuracies.append(np.min(accs))
         max_accuracies.append(np.max(accs))
-        counts.append(len(accs))
+        valid_counts.append(len(accs))
+        population_counts.append(len(generation_population[gen]))
     
     # Print statistics
     print("\nGeneration Statistics:")
-    print(f"{'Gen':<6} {'Count':<8} {'Avg Acc':<10} {'Std':<10} {'Min':<10} {'Max':<10}")
-    print("-" * 60)
-    for gen, count, avg, std, min_acc, max_acc in zip(
-        generations, counts, avg_accuracies, std_accuracies, 
+    print(f"{'Gen':<6} {'Pop':<8} {'Valid':<8} {'Rate':<8} {'Avg Acc':<10} {'Std':<10} {'Min':<10} {'Max':<10}")
+    print("-" * 80)
+    for gen, pop, valid, avg, std, min_acc, max_acc in zip(
+        generations, population_counts, valid_counts, avg_accuracies, std_accuracies, 
         min_accuracies, max_accuracies
     ):
-        print(f"{gen:<6} {count:<8} {avg:<10.4f} {std:<10.4f} {min_acc:<10.4f} {max_acc:<10.4f}")
+        rate = valid / pop * 100 if pop > 0 else 0
+        print(f"{gen:<6} {pop:<8} {valid:<8} {rate:<7.1f}% {avg:<10.4f} {std:<10.4f} {min_acc:<10.4f} {max_acc:<10.4f}")
+    
+    # Print overall summary
+    total_pop = sum(population_counts)
+    total_valid = sum(valid_counts)
+    overall_rate = total_valid / total_pop * 100 if total_pop > 0 else 0
+    print("-" * 80)
+    print(f"{'Total':<6} {total_pop:<8} {total_valid:<8} {overall_rate:<7.1f}%")
     
     # Create plot
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -207,10 +224,10 @@ def main():
     # Set x-axis to show integer generations
     ax.set_xticks(generations)
     
-    # Add count annotations
-    for gen, count, avg in zip(generations, counts, avg_accuracies):
+    # Add count annotations (showing valid/total)
+    for gen, pop, valid, avg in zip(generations, population_counts, valid_counts, avg_accuracies):
         ax.annotate(
-            f'n={count}', 
+            f'{valid}/{pop}', 
             xy=(gen, avg), 
             xytext=(0, 10),
             textcoords='offset points',
