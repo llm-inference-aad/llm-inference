@@ -17,6 +17,13 @@ from utils.rag_metrics import record_metric
 from rag.data_ingestion import build_mutation_description, calculate_fitness_improvement
 from rag.runtime import get_runtime
 from src.cfg.constants import *
+import concurrent.futures
+import uuid
+from src import llm_mutation, llm_crossover
+
+# Global executor for direct LLM tasks
+LLM_TASK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=population_size)
+LLM_FUTURES = {}
 
 def print_ancestry(data):
     for gene in data.keys():
@@ -283,6 +290,67 @@ def fetch_gene(filepath):
     return os.path.basename(filepath).replace('network_','').replace('.py','')
 
 
+
+def submit_direct_llm_task(python_file, **kwargs):
+    """
+    Submits an LLM task directly to the thread pool instead of creating a bash script.
+    """
+    job_id = f"direct_{uuid.uuid4().hex[:8]}"
+    
+    def task_wrapper():
+        try:
+            if python_file == 'src/llm_mutation.py':
+                llm_mutation.augment_network(
+                    input_filename=kwargs.get('input_filename_x'),
+                    output_filename=kwargs.get('output_filename'),
+                    template_txt=kwargs.get('template_txt'),
+                    top_p=kwargs.get('top_p', 0.15),
+                    temperature=kwargs.get('temperature', 0.1),
+                    apply_quality_control=False, # kwargs.get('apply_quality_control', False), # QC handled inside? No, passed as arg
+                    inference_submission=INFERENCE_SUBMISSION,
+                    gene_id=kwargs.get('gene_id_child')
+                )
+            elif python_file == 'src/llm_crossover.py':
+                llm_crossover.augment_network(
+                    input_filename_x=kwargs.get('input_filename_x'),
+                    input_filename_y=kwargs.get('input_filename_y'),
+                    output_filename=kwargs.get('output_filename'),
+                    top_p=kwargs.get('top_p', 0.15),
+                    temperature=kwargs.get('temperature', 0.1),
+                    apply_quality_control=False,
+                    inference_submission=INFERENCE_SUBMISSION,
+                    gene_id=kwargs.get('gene_id_child')
+                )
+            else:
+                raise ValueError(f"Unknown python file: {python_file}")
+            return True, "Job Done"
+        except Exception as e:
+            print(f"Error in direct LLM task {job_id}: {e}")
+            raise e
+
+    future = LLM_TASK_EXECUTOR.submit(task_wrapper)
+    LLM_FUTURES[job_id] = future
+    
+    # Update ancestry (logic copied from write_bash_script)
+    global GLOBAL_DATA_ANCESTRY
+    gene_id_child = kwargs.get('gene_id_child')
+    gene_id_parent = kwargs.get('gene_id_parent')
+    
+    if python_file == 'src/llm_mutation.py':
+        mutation_type = "TEMPLATE_BASED"
+        if gene_id_parent == "initial_creation":
+            gene_id_parent = "network"
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=mutation_type, gene_id_parent2=None)
+    elif python_file == 'src/llm_crossover.py':
+        # Need to fetch parent2 ID from filename
+        input_filename_y = kwargs.get('input_filename_y')
+        gene_id_parent2 = fetch_gene(input_filename_y)
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=None, gene_id_parent2=gene_id_parent2)
+
+    return True, job_id, None
+
 def create_bash_file(file_path, **kwargs):
     bash_script_content = write_bash_script(**kwargs)
     # Extract the directory from the file path
@@ -367,18 +435,52 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
         else:
             return state
 
+    # Handle direct LLM execution
+    if str(job_id).startswith("direct_"):
+        if job_id in LLM_FUTURES:
+            future = LLM_FUTURES[job_id]
+            if future.done():
+                try:
+                    future.result()  # This will raise exception if task failed
+                    print(f"\t☑ Direct LLM Job {job_id} Completed Successfully.", flush=True)
+                    # Clean up future
+                    del LLM_FUTURES[job_id]
+                    return True
+                except Exception as e:
+                    print(f"\t☠ Direct LLM Job {job_id} Failed: {e}", flush=True)
+                    # Clean up future
+                    del LLM_FUTURES[job_id]
+                    return False
+            else:
+                # Still running
+                return None
+        else:
+            # Job ID not found in futures (maybe already cleaned up?)
+            print(f"\t☠ Direct LLM Job {job_id} not found in futures.", flush=True)
+            return False
+
     start_time = time.time()
     # Use correct log path based on LOCAL mode
     if LOCAL:
         output_file = f'slurm-{job_id}.out'
+        error_file = f'slurm-{job_id}.err'
     else:
         output_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.out')
+        error_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.err')
 
     while True:
         # Check if the timeout is reached
         if time.time() - start_time > timeout:
             print("Timeout reached while waiting for job completion.")
             return False
+
+        # Check stderr file first for errors
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as file:
+                contents = file.read()
+                if "traceback" in contents.lower() or "error" in contents.lower():
+                    print(f"\t☠ Error Found in LLM Job stderr ({error_file}).", flush=True)
+                    return False
 
         # Check if the output file exists
         if os.path.exists(output_file):
@@ -411,16 +513,29 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     # Generate template for initial creation (like mutation)
     template_txt, mute_type = generate_template(PROB_EOT, GENERATION, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
     # Assign a file path and name for the model creation bash
+    # Assign a file path and name for the model creation bash
     file_path = os.path.join(out_dir, f'{gene_id}.sh')
-    successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                              input_filename_x=f'{SOTA_ROOT}/network.py',
-                                              output_filename =f'{SOTA_ROOT}/models/network_{gene_id}.py',
-                                              gene_id_child=gene_id,
-                                              gene_id_parent="network",
-                                              template_txt=template_txt,
-                                              gpu=LLM_GPU,
-                                              python_file='src/llm_mutation.py', 
-                                              top_p=0.1, temperature=temperature)
+    
+    if LLM_DIRECT_HTTP:
+        successful_sub_flag, job_id, local_output = submit_direct_llm_task(
+            python_file='src/llm_mutation.py',
+            input_filename_x=f'{SOTA_ROOT}/network.py',
+            output_filename=f'{SOTA_ROOT}/models/network_{gene_id}.py',
+            gene_id_child=gene_id,
+            gene_id_parent="network",
+            template_txt=template_txt,
+            top_p=0.1, temperature=temperature
+        )
+    else:
+        successful_sub_flag, job_id, local_output = submit_bash(file_path, 
+                                                  input_filename_x=f'{SOTA_ROOT}/network.py',
+                                                  output_filename =f'{SOTA_ROOT}/models/network_{gene_id}.py',
+                                                  gene_id_child=gene_id,
+                                                  gene_id_parent="network",
+                                                  template_txt=template_txt,
+                                                  gpu=LLM_GPU,
+                                                  python_file='src/llm_mutation.py', 
+                                                  top_p=0.1, temperature=temperature)
     # Log data
     GLOBAL_DATA[gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
                             'status':'subbed file', 'fitness':None, 'start_time':time.time()}
@@ -605,6 +720,15 @@ def check4results(gene_id):
         # there is no local output, so process with slurm
         # Use correct log path for evaluation jobs
         output_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.out')
+        error_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.err')
+
+        # Check stderr file first for errors
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as file:
+                contents = file.read()
+                if "traceback" in contents.lower():
+                    print("\t☠ Error Found in Eval Job stderr.", flush=True)
+                    return False
         # Check if the output file exists
         if os.path.exists(output_file):
             with open(output_file, 'r') as file:
@@ -890,17 +1014,31 @@ def customCrossover(ind1, ind2):
         # Generate a new gene ID for the offspring
         new_gene_id = generate_random_string(length=24)
         # Create the bash file for the new job
+        # Create the bash file for the new job
         file_path = os.path.join(out_dir, f'{new_gene_id}.sh')
-        successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                          input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
-                                          input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
-                                          output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
-                                          gene_id_child=new_gene_id,
-                                          gene_id_parent=gene_id_1,
-                                          template_txt="",  # Not used for crossover
-                                          gpu=LLM_GPU,
-                                          python_file='src/llm_crossover.py', 
-                                          top_p=0.1, temperature=temperature)
+        
+        if LLM_DIRECT_HTTP:
+            successful_sub_flag, job_id, local_output = submit_direct_llm_task(
+                python_file='src/llm_crossover.py',
+                input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
+                input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
+                output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                gene_id_child=new_gene_id,
+                gene_id_parent=gene_id_1,
+                template_txt="",  # Not used for crossover
+                top_p=0.1, temperature=temperature
+            )
+        else:
+            successful_sub_flag, job_id, local_output = submit_bash(file_path, 
+                                              input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
+                                              input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
+                                              output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                              gene_id_child=new_gene_id,
+                                              gene_id_parent=gene_id_1,
+                                              template_txt="",  # Not used for crossover
+                                              gpu=LLM_GPU,
+                                              python_file='src/llm_crossover.py', 
+                                              top_p=0.1, temperature=temperature)
 
         # Update global data for the new individual
         GLOBAL_DATA[new_gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
@@ -968,6 +1106,7 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     new_gene_id = generate_random_string(length=24)
     print(f'Mutating: {old_gene_id} and Replaceing with: {new_gene_id}')
     # Name of the sh bash file
+    # Name of the sh bash file
     file_path = os.path.join(str(GENERATION), f'{new_gene_id}.sh')
     temperature = round(random.uniform(temp_min, temp_max), 2)
     
@@ -975,15 +1114,26 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
                                                  SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
     
-    successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                              input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
-                                              output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
-                                              gene_id_child=new_gene_id,
-                                              gene_id_parent=old_gene_id,
-                                              template_txt=template_txt,
-                                              gpu=LLM_GPU,
-                                              python_file='src/llm_mutation.py', 
-                                              top_p=0.1, temperature=temperature)
+    if LLM_DIRECT_HTTP:
+        successful_sub_flag, job_id, local_output = submit_direct_llm_task(
+            python_file='src/llm_mutation.py',
+            input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
+            output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+            gene_id_child=new_gene_id,
+            gene_id_parent=old_gene_id,
+            template_txt=template_txt,
+            top_p=0.1, temperature=temperature
+        )
+    else:
+        successful_sub_flag, job_id, local_output = submit_bash(file_path, 
+                                                  input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
+                                                  output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                                  gene_id_child=new_gene_id,
+                                                  gene_id_parent=old_gene_id,
+                                                  template_txt=template_txt,
+                                                  gpu=LLM_GPU,
+                                                  python_file='src/llm_mutation.py', 
+                                                  top_p=0.1, temperature=temperature)
     
     # Update the individual with the new gene ID
     # individual[0] = new_gene_id
@@ -1057,8 +1207,23 @@ def load_checkpoint(folder_name="checkpoints", checkpoint_file=None):
     return None, None
 
 def true_nsga2(pop, k):
-    pop = tools.selNSGA2(pop, len(pop)) # 10 diff
-    new_pop = tools.selTournamentDCD(pop, k) # mults of 4
+    pop = tools.selNSGA2(pop, len(pop))
+    # Ensure k is divisible by 4 (required by selTournamentDCD)
+    k = (k // 4) * 4
+    # Handle edge cases
+    if k == 0:
+        k = 4
+    # If population is too small, duplicate individuals to meet minimum size
+    if len(pop) < k:
+        multiplier = (k // len(pop)) + 1
+        pop = (pop * multiplier)[:k]
+    # Ensure we don't select more than available
+    k = min(k, len(pop))
+    # Final safety check: k must be divisible by 4
+    k = (k // 4) * 4
+    if k == 0:
+        return pop
+    new_pop = tools.selTournamentDCD(pop, k)
     return new_pop
 
 # Error Handling 
