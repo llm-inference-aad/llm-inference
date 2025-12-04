@@ -1,14 +1,16 @@
 python
-def calculate_sum(numbers):
-    total = 0
-    for num in numbers:
-        if isinstance(num, (int, float)):
-            total += num
-    return total
+import numpy as np
 
-numbers_list = [1, 2.5, 'a', 3]
-result = calculate_sum(numbers_list)
-print(result)  # Output: 6.5
+def f(x):
+    return x**2 - 4*x + 3
+
+x = np.linspace(0,5,100)
+y = f(x)
+
+# Plotting
+import matplotlib.pyplot as plt
+plt.plot(x,y)
+plt.show()
 
 ```python
 {}

@@ -3,6 +3,7 @@
 #SBATCH -t 12:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --mem 160G
+#SBATCH -C "H200|H100"
 #SBATCH -c 16
 #SBATCH --output=slurm-results/slurm-server-%j.out
 #SBATCH --error=slurm-results/slurm-server-%j.err

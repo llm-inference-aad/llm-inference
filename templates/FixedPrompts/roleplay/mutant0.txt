@@ -1,12 +1,5 @@
-python
-import numpy as np
+</think>
 
-def model(x):
-    return x * 2 + 3
-
-x = np.array([1, 2, 3])
-y = model(x)
-print(y)
 
 ```python
 {}

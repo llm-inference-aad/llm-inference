@@ -1,6 +1,12 @@
-To make it more efficient? I'm using TensorFlow 2.9.1.
-</think>
+python
+def model(x):
+    return tf.keras.Sequential([
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(1)
+    ])(x)
 
+model.compile(optimizer='adam', loss='mse')
 
 ```python
 {}

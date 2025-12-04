@@ -1,6 +1,8 @@
 python
-def rephrase(text):
-    return''.join(text.split())
+import numpy as np
+
+def predict(x):
+    return x * 2
 
 ```python
 {}

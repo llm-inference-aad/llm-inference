@@ -288,14 +288,24 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=9
     # Use correct log path based on LOCAL mode
     if LOCAL:
         output_file = f'slurm-{job_id}.out'
+        error_file = f'slurm-{job_id}.err'
     else:
         output_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.out')
+        error_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.err')
 
     while True:
         # Check if the timeout is reached
         if time.time() - start_time > timeout:
             print("Timeout reached while waiting for job completion.")
             return False
+
+        # Check stderr file first for errors
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as file:
+                contents = file.read()
+                if "traceback" in contents.lower() or "error" in contents.lower():
+                    print(f"\t☠ Error Found in LLM Job stderr ({error_file}).", flush=True)
+                    return False
 
         # Check if the output file exists
         if os.path.exists(output_file):
@@ -1015,8 +1025,25 @@ def load_checkpoint(folder_name="checkpoints", checkpoint_file=None):
     return None, None
 
 def true_nsga2(pop, k):
-    pop = tools.selNSGA2(pop, len(pop)) # 10 diff
-    new_pop = tools.selTournamentDCD(pop, k) # mults of 4
+    pop = tools.selNSGA2(pop, len(pop))
+    # Ensure k is divisible by 4 (required by selTournamentDCD)
+    k = (k // 4) * 4
+    # Handle edge cases
+    if k == 0:
+        k = 4
+    # If population is too small, duplicate individuals to meet minimum size
+    if len(pop) < k:
+        # Repeat population to have at least k individuals
+        multiplier = (k // len(pop)) + 1
+        pop = (pop * multiplier)[:k]
+    # Ensure we don't select more than available
+    k = min(k, len(pop))
+    # Final safety check: k must be divisible by 4
+    k = (k // 4) * 4
+    if k == 0:
+        # Population too small, return what we have
+        return pop
+    new_pop = tools.selTournamentDCD(pop, k)
     return new_pop
 
 # Error Handling 

@@ -1,9 +1,0 @@
-{
-  "run_id": "server-only",
-  "run_hash": "effff2fd2268c1d2",
-  "session_start": "2025-12-02T18:29:59.183626",
-  "model_path": "/storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
-  "batch_size": 8,
-  "batch_wait_time": 1,
-  "requests": []
-}
