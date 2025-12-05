@@ -7,6 +7,7 @@ import string
 import random
 import pickle
 import argparse
+import requests
 import subprocess
 import numpy as np
 from deap import base, creator, tools
@@ -300,10 +301,18 @@ def submit_direct_llm_task(python_file, **kwargs):
     def task_wrapper():
         try:
             if python_file == 'src/llm_mutation.py':
+                # Write template text to a temp file (mirrors sbatch path expectations)
+                template_content = kwargs.get('template_txt')
+                gene_id_child = kwargs.get('gene_id_child')
+                temp_dir = str(GENERATION)
+                os.makedirs(temp_dir, exist_ok=True)
+                template_path = os.path.join(temp_dir, f'{gene_id_child}_model.txt')
+                with open(template_path, 'w') as tf:
+                    tf.write(template_content)
                 llm_mutation.augment_network(
                     input_filename=kwargs.get('input_filename_x'),
                     output_filename=kwargs.get('output_filename'),
-                    template_txt=kwargs.get('template_txt'),
+                    template_txt=template_path,
                     top_p=kwargs.get('top_p', 0.15),
                     temperature=kwargs.get('temperature', 0.1),
                     apply_quality_control=False, # kwargs.get('apply_quality_control', False), # QC handled inside? No, passed as arg
@@ -1258,6 +1267,38 @@ GLOBAL_DATA_HIST = {}
 GLOBAL_DATA_ANCESTRY = {}
 # Initialize the seed network entry
 GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
+
+
+def wait_for_server_ready(timeout=600, interval=5):
+    """
+    Poll the HTTP server (or load balancer) until it responds, or time out.
+    This prevents early connection refusals while the model is still loading.
+    """
+    use_load_balancer = os.getenv("USE_LOAD_BALANCER", "false").lower() in ["true", "1", "yes"]
+    host_file = os.getenv("LOADBALANCER_LOG_FILE" if use_load_balancer else "HOSTNAME_LOG_FILE",
+                          f"{ROOT_DIR}/loadbalancer.log" if use_load_balancer else f"{ROOT_DIR}/hostname.log")
+    port = os.getenv("LOAD_BALANCER_PORT" if use_load_balancer else "SERVER_PORT", "9000" if use_load_balancer else "8000")
+    start = time.time()
+
+    while time.time() - start < timeout:
+        if not os.path.exists(host_file):
+            print(f"[wait_for_server_ready] Host file not found ({host_file}); retrying in {interval}s...")
+            time.sleep(interval)
+            continue
+        try:
+            with open(host_file, "r") as f:
+                host = f.read().strip()
+            url = f"http://{host}:{port}/"
+            resp = requests.get(url, timeout=5)
+            if resp.status_code < 500:
+                print(f"[wait_for_server_ready] Server responded at {url} (status {resp.status_code}). Proceeding.")
+                return
+        except Exception as exc:
+            print(f"[wait_for_server_ready] Server not ready yet ({exc}); retrying in {interval}s...")
+        time.sleep(interval)
+
+    raise RuntimeError(f"Server did not become ready within {timeout} seconds (checked {host_file}:{port}).")
+
 # Main Evolution Loop
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Generation')
@@ -1266,6 +1307,10 @@ if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
     print(DNA_TXT)
+
+    # Block until the HTTP server (or LB) is up
+    wait_for_server_ready()
+
     checkpoint, start_gen = load_checkpoint(folder_name=args.checkpoints)
     if checkpoint:
         box_print("LOADING CHECKPOINT")
