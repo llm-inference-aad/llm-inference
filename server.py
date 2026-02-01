@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 import threading
 import asyncio
+import bitsandbytes as bnb
 import json
 import hashlib
 import uuid
@@ -22,8 +23,8 @@ MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/mode
 # Note: Security middleware removed for compatibility
 # The 404 errors from malicious requests will still be logged by FastAPI
 
-BATCH_SIZE = 1  # num of LLM requests to process at once
-BATCH_WAIT_TIME = 0  # max wait time for batch to fill in s
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", os.getenv("SERVER_BATCH_SIZE", 2)))  # num of LLM requests to process at once (4 is safe for 40GB VRAM)
+BATCH_WAIT_TIME = 0.5  # max wait time for batch to fill in seconds
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
@@ -59,7 +60,19 @@ metrics_metadata = {
 with open(METRICS_FILE, 'w') as f:
     json.dump(metrics_metadata, f, indent=2)
 
-def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None, prompt=None, generated_text=None):
+def save_latency_metrics(
+    request_data,
+    e2e_time,
+    batch_processing_time,
+    batch_size,
+    queue_wait_time=None,
+    evaluation_score=None,
+    prompt=None,
+    generated_text=None,
+    prompt_tokens=None,
+    completion_tokens=None,
+    total_tokens=None,
+):
     """Save end-to-end latency metrics to JSON file"""
     try:
         # Read current metrics
@@ -81,7 +94,10 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
             "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None,
             "evaluation_score": evaluation_score,
             "prompt": prompt,
-            "generated_text": generated_text
+            "generated_text": generated_text,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
         }
         
         metrics["requests"].append(request_metrics)
@@ -95,7 +111,7 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
 
 class LLMRequest(BaseModel):
     prompt: str
-    max_new_tokens: int = 8192  # Reasonable default for DeepSeek (130k context, but practical limit)
+    max_new_tokens: int = 1024  # Lower default to reduce VRAM footprint
     top_p: float = 0.8
     temperature: float = 0.7
     job_id: str | None = "default"  # Add job identifier to match with slurm file
@@ -126,9 +142,23 @@ class LLMModel:
         print(f"[{timestamp}] Loading model weights and configuration...")
         model_load_start = time.time()
         
+        # Configure 4-bit quantization if enabled (default: true)
+        enable_quantization = os.getenv("ENABLE_QUANTIZATION", "true").lower() in ("true", "1", "yes")
+        
+        if enable_quantization:
+            print(f"[{timestamp}] Loading model with 4-bit quantization enabled...", flush=True)
+            quantization_config = transformers.BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16
+            )
+        else:
+            print(f"[{timestamp}] Loading model with native precision (no quantization)...", flush=True)
+            quantization_config = None
+
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             MODEL_PATH,
             trust_remote_code=True,
+            quantization_config=quantization_config,
             torch_dtype=torch.bfloat16,
             device_map="auto",
             attn_implementation="sdpa" # faster inference
@@ -167,7 +197,7 @@ class LLMModel:
             temperature=0.1,
             top_p=0.15,
             top_k=0,
-            max_new_tokens=8192,  # Reasonable default for DeepSeek
+            max_new_tokens=1024,
             repetition_penalty=1.1,
             do_sample=True,
             batch_size=BATCH_SIZE
@@ -265,7 +295,9 @@ class LLMModel:
                         self.request_queue.task_done()
                 
                 except Exception as e:
+                    import traceback
                     print(f"Error processing batch: {str(e)}")
+                    traceback.print_exc() # Log full traceback
                     for future in futures:
                         if not future.done():
                             future.set_exception(e)
@@ -364,8 +396,15 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         batch_size = result.get("batch_size", 1)
         queue_wait_time = result.get("queue_wait_time_sec", 0)
         
-        # Calculate evaluation score for the generated text
         generated_text = result.get("generated_text", "")
+
+        # Calculate token usage
+        tokenizer = model.tokenizer
+        prompt_tokens = len(tokenizer(full_prompt, add_special_tokens=False)["input_ids"])
+        completion_tokens = len(tokenizer(generated_text, add_special_tokens=False)["input_ids"]) if generated_text else 0
+        total_tokens = prompt_tokens + completion_tokens
+
+        # Calculate evaluation score for the generated text
         evaluation_score = OutputEvaluator.calculate_evaluation_score(generated_text)
         
         # Save latency metrics
@@ -377,7 +416,10 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             queue_wait_time,
             evaluation_score,
             prompt=request.prompt,
-            generated_text=generated_text
+            generated_text=generated_text,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
         )
         
         print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")

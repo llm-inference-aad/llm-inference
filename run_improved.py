@@ -641,6 +641,14 @@ def check4model2run(gene_id):
     print(f'Checking for: SOTA_ROOT ./models/network_{gene_id}.py')
     model_path = f'{SOTA_ROOT}/models/network_{gene_id}.py'
     if os.path.exists(model_path):
+        # Found file
+        pass
+    else:
+        # File missing?
+        # print(f"\t[DEBUG] check4model2run: File not found: {model_path}")
+        return
+
+    if os.path.exists(model_path):
         fallback_marker = f'{model_path}.fallback'
         if os.path.exists(fallback_marker):
             try:
@@ -865,9 +873,16 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
                     GLOBAL_DATA[gene_id]['status'] = 'FAILED: TIMEOUT'
                 else:
                     if 'results_job' not in GLOBAL_DATA[gene_id].keys():
-                        ind.fitness.values = INVALID_FITNESS_MAX # Max error
-                        print(f'\t☠ No Placeholder Fitness for: {gene_id}')
-                        GLOBAL_DATA[gene_id]['status'] == "completed"
+                        # Surya: Handle fitness inheritance case (no job ID needed)
+                        if "inherited" in GLOBAL_DATA[gene_id]['status']:
+                            continue # Handled by completed check next loop? No, explicitly mark?
+                            
+                        # If file is missing or submit_run failed, we might be stuck.
+                        # Do NOT kill the gene immediately; let the Timeout check kill it if it stays stuck.
+                        msg = f'\t☠ No Placeholder Fitness (Eval Job Missing) for: {gene_id} | Status: {GLOBAL_DATA[gene_id].get("status")}'
+                        # box_print(msg, print_bbox_len=60, new_line_end=False) # Reduce spam
+                        pass  
+                        # ind.fitness.values = INVALID_FITNESS_MAX # Removed premature kill
                     else:
                         print(f"\t‣ Still Waiting On: Gene: {gene_id}", flush=True)
                         print_job_info(GLOBAL_DATA[gene_id])

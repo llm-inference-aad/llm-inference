@@ -46,6 +46,7 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
                 temperature,
                 inference_submission=inference_submission,
                 gene_id=gene_id,
+                previous_error=fallback_reason,
             )
         except Exception as exc:
             fallback_reason = str(exc)
