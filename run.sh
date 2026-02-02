@@ -6,13 +6,58 @@
 #SBATCH -N 1
 #SBATCH --gres=gpu:1
 #SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
+#SBATCH --output=slurm-results/slurm-main-%j.out
+#SBATCH --error=slurm-results/slurm-main-%j.err
 
 set -Eeuo pipefail
+
+# ==============================================================================
+# Determine Repository Root
+# ==============================================================================
+# Use SLURM_SUBMIT_DIR if running under SLURM, otherwise use script location
+if [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+  REPO_ROOT="${SLURM_SUBMIT_DIR}"
+else
+  REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+# Change to repository root to ensure all paths work correctly
+cd "${REPO_ROOT}"
+
+# ==============================================================================
+# Automatic Run Directory Setup
+# ==============================================================================
+# If RUN_ID is not set, create a new run directory automatically
+if [[ -z "${RUN_ID:-}" ]]; then
+  echo "No RUN_ID provided. Creating new run directory..."
+  RUN_ID=$(AUTOMATED_CALL=true bash scripts/create_run.sh "auto")
+  echo "Created RUN_ID: ${RUN_ID}"
+fi
+
+# Set the run directory path (absolute path to avoid issues with subprocess working directories)
+RUN_DIR="${REPO_ROOT}/runs/${RUN_ID}"
+
+# Validate run directory exists
+if [[ ! -d "${RUN_DIR}" ]]; then
+  echo "ERROR: Run directory ${RUN_DIR} does not exist!"
+  echo "Expected path: ${RUN_DIR}"
+  echo "REPO_ROOT: ${REPO_ROOT}"
+  echo "RUN_ID: ${RUN_ID}"
+  echo "Create it first with: bash scripts/create_run.sh [optional_name]"
+  exit 1
+fi
+
+export RUN_ID
+export RUN_DIR
+echo "Using run directory: ${RUN_DIR}"
+# ==============================================================================
 
 echo "=== Launching LLM Guided Evolution ==="
 echo "Hostname: $(hostname)"
 echo "Working dir: $(pwd)"
 date
+
+mkdir -p slurm-results
 
 # ----------------------------
 # Load modules / CUDA / Python
@@ -73,8 +118,90 @@ nvidia-smi || true
 # ----------------------------
 # Run your job
 # ----------------------------
-echo "=== Running: uv run python run_improved.py first_test ==="
-uv run python run_improved.py first_test
+echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
+uv run python run_improved.py "${RUN_DIR}/checkpoints"
+
+# Move ALL SLURM logs from this run to run directory for organization
+echo "=== Moving SLURM logs to run directory ==="
+if [[ -d "${REPO_ROOT}/slurm-results" ]]; then
+  # Move main job logs
+  if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    SLURM_OUT="${REPO_ROOT}/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
+    SLURM_ERR="${REPO_ROOT}/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
+    
+    [[ -f "${SLURM_OUT}" ]] && mv "${SLURM_OUT}" "${RUN_DIR}/logs/" && echo "Moved main job .out log"
+    [[ -f "${SLURM_ERR}" ]] && mv "${SLURM_ERR}" "${RUN_DIR}/logs/" && echo "Moved main job .err log"
+  fi
+  
+  # Move all evaluation job logs (eval-*.out, eval-*.err, llm-*.out, llm-*.err)
+  # These are created during the run and should be associated with this run
+  find "${REPO_ROOT}/slurm-results" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_DIR}/logs/" \;
+  
+  MOVED_COUNT=$(find "${RUN_DIR}/logs/" -type f -name "*.out" -o -name "*.err" | wc -l)
+  echo "Moved ${MOVED_COUNT} SLURM log files to ${RUN_DIR}/logs/"
+fi
+
+# Update run metadata on completion
+if [[ -f "${RUN_DIR}/run_metadata.json" ]]; then
+  python3 -c "
+import json
+import sys
+with open('${RUN_DIR}/run_metadata.json', 'r') as f:
+    metadata = json.load(f)
+metadata['status'] = 'completed'
+metadata['completed_at'] = '$(date -Iseconds)'
+metadata['slurm_job_id'] = '${SLURM_JOB_ID:-}'
+with open('${RUN_DIR}/run_metadata.json', 'w') as f:
+    json.dump(metadata, f, indent=2)
+"
+fi
+
+# =============================================================================
+# Automatic LLM Server Shutdown and Log Collection
+# =============================================================================
+echo "=== Shutting down LLM server ==="
+SERVER_JOB_FILE="${REPO_ROOT}/hostname_server_job.txt"
+
+if [[ -f "${SERVER_JOB_FILE}" ]]; then
+  SERVER_JOB_ID=$(cat "${SERVER_JOB_FILE}" 2>/dev/null || echo "")
+  
+  if [[ -n "${SERVER_JOB_ID}" && "${SERVER_JOB_ID}" != "null" ]]; then
+    echo "Canceling server job: ${SERVER_JOB_ID}"
+    scancel "${SERVER_JOB_ID}" || echo "Warning: Could not cancel server job ${SERVER_JOB_ID} (may have already finished)"
+    
+    # Wait for server to shut down and logs to flush
+    echo "Waiting for server shutdown and log flush..."
+    sleep 15
+    
+    # Move server logs to run directory
+    echo "Moving server logs to run directory..."
+    SERVER_OUT_LOG="${REPO_ROOT}/slurm-results/slurm-server-${SERVER_JOB_ID}.out"
+    SERVER_ERR_LOG="${REPO_ROOT}/slurm-results/slurm-server-${SERVER_JOB_ID}.err"
+    
+    if [[ -f "${SERVER_OUT_LOG}" ]]; then
+      mv "${SERVER_OUT_LOG}" "${RUN_DIR}/logs/" && echo "✅ Moved server .out log"
+    else
+      echo "⚠️  Server .out log not found: ${SERVER_OUT_LOG}"
+    fi
+    
+    if [[ -f "${SERVER_ERR_LOG}" ]]; then
+      mv "${SERVER_ERR_LOG}" "${RUN_DIR}/logs/" && echo "✅ Moved server .err log"
+    else
+      echo "⚠️  Server .err log not found: ${SERVER_ERR_LOG}"
+    fi
+    
+    # Clean up tracking files
+    rm -f "${SERVER_JOB_FILE}"
+    rm -f "${REPO_ROOT}/hostname.log"
+    
+    echo "✅ Server shutdown and cleanup complete"
+  else
+    echo "⚠️  No valid server job ID found in ${SERVER_JOB_FILE}"
+  fi
+else
+  echo "⚠️  Server job tracking file not found: ${SERVER_JOB_FILE}"
+  echo "   Server may need to be shut down manually"
+fi
 
 echo "=== Job complete ==="
 date

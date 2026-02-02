@@ -5,8 +5,8 @@ import time
 Printing Functions: Move to Other File
 """
 def print_population(offspring, global_data):
-    box_print(" Poplutation Info:", print_bbox_len=60, new_line_end=False)
-    print(f'🧬 Poplutation Size 🧬: {len(offspring)}')
+    box_print(" Population Info:", print_bbox_len=60, new_line_end=False)
+    print(f'🧬 Population Size 🧬: {len(offspring)}')
     for ind in offspring:
         gene_id = ind[0]
         print(f'Gene: {gene_id}')

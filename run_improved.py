@@ -117,57 +117,88 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
     return template_txt, mute_type
 
 
-def write_bash_script(input_filename_x=f'{SOTA_ROOT}/network.py',
-                      input_filename_y=None,
-                      output_filename=f'{SOTA_ROOT}/models/network_x.py',
-                      gpu='TeslaV100-PCIE-32GB',
-                      python_file='src/llm_mutation.py', 
-                      top_p=0.1, temperature=0.2,
-                     
-                     ):
-    
-    def fetch_gene(filepath):
-        return os.path.basename(filepath).replace('network_','').replace('.py','')
-    
+def write_bash_script(python_file, input_filename_x, output_filename, gene_id_child, gene_id_parent, temperature, top_p, template_txt, input_filename_y=None, gpu=LLM_GPU):
+    """
+    Generates a bash script content for submitting job associated with operating LLM prompts.
+
+    Args:
+        python_file (str): _description_
+        input_filename_x (str): _description_
+        output_filename (str): _description_
+        gene_id_child (str): _description_
+        gene_id_parent (str): _description_
+        temperature (float): _description_
+        top_p (float): _description_
+        template_txt (str): _description_
+        input_filename_y (str, optional): _description_. Defaults to None.
+        gpu (str, optional): _description_. Defaults to LLM_GPU.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        str: A string containing the contents of the bash script.
+    """
     global GLOBAL_DATA_ANCESTRY
     
-    QC_CHECK_BOOL = PROB_QC > np.random.uniform()
+    # Ensure SLURM log directory exists before generating scripts
+    ensure_slurm_log_dir()
     
-    # Extract the directory path from the file path
-    dir_path = os.path.dirname(output_filename)
-    # Create the directory, ignore error if it already exists
-    os.makedirs(dir_path, exist_ok=True)
+    # Validate and set defaults for gpu_constraint
+    if not gpu or gpu.strip() == "":
+        gpu = LLM_GPU  # Use default if empty
     
-    gene_id_parent = fetch_gene(input_filename_x)
-    gene_id_child = fetch_gene(output_filename)
     if python_file=='src/llm_mutation.py':
-        template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
-                                                    SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
-        if GEN_COUNT >= 0: # this does not need to happen at creation of population
-            GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
-                                                    mutation_type=mute_type, gene_id_parent2=None)
-            # print(gene_id_child); print(GLOBAL_DATA_ANCESTRY[gene_id_parent])
+        # For mutation, we use a generic mutation type since the actual type
+        # is determined by the template content, not an index
+        mutation_type = "TEMPLATE_BASED"
+        
+        # Use "network" as parent for initial creation instead of non-existent "initial_creation"
+        if gene_id_parent == "initial_creation":
+            gene_id_parent = "network"
+            
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=mutation_type, gene_id_parent2=None)
         out_dir = str(GENERATION)
         file_path = os.path.join(out_dir, f'{gene_id_child}_model.txt')
         os.makedirs(out_dir, exist_ok=True)
         with open(file_path, 'w') as file:
             file.write(template_txt)
+        
+        # Sample QC check based on PROB_QC probability
+        qc_check = random.random() < PROB_QC
             
         temp_text = f'{python_file} {input_filename_x} {output_filename} {file_path} --top_p {top_p} --temperature {temperature}'
-        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
+        python_runline = f"python {temp_text} --apply_quality_control '{qc_check}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
         
     elif python_file=='src/llm_crossover.py':
         gene_id_parent2 = fetch_gene(input_filename_y)
         GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
                                                 mutation_type=None, gene_id_parent2=gene_id_parent2)
         
+        # Sample QC check based on PROB_QC probability
+        qc_check = random.random() < PROB_QC
+        
         temp_text = f"{python_file} {input_filename_x} {input_filename_y} {output_filename} --top_p {top_p} --temperature {temperature}"
-        python_runline = f"python {temp_text} --apply_quality_control '{QC_CHECK_BOOL}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
+        python_runline = f"python {temp_text} --apply_quality_control '{qc_check}' --inference_submission {INFERENCE_SUBMISSION} --gene_id {gene_id_child}"
     else:
         raise ValueError("Invalid python_file argument")
 
-    bash_script_content = LLM_BASH_SCRIPT_TEMPLATE.format(gpu, python_runline)
+    # Validate python_runline is not empty
+    if not python_runline or python_runline.strip() == "":
+        raise ValueError("python_runline cannot be empty")
+
+    bash_script_content = LLM_BASH_SCRIPT_TEMPLATE.format(
+        gpu_constraint=gpu,
+        python_runline=python_runline,
+        slurm_log_dir=SLURM_LOG_DIR,
+    )
     return bash_script_content
+
+
+def fetch_gene(filepath):
+    return os.path.basename(filepath).replace('network_','').replace('.py','')
+
 
 def create_bash_file(file_path, **kwargs):
     bash_script_content = write_bash_script(**kwargs)
@@ -254,7 +285,11 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
             return state
 
     start_time = time.time()
-    output_file = f'slurm-{job_id}.out'
+    # Use correct log path based on LOCAL mode
+    if LOCAL:
+        output_file = f'slurm-{job_id}.out'
+    else:
+        output_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.out')
 
     while True:
         # Check if the timeout is reached
@@ -290,18 +325,24 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     gene_id = generate_random_string(length=24)
     # Select prompte and temp
     temperature = round(random.uniform(temp_min, temp_max), 2)
+    # Generate template for initial creation (like mutation)
+    template_txt, mute_type = generate_template(PROB_EOT, GENERATION, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
     # Assign a file path and name for the model creation bash
     file_path = os.path.join(out_dir, f'{gene_id}.sh')
     successful_sub_flag, job_id, local_output = submit_bash(file_path, 
                                               input_filename_x=f'{SOTA_ROOT}/network.py',
                                               output_filename =f'{SOTA_ROOT}/models/network_{gene_id}.py',
+                                              gene_id_child=gene_id,
+                                              gene_id_parent="network",
+                                              template_txt=template_txt,
                                               gpu=LLM_GPU,
                                               python_file='src/llm_mutation.py', 
                                               top_p=0.1, temperature=temperature)
     # Log data
     GLOBAL_DATA[gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
                             'status':'subbed file', 'fitness':None, 'start_time':time.time()}
-    GLOBAL_DATA_ANCESTRY[gene_id] = {'GENES':[gene_id], 'MUTATE_TYPE':["CREATED"]}
+    # FIX: Initial individuals are created from "network" seed, not from themselves
+    GLOBAL_DATA_ANCESTRY[gene_id] = {'GENES':['network'], 'MUTATE_TYPE':["CREATED"]}
     
     individual = container([gene_id])  # Assign a file ID
     
@@ -329,7 +370,19 @@ def submit_run(gene_id):
 
         # python_runline = f'python {train_file} -bs 216 -epoch 2 -network "models.network_{gene_id}" {tmp}'
         python_runline = f'python {train_file} -bs 216 -network "models.network_{gene_id}" {tmp}'
-        bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(python_runline)
+        
+        # Ensure SLURM log directory exists before generating scripts
+        ensure_slurm_log_dir()
+        
+        # Validate python_runline is not empty
+        if not python_runline or python_runline.strip() == "":
+            raise ValueError("python_runline cannot be empty")
+        
+        bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(
+            python_runline=python_runline,
+            slurm_log_dir=SLURM_LOG_DIR,
+            root_dir=ROOT_DIR,
+        )
         return bash_script_content
 
     # This is for subbing the python code
@@ -380,6 +433,78 @@ def check4model2run(gene_id):
     print(f'Checking for: SOTA_ROOT ./models/network_{gene_id}.py')
     model_path = f'{SOTA_ROOT}/models/network_{gene_id}.py'
     if os.path.exists(model_path):
+        fallback_marker = f'{model_path}.fallback'
+        if os.path.exists(fallback_marker):
+            try:
+                with open(fallback_marker, 'r') as marker_file:
+                    fallback_reason = marker_file.read().strip() or "unknown"
+            except OSError:
+                fallback_reason = "unknown"
+            GLOBAL_DATA[gene_id]['fallback'] = True
+            GLOBAL_DATA[gene_id]['fallback_reason'] = fallback_reason
+            
+            # Fitness Inheritance Optimization: Skip re-evaluation of fallback clones
+            # Since fallback genes are identical to their parent, we can copy fitness directly
+            if gene_id in GLOBAL_DATA_ANCESTRY and 'GENES' in GLOBAL_DATA_ANCESTRY[gene_id]:
+                parent_genes = GLOBAL_DATA_ANCESTRY[gene_id]['GENES']
+                # Parent is the first gene in the ancestry list (before the current gene)
+                if len(parent_genes) > 0:
+                    parent_gene_id = parent_genes[0]
+                    
+                    # Special case: seed network (parent_gene_id == 'network')
+                    # Load fitness from seed network results file if available
+                    if parent_gene_id == 'network':
+                        seed_results_file = os.path.join(SOTA_ROOT, 'results', 'network_results.txt')
+                        if os.path.exists(seed_results_file):
+                            try:
+                                with open(seed_results_file, 'r') as f:
+                                    content = f.read().strip().split(',')
+                                    if len(content) >= 4:
+                                        test_acc = float(content[0])
+                                        num_params = float(content[1])
+                                        seed_fitness = (test_acc, -num_params)
+                                        
+                                        print(f'⚠️  Gene {gene_id} is a fallback clone of seed network')
+                                        print(f'   Inheriting fitness {seed_fitness} from seed results...')
+                                        
+                                        # Copy fitness from seed network
+                                        GLOBAL_DATA[gene_id]['fitness'] = seed_fitness
+                                        GLOBAL_DATA[gene_id]['status'] = 'fitness inherited from seed'
+                                        GLOBAL_DATA[gene_id]['inherited_from'] = parent_gene_id
+                                        
+                                        # No need to submit evaluation job
+                                        return
+                            except (ValueError, OSError) as e:
+                                print(f'⚠️  Gene {gene_id} is a fallback of seed, but could not load seed fitness: {e}')
+                                print(f'   Will evaluate normally')
+                        else:
+                            print(f'⚠️  Gene {gene_id} is a fallback of seed, but seed results file not found')
+                            print(f'   Will evaluate normally')
+                    # Standard case: parent is another evolved gene
+                    elif parent_gene_id in GLOBAL_DATA and GLOBAL_DATA[parent_gene_id].get('fitness') is not None:
+                        parent_fitness = GLOBAL_DATA[parent_gene_id]['fitness']
+                        
+                        # Verify fitness is valid (not placeholder or invalid)
+                        if parent_fitness != PLACEHOLDER_FITNESS and parent_fitness != INVALID_FITNESS_MAX:
+                            print(f'⚠️  Gene {gene_id} is a fallback clone of parent {parent_gene_id}')
+                            print(f'   Inheriting fitness {parent_fitness} instead of re-evaluating...')
+                            
+                            # Copy fitness from parent
+                            GLOBAL_DATA[gene_id]['fitness'] = parent_fitness
+                            GLOBAL_DATA[gene_id]['status'] = 'fitness inherited from parent'
+                            GLOBAL_DATA[gene_id]['inherited_from'] = parent_gene_id
+                            
+                            # No need to submit evaluation job
+                            return
+                        else:
+                            print(f'⚠️  Gene {gene_id} is a fallback, but parent fitness is invalid/placeholder')
+                    else:
+                        print(f'⚠️  Gene {gene_id} is a fallback, but parent {parent_gene_id} not yet evaluated')
+                        print(f'   Will evaluate (parent and child may be in same generation)')
+        else:
+            GLOBAL_DATA[gene_id]['fallback'] = False
+            if 'fallback_reason' in GLOBAL_DATA[gene_id]:
+                del GLOBAL_DATA[gene_id]['fallback_reason']
         if GLOBAL_DATA[gene_id]['status'] != 'running eval':
             submit_run(gene_id)
             
@@ -394,7 +519,8 @@ def check4results(gene_id):
             else:
                 return state
         # there is no local output, so process with slurm
-        output_file = f'slurm-{job_id}.out'
+        # Use correct log path for evaluation jobs
+        output_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.out')
         # Check if the output file exists
         if os.path.exists(output_file):
             with open(output_file, 'r') as file:
@@ -410,8 +536,36 @@ def check4results(gene_id):
     if job_done is True:
         out_dir = str(GENERATION)
         # The job saves the model results to a file f'{gene_id}_results.txt'
-        # results_path = os.path.join(out_dir, f'{gene_id}_results.txt')
-        results_path = f'{SOTA_ROOT}/results/{gene_id}_results.txt'
+        # Check if we're running in a managed run directory (same logic as train.py)
+        run_dir = os.environ.get('RUN_DIR', None)
+        results_path = None
+        
+        if run_dir:
+            # Try run-specific results directory (absolute path)
+            absolute_run_path = os.path.join(ROOT_DIR, run_dir, 'results', f'{gene_id}_results.txt')
+            if os.path.exists(absolute_run_path):
+                results_path = absolute_run_path
+            else:
+                # Try relative path from SOTA directory (legacy behavior)
+                sota_relative_path = os.path.join(SOTA_ROOT, run_dir, 'results', f'{gene_id}_results.txt')
+                if os.path.exists(sota_relative_path):
+                    results_path = sota_relative_path
+        
+        # Fallback to legacy location in SOTA_ROOT/results
+        if results_path is None:
+            legacy_path = f'{SOTA_ROOT}/results/{gene_id}_results.txt'
+            if os.path.exists(legacy_path):
+                results_path = legacy_path
+        
+        if results_path is None:
+            print(f"ERROR: Results file not found for gene {gene_id}")
+            print(f"  Searched in:")
+            if run_dir:
+                print(f"    - {os.path.join(ROOT_DIR, run_dir, 'results', f'{gene_id}_results.txt')}")
+                print(f"    - {os.path.join(SOTA_ROOT, run_dir, 'results', f'{gene_id}_results.txt')}")
+            print(f"    - {SOTA_ROOT}/results/{gene_id}_results.txt")
+            raise FileNotFoundError(f"Results file not found for gene {gene_id}")
+            
         with open(results_path, 'r') as file:
             results = file.read()
         results = results.split(',')
@@ -495,7 +649,7 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
                         print_job_info(GLOBAL_DATA[gene_id])
                         all_done = False  # Some jobs are still running
         if all_done:
-            box_print("Evalutated All Genes", print_bbox_len=60)
+            box_print("Evaluated All Genes", print_bbox_len=60)
             break  # All jobs are done or timed out
             
         print('Delayed...', flush=True)
@@ -650,6 +804,9 @@ def customCrossover(ind1, ind2):
                                           input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
                                           input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
                                           output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                          gene_id_child=new_gene_id,
+                                          gene_id_parent=gene_id_1,
+                                          template_txt="",  # Not used for crossover
                                           gpu=LLM_GPU,
                                           python_file='src/llm_crossover.py', 
                                           top_p=0.1, temperature=temperature)
@@ -722,9 +879,17 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     # Name of the sh bash file
     file_path = os.path.join(str(GENERATION), f'{new_gene_id}.sh')
     temperature = round(random.uniform(temp_min, temp_max), 2)
+    
+    # Generate template for mutation
+    template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
+                                                 SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
+    
     successful_sub_flag, job_id, local_output = submit_bash(file_path, 
                                               input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
                                               output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                              gene_id_child=new_gene_id,
+                                              gene_id_parent=old_gene_id,
+                                              template_txt=template_txt,
                                               gpu=LLM_GPU,
                                               python_file='src/llm_mutation.py', 
                                               top_p=0.1, temperature=temperature)
@@ -878,26 +1043,34 @@ if __name__ == "__main__":
         # Remove individuals with placeholder fitness
         population = [ind for ind in population if ind.fitness.values != INVALID_FITNESS_MAX]
         print_population(population, GLOBAL_DATA)
+        
+        # Handle edge case: population smaller than target size after invalid removal
+        if len(population) == 0:
+            box_print("⚠️  Warning: All genes failed evaluation - recreating population", new_line_end=False)
+            for i in range(5):
+                createPopulation()
+                if len(population) > 0:
+                    break
+            if len(population) == 0:
+                print("ERROR: Unable to create valid population after 5 attempts. Exiting.")
+                exit(1)
+        
+        # Adjust selection sizes based on actual population size
+        actual_pop_size = len(population)
+        target_num_elites = min(num_elites, actual_pop_size)
+        target_offspring_size = min(population_size, actual_pop_size)
+        
+        if actual_pop_size < population_size:
+            box_print(f"⚠️  Population shrinkage detected: {actual_pop_size}/{population_size} genes survived", new_line_end=False)
+            box_print(f"   Adjusting selection: elites={target_num_elites}, offspring={target_offspring_size}", new_line_end=False)
+        
         # Select the next generation's parents
         box_print(f"Selection", print_bbox_len=60, new_line_end=False)
-        # These bypass the mutation and cross-over so we dont lose them
         
-        # This Line right here is causing the error
-        # Add Condtional here to check population size
-        count = 0
-        for i in range(5):
-            if len(population) == 0:
-                createPopulation()
-            else:
-                break
+        elites = tools.selSPEA2(population, target_num_elites)
 
-        if len(population) == 0:
-            exit() 
-        
-        elites = tools.selSPEA2(population, num_elites)
-
-        # Select the next generation's parents
-        offspring = toolbox.select(population, population_size)
+        # Select the next generation's parents - use adjusted size
+        offspring = toolbox.select(population, target_offspring_size)
         
         print_population(offspring, GLOBAL_DATA)
         

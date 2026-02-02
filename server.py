@@ -9,9 +9,11 @@ import asyncio
 import json
 import hashlib
 import uuid
+import re
 from datetime import datetime
 from pathlib import Path
 from src.cfg.constants import *
+from evaluator import OutputEvaluator
 
 app = FastAPI(title="LLM API", version="1.0")
 
@@ -21,20 +23,32 @@ MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/mode
 # Note: Security middleware removed for compatibility
 # The 404 errors from malicious requests will still be logged by FastAPI
 
-BATCH_SIZE = 8  # num of LLM requests to process at once
-BATCH_WAIT_TIME = 2  # max wait time for batch to fill in s
+BATCH_SIZE = 1  # num of LLM requests to process at once
+BATCH_WAIT_TIME = 0  # max wait time for batch to fill in s
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
+
+# Get RUN_ID from environment (set by run.sh) or use "server-only" if running standalone
+RUN_ID = os.getenv("RUN_ID", "server-only")
+
+# Organize metrics by run_id
 METRICS_BASE_PATH = os.getenv("METRICS_PATH", "./metrics")
-METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
-METRICS_FILE = METRICS_DIR / f"e2e-latency-{RUN_HASH}.json"
+if RUN_ID == "server-only":
+    # Standalone server mode: use old flat structure for backwards compatibility
+    METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
+else:
+    # Evolution run mode: organize by run_id
+    METRICS_DIR = Path("./runs") / RUN_ID / "metrics"
+    
+METRICS_FILE = METRICS_DIR / f"latency-{RUN_HASH}.json"
 
 # Ensure metrics directory exists
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize metrics file with metadata
 metrics_metadata = {
+    "run_id": RUN_ID,
     "run_hash": RUN_HASH,
     "session_start": datetime.now().isoformat(),
     "model_path": MODEL_PATH,
@@ -46,7 +60,29 @@ metrics_metadata = {
 with open(METRICS_FILE, 'w') as f:
     json.dump(metrics_metadata, f, indent=2)
 
-def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None):
+def strip_thinking_tokens(text: str) -> str:
+    """
+    Remove thinking/reasoning tokens from LLM output and extract only the code.
+    Handles models like DeepSeek-R1 that output thinking tokens before the actual response.
+    Returns only the code content from fenced code blocks, not the reasoning text.
+    """
+    if not text:
+        return text
+    
+    # Remove everything before and including </think> tag
+    if "</think>" in text:
+        text = text.split("</think>")[-1].strip()
+    
+    # Extract code from fenced blocks using regex (similar to clean_code_from_llm)
+    fenced_blocks = re.findall(r"```(?:python)?\s*(.*?)```", text, flags=re.IGNORECASE | re.DOTALL)
+    if fenced_blocks:
+        # Return the last code block (most likely the final answer)
+        return fenced_blocks[-1].strip()
+    
+    # If no fenced blocks found, return the text as-is (might already be code)
+    return text.strip()
+
+def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None, prompt=None, generated_text=None):
     """Save end-to-end latency metrics to JSON file"""
     try:
         # Read current metrics
@@ -56,15 +92,19 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
         # Add new request metrics
         request_metrics = {
             "timestamp": datetime.now().isoformat(),
-            "gene_id": request_data.get("gene_id", None),
+            "job_id": request_data.get("job_id", "default"),  # To match with slurm file
+            "gene_id": request_data.get("gene_id", None),  # Track gene_id for individual tracking
             "prompt_length": len(request_data["prompt"]),
             "max_new_tokens": request_data["max_new_tokens"],
             "temperature": request_data["temperature"],
             "top_p": request_data["top_p"],
-            "e2e_latency_sec": round(e2e_time, 4),
+            "_latency_sec": round(e2e_time, 4),
             "batch_processing_time_sec": round(batch_processing_time, 4),
             "batch_size": batch_size,
-            "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None
+            "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None,
+            "evaluation_score": evaluation_score,
+            "prompt": prompt,
+            "generated_text": generated_text
         }
         
         metrics["requests"].append(request_metrics)
@@ -78,10 +118,11 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
 
 class LLMRequest(BaseModel):
     prompt: str
-    max_new_tokens: int = 800
+    max_new_tokens: int = 8192  # Reasonable default for DeepSeek (130k context, but practical limit)
     top_p: float = 0.8
     temperature: float = 0.7
-    gene_id: str | None = None
+    job_id: str | None = "default"  # Add job identifier to match with slurm file
+    gene_id: str | None = None  # Identifier for the individual this request belongs to
 
 class LLMModel:
     _instance = None
@@ -149,7 +190,7 @@ class LLMModel:
             temperature=0.1,
             top_p=0.15,
             top_k=0,
-            max_new_tokens=1648,
+            max_new_tokens=8192,  # Reasonable default for DeepSeek
             repetition_penalty=1.1,
             do_sample=True,
             batch_size=BATCH_SIZE
@@ -299,21 +340,33 @@ async def generate_text(request: LLMRequest):
         max_new_tokens (int): maximum number of tokens model should generate
         top_p (float): threshold, higher to consider wider range of words
         temperature (float): randomness, higher for more varied outputs
+        job_id (str): identifier to match with slurm file
         gene_id (str): identifier for the individual this request belongs to
 
     Returns:
-    dict: generated_text (output of LLM), response_time, and run_hash for metrics tracking
+    dict: generated_text (output of LLM), response_time, run_hash, and evaluationScore
     """
-    e2e_start_time = time.time()
+    _start_time = time.time()
     
     try:
+        # Add system prompt to all requests (configurable via environment variable)
+        system_prompt = os.getenv("SYSTEM_PROMPT", """Output a single fenced code block with runnable Python code and nothing else.
+Do not include explanations, comments outside the code block, or extra code fences.
+Begin with ```python and end with ```. If you cannot comply, output exactly FAIL.
+
+""")
+        
+        # Combine system prompt with user prompt
+        full_prompt = system_prompt + request.prompt
+        
         # Convert request to dict
         request_dict = {
-            "prompt": request.prompt,
+            "prompt": full_prompt,
             "max_new_tokens": request.max_new_tokens,
             "top_p": request.top_p,
             "temperature": request.temperature,
-            "gene_id": request.gene_id
+            "job_id": request.job_id,  # Include job identifier
+            "gene_id": request.gene_id  # Include gene_id for individual tracking
         }
         
         # Get the model instance (already loaded at startup)
@@ -321,19 +374,25 @@ async def generate_text(request: LLMRequest):
         
         # Track queue wait time
         queue_start_time = time.time()
-        gene_info = f" for gene {request.gene_id}" if request.gene_id else ""
-        print(f"Request received{gene_info} at {time.strftime('%H:%M:%S', time.localtime(e2e_start_time))}")
+        print(f"Request received at {time.strftime('%H:%M:%S', time.localtime(_start_time))} [Job: {request.job_id}, Gene: {request.gene_id}]")
         
         # Submit to the batch processor and wait for result
         result = await model.generate(request_dict, queue_start_time)
         
         # Calculate end-to-end latency
-        e2e_time = time.time() - e2e_start_time
+        e2e_time = time.time() - _start_time
         
         # Extract batch processing time and queue wait time from result
         batch_processing_time = result.get("response_time_sec", 0)
         batch_size = result.get("batch_size", 1)
         queue_wait_time = result.get("queue_wait_time_sec", 0)
+        
+        # Calculate evaluation score for the generated text
+        generated_text = result.get("generated_text", "")
+        evaluation_score = OutputEvaluator.calculate_evaluation_score(generated_text)
+        
+        # Strip thinking tokens before logging
+        generated_text_for_logging = strip_thinking_tokens(generated_text)
         
         # Save latency metrics
         save_latency_metrics(
@@ -341,15 +400,19 @@ async def generate_text(request: LLMRequest):
             e2e_time, 
             batch_processing_time, 
             batch_size, 
-            queue_wait_time
+            queue_wait_time,
+            evaluation_score,
+            prompt=request.prompt,
+            generated_text=generated_text_for_logging
         )
         
-        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing)")
+        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")
         
-        # Add run hash and e2e latency to response
+        # Add run hash, e2e latency, and evaluation score to response
+        result["_latency_sec"] = round(e2e_time, 4)
         result["e2e_latency_sec"] = round(e2e_time, 4)
         result["run_hash"] = RUN_HASH
-        result["gene_id"] = request.gene_id
+        result["evaluationScore"] = evaluation_score
         
         return result
     except Exception as e:
