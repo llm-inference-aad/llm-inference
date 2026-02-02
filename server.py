@@ -149,10 +149,17 @@ class LLMModel:
         print(f"[{timestamp}] Loading model weights and configuration...")
         model_load_start = time.time()
         
+        # Configure 4-bit quantization
+        quantization_config = transformers.BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.bfloat16
+        )
+        
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             MODEL_PATH,
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16,
+            quantization_config=quantization_config,
+            dtype=torch.bfloat16,
             device_map="auto",
             attn_implementation="sdpa" # faster inference
         ).eval()
