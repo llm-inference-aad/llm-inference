@@ -13,14 +13,19 @@ SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
 SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
-# For BASELINE run: Set to False for parallel evaluation (better for inference optimization experiments)
-LOCAL = True
+# For RAG TESTING: Set to True for simpler debugging, serial execution
+# For BASELINE/PARALLEL: Set to False for parallel evaluation (requires Phase 2 modifications)
+LOCAL = False
 if LOCAL:
 	RUN_COMMAND = 'bash'
 	DELAYED_CHECK = False
 else: 
 	RUN_COMMAND = 'sbatch'
 	DELAYED_CHECK = True
+	
+#: Whether to run LLM operations directly via HTTP (True) or submit via sbatch (False)
+#: When running distributed (LOCAL=False), we want to avoid sbatch for simple HTTP requests
+LLM_DIRECT_HTTP = os.getenv("LLM_DIRECT_HTTP", str(not LOCAL)).lower() in ("true", "1", "yes")
 
 #: Whether host uses macOS (True) and should use mps, or not (False) and should use cpu or cuda depending on what is available
 MACOS = False
@@ -44,9 +49,9 @@ except:
 LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3))
 # Centralized epoch configuration (overrides scattered hard-coded values)
 try:
-	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '30').strip())
+	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '24').strip())
 except Exception:
-	TRAIN_EPOCHS = 30
+	TRAIN_EPOCHS = 24
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
 
 
@@ -94,17 +99,17 @@ PROB_EOT = 0.25
 # Recommended settings for establishing baseline metrics before applying
 # optimization techniques (RAG, speculative decoding, etc.)
 #
-# For baseline run:
+# For beline run:
 # - num_generations: 10-15 (enough for statistical significance)
 # - population_size: 8-16 (matches batch size for efficient batching)
 # - LOCAL: False (parallel evaluation, better for throughput measurement)
-# =============================================================================
+# ========================================================
 
 #: Number of generations to run for
-num_generations = 12  # BASELINE: 10 generations for initial experiments
+num_generations = 15  # BASELINE: 15 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 32  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
 population_size = 16  # BASELINE: Keep consistent with start_population_size

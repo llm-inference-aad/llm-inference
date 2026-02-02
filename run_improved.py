@@ -1340,7 +1340,7 @@ def verify_population_integrity(population):
                 print(f"Detected ZOMBIE gene {gene_id}! Status=completed but file missing.", flush=True)
                 data['status'] = 'failed' # Demote status
                 data['fitness'] = INVALID_FITNESS_MAX # Invalidate fitness
-                zombies += 1
+            zombies += 1
     
     if zombies > 0:
         print(f"[{time.strftime('%H:%M:%S')}] Purged {zombies} zombie genes.", flush=True)

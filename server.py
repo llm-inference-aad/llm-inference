@@ -172,7 +172,7 @@ class LLMModel:
         print(f"[{timestamp}] Loading tokenizer...")
         tokenizer_start = time.time()
         
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_PATH)
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_PATH, padding_side='left')
         
         tokenizer_time = time.time() - tokenizer_start
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -257,6 +257,8 @@ class LLMModel:
                     batch_size = len(batch)
                     batch_processing_start = time.time()
                     print(f"Processing batch of {batch_size} requests")
+                    if torch.cuda.is_available():
+                        print(f"Current VRAM: {torch.cuda.memory_allocated()/1024**3:.2f} GB / {torch.cuda.max_memory_allocated()/1024**3:.2f} GB (Peak)")
                     
                     prompts = [req["prompt"] for req in batch]
                     
