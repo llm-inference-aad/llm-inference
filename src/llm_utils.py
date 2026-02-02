@@ -4,6 +4,8 @@ sys.path.append("src")
 import re
 import os
 import glob
+import inspect
+import torch.nn as nn
 import time
 import numpy as np
 import transformers
@@ -95,19 +97,49 @@ def _format_retry_prompt(base_prompt: str, attempt: int) -> str:
 
 
 def validate_module_source(source_code: str, module_path: str, module_name: Optional[str] = None) -> None:
-    """Execute module source to catch runtime errors (NameError, etc.) before evaluation."""
+    """Execute module source AND instantiate classes to catch runtime errors (NameError, etc.) before evaluation."""
     unique_name = module_name or f"_llmge_validation_{hash(module_path)}"
     module_globals = {"__name__": unique_name, "__file__": module_path}
+    
+    # 1. Execute the code (catches SyntaxError)
     exec(compile(source_code, module_path, "exec"), module_globals, {})
 
+    # 2. Enhanced Validation: Instantiate nn.Module classes to trigger __init__ logic
+    # This catches "NameError: name 'ME' is not defined" inside __init__
+    for name, obj in module_globals.items():
+        if isinstance(obj, type) and issubclass(obj, nn.Module) and obj is not nn.Module:
+            # Skip imported modules if possible, but hard to distinguish without inspection
+            # Just try to instantiate.
+            try:
+                # Attempt standard CIFAR-10 signature
+                obj(10, 3)
+            except TypeError:
+                try:
+                    # Attempt no-arg signature
+                    obj()
+                except Exception:
+                    # If instantiation fails due to arguments, we ignore it (can't guess args)
+                    # But NameError/AttributeError inside __init__ WILL propagate
+                    pass
+            except Exception as e:
+                # Re-raise runtime errors found during __init__
+                if isinstance(e, (NameError, AttributeError, ImportError)):
+                    raise e
+                # Other errors might be argument mismatches, which we ignore
 
-def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None, previous_error=None):
+
+
+def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None, previous_error=None, previous_code=None):
     """Generate augmented code with retry loop: validates syntax before accepting LLM output."""
     
     if previous_error:
-        # Surya: Self-Correction mechanism for weaker models (e.g. Mixtral)
-        error_msg = f"\n\n[SYSTEM]: Your previous code generation failed validation with this error:\n{previous_error}\n" \
-                    "You MUST fix this error in your next response. Ensure all used modules (like torch.nn) are imported."
+        # Surya: Self-Correction mechanism for models (e.g. Llama)
+        error_msg = f"\n\n[SYSTEM]: Your previous code generation failed validation with this error:\n{previous_error}\n"
+        
+        if previous_code:
+            error_msg += f"\nHere is the code you generated that caused the error:\n```python\n{previous_code}\n```\n"
+
+        error_msg += "You MUST fix this error in your next response. Ensure all used modules (like torch.nn) are imported."
         # Inject error message before the final instruction or append it
         txt2llm += error_msg
 
@@ -142,7 +174,7 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         else:
             raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
             # Add explicit debug logging for every raw response
-            box_print("TEXT FROM LLM (DEBUG RAW)", print_bbox_len=60, new_line_end=False)
+            box_print("TEXT FROM LLM (RAW OUTPUT)", print_bbox_len=60, new_line_end=False)
             print(raw_response)
             candidate_code = clean_code_from_llm(raw_response)
 
