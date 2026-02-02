@@ -418,7 +418,7 @@ def check_contents_for_error(contents):
     else:
         return None
         
-def check4job_completion(job_id, local_output=None, check_interval=60, timeout=120): # 3600 * 3
+def check4job_completion(job_id, local_output=None, check_interval=60, timeout=14400): # 4 hours
     """
     Check for the completion of a job by searching for its output file and scanning for errors.
 
@@ -448,24 +448,28 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
     if str(job_id).startswith("direct_"):
         if job_id in LLM_FUTURES:
             future = LLM_FUTURES[job_id]
-            if future.done():
-                try:
-                    future.result()  # This will raise exception if task failed
-                    print(f"\t☑ Direct LLM Job {job_id} Completed Successfully.", flush=True)
-                    # Clean up future
+            try:
+                # Block-wait for the future with timeout
+                print(f"\t‣ Waiting for direct LLM job {job_id} (timeout={timeout}s)...", flush=True)
+                future.result(timeout=timeout)  # Blocks until done or timeout
+                print(f"\t☑ Direct LLM Job {job_id} Completed Successfully.", flush=True)
+                del LLM_FUTURES[job_id]
+                return True
+            except TimeoutError:
+                print(f"\t⏱ Direct LLM Job {job_id} timed out after {timeout}s", flush=True)
+                try: 
+                    future.cancel()
                     del LLM_FUTURES[job_id]
-                    return True
-                except Exception as e:
-                    print(f"\t☠ Direct LLM Job {job_id} Failed: {e}", flush=True)
-                    # Clean up future
-                    del LLM_FUTURES[job_id]
-                    return False
-            else:
-                # Still running
-                return None
+                except:
+                    pass
+                return False
+            except Exception as e:
+                print(f"\t☠ Direct LLM Job {job_id} Failed: {e}", flush=True)
+                del LLM_FUTURES[job_id]
+                return False
         else:
             # Job ID not found in futures (maybe already cleaned up?)
-            print(f"\t☠ Direct LLM Job {job_id} not found in futures.", flush=True)
+            print(f"\t☠ Direct LLM Job {job_id} not found in futures (assumed complete/failed).", flush=True)
             return False
 
     start_time = time.time()
@@ -645,7 +649,7 @@ def check4model2run(gene_id):
         pass
     else:
         # File missing?
-        # print(f"\t[DEBUG] check4model2run: File not found: {model_path}")
+        print(f"\t[DEBUG] check4model2run: File not found: {model_path}", flush=True)
         return
 
     if os.path.exists(model_path):
@@ -1137,7 +1141,13 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     # Generate template for mutation
     template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
                                                  SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
-    
+
+    # Surya: Prevent mutation of zombie parents
+    parent_model_path = f'{SOTA_ROOT}/models/network_{old_gene_id}.py'
+    if not os.path.exists(parent_model_path):
+        print(f"Skipping mutation for {old_gene_id}: Parent file missing! (Zombie Gene)", flush=True)
+        return individual,
+
     if LLM_DIRECT_HTTP:
         successful_sub_flag, job_id, local_output = submit_direct_llm_task(
             python_file='src/llm_mutation.py',
@@ -1284,7 +1294,7 @@ GLOBAL_DATA_ANCESTRY = {}
 GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
 
 
-def wait_for_server_ready(timeout=600, interval=5):
+def wait_for_server_ready(timeout=1800, interval=5):
     """
     Poll the HTTP server (or load balancer) until it responds, or time out.
     This prevents early connection refusals while the model is still loading.
@@ -1314,6 +1324,27 @@ def wait_for_server_ready(timeout=600, interval=5):
 
     raise RuntimeError(f"Server did not become ready within {timeout} seconds (checked {host_file}:{port}).")
 
+def verify_population_integrity(population):
+    """
+    Surya: Prune 'zombie' genes that are marked completed but missing model files.
+    This prevents mutation crashes when accessing parent code.
+    """
+    print(f"[{time.strftime('%H:%M:%S')}] Verifying population integrity...", flush=True)
+    zombies = 0
+    model_dir = f'{SOTA_ROOT}/models'
+    
+    for gene_id, data in GLOBAL_DATA.items():
+        if data.get('status') == 'completed':
+            model_path = f'{model_dir}/network_{gene_id}.py'
+            if not os.path.exists(model_path):
+                print(f"Detected ZOMBIE gene {gene_id}! Status=completed but file missing.", flush=True)
+                data['status'] = 'failed' # Demote status
+                data['fitness'] = INVALID_FITNESS_MAX # Invalidate fitness
+                zombies += 1
+    
+    if zombies > 0:
+        print(f"[{time.strftime('%H:%M:%S')}] Purged {zombies} zombie genes.", flush=True)
+
 # Main Evolution Loop
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Generation')
@@ -1333,6 +1364,7 @@ if __name__ == "__main__":
         GLOBAL_DATA_HIST = checkpoint["GLOBAL_DATA_HIST"]
         GLOBAL_DATA_ANCESTRY = checkpoint["GLOBAL_DATA_ANCESTRY"]
         population = checkpoint["population"]
+        verify_population_integrity(population)
         hof = checkpoint["hof"]
     else:
         # Create an initial population
@@ -1352,6 +1384,7 @@ if __name__ == "__main__":
     # Evolution
     for gen in range(start_gen, num_generations):
         GEN_COUNT = gen
+        verify_population_integrity(population)
         TOP_N_GENES = tools.selSPEA2(population, NUM_EOT_ELITES)
         box_print(f"STARTING GENERATION: {gen}", new_line_end=False)
         print_population(population, GLOBAL_DATA)
