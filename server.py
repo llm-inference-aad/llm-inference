@@ -256,9 +256,9 @@ class LLMModel:
                     
                     batch_size = len(batch)
                     batch_processing_start = time.time()
-                    print(f"Processing batch of {batch_size} requests")
+                    print(f"Processing batch of {batch_size} requests", flush=True)
                     if torch.cuda.is_available():
-                        print(f"Current VRAM: {torch.cuda.memory_allocated()/1024**3:.2f} GB / {torch.cuda.max_memory_allocated()/1024**3:.2f} GB (Peak)")
+                        print(f"Current VRAM: {torch.cuda.memory_allocated()/1024**3:.2f} GB / {torch.cuda.max_memory_allocated()/1024**3:.2f} GB (Peak)", flush=True)
                     
                     prompts = [req["prompt"] for req in batch]
                     

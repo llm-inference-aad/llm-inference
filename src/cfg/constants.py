@@ -141,7 +141,7 @@ PYTHON_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=evaluateGene
 #SBATCH -t 8:00:00
 #SBATCH --gres=gpu:1
-#SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
+#SBATCH -C "nvidia-gpu"
 #SBATCH --mem-per-gpu 16G
 #SBATCH -n 12
 #SBATCH -N 1
@@ -168,8 +168,19 @@ source "$VENV_PATH/bin/activate"
 # Change to repository root directory to ensure consistent paths
 cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
 
+# Time the evaluation
+EVAL_START=$(date +%s)
+
 # Run Python script
 {python_runline}
+EXIT_CODE=$?
+
+EVAL_END=$(date +%s)
+EVAL_ELAPSED=$((EVAL_END - EVAL_START))
+echo "EVAL_TIME_SECONDS=$EVAL_ELAPSED" >> {slurm_log_dir}/eval-$SLURM_JOB_ID.time
+echo "EXIT_CODE=$EXIT_CODE" >> {slurm_log_dir}/eval-$SLURM_JOB_ID.time
+
+exit $EXIT_CODE
 """
 
 # modify the script to use .env 
