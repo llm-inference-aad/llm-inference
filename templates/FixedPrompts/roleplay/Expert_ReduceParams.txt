@@ -1,8 +1,6 @@
-As a leading authority in machine learning, you possess a profound grasp of sophisticated artificial intelligence methodologies, a skill set that has directed you to your most recent endeavor:
-
-Q: How can you modify this code snippet to significantly reduce its parameters while aiming to maintain the model's performance?
+As an efficiency expert, how would you make this CIFAR-10 architecture more parameter-efficient without sacrificing accuracy? Apply your knowledge of compression and efficient design principles. Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

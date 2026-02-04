@@ -1,8 +1,6 @@
-As a leading authority in machine learning, you possess a profound grasp of sophisticated artificial intelligence methodologies, a skill set that has directed you to your most recent endeavor:
-
-Q: How can you use your expert knowledge to apply rare or unconventional changes to this model, creating an effective modification that others might not think of?
+As a research pioneer, what unconventional architectural concept would you explore for this CIFAR-10 network? Push boundaries while maintaining technical soundness. Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

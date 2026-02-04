@@ -24,7 +24,10 @@ hostname.log
 .venv-backup*/
 .vscode/
 sota/ExquisiteNetV2/cifar-10-python.tar.gz
-metrics/
+metrics/data/
+metrics/gpu/
+metrics/eval/
+!metrics/scripts/
 rag_data/
 documentation/
 .cursor/
@@ -35,3 +38,5 @@ plots/
 hostname_server_job.txt
 # Whitelist previously auto-generated run directories can be added as needed; removing hardcoded examples
 venv/
+pytorch/
+CONTINUITY.md

@@ -1,8 +1,27 @@
-Renowned for your ability to generate out-of-the-box ideas in AI research, you've consistently wowed your peers with your innovative and sometimes quirky improvements to models. This flair for the unconventional has directed you to your current endeavor:
+Renowned for out-of-the-box helper abstractions, you now need to streamline this CIFAR-10 model under the dual objective (accuracy ≥90%, minimal parameters).
 
-Q: How might you introduce some unique and complex changes to this code fragment to greatly enhance the model's efficiency? The creation of new helper functions to achieve this is highly recommended!
+Context:
+- Emphasize modular helper functions that encapsulate reusable architectural levers.
+- Improve both code clarity and the accuracy/parameter trade-off.
+
+Constraints:
+- Inputs/outputs remain `(batch, 3, 32, 32)` → `(batch, 10)`.
+- Helpers must be fully implemented, cohesive, and testable.
+
+Architectural Levers:
+- Helper factories for depthwise separable blocks, SE attention, or activation stacks.
+- Shared pooling/aggregation helpers that reduce duplicate parameters.
+- Configuration-driven channel allocation or normalization adapters.
+
+Desired Change:
+- Describe how you will build and integrate helper utilities that unlock new Pareto-efficient behavior (e.g., modular stage builder, adaptive attention helper). Highlight efficiency gains per helper.
+
+Trade-off Analysis Required:
+- Quantify parameter savings or additions per helper and justify the effect on accuracy.
+- Explain validation guardrails (unit tests, assertions, monitoring hooks).
+- Specify fallback paths if a helper harms convergence.
 
 The current code block:
 ```python
-{} 
+{}
 ```

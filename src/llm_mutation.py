@@ -1,6 +1,8 @@
 import re
 import time
 import glob
+import csv
+from datetime import datetime
 import numpy as np
 import transformers
 from torch import bfloat16
@@ -33,6 +35,7 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
     txt2llm = template_txt.format(code2llm.strip())
     note_txt = extract_note(code2llm)
 
+    code_from_llm = None
     fallback_reason = None
     candidate_txt = None
     # Surya: Validate assembled module; fallback to parent if all retries fail
@@ -46,6 +49,8 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
                 temperature,
                 inference_submission=inference_submission,
                 gene_id=gene_id,
+                previous_error=fallback_reason,
+                previous_code=code_from_llm,
             )
         except Exception as exc:
             fallback_reason = str(exc)
@@ -65,6 +70,15 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
             break
         except Exception as exc:
             fallback_reason = str(exc)
+            
+            # Surya: Log validation error for analysis
+            try:
+                os.makedirs("runs", exist_ok=True)
+                with open("runs/validation_errors.csv", "a") as f:
+                    csv.writer(f).writerow([datetime.now(), gene_id, augment_idx, type(exc).__name__, str(exc)])
+            except Exception:
+                pass
+
             box_print("Generated module failed validation", print_bbox_len=80, new_line_end=False)
             print(f"Attempt {attempt + 1} validation error: {fallback_reason}")
             candidate_txt = None
@@ -84,7 +98,7 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
             try:
                 fallback_marker.unlink()
             except OSError as marker_exc:
-                print(f"[WARN] Unable to remove fallback marker for {output_filename}: {marker_exc}")
+               print(f"[WARN] Unable to remove fallback marker for {output_filename}: {marker_exc}")
         python_network_txt = candidate_txt
     # Write the text to the file
     file = Path(output_filename)

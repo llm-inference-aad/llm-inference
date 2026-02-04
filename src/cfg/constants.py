@@ -11,16 +11,21 @@ SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 #: Location where the network architecture for the seed resides
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
-SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
+SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'metrics/slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
-# For BASELINE run: Set to False for parallel evaluation (better for inference optimization experiments)
-LOCAL = True
+# For RAG TESTING: Set to True for simpler debugging, serial execution
+# For BASELINE/PARALLEL: Set to False for parallel evaluation (requires Phase 2 modifications)
+LOCAL = False
 if LOCAL:
 	RUN_COMMAND = 'bash'
 	DELAYED_CHECK = False
 else: 
 	RUN_COMMAND = 'sbatch'
 	DELAYED_CHECK = True
+	
+#: Whether to run LLM operations directly via HTTP (True) or submit via sbatch (False)
+#: When running distributed (LOCAL=False), we want to avoid sbatch for simple HTTP requests
+LLM_DIRECT_HTTP = os.getenv("LLM_DIRECT_HTTP", str(not LOCAL)).lower() in ("true", "1", "yes")
 
 #: Whether host uses macOS (True) and should use mps, or not (False) and should use cpu or cuda depending on what is available
 MACOS = False
@@ -44,9 +49,9 @@ except:
 LLM_GENERATION_MAX_RETRIES = int(os.environ.get('LLM_GENERATION_MAX_RETRIES', 3))
 # Centralized epoch configuration (overrides scattered hard-coded values)
 try:
-	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '30').strip())
+	TRAIN_EPOCHS = int(os.environ.get('EPOCHS', '24').strip())
 except Exception:
-	TRAIN_EPOCHS = 30
+	TRAIN_EPOCHS = 24
 # SEED_PACKAGE_DIR = "./sota/ExquisiteNetV2/divine_seed_module"
 
 
@@ -67,6 +72,7 @@ RAG_TEXT_EMBED_MODEL = os.environ.get("RAG_TEXT_EMBED_MODEL", "sentence-transfor
 RAG_TOP_K = int(os.environ.get("RAG_TOP_K", 5))
 RAG_MIN_ACCURACY = float(os.environ.get("RAG_MIN_ACCURACY", 0.9))
 RAG_MAX_PARAMETERS = _parse_optional_float(os.environ.get("RAG_MAX_PARAMETERS"))
+RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", 0.3))  # Minimum similarity threshold for filtering irrelevant results
 
 # Evolution Constants/Params
 # --------------------------
@@ -97,13 +103,13 @@ PROB_EOT = 0.25
 # - num_generations: 10-15 (enough for statistical significance)
 # - population_size: 8-16 (matches batch size for efficient batching)
 # - LOCAL: False (parallel evaluation, better for throughput measurement)
-# =============================================================================
+# ========================================================
 
 #: Number of generations to run for
-num_generations = 12  # BASELINE: 10 generations for initial experiments
+num_generations = 15  # BASELINE: 15 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 32  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
 population_size = 16  # BASELINE: Keep consistent with start_population_size
@@ -135,7 +141,7 @@ PYTHON_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=evaluateGene
 #SBATCH -t 8:00:00
 #SBATCH --gres=gpu:1
-#SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
+#SBATCH -C "nvidia-gpu"
 #SBATCH --mem-per-gpu 16G
 #SBATCH -n 12
 #SBATCH -N 1
@@ -162,8 +168,19 @@ source "$VENV_PATH/bin/activate"
 # Change to repository root directory to ensure consistent paths
 cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
 
+# Time the evaluation
+EVAL_START=$(date +%s)
+
 # Run Python script
 {python_runline}
+EXIT_CODE=$?
+
+EVAL_END=$(date +%s)
+EVAL_ELAPSED=$((EVAL_END - EVAL_START))
+echo "EVAL_TIME_SECONDS=$EVAL_ELAPSED" >> {slurm_log_dir}/eval-$SLURM_JOB_ID.time
+echo "EXIT_CODE=$EXIT_CODE" >> {slurm_log_dir}/eval-$SLURM_JOB_ID.time
+
+exit $EXIT_CODE
 """
 
 # modify the script to use .env 
