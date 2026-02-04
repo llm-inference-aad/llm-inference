@@ -6,14 +6,14 @@
 #SBATCH -p ice-gpu
 #SBATCH --mem 160G
 #SBATCH -c 16
-#SBATCH --output=slurm-results/slurm-server-%j.out
-#SBATCH --error=slurm-results/slurm-server-%j.err
+#SBATCH --output=metrics/slurm-results/slurm-server-%j.out
+#SBATCH --error=metrics/slurm-results/slurm-server-%j.err
 
 echo "launching LLM Server"
 
 hostname
 
-mkdir -p slurm-results
+mkdir -p metrics/slurm-results
 
 module load cuda
 

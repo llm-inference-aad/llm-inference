@@ -11,7 +11,7 @@ SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 #: Location where the network architecture for the seed resides
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
-SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'slurm-results')
+SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'metrics/slurm-results')
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 # For RAG TESTING: Set to True for simpler debugging, serial execution
 # For BASELINE/PARALLEL: Set to False for parallel evaluation (requires Phase 2 modifications)
