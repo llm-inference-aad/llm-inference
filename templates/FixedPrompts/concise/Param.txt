@@ -1,6 +1,6 @@
-Q: What modifications to default parameters or hyperparameters could potentially enhance the performance of this existing code snippet?
+Q: What hyperparameter adjustments could unlock better training dynamics for this CIFAR-10 network? Think about learning rates, optimizers, regularization schedules, or normalization parameters that might improve convergence or generalization. Architectural structure should remain unchanged. Input/output tensors: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

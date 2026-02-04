@@ -1,8 +1,26 @@
-As an AI researcher celebrated for your unusual yet ingenious approach, you have a history of presenting surprisingly effective solutions that often defy conventional wisdom. Your talent for crafting these inventive strategies has led you to this latest task:
+As an inventive AI researcher, devise creative helper-driven modifications that enhance functionality while respecting the accuracy ≥90% / low-parameter objective.
 
-Q: Could you implement some creative and sophisticated modifications to this piece of code in order to drastically improve the model's functionality? Designing and integrating bespoke helper functions is part of this challenge!
+Context:
+- You may compose bespoke helpers that encapsulate unusual pooling, attention, or activation flows.
+- Each helper should clarify intent and make future experimentation easier.
+
+Constraints:
+- Maintain tensor contracts and ensure helpers are production-ready (docstring, typing if applicable).
+
+Architectural Levers:
+- Helper pipelines for multiscale pooling, residual attention routing, or activation blends.
+- Parameter-sharing helpers (e.g., channel shuffle modules) to offset added complexity.
+- Training utility helpers (e.g., adaptive dropout controllers) that affect accuracy without parameters.
+
+Desired Change:
+- Outline the helper(s) you will add, the modules they replace or augment, and how they shift the accuracy/parameter trade-off.
+
+Trade-off Analysis Required:
+- Provide parameter impact estimates (positive/negative/neutral).
+- Describe testing or monitoring steps to validate each helper’s effect.
+- Include rollback toggles or environment flags to disable experimental helpers quickly.
 
 The current code block:
 ```python
-{} 
+{}
 ```

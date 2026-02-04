@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import copy
 import glob
 import time
@@ -6,13 +7,24 @@ import string
 import random
 import pickle
 import argparse
+import requests
 import subprocess
 import numpy as np
 from deap import base, creator, tools
 from deap.tools import HallOfFame
 from src.utils.print_utils import print_population, print_scores, box_print, print_job_info
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
+from utils.rag_metrics import record_metric
+from rag.data_ingestion import build_mutation_description, calculate_fitness_improvement
+from rag.runtime import get_runtime
 from src.cfg.constants import *
+import concurrent.futures
+import uuid
+from src import llm_mutation, llm_crossover
+
+# Global executor for direct LLM tasks
+LLM_TASK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=population_size)
+LLM_FUTURES = {}
 
 def print_ancestry(data):
     for gene in data.keys():
@@ -59,6 +71,83 @@ def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None,
     return ancestry
 
 
+def _apply_rag_context(template_txt: str, mutation_type: str | None, query_code: str | None = None) -> str:
+    runtime = get_runtime()
+    if runtime is None:
+        return template_txt
+    start = time.perf_counter()
+    augmented_template, mutations = runtime.enhance_template(
+        template=template_txt,
+        mutation_type=mutation_type,
+        query_code=query_code,
+    )
+    duration_ms = (time.perf_counter() - start) * 1000
+    record_metric(
+        "rag_generation_context",
+        {
+            "mutation_type": mutation_type,
+            "retrieved_mutations": len(mutations),
+            "retrieval_ms": duration_ms,
+            "prompt_tokens": len(augmented_template.split()),
+        },
+    )
+    return augmented_template
+
+
+def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
+    runtime = get_runtime()
+    if runtime is None:
+        return
+    
+    # Filter: Only log mutations that meet minimum quality threshold
+    from cfg.constants import RAG_MIN_ACCURACY
+    if not fitness or len(fitness) == 0:
+        return
+    accuracy = float(fitness[0]) if fitness else 0.0
+    if accuracy < RAG_MIN_ACCURACY:
+        # Mutation doesn't meet quality threshold - skip logging
+        return
+    
+    code_path = os.path.join(SOTA_ROOT, f"models/network_{gene_id}.py")
+    if not os.path.exists(code_path):
+        return
+    ancestry_info = GLOBAL_DATA_ANCESTRY.get(gene_id, {})
+    genes = ancestry_info.get("GENES") or []
+    mutation_types = ancestry_info.get("MUTATE_TYPE") or []
+    parent_gene_id = genes[-2] if len(genes) >= 2 else (genes[0] if genes else None)
+    mutation_type = mutation_types[-1] if mutation_types else None
+    parent_fitness = None
+    if parent_gene_id and parent_gene_id in GLOBAL_DATA:
+        parent_fitness = GLOBAL_DATA[parent_gene_id].get("fitness")
+    improvement = calculate_fitness_improvement(fitness, parent_fitness)
+    description = build_mutation_description(gene_id, mutation_type, fitness, improvement)
+    try:
+        code = Path(code_path).read_text(encoding="utf-8")
+    except OSError:
+        return
+    metadata = {
+        "gene_id": gene_id,
+        "parent_gene_id": parent_gene_id,
+        "mutation_type": mutation_type,
+        "fitness": fitness,
+        "improvement": improvement,
+        "description": description,
+        "source": "runtime_log",
+    }
+    runtime.log_mutation_code(content=f"{description}\n\nCode:\n{code.strip()}", metadata=metadata)
+    record_metric(
+        "rag_mutation_logged",
+        {
+            "gene_id": gene_id,
+            "mutation_type": mutation_type,
+            "accuracy": float(fitness[0]) if fitness else None,
+            "parameters": float(fitness[1]) if len(fitness) > 1 else None,
+            "accuracy_delta": improvement.get("accuracy_delta") if improvement else None,
+            "parameters_delta": improvement.get("parameters_delta") if improvement else None,
+        },
+    )
+
+
 def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR):
     """
     Generates a template based on given probabilities and gene information.
@@ -103,6 +192,7 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
             
         template_txt = eot_template_txt.format(x, y, "{}")
         mute_type = "EoT"
+        template_txt = _apply_rag_context(template_txt, mute_type, query_code=x)
     else:
         print("\t‣ FixedPrompts")
         prompt_templates = glob.glob(f'{ROOT_DIR}/templates/FixedPrompts/*/*.txt')
@@ -113,6 +203,7 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
         with open(f'{ROOT_DIR}/templates/ConstantRules.txt', 'r') as file:
             rules_txt = file.read()
         template_txt = f'{template_txt}\n{rules_txt}'
+        template_txt = _apply_rag_context(template_txt, mute_type)
 
     return template_txt, mute_type
 
@@ -200,6 +291,75 @@ def fetch_gene(filepath):
     return os.path.basename(filepath).replace('network_','').replace('.py','')
 
 
+
+def submit_direct_llm_task(python_file, **kwargs):
+    """
+    Submits an LLM task directly to the thread pool instead of creating a bash script.
+    """
+    job_id = f"direct_{uuid.uuid4().hex[:8]}"
+    
+    def task_wrapper():
+        try:
+            if python_file == 'src/llm_mutation.py':
+                # Write template text to a temp file (mirrors sbatch path expectations)
+                template_content = kwargs.get('template_txt')
+                gene_id_child = kwargs.get('gene_id_child')
+                temp_dir = str(GENERATION)
+                os.makedirs(temp_dir, exist_ok=True)
+                template_path = os.path.join(temp_dir, f'{gene_id_child}_model.txt')
+                with open(template_path, 'w') as tf:
+                    tf.write(template_content)
+                llm_mutation.augment_network(
+                    input_filename=kwargs.get('input_filename_x'),
+                    output_filename=kwargs.get('output_filename'),
+                    template_txt=template_path,
+                    top_p=kwargs.get('top_p', 0.15),
+                    temperature=kwargs.get('temperature', 0.1),
+                    apply_quality_control=False, # kwargs.get('apply_quality_control', False), # QC handled inside? No, passed as arg
+                    inference_submission=INFERENCE_SUBMISSION,
+                    gene_id=kwargs.get('gene_id_child')
+                )
+            elif python_file == 'src/llm_crossover.py':
+                llm_crossover.augment_network(
+                    input_filename_x=kwargs.get('input_filename_x'),
+                    input_filename_y=kwargs.get('input_filename_y'),
+                    output_filename=kwargs.get('output_filename'),
+                    top_p=kwargs.get('top_p', 0.15),
+                    temperature=kwargs.get('temperature', 0.1),
+                    apply_quality_control=False,
+                    inference_submission=INFERENCE_SUBMISSION,
+                    gene_id=kwargs.get('gene_id_child')
+                )
+            else:
+                raise ValueError(f"Unknown python file: {python_file}")
+            return True, "Job Done"
+        except Exception as e:
+            print(f"Error in direct LLM task {job_id}: {e}")
+            raise e
+
+    future = LLM_TASK_EXECUTOR.submit(task_wrapper)
+    LLM_FUTURES[job_id] = future
+    
+    # Update ancestry (logic copied from write_bash_script)
+    global GLOBAL_DATA_ANCESTRY
+    gene_id_child = kwargs.get('gene_id_child')
+    gene_id_parent = kwargs.get('gene_id_parent')
+    
+    if python_file == 'src/llm_mutation.py':
+        mutation_type = "TEMPLATE_BASED"
+        if gene_id_parent == "initial_creation":
+            gene_id_parent = "network"
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=mutation_type, gene_id_parent2=None)
+    elif python_file == 'src/llm_crossover.py':
+        # Need to fetch parent2 ID from filename
+        input_filename_y = kwargs.get('input_filename_y')
+        gene_id_parent2 = fetch_gene(input_filename_y)
+        GLOBAL_DATA_ANCESTRY = update_ancestry(gene_id_child, gene_id_parent, GLOBAL_DATA_ANCESTRY, 
+                                                mutation_type=None, gene_id_parent2=gene_id_parent2)
+
+    return True, job_id, None
+
 def create_bash_file(file_path, **kwargs):
     bash_script_content = write_bash_script(**kwargs)
     # Extract the directory from the file path
@@ -258,7 +418,7 @@ def check_contents_for_error(contents):
     else:
         return None
         
-def check4job_completion(job_id, local_output=None, check_interval=60, timeout=120): # 3600 * 3
+def check4job_completion(job_id, local_output=None, check_interval=60, timeout=14400): # 4 hours
     """
     Check for the completion of a job by searching for its output file and scanning for errors.
 
@@ -284,18 +444,56 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
         else:
             return state
 
+    # Handle direct LLM execution
+    if str(job_id).startswith("direct_"):
+        if job_id in LLM_FUTURES:
+            future = LLM_FUTURES[job_id]
+            try:
+                # Block-wait for the future with timeout
+                print(f"\t‣ Waiting for direct LLM job {job_id} (timeout={timeout}s)...", flush=True)
+                future.result(timeout=timeout)  # Blocks until done or timeout
+                print(f"\t☑ Direct LLM Job {job_id} Completed Successfully.", flush=True)
+                del LLM_FUTURES[job_id]
+                return True
+            except TimeoutError:
+                print(f"\t⏱ Direct LLM Job {job_id} timed out after {timeout}s", flush=True)
+                try: 
+                    future.cancel()
+                    del LLM_FUTURES[job_id]
+                except:
+                    pass
+                return False
+            except Exception as e:
+                print(f"\t☠ Direct LLM Job {job_id} Failed: {e}", flush=True)
+                del LLM_FUTURES[job_id]
+                return False
+        else:
+            # Job ID not found in futures (maybe already cleaned up?)
+            print(f"\t☠ Direct LLM Job {job_id} not found in futures (assumed complete/failed).", flush=True)
+            return False
+
     start_time = time.time()
     # Use correct log path based on LOCAL mode
     if LOCAL:
         output_file = f'slurm-{job_id}.out'
+        error_file = f'slurm-{job_id}.err'
     else:
         output_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.out')
+        error_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.err')
 
     while True:
         # Check if the timeout is reached
         if time.time() - start_time > timeout:
             print("Timeout reached while waiting for job completion.")
             return False
+
+        # Check stderr file first for errors
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as file:
+                contents = file.read()
+                if "traceback" in contents.lower() or "error" in contents.lower():
+                    print(f"\t☠ Error Found in LLM Job stderr ({error_file}).", flush=True)
+                    return False
 
         # Check if the output file exists
         if os.path.exists(output_file):
@@ -328,16 +526,29 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     # Generate template for initial creation (like mutation)
     template_txt, mute_type = generate_template(PROB_EOT, GENERATION, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
     # Assign a file path and name for the model creation bash
+    # Assign a file path and name for the model creation bash
     file_path = os.path.join(out_dir, f'{gene_id}.sh')
-    successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                              input_filename_x=f'{SOTA_ROOT}/network.py',
-                                              output_filename =f'{SOTA_ROOT}/models/network_{gene_id}.py',
-                                              gene_id_child=gene_id,
-                                              gene_id_parent="network",
-                                              template_txt=template_txt,
-                                              gpu=LLM_GPU,
-                                              python_file='src/llm_mutation.py', 
-                                              top_p=0.1, temperature=temperature)
+    
+    if LLM_DIRECT_HTTP:
+        successful_sub_flag, job_id, local_output = submit_direct_llm_task(
+            python_file='src/llm_mutation.py',
+            input_filename_x=f'{SOTA_ROOT}/network.py',
+            output_filename=f'{SOTA_ROOT}/models/network_{gene_id}.py',
+            gene_id_child=gene_id,
+            gene_id_parent="network",
+            template_txt=template_txt,
+            top_p=0.1, temperature=temperature
+        )
+    else:
+        successful_sub_flag, job_id, local_output = submit_bash(file_path, 
+                                                  input_filename_x=f'{SOTA_ROOT}/network.py',
+                                                  output_filename =f'{SOTA_ROOT}/models/network_{gene_id}.py',
+                                                  gene_id_child=gene_id,
+                                                  gene_id_parent="network",
+                                                  template_txt=template_txt,
+                                                  gpu=LLM_GPU,
+                                                  python_file='src/llm_mutation.py', 
+                                                  top_p=0.1, temperature=temperature)
     # Log data
     GLOBAL_DATA[gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
                             'status':'subbed file', 'fitness':None, 'start_time':time.time()}
@@ -364,11 +575,12 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
 def submit_run(gene_id):
     def write_bash_script_py(gene_id, train_file='./sota/ExquisiteNetV2/train.py'):
         if not MACOS:
-            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -amp"
+            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -amp -epoch {TRAIN_EPOCHS}"
         else:
-            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -epoch 2"
+            # MacOS path – keep env-driven epochs for consistency
+            tmp = f"-data {DATA_PATH} -end_lr 0.001 -seed 21 -val_r 0.2 -epoch {TRAIN_EPOCHS}"
 
-        # python_runline = f'python {train_file} -bs 216 -epoch 2 -network "models.network_{gene_id}" {tmp}'
+        # python_runline = f'python {train_file} -bs 216 -epoch {TRAIN_EPOCHS} -network "models.network_{gene_id}" {tmp}'
         python_runline = f'python {train_file} -bs 216 -network "models.network_{gene_id}" {tmp}'
         
         # Ensure SLURM log directory exists before generating scripts
@@ -432,6 +644,14 @@ def check4model2run(gene_id):
     
     print(f'Checking for: SOTA_ROOT ./models/network_{gene_id}.py')
     model_path = f'{SOTA_ROOT}/models/network_{gene_id}.py'
+    if os.path.exists(model_path):
+        # Found file
+        pass
+    else:
+        # File missing?
+        print(f"\t[DEBUG] check4model2run: File not found: {model_path}", flush=True)
+        return
+
     if os.path.exists(model_path):
         fallback_marker = f'{model_path}.fallback'
         if os.path.exists(fallback_marker):
@@ -521,6 +741,15 @@ def check4results(gene_id):
         # there is no local output, so process with slurm
         # Use correct log path for evaluation jobs
         output_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.out')
+        error_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.err')
+
+        # Check stderr file first for errors
+        if os.path.exists(error_file):
+            with open(error_file, 'r') as file:
+                contents = file.read()
+                if "traceback" in contents.lower():
+                    print("\t☠ Error Found in Eval Job stderr.", flush=True)
+                    return False
         # Check if the output file exists
         if os.path.exists(output_file):
             with open(output_file, 'r') as file:
@@ -635,15 +864,29 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
                     # Process results and assign fitness
                     fitness_tuple = GLOBAL_DATA[gene_id]['fitness']  # Implement this function
                     ind.fitness.values = fitness_tuple
+                    if (
+                        fitness_tuple
+                        and fitness_tuple != INVALID_FITNESS_MAX
+                        and fitness_tuple != PLACEHOLDER_FITNESS
+                        and not GLOBAL_DATA[gene_id].get("fallback", False)
+                    ):
+                        _log_mutation_result(gene_id, fitness_tuple)
                 elif time.time() - GLOBAL_DATA[gene_id]['start_time'] > timeout:
                     print(f"Timeout for gene ID {gene_id}")
                     ind.fitness.values = INVALID_FITNESS_MAX 
                     GLOBAL_DATA[gene_id]['status'] = 'FAILED: TIMEOUT'
                 else:
                     if 'results_job' not in GLOBAL_DATA[gene_id].keys():
-                        ind.fitness.values = INVALID_FITNESS_MAX # Max error
-                        print(f'\t☠ No Placeholder Fitness for: {gene_id}')
-                        GLOBAL_DATA[gene_id]['status'] == "completed"
+                        # Surya: Handle fitness inheritance case (no job ID needed)
+                        if "inherited" in GLOBAL_DATA[gene_id]['status']:
+                            continue # Handled by completed check next loop? No, explicitly mark?
+                            
+                        # If file is missing or submit_run failed, we might be stuck.
+                        # Do NOT kill the gene immediately; let the Timeout check kill it if it stays stuck.
+                        msg = f'\t☠ No Placeholder Fitness (Eval Job Missing) for: {gene_id} | Status: {GLOBAL_DATA[gene_id].get("status")}'
+                        # box_print(msg, print_bbox_len=60, new_line_end=False) # Reduce spam
+                        pass  
+                        # ind.fitness.values = INVALID_FITNESS_MAX # Removed premature kill
                     else:
                         print(f"\t‣ Still Waiting On: Gene: {gene_id}", flush=True)
                         print_job_info(GLOBAL_DATA[gene_id])
@@ -799,17 +1042,31 @@ def customCrossover(ind1, ind2):
         # Generate a new gene ID for the offspring
         new_gene_id = generate_random_string(length=24)
         # Create the bash file for the new job
+        # Create the bash file for the new job
         file_path = os.path.join(out_dir, f'{new_gene_id}.sh')
-        successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                          input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
-                                          input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
-                                          output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
-                                          gene_id_child=new_gene_id,
-                                          gene_id_parent=gene_id_1,
-                                          template_txt="",  # Not used for crossover
-                                          gpu=LLM_GPU,
-                                          python_file='src/llm_crossover.py', 
-                                          top_p=0.1, temperature=temperature)
+        
+        if LLM_DIRECT_HTTP:
+            successful_sub_flag, job_id, local_output = submit_direct_llm_task(
+                python_file='src/llm_crossover.py',
+                input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
+                input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
+                output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                gene_id_child=new_gene_id,
+                gene_id_parent=gene_id_1,
+                template_txt="",  # Not used for crossover
+                top_p=0.1, temperature=temperature
+            )
+        else:
+            successful_sub_flag, job_id, local_output = submit_bash(file_path, 
+                                              input_filename_x=f'{SOTA_ROOT}/models/network_{gene_id_1}.py',
+                                              input_filename_y=f'{SOTA_ROOT}/models/network_{gene_id_2}.py',
+                                              output_filename=f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                              gene_id_child=new_gene_id,
+                                              gene_id_parent=gene_id_1,
+                                              template_txt="",  # Not used for crossover
+                                              gpu=LLM_GPU,
+                                              python_file='src/llm_crossover.py', 
+                                              top_p=0.1, temperature=temperature)
 
         # Update global data for the new individual
         GLOBAL_DATA[new_gene_id] = {'sub_flag':successful_sub_flag, 'job_id':job_id, 
@@ -877,22 +1134,40 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     new_gene_id = generate_random_string(length=24)
     print(f'Mutating: {old_gene_id} and Replaceing with: {new_gene_id}')
     # Name of the sh bash file
+    # Name of the sh bash file
     file_path = os.path.join(str(GENERATION), f'{new_gene_id}.sh')
     temperature = round(random.uniform(temp_min, temp_max), 2)
     
     # Generate template for mutation
     template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
                                                  SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
-    
-    successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                              input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
-                                              output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
-                                              gene_id_child=new_gene_id,
-                                              gene_id_parent=old_gene_id,
-                                              template_txt=template_txt,
-                                              gpu=LLM_GPU,
-                                              python_file='src/llm_mutation.py', 
-                                              top_p=0.1, temperature=temperature)
+
+    # Surya: Prevent mutation of zombie parents
+    parent_model_path = f'{SOTA_ROOT}/models/network_{old_gene_id}.py'
+    if not os.path.exists(parent_model_path):
+        print(f"Skipping mutation for {old_gene_id}: Parent file missing! (Zombie Gene)", flush=True)
+        return individual,
+
+    if LLM_DIRECT_HTTP:
+        successful_sub_flag, job_id, local_output = submit_direct_llm_task(
+            python_file='src/llm_mutation.py',
+            input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
+            output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+            gene_id_child=new_gene_id,
+            gene_id_parent=old_gene_id,
+            template_txt=template_txt,
+            top_p=0.1, temperature=temperature
+        )
+    else:
+        successful_sub_flag, job_id, local_output = submit_bash(file_path, 
+                                                  input_filename_x= f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
+                                                  output_filename = f'{SOTA_ROOT}/models/network_{new_gene_id}.py',
+                                                  gene_id_child=new_gene_id,
+                                                  gene_id_parent=old_gene_id,
+                                                  template_txt=template_txt,
+                                                  gpu=LLM_GPU,
+                                                  python_file='src/llm_mutation.py', 
+                                                  top_p=0.1, temperature=temperature)
     
     # Update the individual with the new gene ID
     # individual[0] = new_gene_id
@@ -966,8 +1241,23 @@ def load_checkpoint(folder_name="checkpoints", checkpoint_file=None):
     return None, None
 
 def true_nsga2(pop, k):
-    pop = tools.selNSGA2(pop, len(pop)) # 10 diff
-    new_pop = tools.selTournamentDCD(pop, k) # mults of 4
+    pop = tools.selNSGA2(pop, len(pop))
+    # Ensure k is divisible by 4 (required by selTournamentDCD)
+    k = (k // 4) * 4
+    # Handle edge cases
+    if k == 0:
+        k = 4
+    # If population is too small, duplicate individuals to meet minimum size
+    if len(pop) < k:
+        multiplier = (k // len(pop)) + 1
+        pop = (pop * multiplier)[:k]
+    # Ensure we don't select more than available
+    k = min(k, len(pop))
+    # Final safety check: k must be divisible by 4
+    k = (k // 4) * 4
+    if k == 0:
+        return pop
+    new_pop = tools.selTournamentDCD(pop, k)
     return new_pop
 
 # Error Handling 
@@ -1002,6 +1292,59 @@ GLOBAL_DATA_HIST = {}
 GLOBAL_DATA_ANCESTRY = {}
 # Initialize the seed network entry
 GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
+
+
+def wait_for_server_ready(timeout=7200, interval=5):
+    """
+    Poll the HTTP server (or load balancer) until it responds, or time out.
+    This prevents early connection refusals while the model is still loading.
+    """
+    use_load_balancer = os.getenv("USE_LOAD_BALANCER", "false").lower() in ["true", "1", "yes"]
+    host_file = os.getenv("LOADBALANCER_LOG_FILE" if use_load_balancer else "HOSTNAME_LOG_FILE",
+                          f"{ROOT_DIR}/loadbalancer.log" if use_load_balancer else f"{ROOT_DIR}/hostname.log")
+    port = os.getenv("LOAD_BALANCER_PORT" if use_load_balancer else "SERVER_PORT", "9000" if use_load_balancer else "8000")
+    start = time.time()
+
+    while time.time() - start < timeout:
+        if not os.path.exists(host_file):
+            print(f"[wait_for_server_ready] Host file not found ({host_file}); retrying in {interval}s...")
+            time.sleep(interval)
+            continue
+        try:
+            with open(host_file, "r") as f:
+                host = f.read().strip()
+            url = f"http://{host}:{port}/"
+            resp = requests.get(url, timeout=5)
+            if resp.status_code < 500:
+                print(f"[wait_for_server_ready] Server responded at {url} (status {resp.status_code}). Proceeding.")
+                return
+        except Exception as exc:
+            print(f"[wait_for_server_ready] Server not ready yet ({exc}); retrying in {interval}s...")
+        time.sleep(interval)
+
+    raise RuntimeError(f"Server did not become ready within {timeout} seconds (checked {host_file}:{port}).")
+
+def verify_population_integrity(population):
+    """
+    Surya: Prune 'zombie' genes that are marked completed but missing model files.
+    This prevents mutation crashes when accessing parent code.
+    """
+    print(f"[{time.strftime('%H:%M:%S')}] Verifying population integrity...", flush=True)
+    zombies = 0
+    model_dir = f'{SOTA_ROOT}/models'
+    
+    for gene_id, data in GLOBAL_DATA.items():
+        if data.get('status') == 'completed':
+            model_path = f'{model_dir}/network_{gene_id}.py'
+            if not os.path.exists(model_path):
+                print(f"Detected ZOMBIE gene {gene_id}! Status=completed but file missing.", flush=True)
+                data['status'] = 'failed' # Demote status
+                data['fitness'] = INVALID_FITNESS_MAX # Invalidate fitness
+            zombies += 1
+    
+    if zombies > 0:
+        print(f"[{time.strftime('%H:%M:%S')}] Purged {zombies} zombie genes.", flush=True)
+
 # Main Evolution Loop
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run Generation')
@@ -1010,6 +1353,10 @@ if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
     print(DNA_TXT)
+
+    # Block until the HTTP server (or LB) is up
+    wait_for_server_ready()
+
     checkpoint, start_gen = load_checkpoint(folder_name=args.checkpoints)
     if checkpoint:
         box_print("LOADING CHECKPOINT")
@@ -1017,6 +1364,7 @@ if __name__ == "__main__":
         GLOBAL_DATA_HIST = checkpoint["GLOBAL_DATA_HIST"]
         GLOBAL_DATA_ANCESTRY = checkpoint["GLOBAL_DATA_ANCESTRY"]
         population = checkpoint["population"]
+        verify_population_integrity(population)
         hof = checkpoint["hof"]
     else:
         # Create an initial population
@@ -1036,6 +1384,7 @@ if __name__ == "__main__":
     # Evolution
     for gen in range(start_gen, num_generations):
         GEN_COUNT = gen
+        verify_population_integrity(population)
         TOP_N_GENES = tools.selSPEA2(population, NUM_EOT_ELITES)
         box_print(f"STARTING GENERATION: {gen}", new_line_end=False)
         print_population(population, GLOBAL_DATA)

@@ -1,17 +1,19 @@
 #!/bin/bash
 #SBATCH --job-name=LLMGE01_Server
-#SBATCH -t 12:00:00
-#SBATCH --gres=gpu:1
+#SBATCH -t 08:00:00
+#SBATCH -C "H100"
+#SBATCH --gpus-per-node=2
+#SBATCH -p ice-gpu
 #SBATCH --mem 160G
 #SBATCH -c 16
-#SBATCH --output=slurm-results/slurm-server-%j.out
-#SBATCH --error=slurm-results/slurm-server-%j.err
+#SBATCH --output=metrics/slurm-results/slurm-server-%j.out
+#SBATCH --error=metrics/slurm-results/slurm-server-%j.err
 
 echo "launching LLM Server"
 
 hostname
 
-mkdir -p slurm-results
+mkdir -p metrics/slurm-results
 
 module load cuda
 
@@ -43,7 +45,7 @@ if [ ! -z "$HOSTNAME_LOG_FILE" ]; then
 fi
 
 # Make sure CUDA can see all GPUs
-export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+# export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 export MKL_THREADING_LAYER=${MKL_THREADING_LAYER:-GNU}
 
 # Set root directory if not already set
@@ -187,5 +189,14 @@ EOF
 else
     echo "SERVER_REGISTRY_FILE not set, skipping load balancer registration"
 fi
+
+# Start GPU Monitoring
+echo "Starting GPU monitoring..."
+mkdir -p "${LLM_INFERENCE_ROOT_DIR}/metrics/gpu"
+nvidia-smi --query-gpu=timestamp,name,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${LLM_INFERENCE_ROOT_DIR}/metrics/gpu/server-${SLURM_JOB_ID}.csv" &
+MONITOR_PID=$!
+
+# Ensure monitor is killed when script exits
+trap "kill $MONITOR_PID" EXIT
 
 python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS

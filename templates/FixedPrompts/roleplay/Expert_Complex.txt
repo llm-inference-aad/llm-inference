@@ -1,8 +1,6 @@
-As a leading authority in machine learning, you possess a profound grasp of sophisticated artificial intelligence methodologies, a skill set that has directed you to your most recent endeavor:
-
-Q: How can you apply complex modifications to this code snippet to substantially elevate the model's performance?
+As a leading ML authority, how would you evolve this CIFAR-10 architecture to breakthrough performance? Draw on your expertise to propose creative architectural innovations that balance accuracy (≥90%) with parameter efficiency. Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

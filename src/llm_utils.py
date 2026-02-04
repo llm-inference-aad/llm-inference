@@ -4,12 +4,16 @@ sys.path.append("src")
 import re
 import os
 import glob
+import inspect
+import torch.nn as nn
 import time
 import numpy as np
 import transformers
 from torch import bfloat16
 from cfg.constants import *
 from utils.print_utils import box_print
+from utils.rag_metrics import record_metric
+from rag.runtime import get_runtime
 
 from typing import Optional
 #import fire
@@ -93,14 +97,52 @@ def _format_retry_prompt(base_prompt: str, attempt: int) -> str:
 
 
 def validate_module_source(source_code: str, module_path: str, module_name: Optional[str] = None) -> None:
-    """Execute module source to catch runtime errors (NameError, etc.) before evaluation."""
+    """Execute module source AND instantiate classes to catch runtime errors (NameError, etc.) before evaluation."""
     unique_name = module_name or f"_llmge_validation_{hash(module_path)}"
     module_globals = {"__name__": unique_name, "__file__": module_path}
+    
+    # 1. Execute the code (catches SyntaxError)
     exec(compile(source_code, module_path, "exec"), module_globals, {})
 
+    # 2. Enhanced Validation: Instantiate nn.Module classes to trigger __init__ logic
+    # This catches "NameError: name 'ME' is not defined" inside __init__
+    for name, obj in module_globals.items():
+        if isinstance(obj, type) and issubclass(obj, nn.Module) and obj is not nn.Module:
+            # Skip imported modules if possible, but hard to distinguish without inspection
+            # Just try to instantiate.
+            try:
+                # Attempt standard CIFAR-10 signature
+                obj(10, 3)
+            except TypeError:
+                try:
+                    # Attempt no-arg signature
+                    obj()
+                except Exception:
+                    # If instantiation fails due to arguments, we ignore it (can't guess args)
+                    # But NameError/AttributeError inside __init__ WILL propagate
+                    pass
+            except Exception as e:
+                # Re-raise runtime errors found during __init__
+                if isinstance(e, (NameError, AttributeError, ImportError)):
+                    raise e
+                # Other errors might be argument mismatches, which we ignore
 
-def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None):
+
+
+def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None, previous_error=None, previous_code=None):
     """Generate augmented code with retry loop: validates syntax before accepting LLM output."""
+    
+    if previous_error:
+        # Surya: Self-Correction mechanism for models (e.g. Llama)
+        error_msg = f"\n\n[SYSTEM]: Your previous code generation failed validation with this error:\n{previous_error}\n"
+        
+        if previous_code:
+            error_msg += f"\nHere is the code you generated that caused the error:\n```python\n{previous_code}\n```\n"
+
+        error_msg += "You MUST fix this error in your next response. Ensure all used modules (like torch.nn) are imported."
+        # Inject error message before the final instruction or append it
+        txt2llm += error_msg
+
     box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
     print(txt2llm)
 
@@ -131,7 +173,8 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
             candidate_code = qc_func(raw_response, base_code, generate_text)
         else:
             raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
-            box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
+            # Add explicit debug logging for every raw response
+            box_print("TEXT FROM LLM (RAW OUTPUT)", print_bbox_len=60, new_line_end=False)
             print(raw_response)
             candidate_code = clean_code_from_llm(raw_response)
 
@@ -168,6 +211,62 @@ def split_file(filename):
     parts = re.split(pattern, content)
 
     return parts
+
+
+def _augment_template_with_rag(template_text: str, mutation_label: str | None, query_code: str | None = None) -> str:
+    """
+    Inject RAG context into a template when the runtime is enabled.
+    """
+    runtime = get_runtime()
+    if runtime is None:
+        return template_text
+    start = time.perf_counter()
+    augmented_template, mutations = runtime.enhance_template(
+        template=template_text,
+        mutation_type=mutation_label,
+        query_code=query_code,
+    )
+    duration_ms = (time.perf_counter() - start) * 1000
+    record_metric(
+        "rag_prompt_enhancement",
+        {
+            "mutation_type": mutation_label,
+            "retrieval_ms": duration_ms,
+            "retrieved_mutations": len(mutations),
+            "prompt_tokens": len(augmented_template.split()),
+        },
+    )
+    return augmented_template
+
+
+def _prepend_rag_context_to_prompt(prompt_text: str, mutation_label: str | None) -> str:
+    """
+    Build an instruction prefix that references top-performing mutations.
+    """
+    runtime = get_runtime()
+    if runtime is None or not mutation_label:
+        return prompt_text
+    start = time.perf_counter()
+    mutations = runtime.collect_context(mutation_type=mutation_label)
+    duration_ms = (time.perf_counter() - start) * 1000
+    if not mutations:
+        return prompt_text
+    context_block = runtime.format_context(mutations)
+    rag_prefix = (
+        "Here are some successful mutations from prior generations. "
+        "Consider how their approaches might inspire your own creative solution, but feel free to explore novel directions.\n"
+        f"{context_block}\n\n"
+    )
+    record_metric(
+        "rag_prompt_rephrase_context",
+        {
+            "mutation_type": mutation_label,
+            "retrieval_ms": duration_ms,
+            "retrieved_mutations": len(mutations),
+            "prompt_tokens": len(prompt_text.split()),
+        },
+    )
+    return f"{rag_prefix}{prompt_text}"
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -394,7 +493,16 @@ def mutate_prompts(n=5):
         with open(template, 'r') as file:
             prompt_text = file.read()
         prompt_text = prompt_text.split("```")[0].strip()
-        prompt = "Can you rephrase this text:\n```\n{}\n```".format(prompt_text)
+        mutation_label = os.path.splitext(filename)[0]
+        prompt_base = (
+            "Rephrase the following prompt template text. "
+            "Return ONLY the rephrased prompt text, do NOT include any code examples or code blocks. "
+            "The output should be a prompt template that can be used to instruct an LLM to modify code. "
+            "Preserve the placeholder {{}} where code should be inserted.\n\n"
+            "Original prompt template:\n```\n{}\n```\n\n"
+            "Rephrased prompt template (text only, no code):"
+        ).format(prompt_text)
+        prompt = _prepend_rag_context_to_prompt(prompt_base, mutation_label)
         temp = np.random.uniform(0.01, 0.4)
         if LLM_MODEL == 'mixtral':
             llm_code_generator = submit_mixtral_hf
@@ -405,9 +513,16 @@ def mutate_prompts(n=5):
         else:
             llm_code_generator = submit_mixtral_hf  # fallback
         output = llm_code_generator(prompt, temperature=temp, gene_id="mutate_prompts").strip()
+        # Remove any code blocks that LLM might have generated
         if "```" in output:
-            output = output.split("```")[0]
-        output = output + "\n```python\n{}\n```"
+            # Extract text before first code block
+            output = output.split("```")[0].strip()
+        # Ensure output ends with the code placeholder
+        if "{}" not in output:
+            output = output + "\n```python\n{}\n```"
+        elif not output.rstrip().endswith("```"):
+            # If {} exists but doesn't end with code block, add it
+            output = output.rstrip() + "\n```python\n{}\n```"
         with open(os.path.join(path, "mutant{}.txt".format(i)), 'w') as file:
             file.write(output)
 
@@ -500,15 +615,18 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
                 response = requests.post(api_url, json=payload, timeout=timeout_seconds)
                 if response.status_code == 200:
                     result = response.json()
+                    # Log the structure of the keys for debugging
+                    # print(f"[DEBUG] Local Server keys: {list(result.keys())}")
                     return result.get("generated_text", "")
                 else:
+                    print(f"[ERROR] Server returned {response.status_code}. Content: {response.text}")
                     raise Exception(f"Server returned status code {response.status_code}: {response.text}")
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as exc:
                 last_exception = exc
                 print(f"[WARN] Local server attempt {attempt}/{max_retries} failed: {exc}")
             except Exception as exc:
                 last_exception = exc
-                print(f"[WARN] Local server attempt {attempt}/{max_retries} failed: {exc}")
+                print(f"[WARN] Local server attempt {attempt}/{max_retries} failed type={type(exc)}: {exc}")
                 # Non-transient error; exit retry loop
                 break
             

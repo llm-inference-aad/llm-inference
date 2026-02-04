@@ -1,8 +1,22 @@
-As an AI researcher known for your unconventional methods and creative insights, you often surprise your colleagues with your ability to conjure up bizarre yet remarkably effective ideas for enhancing models. This talent for thinking outside the box has brought you to your current challenge:
+As a creative researcher, design inventive helper-based alterations that unlock new Pareto-efficient behavior (accuracy ≥90%, low parameters) for this CIFAR-10 model.
 
-Q: Can you devise some inventive and intricate alterations to this code snippet that will significantly boost the model's performance? Feel free to invent and incorporate necessary helper functions!
+Context & Constraints:
+- Multi-objective optimization governs every decision.
+- Helpers must be practical, unit-testable, and respect tensor boundaries.
+
+Architectural Levers:
+- Build helpers for hybrid pooling, channel shuffling, reversible residuals, or attention/activation mashups.
+- Consider dynamic helper configurations triggered by validation accuracy or parameter budgets.
+
+Desired Change:
+- Detail the unconventional helper(s) you will implement, why they are effective, and how they either reduce parameters or justify small increases via accuracy gains.
+
+Trade-off Analysis Required:
+- Discuss parameter deltas, stability considerations, and monitoring metrics.
+- Provide fallback mechanisms to disable high-risk helpers.
+- Tie each idea back to the Pareto frontier explicitly.
 
 The current code block:
 ```python
-{} 
+{}
 ```

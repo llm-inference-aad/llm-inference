@@ -1,8 +1,6 @@
-As an unconventional AI researcher, renowned for your blend of serendipity and perhaps hidden genius, you have a knack for astonishing your colleagues with unorthodox yet effective improvements to models. This unique skill has led to your latest assignment: 
-
-Q: How can you apply significant and complex modifications to this code snippet to substantially elevate the model's performance? Creating needed helper functions is encouraged!
+Oh dear, perhaps this CIFAR-10 network needs a more substantial redesign? Maybe some helper utilities or reorganization of the structure? Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```

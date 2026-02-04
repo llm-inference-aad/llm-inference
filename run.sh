@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=llm_opt
-#SBATCH -t 8:00:00                # Runtime in D-HH:MM
+#SBATCH -t 15:00:00                # Runtime in D-HH:MM
 #SBATCH --mem-per-gpu=16G
 #SBATCH -n 1                      # number of CPU cores
 #SBATCH -N 1
 #SBATCH --gres=gpu:1
-#SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
-#SBATCH --output=slurm-results/slurm-main-%j.out
-#SBATCH --error=slurm-results/slurm-main-%j.err
+# Removed GPU constraint - ice-gpu partition uses different naming (a100, v100, etc.)
+#SBATCH --output=metrics/slurm-results/slurm-main-%j.out
+#SBATCH --error=metrics/slurm-results/slurm-main-%j.err
 
 set -Eeuo pipefail
 
@@ -57,7 +57,7 @@ echo "Hostname: $(hostname)"
 echo "Working dir: $(pwd)"
 date
 
-mkdir -p slurm-results
+mkdir -p metrics/slurm-results
 
 # ----------------------------
 # Load modules / CUDA / Python
@@ -123,22 +123,26 @@ uv run python run_improved.py "${RUN_DIR}/checkpoints"
 
 # Move ALL SLURM logs from this run to run directory for organization
 echo "=== Moving SLURM logs to run directory ==="
-if [[ -d "${REPO_ROOT}/slurm-results" ]]; then
+if [[ -d "${REPO_ROOT}/metrics/slurm-results" ]]; then
+  mkdir -p "${RUN_DIR}/logs" "${RUN_DIR}/helper_logs"
+
   # Move main job logs
   if [[ -n "${SLURM_JOB_ID:-}" ]]; then
-    SLURM_OUT="${REPO_ROOT}/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
-    SLURM_ERR="${REPO_ROOT}/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
+    SLURM_OUT="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
+    SLURM_ERR="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
     
     [[ -f "${SLURM_OUT}" ]] && mv "${SLURM_OUT}" "${RUN_DIR}/logs/" && echo "Moved main job .out log"
     [[ -f "${SLURM_ERR}" ]] && mv "${SLURM_ERR}" "${RUN_DIR}/logs/" && echo "Moved main job .err log"
   fi
   
-  # Move all evaluation job logs (eval-*.out, eval-*.err, llm-*.out, llm-*.err)
+  # Move all helper logs (evaluation + LLM ops) into helper_logs/
   # These are created during the run and should be associated with this run
-  find "${REPO_ROOT}/slurm-results" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_DIR}/logs/" \;
+  find "${REPO_ROOT}/metrics/slurm-results" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_DIR}/helper_logs/" \;
   
-  MOVED_COUNT=$(find "${RUN_DIR}/logs/" -type f -name "*.out" -o -name "*.err" | wc -l)
-  echo "Moved ${MOVED_COUNT} SLURM log files to ${RUN_DIR}/logs/"
+  MAIN_COUNT=$(find "${RUN_DIR}/logs/" -type f \( -name "slurm-main-*.out" -o -name "slurm-main-*.err" \) | wc -l)
+  HELPER_COUNT=$(find "${RUN_DIR}/helper_logs/" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) | wc -l)
+  echo "Moved ${MAIN_COUNT} main SLURM log files to ${RUN_DIR}/logs/"
+  echo "Moved ${HELPER_COUNT} helper SLURM log files to ${RUN_DIR}/helper_logs/"
 fi
 
 # Update run metadata on completion
@@ -175,17 +179,17 @@ if [[ -f "${SERVER_JOB_FILE}" ]]; then
     
     # Move server logs to run directory
     echo "Moving server logs to run directory..."
-    SERVER_OUT_LOG="${REPO_ROOT}/slurm-results/slurm-server-${SERVER_JOB_ID}.out"
-    SERVER_ERR_LOG="${REPO_ROOT}/slurm-results/slurm-server-${SERVER_JOB_ID}.err"
+    SERVER_OUT_LOG="${REPO_ROOT}/metrics/slurm-results/slurm-server-${SERVER_JOB_ID}.out"
+    SERVER_ERR_LOG="${REPO_ROOT}/metrics/slurm-results/slurm-server-${SERVER_JOB_ID}.err"
     
     if [[ -f "${SERVER_OUT_LOG}" ]]; then
-      mv "${SERVER_OUT_LOG}" "${RUN_DIR}/logs/" && echo "✅ Moved server .out log"
+      mv "${SERVER_OUT_LOG}" "${RUN_DIR}/helper_logs/" && echo "✅ Moved server .out log"
     else
       echo "⚠️  Server .out log not found: ${SERVER_OUT_LOG}"
     fi
     
     if [[ -f "${SERVER_ERR_LOG}" ]]; then
-      mv "${SERVER_ERR_LOG}" "${RUN_DIR}/logs/" && echo "✅ Moved server .err log"
+      mv "${SERVER_ERR_LOG}" "${RUN_DIR}/helper_logs/" && echo "✅ Moved server .err log"
     else
       echo "⚠️  Server .err log not found: ${SERVER_ERR_LOG}"
     fi

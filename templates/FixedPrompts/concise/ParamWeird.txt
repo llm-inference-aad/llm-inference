@@ -1,6 +1,6 @@
-Q: What are some obscure modifications to default parameters or hyperparameters that could potentially improve the performance of this existing code snippet?
+Q: What unconventional hyperparameter strategy could unlock unexpected training dynamics for this CIFAR-10 network? Think oscillating schedules, curriculum-based regularization, layer-wise optimizer mixing, or other creative training ideas. No architectural changes—pure optimization creativity. Input/output tensors: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python
-{} 
+{}
 ```
