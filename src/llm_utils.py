@@ -7,6 +7,7 @@ import glob
 import inspect
 import torch.nn as nn
 import time
+from datetime import datetime
 import numpy as np
 import transformers
 from torch import bfloat16
@@ -29,6 +30,34 @@ from google.genai import types
 
 from huggingface_hub.utils import HfHubHTTPError
 import os, time, random
+import json
+
+def log_llm_interaction(gene_id, stage, content, is_error=False):
+    """Log LLM interactions to a separate file per gene in metrics/llm/."""
+    # Use ROOT_DIR from constants if available, else fallback
+    root = globals().get('ROOT_DIR', os.getcwd())
+    
+    log_dir = os.path.join(root, "metrics", "llm")
+    os.makedirs(log_dir, exist_ok=True)
+    
+    filename = "unknown.log"
+    if gene_id:
+        filename = f"gene_{gene_id}.log"
+    
+    log_path = os.path.join(log_dir, filename)
+    
+    timestamp = datetime.now().isoformat()
+    heading = f"[{timestamp}] {stage}"
+    if is_error:
+        heading += " (ERROR)"
+    
+    with open(log_path, 'a') as f:
+        f.write(f"\n{'='*80}\n")
+        f.write(f"{heading}\n")
+        f.write(f"{'-'*80}\n")
+        f.write(f"{content}\n")
+        f.write(f"{'='*80}\n")
+
 
 
 def retrieve_base_code(idx):
@@ -143,8 +172,9 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         # Inject error message before the final instruction or append it
         txt2llm += error_msg
 
-    box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
-    print(txt2llm)
+    # box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
+    # print(txt2llm)
+    log_llm_interaction(gene_id, "PROMPT TO LLM", txt2llm)
 
     if inference_submission is False:
         if LLM_MODEL == 'local_server':
@@ -174,21 +204,24 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         else:
             raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
             # Add explicit debug logging for every raw response
-            box_print("TEXT FROM LLM (RAW OUTPUT)", print_bbox_len=60, new_line_end=False)
-            print(raw_response)
+            # box_print("TEXT FROM LLM (RAW OUTPUT)", print_bbox_len=60, new_line_end=False)
+            # print(raw_response)
+            log_llm_interaction(gene_id, "TEXT FROM LLM (RAW)", raw_response)
             candidate_code = clean_code_from_llm(raw_response)
 
         candidate_code = clean_code_from_llm(candidate_code)
 
         is_valid, validation_error = _validate_python_snippet(candidate_code)
         if is_valid:
-            box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
-            print(candidate_code)
+            # box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
+            # print(candidate_code)
+            log_llm_interaction(gene_id, "CODE FROM LLM (VALID)", candidate_code)
             return candidate_code
 
         last_error = validation_error or "unable to extract python code"
-        box_print("INVALID LLM OUTPUT", print_bbox_len=60, new_line_end=False)
-        print(f"Attempt {attempt + 1} failed validation: {last_error}")
+        # box_print("INVALID LLM OUTPUT", print_bbox_len=60, new_line_end=False)
+        # print(f"Attempt {attempt + 1} failed validation: {last_error}")
+        log_llm_interaction(gene_id, f"INVALID LLM OUTPUT (Attempt {attempt+1})", f"Error: {last_error}\n\nCode:\n{candidate_code}", is_error=True)
 
     raise RuntimeError(
         f"LLM failed to provide valid Python after {LLM_GENERATION_MAX_RETRIES} attempts. Last error: {last_error}"

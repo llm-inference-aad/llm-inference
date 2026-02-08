@@ -1,0 +1,29 @@
+flowchart TD
+    subgraph Data Ingestion
+        A[Start: Read Source] --> B{Source Type?}
+        B -->|Checkpoint| C[Load Mutation .pkl]
+        B -->|PDF/Docs| D[PDFPlumber / Text Loader]
+        C --> E[Extract Code & Metrics]
+        D --> E
+        E --> F[Chunk Text (400 words)]
+        F --> G[Generate Embeddings (Code/Text Models)]
+        G --> H[Vector Store (ChromaDB)]
+    end
+
+    subgraph Runtime Retrieval
+        I[LLM Request] --> J{RAG Enabled?}
+        J -->|Yes| K[Query Vector Store]
+        K --> L[Retrieve Top-K Semantic Matches]
+        L --> M[Filter by Accuracy/Params]
+        M --> N[Format Context Prompt]
+        N --> O[Append to Original Prompt]
+        J -->|No| O
+        O --> P[Send to LLM]
+    end
+
+    subgraph Storage
+        H
+    end
+
+    style H fill:#f9f,stroke:#333,stroke-width:2px
+    style O fill:#ff9,stroke:#333,stroke-width:2px
