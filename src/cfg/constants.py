@@ -37,6 +37,9 @@ elif torch.cuda.is_available():
 else:
 	DEVICE = 'cpu'
 
+LLM_JOB_TIMEOUT_SECONDS = int(os.environ.get('LLM_JOB_TIMEOUT_SECONDS', 3600))
+LLM_JOB_CHECK_INTERVAL_SECONDS = int(os.environ.get('LLM_JOB_CHECK_INTERVAL_SECONDS', 60))
+
 #LLM_MODEL = 'mixtral'
 #LLM_MODEL = 'llama3'
 #: LLM Model to use. Choices currently include ['gemini', 'mixtral', 'llama3', 'local_server']
