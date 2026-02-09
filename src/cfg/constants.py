@@ -102,7 +102,7 @@ PROB_EOT = 0.25
 # Recommended settings for establishing baseline metrics before applying
 # optimization techniques (RAG, speculative decoding, etc.)
 #
-# For beline run:
+# For baseline run:
 # - num_generations: 10-15 (enough for statistical significance)
 # - population_size: 8-16 (matches batch size for efficient batching)
 # - LOCAL: False (parallel evaluation, better for throughput measurement)

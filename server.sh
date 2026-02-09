@@ -45,6 +45,8 @@ if [ ! -z "$HOSTNAME_LOG_FILE" ]; then
 fi
 
 # Make sure CUDA can see all GPUs
+# NOTE: CUDA_VISIBLE_DEVICES export is intentionally disabled to allow Slurm
+#       to manage GPU visibility/indexing for multi-GPU allocations.
 # export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 export MKL_THREADING_LAYER=${MKL_THREADING_LAYER:-GNU}
 
