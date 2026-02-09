@@ -162,14 +162,22 @@ module load cuda
 # export LD_LIBRARY_PATH=~/.conda/envs/llm_guided_env/lib/python3.12/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 # conda info
 
+# Change to repository root directory first
+cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
+
+# Load environment variables from .env file
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+fi
+
+# Set fallback for VENV_PATH if not set
+VENV_PATH="${{VENV_PATH:-{root_dir}/.venv}}"
+
 export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.13/site-packages/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH"
 source "$VENV_PATH/bin/activate"
 
 # Set the TOKENIZERS_PARALLELISM environment variable if needed
 # export TOKENIZERS_PARALLELISM=false
-
-# Change to repository root directory to ensure consistent paths
-cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
 
 # Time the evaluation
 EVAL_START=$(date +%s)

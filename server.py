@@ -17,6 +17,34 @@ from evaluator import OutputEvaluator
 
 app = FastAPI(title="LLM API", version="1.0")
 
+def strip_thinking_tokens(text: str) -> str:
+    """
+    Remove thinking process markers from LLM output.
+    Strips patterns like 'Let us think step by step' and similar reasoning preambles.
+    
+    Args:
+        text: The generated text from LLM
+        
+    Returns:
+        str: Text with thinking tokens removed
+    """
+    if not text:
+        return text
+    
+    # Remove common thinking patterns
+    thinking_patterns = [
+        r'Let us think step by step[:\s]*',
+        r'Let me think[:\s]*',
+        r'Step by step[:\s]*',
+        r'A:\s*',  # Common response marker
+    ]
+    
+    cleaned_text = text
+    for pattern in thinking_patterns:
+        cleaned_text = re.sub(pattern, '', cleaned_text, flags=re.IGNORECASE)
+    
+    return cleaned_text.strip()
+
 # Path To Local Large Language Model (from environment variable)
 MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it")
 
