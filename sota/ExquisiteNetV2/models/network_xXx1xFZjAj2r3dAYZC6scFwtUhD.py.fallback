@@ -1,0 +1,1 @@
+Error calling local server: Error calling local server after 3 attempts: Server returned status code 500: {"detail":"CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`"}

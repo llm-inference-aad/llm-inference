@@ -1,0 +1,34 @@
+As a creative researcher, design inventive helper-based alterations that unlock new Pareto-efficient behavior (accuracy ≥90%, low parameters) for this CIFAR-10 model.
+
+Context & Constraints:
+- Multi-objective optimization governs every decision.
+- Helpers must be practical, unit-testable, and respect tensor boundaries.
+
+Architectural Levers:
+- Build helpers for hybrid pooling, channel shuffling, reversible residuals, or attention/activation mashups.
+- Consider dynamic helper configurations triggered by validation accuracy or parameter budgets.
+
+Desired Change:
+- Detail the unconventional helper(s) you will implement, why they are effective, and how they either reduce parameters or justify small increases via accuracy gains.
+
+Trade-off Analysis Required:
+- Discuss parameter deltas, stability considerations, and monitoring metrics.
+- Provide fallback mechanisms to disable high-risk helpers.
+- Tie each idea back to the Pareto frontier explicitly.
+
+The current code block:
+```python
+{}
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. If no change is required, return the original code inside the fenced block.
+9. This network targets high CIFAR-10 accuracy (≥90%) with efficient parameter usage. Consider how architectural choices influence both objectives.
+10. Explore creative modifications that push performance boundaries—novel layer compositions, unconventional activation patterns, or emergent architectural motifs are encouraged.
+
+A: Let us think step by step

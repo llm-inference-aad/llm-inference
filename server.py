@@ -269,36 +269,74 @@ class LLMModel:
                     
                     start_time = time.time()
                     
-                    results = self.pipeline(
-                        prompts, 
-                        max_new_tokens=max_new_tokens,
-                        temperature=temperature,
-                        top_p=top_p
-                    )
+                    # Calculate timeout based on expected generation time
+                    # For 70B model: ~2-5 tokens/sec, so allow ~0.3sec per token + baseline
+                    # This ensures we don't timeout prematurely on generation
+                    base_timeout = 60  # 1 minute baseline for small requests
+                    per_token_timeout = 0.3  # 0.3 seconds per token (conservative)
+                    generation_timeout = base_timeout + (max_new_tokens * per_token_timeout)
+                    generation_timeout = min(generation_timeout, 1800)  # Cap at 30 minutes
+                    
+                    print(f"[DEBUG] Generating with timeout={generation_timeout}s for max_new_tokens={max_new_tokens}", flush=True)
+                    
+                    try:
+                        # Run pipeline in executor to allow timeout
+                        loop = asyncio.get_event_loop()
+                        results = await asyncio.wait_for(
+                            loop.run_in_executor(
+                                None,
+                                lambda: self.pipeline(
+                                    prompts,
+                                    max_new_tokens=max_new_tokens,
+                                    temperature=temperature,
+                                    top_p=top_p
+                                )
+                            ),
+                            timeout=generation_timeout
+                        )
+                    except asyncio.TimeoutError:
+                        raise Exception(f"Model generation timed out after {generation_timeout}s (max_new_tokens={max_new_tokens}). Model may be stuck or GPU unresponsive.")
                     
                     response_time = round(time.time() - start_time, 2)
                     
                     # for every future, set its result
                     for i, (result, future) in enumerate(zip(results, futures)):
-                        output_txt = result[0].get("generated_text", str(result))
-                        
-                        # Calculate queue wait time for this specific request
-                        queue_wait_time = batch_processing_start - batch[i].get("queue_start_time", batch_processing_start)
-                        
-                        future.set_result({
-                            "generated_text": output_txt,
-                            "response_time_sec": response_time,
-                            "batch_size": batch_size,
-                            "queue_wait_time_sec": round(queue_wait_time, 4)
-                        })
-                        
-                        # done with task
-                        self.request_queue.task_done()
+                        try:
+                            output_txt = result[0].get("generated_text", str(result))
+                            
+                            # Validate response is not empty or obviously truncated
+                            if not output_txt or not output_txt.strip():
+                                raise ValueError(f"Empty response from model generation for prompt #{i}")
+                            
+                            # Warn if response looks very short (might be truncated)
+                            if len(output_txt.strip()) < 10:
+                                print(f"[WARN] Very short response ({len(output_txt)} chars) for request {i}: {output_txt[:50]}", flush=True)
+                            
+                            # Calculate queue wait time for this specific request
+                            queue_wait_time = batch_processing_start - batch[i].get("queue_start_time", batch_processing_start)
+                            
+                            future.set_result({
+                                "generated_text": output_txt,
+                                "response_time_sec": response_time,
+                                "batch_size": batch_size,
+                                "queue_wait_time_sec": round(queue_wait_time, 4)
+                            })
+                            
+                            # done with task
+                            self.request_queue.task_done()
+                        except Exception as result_err:
+                            print(f"[ERROR] Failed to process result #{i}: {result_err}", flush=True)
+                            if not future.done():
+                                future.set_exception(Exception(f"Response processing error: {result_err}"))
+                            self.request_queue.task_done()
                 
                 except Exception as e:
                     import traceback
-                    print(f"Error processing batch: {str(e)}")
+                    timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+                    print(f"[{timestamp}] [ERROR] Error processing batch: {str(e)}", flush=True)
                     traceback.print_exc() # Log full traceback
+                    
+                    # Report error to all futures in this batch
                     for future in futures:
                         if not future.done():
                             future.set_exception(e)

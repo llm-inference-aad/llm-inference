@@ -527,11 +527,13 @@ def mutate_prompts(n=5):
             file.write(output)
 
 
-def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
+def submit_local_server(txt2llm, max_new_tokens=2048, top_p=0.8, temperature=0.7, gene_id=None, **kwargs):
     """
     Submit a request to the local FastAPI server or load balancer running on PACE-ICE cluster.
     This helper now includes retry logic and an optional remote fallback to keep evolution moving
     even when the primary gateway is down.
+    
+    Default max_new_tokens=2048 is sufficient for neural network code mutations (typically 500-1500 tokens).
     """
     try:
         # Check if load balancer mode is enabled

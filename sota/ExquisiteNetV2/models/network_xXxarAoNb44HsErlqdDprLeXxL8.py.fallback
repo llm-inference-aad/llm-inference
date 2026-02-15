@@ -1,0 +1,1 @@
+Error calling local server: Error calling local server after 3 attempts: Server returned status code 500: {"detail":"Model generation timed out after 120s. Model may be stuck or GPU unresponsive."}
