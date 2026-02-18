@@ -117,6 +117,50 @@ echo "UV Python path: $(uv run which python)"
 nvidia-smi || true
 
 # ----------------------------
+# Wait for LLM server to be ready (if using local server)
+# ----------------------------
+HOSTNAME_LOG="${REPO_ROOT}/hostname.log"
+SERVER_PORT="${SERVER_PORT:-8001}"
+WAIT_FOR_FILE_TIMEOUT=600      # 10 min to see hostname.log
+WAIT_FOR_SERVER_TIMEOUT=1200    # 20 min for server to become ready
+POLL_INTERVAL=30
+
+if [[ -n "${LLM_MODEL:-}" && "${LLM_MODEL}" = "local_server" ]]; then
+  echo "=== Waiting for LLM server (hostname.log + HTTP) ==="
+  # Wait for hostname.log to exist and be non-empty
+  FILE_WAIT=0
+  while [[ ! -s "${HOSTNAME_LOG}" ]]; do
+    if [[ $FILE_WAIT -ge $WAIT_FOR_FILE_TIMEOUT ]]; then
+      echo "ERROR: hostname.log did not appear within ${WAIT_FOR_FILE_TIMEOUT}s. Is the server job running?"
+      exit 1
+    fi
+    echo "  Waiting for hostname.log... (${FILE_WAIT}s / ${WAIT_FOR_FILE_TIMEOUT}s)"
+    sleep 30
+    FILE_WAIT=$((FILE_WAIT + 30))
+  done
+  SERVER_HOST=$(cat "${HOSTNAME_LOG}" | tr -d '\n\r')
+  echo "  Server host from hostname.log: ${SERVER_HOST}"
+  # Wait for server to respond
+  SERVER_WAIT=0
+  while true; do
+    if curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "http://${SERVER_HOST}:${SERVER_PORT}/" | grep -q '200'; then
+      echo "  Server responded at http://${SERVER_HOST}:${SERVER_PORT}/"
+      break
+    fi
+    if [[ $SERVER_WAIT -ge $WAIT_FOR_SERVER_TIMEOUT ]]; then
+      echo "ERROR: Server did not respond within ${WAIT_FOR_SERVER_TIMEOUT}s."
+      exit 1
+    fi
+    echo "  Waiting for server HTTP... (${SERVER_WAIT}s / ${WAIT_FOR_SERVER_TIMEOUT}s)"
+    sleep "$POLL_INTERVAL"
+    SERVER_WAIT=$((SERVER_WAIT + POLL_INTERVAL))
+  done
+  echo "=== LLM server ready ==="
+else
+  echo "=== Skipping server wait (LLM_MODEL=${LLM_MODEL:-not set}) ==="
+fi
+
+# ----------------------------
 # Run your job
 # ----------------------------
 echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
@@ -202,6 +246,19 @@ if [[ -f "${SERVER_JOB_FILE}" ]]; then
 else
   echo "⚠️  Server job tracking file not found: ${SERVER_JOB_FILE}"
   echo "   Server may need to be shut down manually"
+fi
+
+# =============================================================================
+# Generate Comprehensive Evaluation Report
+# =============================================================================
+echo "=== Generating evaluation report ==="
+if [[ -d "${RUN_DIR}" ]]; then
+  uv run python generate_evaluation_report.py "${RUN_DIR}"
+  echo "✅ Evaluation report generated in ${RUN_DIR}/"
+  echo "   - evaluation_report.json (machine-readable)"
+  echo "   - evaluation_report.txt (human-readable)"
+else
+  echo "⚠️  Run directory not found: ${RUN_DIR}"
 fi
 
 echo "=== Job complete ==="

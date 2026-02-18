@@ -38,6 +38,18 @@ uv sync
 ```
 This process typically completes in under 3 minutes and installs over 100 packages, including PyTorch, Transformers, and DEAP.
 
+### Optional: vLLM Backend (Continuous Batching)
+
+For higher throughput, you can enable the vLLM inference backend:
+
+```bash
+uv sync --extra vllm
+```
+
+Then set `USE_VLLM=true` in your `.env` file. The server will use vLLM's continuous batching for better performance during LLM Guided Evolution.
+
+**Note**: vLLM has additional build dependencies (e.g., compatible CUDA, possibly Rust for some transitive deps). If installation fails, the server automatically falls back to the HuggingFace backend when `USE_VLLM=true` but vLLM is not installed.
+
 ## 4. Using `uv run`
 
 As an alternative to activating the environment, you can use `uv run` to execute commands within the managed environment. This is useful for one-off script executions.

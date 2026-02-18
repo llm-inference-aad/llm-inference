@@ -250,10 +250,10 @@ def check_contents_for_error(contents):
 
     # Check for error indicators in the file
     if "traceback" in contents.lower() or "slurmstepd: error" in contents.lower():
-        print("\t☠ Error Found in LLM Job Output.", flush=True)
+        print("\t❌ Error Found in LLM Job Output.", flush=True)
         return False
     elif "job done" in contents.lower():
-        print("\t☑ LLM Job Completed Successfully.", flush=True)
+        print("\t✅ LLM Job Completed Successfully.", flush=True)
         return True
     else:
         return None
@@ -642,7 +642,7 @@ def check_and_update_fitness(population, timeout=3600*30, loop_delay=60*30):
                 else:
                     if 'results_job' not in GLOBAL_DATA[gene_id].keys():
                         ind.fitness.values = INVALID_FITNESS_MAX # Max error
-                        print(f'\t☠ No Placeholder Fitness for: {gene_id}')
+                        print(f'\t❌ No Placeholder Fitness for: {gene_id}')
                         GLOBAL_DATA[gene_id]['status'] == "completed"
                     else:
                         print(f"\t‣ Still Waiting On: Gene: {gene_id}", flush=True)
@@ -685,10 +685,10 @@ def update_individual(ind, new_gene_id, old_gene_id=None, process_success=True, 
         ind = creator.Individual([new_gene_id])
         if old_gene_id is not None and old_gene_id in GLOBAL_DATA.keys():
             del GLOBAL_DATA[old_gene_id]
-        print(f'\t☑ {operation}: {new_gene_id}')
+        print(f'\t✅ {operation}: {new_gene_id}')
         # GLOBAL_DATA_ANCESTRY[new_gene_id] = {'SCORES':[], 'GENES':[], 'CROSS_OVERS':{}, 'MUTATE_TYPE':[]}
     else:
-        print(f'\t☠ Failed {operation}: {new_gene_id}')
+        print(f'\t❌ Failed {operation}: {new_gene_id}')
         if new_gene_id in GLOBAL_DATA.keys():
             del GLOBAL_DATA[new_gene_id]
         if old_gene_id is not None:
@@ -771,7 +771,7 @@ def delayed_mutate_check(offspring):
                     if job_done:
                         print(f'\t‣ Model Files for {new_gene_id} are Loaded') 
                     else: 
-                        print(f'\t☠ Error Loading Model Files for {new_gene_id}')
+                        print(f'\t❌ Error Loading Model Files for {new_gene_id}')
 
                     failed_process = not (successful_sub_flag and job_done)
                     old_gene_id = LINKED_GENES[k]
@@ -913,7 +913,7 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
         if job_done:
             print(f'\t‣ Model Files for {new_gene_id} are Loaded')
         else: 
-            print(f'\t☠ Error Loading Model Files for {new_gene_id}')
+            print(f'\t❌ Error Loading Model Files for {new_gene_id}')
     
     failed_process = not (successful_sub_flag and job_done)
 

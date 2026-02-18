@@ -1,15 +1,20 @@
 #!/bin/bash
 #SBATCH --job-name=LLMGE01_Server
-#SBATCH -t 12:00:00
-#SBATCH --gres=gpu:1
-#SBATCH --mem 160G
-#SBATCH -c 16
+#SBATCH -t 4:00:00
+#SBATCH -N 1
+# Request H200 (or other high-memory GPUs): 70B + 128K context needs >80GB per GPU; H100 80GB can OOM on KV cache
+#SBATCH --gres=gpu:h200:2
+#SBATCH --mem 320G
+#SBATCH -c 32
 #SBATCH --output=slurm-results/slurm-server-%j.out
 #SBATCH --error=slurm-results/slurm-server-%j.err
 
-echo "launching LLM Server"
+echo "================================================================================"
+echo "                         LAUNCHING LLM SERVER"
+echo "================================================================================"
 
 hostname
+echo "Job ID: ${SLURM_JOB_ID}"
 
 mkdir -p slurm-results
 
@@ -28,9 +33,21 @@ else
     export SERVER_PORT="8000"
     export SERVER_WORKERS="1"
     export HOSTNAME_LOG_FILE="$(pwd)/hostname.log"
-    export CUDA_VISIBLE_DEVICES="0"
+    export CUDA_VISIBLE_DEVICES="0,1"
     export MKL_THREADING_LAYER="GNU"
+    export USE_VLLM="true"
 fi
+
+# Display vLLM configuration prominently
+echo ""
+echo "================================================================================"
+if [ "${USE_VLLM}" = "true" ] || [ "${USE_VLLM}" = "1" ] || [ "${USE_VLLM}" = "yes" ]; then
+    echo "                    *** vLLM STATUS: ENABLED ✅ ***"
+else
+    echo "                    *** vLLM STATUS: DISABLED ❌ ***"
+fi
+echo "================================================================================"
+echo ""
 
 # IMPORTANT: Command-line/sbatch exports override .env values
 # This allows parallel jobs to use different ports
@@ -42,9 +59,26 @@ if [ ! -z "$HOSTNAME_LOG_FILE" ]; then
     echo "  HOSTNAME_LOG_FILE override detected: $HOSTNAME_LOG_FILE"
 fi
 
-# Make sure CUDA can see all GPUs
-export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+# Make sure CUDA can see all GPUs (for 2-GPU setup, use 0,1)
+# SLURM automatically sets this for allocated GPUs, but we ensure it's set correctly
+if [ "${SLURM_GPUS_ON_NODE:-0}" -ge 2 ]; then
+    export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0,1}
+else
+    export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+fi
 export MKL_THREADING_LAYER=${MKL_THREADING_LAYER:-GNU}
+
+# Fix Ray AMD GPU detection issue on NVIDIA clusters
+export RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES=1
+unset ROCR_VISIBLE_DEVICES
+unset HIP_VISIBLE_DEVICES
+
+# Force vLLM to use 'spawn' multiprocessing method for CUDA multi-GPU
+export VLLM_WORKER_MULTIPROC_METHOD=spawn
+
+echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
+echo "SLURM_GPUS_ON_NODE: ${SLURM_GPUS_ON_NODE:-not set}"
+echo "VLLM_WORKER_MULTIPROC_METHOD: $VLLM_WORKER_MULTIPROC_METHOD"
 
 # Set root directory if not already set
 export LLM_INFERENCE_ROOT_DIR=${LLM_INFERENCE_ROOT_DIR:-$(pwd)}
@@ -70,6 +104,11 @@ echo "Writing server job ID '${SLURM_JOB_ID}' to file: $SERVER_JOB_FILE"
 echo "${SLURM_JOB_ID}" > "$SERVER_JOB_FILE"
 
 echo "Starting LLM server on host: $SERVER_HOSTNAME"
+echo ""
+echo "========================================"
+echo "  vLLM STATUS: ${USE_VLLM}"
+echo "========================================"
+echo ""
 
 # Use environment variables for server configuration
 SERVER_HOST=${SERVER_HOST:-$SERVER_HOSTNAME}
@@ -187,5 +226,18 @@ EOF
 else
     echo "SERVER_REGISTRY_FILE not set, skipping load balancer registration"
 fi
+
+# Force single-node Ray for vLLM tensor parallelism (2+ GPUs on one node)
+export RAY_ADDRESS=""
+export VLLM_HOST_IP=$(hostname -I | awk '{print $1}')
+echo "Ray single-node config: VLLM_HOST_IP=$VLLM_HOST_IP"
+
+# Pre-start Ray head with GPU count so vLLM can create placement group
+# Get GPU count from SLURM or fall back to TENSOR_PARALLEL_SIZE
+NGPUS=${SLURM_GPUS_ON_NODE:-${VLLM_TENSOR_PARALLEL_SIZE:-2}}
+echo "Starting Ray head with $NGPUS GPUs (NVIDIA)..."
+echo "CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
+ray start --head --num-gpus=$NGPUS --disable-usage-stats --num-cpus=32
+sleep 2
 
 python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS

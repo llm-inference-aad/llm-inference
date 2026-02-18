@@ -60,14 +60,14 @@ if [ -n "${JOB_ID}" ]; then
     
     if [ -f "${MAIN_OUT}" ]; then
         mv "${MAIN_OUT}" "${LOGS_DIR}/"
-        echo "  ✓ Moved slurm-main-${JOB_ID}.out"
+        echo "  ✅ Moved slurm-main-${JOB_ID}.out"
     else
         echo "  ⚠ Not found: ${MAIN_OUT}"
     fi
     
     if [ -f "${MAIN_ERR}" ]; then
         mv "${MAIN_ERR}" "${LOGS_DIR}/"
-        echo "  ✓ Moved slurm-main-${JOB_ID}.err"
+        echo "  ✅ Moved slurm-main-${JOB_ID}.err"
     else
         echo "  ⚠ Not found: ${MAIN_ERR}"
     fi
@@ -87,7 +87,7 @@ if [ -n "${RUN_START_TIME}" ]; then
         if [ -f "${log_file}" ]; then
             filename=$(basename "${log_file}")
             mv "${log_file}" "${LOGS_DIR}/"
-            echo "  ✓ Moved ${filename}"
+            echo "  ✅ Moved ${filename}"
             ((MOVED_COUNT++))
         fi
     done < <(find "${SLURM_RESULTS}" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -print0 2>/dev/null)
@@ -100,7 +100,7 @@ else
             if [ -f "${log_file}" ]; then
                 filename=$(basename "${log_file}")
                 mv "${log_file}" "${LOGS_DIR}/"
-                echo "  ✓ Moved ${filename}"
+                echo "  ✅ Moved ${filename}"
                 ((MOVED_COUNT++))
             fi
         done < <(find "${SLURM_RESULTS}" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -print0)
