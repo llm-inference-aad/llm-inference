@@ -36,6 +36,8 @@ fi
 
 # Set the run directory path (absolute path to avoid issues with subprocess working directories)
 RUN_DIR="${REPO_ROOT}/runs/${RUN_ID}"
+RUN_LOG_DIR="${RUN_DIR}/logs"
+RUN_METRICS_DIR="${RUN_DIR}/metrics"
 
 # Validate run directory exists
 if [[ ! -d "${RUN_DIR}" ]]; then
@@ -49,6 +51,11 @@ fi
 
 export RUN_ID
 export RUN_DIR
+export RUN_LOG_DIR
+export RUN_METRICS_DIR
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}"
+exec > >(tee -a "${RUN_LOG_DIR}/run-main-${SLURM_JOB_ID:-manual}.out") \
+     2> >(tee -a "${RUN_LOG_DIR}/run-main-${SLURM_JOB_ID:-manual}.err" >&2)
 echo "Using run directory: ${RUN_DIR}"
 # ==============================================================================
 
@@ -57,7 +64,7 @@ echo "Hostname: $(hostname)"
 echo "Working dir: $(pwd)"
 date
 
-mkdir -p metrics/slurm-results
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" metrics/slurm-results
 
 # ----------------------------
 # Load modules / CUDA / Python
@@ -98,6 +105,21 @@ set +a
 export LLM_INFERENCE_ROOT_DIR
 echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
 
+# ------------------------------------------------------------------------------
+# Enforce run-scoped paths for all runtime logs and metrics
+# ------------------------------------------------------------------------------
+export RUN_LOG_DIR="${RUN_LOG_DIR}"
+export RUN_METRICS_DIR="${RUN_METRICS_DIR}"
+export SLURM_LOG_DIR="${RUN_LOG_DIR}"
+export METRICS_PATH="${RUN_METRICS_DIR}"
+export HOSTNAME_LOG_FILE="${RUN_LOG_DIR}/hostname.log"
+export LOADBALANCER_LOG_FILE="${RUN_LOG_DIR}/loadbalancer.log"
+export SERVER_REGISTRY_FILE="${RUN_LOG_DIR}/servers.json"
+
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}"
+echo "RUN_LOG_DIR: ${RUN_LOG_DIR}"
+echo "RUN_METRICS_DIR: ${RUN_METRICS_DIR}"
+
 # ----------------------------
 # CUDA libs for uv environment (best-effort)
 # ----------------------------
@@ -125,25 +147,22 @@ uv run python run_improved.py "${RUN_DIR}/checkpoints"
 # Move ALL SLURM logs from this run to run directory for organization
 echo "=== Moving SLURM logs to run directory ==="
 if [[ -d "${REPO_ROOT}/metrics/slurm-results" ]]; then
-  mkdir -p "${RUN_DIR}/logs" "${RUN_DIR}/helper_logs"
+  mkdir -p "${RUN_LOG_DIR}"
 
   # Move main job logs
   if [[ -n "${SLURM_JOB_ID:-}" ]]; then
     SLURM_OUT="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
     SLURM_ERR="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
     
-    [[ -f "${SLURM_OUT}" ]] && mv "${SLURM_OUT}" "${RUN_DIR}/logs/" && echo "Moved main job .out log"
-    [[ -f "${SLURM_ERR}" ]] && mv "${SLURM_ERR}" "${RUN_DIR}/logs/" && echo "Moved main job .err log"
+    [[ -f "${SLURM_OUT}" ]] && mv "${SLURM_OUT}" "${RUN_LOG_DIR}/" && echo "Moved main job .out log"
+    [[ -f "${SLURM_ERR}" ]] && mv "${SLURM_ERR}" "${RUN_LOG_DIR}/" && echo "Moved main job .err log"
   fi
   
-  # Move all helper logs (evaluation + LLM ops) into helper_logs/
-  # These are created during the run and should be associated with this run
-  find "${REPO_ROOT}/metrics/slurm-results" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_DIR}/helper_logs/" \;
+  # Move any legacy helper/server logs generated under metrics/slurm-results.
+  find "${REPO_ROOT}/metrics/slurm-results" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" -o -name "slurm-server-*.out" -o -name "slurm-server-*.err" \) -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_LOG_DIR}/" \;
   
-  MAIN_COUNT=$(find "${RUN_DIR}/logs/" -type f \( -name "slurm-main-*.out" -o -name "slurm-main-*.err" \) | wc -l)
-  HELPER_COUNT=$(find "${RUN_DIR}/helper_logs/" -type f \( -name "eval-*.out" -o -name "eval-*.err" -o -name "llm-*.out" -o -name "llm-*.err" \) | wc -l)
-  echo "Moved ${MAIN_COUNT} main SLURM log files to ${RUN_DIR}/logs/"
-  echo "Moved ${HELPER_COUNT} helper SLURM log files to ${RUN_DIR}/helper_logs/"
+  LOG_COUNT=$(find "${RUN_LOG_DIR}/" -type f | wc -l)
+  echo "Run log files available in ${RUN_LOG_DIR}: ${LOG_COUNT}"
 fi
 
 # Update run metadata on completion
@@ -165,7 +184,7 @@ fi
 # Automatic LLM Server Shutdown and Log Collection
 # =============================================================================
 echo "=== Shutting down LLM server ==="
-SERVER_JOB_FILE="${REPO_ROOT}/hostname_server_job.txt"
+SERVER_JOB_FILE="${HOSTNAME_LOG_FILE%.log}_server_job.txt"
 
 if [[ -f "${SERVER_JOB_FILE}" ]]; then
   SERVER_JOB_ID=$(cat "${SERVER_JOB_FILE}" 2>/dev/null || echo "")
@@ -180,24 +199,32 @@ if [[ -f "${SERVER_JOB_FILE}" ]]; then
     
     # Move server logs to run directory
     echo "Moving server logs to run directory..."
-    SERVER_OUT_LOG="${REPO_ROOT}/metrics/slurm-results/slurm-server-${SERVER_JOB_ID}.out"
-    SERVER_ERR_LOG="${REPO_ROOT}/metrics/slurm-results/slurm-server-${SERVER_JOB_ID}.err"
+    SERVER_OUT_LOG_PRIMARY="${RUN_LOG_DIR}/slurm-server-${SERVER_JOB_ID}.out"
+    SERVER_ERR_LOG_PRIMARY="${RUN_LOG_DIR}/slurm-server-${SERVER_JOB_ID}.err"
+    SERVER_OUT_LOG_LEGACY="${REPO_ROOT}/metrics/slurm-results/slurm-server-${SERVER_JOB_ID}.out"
+    SERVER_ERR_LOG_LEGACY="${REPO_ROOT}/metrics/slurm-results/slurm-server-${SERVER_JOB_ID}.err"
     
-    if [[ -f "${SERVER_OUT_LOG}" ]]; then
-      mv "${SERVER_OUT_LOG}" "${RUN_DIR}/helper_logs/" && echo "✅ Moved server .out log"
+    if [[ -f "${SERVER_OUT_LOG_LEGACY}" ]]; then
+      mv "${SERVER_OUT_LOG_LEGACY}" "${RUN_LOG_DIR}/" && echo "✅ Moved legacy server .out log"
+    fi
+    if [[ -f "${SERVER_OUT_LOG_PRIMARY}" ]]; then
+      echo "✅ Server .out log found in run log directory"
     else
-      echo "⚠️  Server .out log not found: ${SERVER_OUT_LOG}"
+      echo "⚠️  Server .out log not found in expected locations"
     fi
     
-    if [[ -f "${SERVER_ERR_LOG}" ]]; then
-      mv "${SERVER_ERR_LOG}" "${RUN_DIR}/helper_logs/" && echo "✅ Moved server .err log"
+    if [[ -f "${SERVER_ERR_LOG_LEGACY}" ]]; then
+      mv "${SERVER_ERR_LOG_LEGACY}" "${RUN_LOG_DIR}/" && echo "✅ Moved legacy server .err log"
+    fi
+    if [[ -f "${SERVER_ERR_LOG_PRIMARY}" ]]; then
+      echo "✅ Server .err log found in run log directory"
     else
-      echo "⚠️  Server .err log not found: ${SERVER_ERR_LOG}"
+      echo "⚠️  Server .err log not found in expected locations"
     fi
     
     # Clean up tracking files
     rm -f "${SERVER_JOB_FILE}"
-    rm -f "${REPO_ROOT}/hostname.log"
+    rm -f "${HOSTNAME_LOG_FILE}"
     
     echo "✅ Server shutdown and cleanup complete"
   else

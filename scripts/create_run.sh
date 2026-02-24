@@ -25,6 +25,7 @@ RUN_DIR="runs/${RUN_ID}"
 mkdir -p "${RUN_DIR}/checkpoints"
 mkdir -p "${RUN_DIR}/results"
 mkdir -p "${RUN_DIR}/logs"
+mkdir -p "${RUN_DIR}/metrics"
 
 # Create run metadata file
 cat > "${RUN_DIR}/run_metadata.json" <<EOF

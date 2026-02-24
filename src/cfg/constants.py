@@ -4,6 +4,14 @@ import torch
 
 #: Root directory of the repository
 ROOT_DIR = os.environ.get('LLM_INFERENCE_ROOT_DIR', os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+#: Active run identifier used to namespace logs/metrics.
+RUN_ID = os.environ.get("RUN_ID", "server-only")
+#: Directory for this run's artifacts.
+RUN_DIR = os.environ.get("RUN_DIR", os.path.join(ROOT_DIR, "runs", RUN_ID))
+#: Directory for consolidated logs (server, slurm, health checks, host files).
+RUN_LOG_DIR = os.environ.get("RUN_LOG_DIR", os.path.join(RUN_DIR, "logs"))
+#: Directory for analyzable metrics and evaluation outputs.
+RUN_METRICS_DIR = os.environ.get("RUN_METRICS_DIR", os.path.join(RUN_DIR, "metrics"))
 #: DATA_PATH absolute or relative to ExquisiteNetV2
 DATA_PATH = "./cifar10"
 #: Location where the current seed repo resides
@@ -11,7 +19,7 @@ SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 #: Location where the network architecture for the seed resides
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
-SLURM_LOG_DIR = os.path.join(ROOT_DIR, 'metrics/slurm-results')
+SLURM_LOG_DIR = os.environ.get("SLURM_LOG_DIR", RUN_LOG_DIR)
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 # For RAG TESTING: Set to True for simpler debugging, serial execution
 # For BASELINE/PARALLEL: Set to False for parallel evaluation (requires Phase 2 modifications)
@@ -228,9 +236,11 @@ export LD_LIBRARY_PATH="$VENV_PATH/lib/python3.12/site-packages/nvidia/nvjitlink
 
 def ensure_slurm_log_dir():
     """
-    Ensure the SLURM log directory exists.
+    Ensure run-scoped logging/metrics directories exist.
     This should be called during program startup/configuration rather than at import time.
     """
+    os.makedirs(RUN_LOG_DIR, exist_ok=True)
+    os.makedirs(RUN_METRICS_DIR, exist_ok=True)
     os.makedirs(SLURM_LOG_DIR, exist_ok=True)
 
 

@@ -29,7 +29,7 @@ else
     export SERVER_HOST="0.0.0.0"
     export SERVER_PORT="8000"
     export SERVER_WORKERS="1"
-    export HOSTNAME_LOG_FILE="$(pwd)/hostname.log"
+    export HOSTNAME_LOG_FILE="$(pwd)/runs/server-only/logs/hostname.log"
     export CUDA_VISIBLE_DEVICES="0"
     export MKL_THREADING_LAYER="GNU"
 fi
@@ -52,6 +52,22 @@ export MKL_THREADING_LAYER=${MKL_THREADING_LAYER:-GNU}
 
 # Set root directory if not already set
 export LLM_INFERENCE_ROOT_DIR=${LLM_INFERENCE_ROOT_DIR:-$(pwd)}
+export RUN_ID=${RUN_ID:-server-only}
+export RUN_DIR=${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}
+export RUN_LOG_DIR=${RUN_LOG_DIR:-${RUN_DIR}/logs}
+export RUN_METRICS_DIR=${RUN_METRICS_DIR:-${RUN_DIR}/metrics}
+export SLURM_LOG_DIR=${SLURM_LOG_DIR:-${RUN_LOG_DIR}}
+export METRICS_PATH=${METRICS_PATH:-${RUN_METRICS_DIR}}
+export HOSTNAME_LOG_FILE=${HOSTNAME_LOG_FILE:-"${RUN_LOG_DIR}/hostname.log"}
+export LOADBALANCER_LOG_FILE=${LOADBALANCER_LOG_FILE:-"${RUN_LOG_DIR}/loadbalancer.log"}
+export SERVER_REGISTRY_FILE=${SERVER_REGISTRY_FILE:-"${RUN_LOG_DIR}/servers.json"}
+
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" "${SLURM_LOG_DIR}" "${RUN_METRICS_DIR}/gpu"
+exec > >(tee -a "${RUN_LOG_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.out") \
+     2> >(tee -a "${RUN_LOG_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.err" >&2)
+echo "RUN_ID: ${RUN_ID}"
+echo "RUN_LOG_DIR: ${RUN_LOG_DIR}"
+echo "RUN_METRICS_DIR: ${RUN_METRICS_DIR}"
 
 # Activate virtual environment
 if [ -d "${VENV_PATH}/bin" ]; then
@@ -63,7 +79,7 @@ fi
 
 export SERVER_HOSTNAME=$(hostname)
 
-HOSTNAME_FILE=${HOSTNAME_LOG_FILE:-"${LLM_INFERENCE_ROOT_DIR}/hostname.log"}
+HOSTNAME_FILE=${HOSTNAME_LOG_FILE}
 
 echo "Writing server hostname '$SERVER_HOSTNAME' to file: $HOSTNAME_FILE"
 echo "$SERVER_HOSTNAME" > "$HOSTNAME_FILE"
@@ -194,11 +210,21 @@ fi
 
 # Start GPU Monitoring
 echo "Starting GPU monitoring..."
-mkdir -p "${LLM_INFERENCE_ROOT_DIR}/metrics/gpu"
-nvidia-smi --query-gpu=timestamp,name,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${LLM_INFERENCE_ROOT_DIR}/metrics/gpu/server-${SLURM_JOB_ID}.csv" &
+mkdir -p "${RUN_METRICS_DIR}/gpu"
+nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${RUN_METRICS_DIR}/gpu/server-${SLURM_JOB_ID}.csv" &
 MONITOR_PID=$!
 
 # Ensure monitor is killed when script exits
 trap "kill $MONITOR_PID" EXIT
 
-python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
+# Select backend: vllm (default, PagedAttention) or hf (legacy HuggingFace pipeline)
+VLLM_BACKEND=${VLLM_BACKEND:-true}
+
+if [ "$VLLM_BACKEND" = "true" ]; then
+    echo "Starting vLLM backend (PagedAttention + prefix caching)"
+    # vLLM manages multi-GPU internally via tensor_parallel_size — use 1 worker
+    python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1
+else
+    echo "Starting legacy HuggingFace backend"
+    python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
+fi

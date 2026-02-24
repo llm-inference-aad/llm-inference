@@ -21,8 +21,11 @@ if [[ -f .env ]]; then
 fi
 
 export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$(pwd)}"
-export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${LLM_INFERENCE_ROOT_DIR}/servers.json}"
-export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${LLM_INFERENCE_ROOT_DIR}/loadbalancer.log}"
+export RUN_ID="${RUN_ID:-server-only}"
+export RUN_DIR="${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}"
+export RUN_LOG_DIR="${RUN_LOG_DIR:-${RUN_DIR}/logs}"
+export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${RUN_LOG_DIR}/servers.json}"
+export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${RUN_LOG_DIR}/loadbalancer.log}"
 
 case "$COMMAND" in
     "status")
@@ -197,5 +200,4 @@ EOF
         echo "  $0 add 2"
         ;;
 esac
-
 

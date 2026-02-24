@@ -33,11 +33,8 @@ import os, time, random
 import json
 
 def log_llm_interaction(gene_id, stage, content, is_error=False):
-    """Log LLM interactions to a separate file per gene in metrics/llm/."""
-    # Use ROOT_DIR from constants if available, else fallback
-    root = globals().get('ROOT_DIR', os.getcwd())
-    
-    log_dir = os.path.join(root, "metrics", "llm")
+    """Log LLM interactions to per-gene files under the run log directory."""
+    log_dir = os.path.join(RUN_LOG_DIR, "llm")
     os.makedirs(log_dir, exist_ok=True)
     
     filename = "unknown.log"
@@ -572,7 +569,7 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
         
         if use_load_balancer:
             # Load balancer mode: connect to load balancer
-            loadbalancer_file = os.getenv("LOADBALANCER_LOG_FILE", f"{ROOT_DIR}/loadbalancer.log")
+            loadbalancer_file = os.getenv("LOADBALANCER_LOG_FILE", f"{RUN_LOG_DIR}/loadbalancer.log")
             
             if not os.path.exists(loadbalancer_file):
                 raise Exception("Load balancer hostname file not found. Make sure the load balancer is running.")
@@ -586,7 +583,7 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
             print(f"[INFO] Using load balancer at {api_url}")
         else:
             # Single server mode: connect directly to server (backward compatible)
-            hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{ROOT_DIR}/hostname.log")
+            hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{RUN_LOG_DIR}/hostname.log")
 
             if not os.path.exists(hostname_file):
                 raise Exception("Server hostname file not found. Make sure the server is running.")

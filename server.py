@@ -31,15 +31,8 @@ RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).
 # Get RUN_ID from environment (set by run.sh) or use "server-only" if running standalone
 RUN_ID = os.getenv("RUN_ID", "server-only")
 
-# Organize metrics by run_id
-METRICS_BASE_PATH = os.getenv("METRICS_PATH", "./metrics")
-if RUN_ID == "server-only":
-    # Standalone server mode: use old flat structure for backwards compatibility
-    METRICS_DIR = Path(METRICS_BASE_PATH) / "data"
-else:
-    # Evolution run mode: organize by run_id
-    METRICS_DIR = Path("./runs") / RUN_ID / "metrics"
-    
+# Organize metrics in run-scoped metrics directory for traceability.
+METRICS_DIR = Path(os.getenv("RUN_METRICS_DIR", RUN_METRICS_DIR))
 METRICS_FILE = METRICS_DIR / f"latency-{RUN_HASH}.json"
 
 # Ensure metrics directory exists
@@ -90,7 +83,7 @@ def save_latency_metrics(
             "_latency_sec": round(e2e_time, 4),
             "batch_processing_time_sec": round(batch_processing_time, 4),
             "batch_size": batch_size,
-            "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None,
+            "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time is not None else None,
             "evaluation_score": evaluation_score,
             "prompt": prompt,
             "generated_text": generated_text,

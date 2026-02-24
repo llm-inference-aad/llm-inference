@@ -1300,8 +1300,10 @@ def wait_for_server_ready(timeout=7200, interval=5):
     This prevents early connection refusals while the model is still loading.
     """
     use_load_balancer = os.getenv("USE_LOAD_BALANCER", "false").lower() in ["true", "1", "yes"]
-    host_file = os.getenv("LOADBALANCER_LOG_FILE" if use_load_balancer else "HOSTNAME_LOG_FILE",
-                          f"{ROOT_DIR}/loadbalancer.log" if use_load_balancer else f"{ROOT_DIR}/hostname.log")
+    host_file = os.getenv(
+        "LOADBALANCER_LOG_FILE" if use_load_balancer else "HOSTNAME_LOG_FILE",
+        f"{RUN_LOG_DIR}/loadbalancer.log" if use_load_balancer else f"{RUN_LOG_DIR}/hostname.log",
+    )
     port = os.getenv("LOAD_BALANCER_PORT" if use_load_balancer else "SERVER_PORT", "9000" if use_load_balancer else "8000")
     start = time.time()
 
