@@ -32,3 +32,20 @@ notebook.md
 /loadbalancer.log
 plots/
 hostname_server_job.txt
+
+# Large files (model weights, checkpoints, datasets)
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.bin.index.json
+*.onnx
+*.msgpack
+checkpoint-*/
+model-*/
+*.arrow
+*.parquet
+datasets/
+models/
+weights/

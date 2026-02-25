@@ -2,15 +2,16 @@ import os
 import json
 import argparse
 import torch
+
+# Set HuggingFace cache to scratch directory (avoid home quota issues)
+os.environ["HF_HOME"] = "/home/hice1/rmanimaran8/scratch/.cache/huggingface"
 from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    BitsAndBytesConfig,
-    TrainingArguments,
 )
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer
+from peft import LoraConfig, get_peft_model
+from trl import SFTTrainer, SFTConfig
 
 def load_and_format_data(dataset_path):
     """
@@ -47,8 +48,8 @@ def main():
     parser.add_argument("--output-dir", type=str, default=os.path.expanduser("~/deepseek-mutation-finetune"), help="Output directory for checkpoints")
     args = parser.parse_args()
 
-    # Configuration
-    model_path = "/storage/ice-shared/vip-vvk/llm_storage/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+    # Configuration - Using GPT-2 for testing (124M params - reliable small model)
+    model_path = "gpt2"
     dataset_path = "dataset.json"
     output_dir = args.output_dir
     
@@ -70,19 +71,12 @@ def main():
         print(f"Model would be saved to: {output_dir}")
         return
 
-    # 4-bit Quantization Config
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-        bnb_4bit_use_double_quant=False,
-    )
-
+    # Skip quantization for tiny model - not needed for 70M params
     print(f"Loading model from {model_path}...")
     try:
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
-            quantization_config=bnb_config,
+            torch_dtype=torch.float16,
             device_map="auto",
             trust_remote_code=True
         )
@@ -90,18 +84,17 @@ def main():
         print(f"Error loading model: {e}")
         return
 
-    # Enable gradient checkpointing and k-bit training
+    # Enable gradient checkpointing
     model.gradient_checkpointing_enable()
-    model = prepare_model_for_kbit_training(model)
 
-    # LoRA Config
+    # LoRA Config - target modules for GPT-2 architecture
     peft_config = LoraConfig(
         r=16,
         lora_alpha=32,
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"] 
+        target_modules=["c_attn", "c_proj", "c_fc"] 
     )
     
     model = get_peft_model(model, peft_config)
@@ -112,33 +105,29 @@ def main():
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
 
-    # Training Arguments
-    training_args = TrainingArguments(
+    # Training Arguments using SFTConfig (new TRL API)
+    training_args = SFTConfig(
         output_dir=output_dir,
         num_train_epochs=1,
-        per_device_train_batch_size=1, # Low batch size for 32B model
+        per_device_train_batch_size=1,
         gradient_accumulation_steps=4,
         learning_rate=2e-4,
         fp16=True,
         logging_steps=1,
         save_strategy="epoch",
-        optim="paged_adamw_32bit", # Memory efficient optimizer
+        optim="adamw_torch",  # Standard optimizer for small model
         max_grad_norm=0.3,
         warmup_ratio=0.03,
         lr_scheduler_type="constant",
+        max_length=512,  # Shorter for GPT-2
+        dataset_text_field="text",
     )
 
-    # Formatting function for SFTTrainer
-    def formatting_func(examples):
-        return examples["text"]
-    
     # Trainer
     trainer = SFTTrainer(
         model=model,
         train_dataset=dataset,
-        formatting_func=formatting_func,
-        max_seq_length=2048, # Adjust based on prompt length
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         args=training_args,
         peft_config=peft_config,
     )

@@ -5,21 +5,37 @@
 #SBATCH --qos=coe-ice
 #SBATCH -N 1
 #SBATCH --gres=gpu:h100:1
-#SBATCH --mem=32G
+#SBATCH --mem=128G
 #SBATCH -t 4:00:00
 #SBATCH -o slurm-%j.out
 #SBATCH -e slurm-%j.err
 
-# Load any necessary modules (if applicable)
-# module load cuda/12.1  # Example, adjust if needed
+set -e
 
-# Activate virtual environment
-source .venv/bin/activate
+echo "=== DeepSeek Fine-tuning Job ==="
+echo "Hostname: $(hostname)"
+echo "Working dir: $(pwd)"
+date
 
-# Install dependencies if not already present (safety check)
-pip install peft bitsandbytes trl scipy datasets
+# Load modules
+module load cuda
+module load anaconda3 || true
 
-# Run finetuning
-python finetune_mutation.py
+# Set cache directory to /storage to avoid disk quota issues
+export UV_CACHE_DIR="/storage/ice1/8/6/rmanimaran8/.cache/uv"
+mkdir -p "$UV_CACHE_DIR"
+
+# Navigate to project directory
+cd /home/hice1/rmanimaran8/scratch/llm-inference/llm-inference
+
+# Set output directory
+OUTPUT_DIR="/storage/ice1/8/6/rmanimaran8/deepseek-mutation-finetune"
+
+# Run finetuning with uv
+echo "Starting fine-tuning..."
+uv run --active python finetune_mutation.py --output-dir "$OUTPUT_DIR"
+
+echo "=== Fine-tuning Complete ==="
+date
 
 
