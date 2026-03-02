@@ -1,0 +1,1288 @@
+{
+  "source": "rag_corpus/pytorch.json",
+  "tiers": {
+    "medium": [
+      {
+        "expected": [
+          "torch.nn.AdaptiveAvgPool1d"
+        ],
+        "query": "adaptive avg pooling 1 d"
+      },
+      {
+        "expected": [
+          "torch.optim.ASGD"
+        ],
+        "query": "pytorch asgd"
+      },
+      {
+        "expected": [
+          "torchvision.models.AlexNet"
+        ],
+        "query": "pytorch alex net"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.AugMix"
+        ],
+        "query": "pytorch aug mix"
+      },
+      {
+        "expected": [
+          "torch.nn.AdaptiveAvgPool2d"
+        ],
+        "query": "adaptive avg pooling 2 d"
+      },
+      {
+        "expected": [
+          "torch.optim.Adadelta"
+        ],
+        "query": "pytorch adadelta"
+      },
+      {
+        "expected": [
+          "torchvision.models.AlexNet_Weights"
+        ],
+        "query": "alex net weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.AutoAugment"
+        ],
+        "query": "pytorch auto augment"
+      },
+      {
+        "expected": [
+          "torch.nn.AdaptiveAvgPool3d"
+        ],
+        "query": "adaptive avg pooling 3 d"
+      },
+      {
+        "expected": [
+          "torch.optim.Adafactor"
+        ],
+        "query": "pytorch adafactor"
+      },
+      {
+        "expected": [
+          "torchvision.models.ConvNeXt"
+        ],
+        "query": "convolution ne xt"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.AutoAugmentPolicy"
+        ],
+        "query": "auto augment policy"
+      },
+      {
+        "expected": [
+          "torch.nn.AdaptiveLogSoftmaxWithLoss"
+        ],
+        "query": "adaptive log softmax with loss"
+      },
+      {
+        "expected": [
+          "torch.optim.Adagrad"
+        ],
+        "query": "pytorch adagrad"
+      },
+      {
+        "expected": [
+          "torchvision.models.ConvNeXt_Base_Weights"
+        ],
+        "query": "convolution ne xt base weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.CenterCrop"
+        ],
+        "query": "pytorch center crop"
+      },
+      {
+        "expected": [
+          "torch.nn.AdaptiveMaxPool1d"
+        ],
+        "query": "adaptive max pooling 1 d"
+      },
+      {
+        "expected": [
+          "torch.optim.Adam"
+        ],
+        "query": "pytorch adam"
+      },
+      {
+        "expected": [
+          "torchvision.models.ConvNeXt_Large_Weights"
+        ],
+        "query": "convolution ne xt large weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.ColorJitter"
+        ],
+        "query": "pytorch color jitter"
+      },
+      {
+        "expected": [
+          "torch.nn.AdaptiveMaxPool2d"
+        ],
+        "query": "adaptive max pooling 2 d"
+      },
+      {
+        "expected": [
+          "torch.optim.AdamW"
+        ],
+        "query": "pytorch adam w"
+      },
+      {
+        "expected": [
+          "torchvision.models.ConvNeXt_Small_Weights"
+        ],
+        "query": "convolution ne xt small weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.Compose"
+        ],
+        "query": "pytorch compose"
+      },
+      {
+        "expected": [
+          "torch.nn.AdaptiveMaxPool3d"
+        ],
+        "query": "adaptive max pooling 3 d"
+      },
+      {
+        "expected": [
+          "torch.optim.Adamax"
+        ],
+        "query": "pytorch adamax"
+      },
+      {
+        "expected": [
+          "torchvision.models.ConvNeXt_Tiny_Weights"
+        ],
+        "query": "convolution ne xt tiny weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.ConvertImageDtype"
+        ],
+        "query": "convert image dtype"
+      },
+      {
+        "expected": [
+          "torch.nn.AlphaDropout"
+        ],
+        "query": "pytorch alpha dropout"
+      },
+      {
+        "expected": [
+          "torch.optim.LBFGS"
+        ],
+        "query": "pytorch lbfgs"
+      },
+      {
+        "expected": [
+          "torchvision.models.DenseNet"
+        ],
+        "query": "pytorch dense net"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.ElasticTransform"
+        ],
+        "query": "pytorch elastic transform"
+      },
+      {
+        "expected": [
+          "torch.nn.AvgPool1d"
+        ],
+        "query": "avg pooling 1 d"
+      },
+      {
+        "expected": [
+          "torch.optim.NAdam"
+        ],
+        "query": "pytorch n adam"
+      },
+      {
+        "expected": [
+          "torchvision.models.DenseNet121_Weights"
+        ],
+        "query": "dense net 121 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.FiveCrop"
+        ],
+        "query": "pytorch five crop"
+      },
+      {
+        "expected": [
+          "torch.nn.AvgPool2d"
+        ],
+        "query": "avg pooling 2 d"
+      },
+      {
+        "expected": [
+          "torch.optim.Optimizer"
+        ],
+        "query": "pytorch optimizer"
+      },
+      {
+        "expected": [
+          "torchvision.models.DenseNet161_Weights"
+        ],
+        "query": "dense net 161 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.GaussianBlur"
+        ],
+        "query": "pytorch gaussian blur"
+      },
+      {
+        "expected": [
+          "torch.nn.AvgPool3d"
+        ],
+        "query": "avg pooling 3 d"
+      },
+      {
+        "expected": [
+          "torch.optim.RAdam"
+        ],
+        "query": "pytorch r adam"
+      },
+      {
+        "expected": [
+          "torchvision.models.DenseNet169_Weights"
+        ],
+        "query": "dense net 169 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.Grayscale"
+        ],
+        "query": "pytorch grayscale"
+      },
+      {
+        "expected": [
+          "torch.nn.BCELoss"
+        ],
+        "query": "pytorch bce loss"
+      },
+      {
+        "expected": [
+          "torch.optim.RMSprop"
+        ],
+        "query": "pytorch rm sprop"
+      },
+      {
+        "expected": [
+          "torchvision.models.DenseNet201_Weights"
+        ],
+        "query": "dense net 201 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.InterpolationMode"
+        ],
+        "query": "pytorch interpolation mode"
+      },
+      {
+        "expected": [
+          "torch.nn.BCEWithLogitsLoss"
+        ],
+        "query": "bce with logits loss"
+      },
+      {
+        "expected": [
+          "torch.optim.Rprop"
+        ],
+        "query": "pytorch rprop"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet"
+        ],
+        "query": "pytorch efficient net"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.Lambda"
+        ],
+        "query": "pytorch lambda"
+      },
+      {
+        "expected": [
+          "torch.nn.BatchNorm1d"
+        ],
+        "query": "batch norm 1 d"
+      },
+      {
+        "expected": [
+          "torch.optim.SGD"
+        ],
+        "query": "pytorch sgd"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B0_Weights"
+        ],
+        "query": "efficient net 0 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.LinearTransformation"
+        ],
+        "query": "pytorch linear transformation"
+      },
+      {
+        "expected": [
+          "torch.nn.BatchNorm2d"
+        ],
+        "query": "batch norm 2 d"
+      },
+      {
+        "expected": [
+          "torch.optim.SparseAdam"
+        ],
+        "query": "pytorch sparse adam"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B1_Weights"
+        ],
+        "query": "efficient net 1 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.Normalize"
+        ],
+        "query": "pytorch normalize"
+      },
+      {
+        "expected": [
+          "torch.nn.BatchNorm3d"
+        ],
+        "query": "batch norm 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B2_Weights"
+        ],
+        "query": "efficient net 2 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.PILToTensor"
+        ],
+        "query": "pil to tensor"
+      },
+      {
+        "expected": [
+          "torch.nn.Bilinear"
+        ],
+        "query": "pytorch bilinear"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B3_Weights"
+        ],
+        "query": "efficient net 3 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.Pad"
+        ],
+        "query": "pytorch pad"
+      },
+      {
+        "expected": [
+          "torch.nn.Buffer"
+        ],
+        "query": "pytorch buffer"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B4_Weights"
+        ],
+        "query": "efficient net 4 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandAugment"
+        ],
+        "query": "pytorch rand augment"
+      },
+      {
+        "expected": [
+          "torch.nn.CELU"
+        ],
+        "query": "pytorch celu"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B5_Weights"
+        ],
+        "query": "efficient net 5 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomAdjustSharpness"
+        ],
+        "query": "random adjust sharpness"
+      },
+      {
+        "expected": [
+          "torch.nn.CTCLoss"
+        ],
+        "query": "pytorch ctc loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B6_Weights"
+        ],
+        "query": "efficient net 6 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomAffine"
+        ],
+        "query": "pytorch random affine"
+      },
+      {
+        "expected": [
+          "torch.nn.ChannelShuffle"
+        ],
+        "query": "pytorch channel shuffle"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_B7_Weights"
+        ],
+        "query": "efficient net 7 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomApply"
+        ],
+        "query": "pytorch random apply"
+      },
+      {
+        "expected": [
+          "torch.nn.CircularPad1d"
+        ],
+        "query": "circular pad 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_V2_L_Weights"
+        ],
+        "query": "efficient net 2 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomAutocontrast"
+        ],
+        "query": "pytorch random autocontrast"
+      },
+      {
+        "expected": [
+          "torch.nn.CircularPad2d"
+        ],
+        "query": "circular pad 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_V2_M_Weights"
+        ],
+        "query": "efficient net 2 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomChoice"
+        ],
+        "query": "pytorch random choice"
+      },
+      {
+        "expected": [
+          "torch.nn.CircularPad3d"
+        ],
+        "query": "circular pad 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.EfficientNet_V2_S_Weights"
+        ],
+        "query": "efficient net 2 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomCrop"
+        ],
+        "query": "pytorch random crop"
+      },
+      {
+        "expected": [
+          "torch.nn.ConstantPad1d"
+        ],
+        "query": "constant pad 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.GoogLeNet"
+        ],
+        "query": "goog le net"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomEqualize"
+        ],
+        "query": "pytorch random equalize"
+      },
+      {
+        "expected": [
+          "torch.nn.ConstantPad2d"
+        ],
+        "query": "constant pad 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.GoogLeNetOutputs"
+        ],
+        "query": "goog le net outputs"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomErasing"
+        ],
+        "query": "pytorch random erasing"
+      },
+      {
+        "expected": [
+          "torch.nn.ConstantPad3d"
+        ],
+        "query": "constant pad 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.GoogLeNet_Weights"
+        ],
+        "query": "goog le net weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomGrayscale"
+        ],
+        "query": "pytorch random grayscale"
+      },
+      {
+        "expected": [
+          "torch.nn.Container"
+        ],
+        "query": "pytorch container"
+      },
+      {
+        "expected": [
+          "torchvision.models.Inception3"
+        ],
+        "query": "pytorch inception 3"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomHorizontalFlip"
+        ],
+        "query": "random horizontal flip"
+      },
+      {
+        "expected": [
+          "torch.nn.Conv1d"
+        ],
+        "query": "convolution 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.Inception_V3_Weights"
+        ],
+        "query": "inception 3 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomInvert"
+        ],
+        "query": "pytorch random invert"
+      },
+      {
+        "expected": [
+          "torch.nn.Conv2d"
+        ],
+        "query": "convolution 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MNASNet"
+        ],
+        "query": "pytorch mnas net"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomOrder"
+        ],
+        "query": "pytorch random order"
+      },
+      {
+        "expected": [
+          "torch.nn.Conv3d"
+        ],
+        "query": "convolution 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MNASNet0_5_Weights"
+        ],
+        "query": "mnas net 0 5 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomPerspective"
+        ],
+        "query": "pytorch random perspective"
+      },
+      {
+        "expected": [
+          "torch.nn.ConvTranspose1d"
+        ],
+        "query": "convolution transpose 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MNASNet0_75_Weights"
+        ],
+        "query": "mnas net 0 75 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomPosterize"
+        ],
+        "query": "pytorch random posterize"
+      },
+      {
+        "expected": [
+          "torch.nn.ConvTranspose2d"
+        ],
+        "query": "convolution transpose 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MNASNet1_0_Weights"
+        ],
+        "query": "mnas net 1 0 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomResizedCrop"
+        ],
+        "query": "random resized crop"
+      },
+      {
+        "expected": [
+          "torch.nn.ConvTranspose3d"
+        ],
+        "query": "convolution transpose 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MNASNet1_3_Weights"
+        ],
+        "query": "mnas net 1 3 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomRotation"
+        ],
+        "query": "pytorch random rotation"
+      },
+      {
+        "expected": [
+          "torch.nn.CosineEmbeddingLoss"
+        ],
+        "query": "cosine embedding loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.MaxVit"
+        ],
+        "query": "pytorch max vit"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomSolarize"
+        ],
+        "query": "pytorch random solarize"
+      },
+      {
+        "expected": [
+          "torch.nn.CosineSimilarity"
+        ],
+        "query": "pytorch cosine similarity"
+      },
+      {
+        "expected": [
+          "torchvision.models.MaxVit_T_Weights"
+        ],
+        "query": "max vit weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomVerticalFlip"
+        ],
+        "query": "random vertical flip"
+      },
+      {
+        "expected": [
+          "torch.nn.CrossEntropyLoss"
+        ],
+        "query": "cross entropy loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.MobileNetV2"
+        ],
+        "query": "mobile net 2"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.Resize"
+        ],
+        "query": "pytorch resize"
+      },
+      {
+        "expected": [
+          "torch.nn.CrossMapLRN2d"
+        ],
+        "query": "cross map 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MobileNetV3"
+        ],
+        "query": "mobile net 3"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.TenCrop"
+        ],
+        "query": "pytorch ten crop"
+      },
+      {
+        "expected": [
+          "torch.nn.DataParallel"
+        ],
+        "query": "pytorch data parallel"
+      },
+      {
+        "expected": [
+          "torchvision.models.MobileNet_V2_Weights"
+        ],
+        "query": "mobile net 2 weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.ToPILImage"
+        ],
+        "query": "to pil image"
+      },
+      {
+        "expected": [
+          "torch.nn.Dropout"
+        ],
+        "query": "pytorch dropout"
+      },
+      {
+        "expected": [
+          "torchvision.models.MobileNet_V3_Large_Weights"
+        ],
+        "query": "mobile net 3 large weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.ToTensor"
+        ],
+        "query": "pytorch to tensor"
+      },
+      {
+        "expected": [
+          "torch.nn.Dropout1d"
+        ],
+        "query": "dropout 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.MobileNet_V3_Small_Weights"
+        ],
+        "query": "mobile net 3 small weights"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.TrivialAugmentWide"
+        ],
+        "query": "trivial augment wide"
+      },
+      {
+        "expected": [
+          "torch.nn.Dropout2d"
+        ],
+        "query": "dropout 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet"
+        ],
+        "query": "pytorch reg net"
+      },
+      {
+        "expected": [
+          "torch.nn.Dropout3d"
+        ],
+        "query": "dropout 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_16GF_Weights"
+        ],
+        "query": "reg net 16 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.ELU"
+        ],
+        "query": "pytorch elu"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_1_6GF_Weights"
+        ],
+        "query": "reg net 1 6 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Embedding"
+        ],
+        "query": "pytorch embedding"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_32GF_Weights"
+        ],
+        "query": "reg net 32 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.EmbeddingBag"
+        ],
+        "query": "pytorch embedding bag"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_3_2GF_Weights"
+        ],
+        "query": "reg net 3 2 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.FeatureAlphaDropout"
+        ],
+        "query": "feature alpha dropout"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_400MF_Weights"
+        ],
+        "query": "reg net 400 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Flatten"
+        ],
+        "query": "pytorch flatten"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_800MF_Weights"
+        ],
+        "query": "reg net 800 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Fold"
+        ],
+        "query": "pytorch fold"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_X_8GF_Weights"
+        ],
+        "query": "reg net 8 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.FractionalMaxPool2d"
+        ],
+        "query": "fractional max pooling 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_128GF_Weights"
+        ],
+        "query": "reg net 128 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.FractionalMaxPool3d"
+        ],
+        "query": "fractional max pooling 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_16GF_Weights"
+        ],
+        "query": "reg net 16 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.GELU"
+        ],
+        "query": "pytorch gelu"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_1_6GF_Weights"
+        ],
+        "query": "reg net 1 6 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.GLU"
+        ],
+        "query": "pytorch glu"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_32GF_Weights"
+        ],
+        "query": "reg net 32 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.GRU"
+        ],
+        "query": "pytorch gru"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_3_2GF_Weights"
+        ],
+        "query": "reg net 3 2 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.GRUCell"
+        ],
+        "query": "pytorch gru cell"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_400MF_Weights"
+        ],
+        "query": "reg net 400 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.GaussianNLLLoss"
+        ],
+        "query": "gaussian nll loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_800MF_Weights"
+        ],
+        "query": "reg net 800 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.GroupNorm"
+        ],
+        "query": "pytorch group norm"
+      },
+      {
+        "expected": [
+          "torchvision.models.RegNet_Y_8GF_Weights"
+        ],
+        "query": "reg net 8 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Hardshrink"
+        ],
+        "query": "pytorch hardshrink"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNeXt101_32X8D_Weights"
+        ],
+        "query": "res ne xt 101 32 8 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Hardsigmoid"
+        ],
+        "query": "pytorch hardsigmoid"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNeXt101_64X4D_Weights"
+        ],
+        "query": "res ne xt 101 64 4 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Hardswish"
+        ],
+        "query": "pytorch hardswish"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNeXt50_32X4D_Weights"
+        ],
+        "query": "res ne xt 50 32 4 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Hardtanh"
+        ],
+        "query": "pytorch hardtanh"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNet"
+        ],
+        "query": "pytorch res net"
+      },
+      {
+        "expected": [
+          "torch.nn.HingeEmbeddingLoss"
+        ],
+        "query": "hinge embedding loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNet101_Weights"
+        ],
+        "query": "res net 101 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.HuberLoss"
+        ],
+        "query": "pytorch huber loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNet152_Weights"
+        ],
+        "query": "res net 152 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.Identity"
+        ],
+        "query": "pytorch identity"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNet18_Weights"
+        ],
+        "query": "res net 18 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.InstanceNorm1d"
+        ],
+        "query": "instance norm 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNet34_Weights"
+        ],
+        "query": "res net 34 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.InstanceNorm2d"
+        ],
+        "query": "instance norm 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.ResNet50_Weights"
+        ],
+        "query": "res net 50 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.InstanceNorm3d"
+        ],
+        "query": "instance norm 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.ShuffleNetV2"
+        ],
+        "query": "shuffle net 2"
+      },
+      {
+        "expected": [
+          "torch.nn.KLDivLoss"
+        ],
+        "query": "kl div loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.ShuffleNet_V2_X0_5_Weights"
+        ],
+        "query": "shuffle net 2 0 5 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.L1Loss"
+        ],
+        "query": "pytorch 1 loss"
+      },
+      {
+        "expected": [
+          "torchvision.models.ShuffleNet_V2_X1_0_Weights"
+        ],
+        "query": "shuffle net 2 1 0 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.LPPool1d"
+        ],
+        "query": "lp pooling 1 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.ShuffleNet_V2_X1_5_Weights"
+        ],
+        "query": "shuffle net 2 1 5 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.LPPool2d"
+        ],
+        "query": "lp pooling 2 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.ShuffleNet_V2_X2_0_Weights"
+        ],
+        "query": "shuffle net 2 2 0 weights"
+      },
+      {
+        "expected": [
+          "torch.nn.LPPool3d"
+        ],
+        "query": "lp pooling 3 d"
+      },
+      {
+        "expected": [
+          "torchvision.models.SqueezeNet"
+        ],
+        "query": "pytorch squeeze net"
+      }
+    ],
+    "small": [
+      {
+        "expected": [
+          "torch.nn.Conv2d"
+        ],
+        "query": "convolutional layer 2d"
+      },
+      {
+        "expected": [
+          "torch.nn.MaxPool2d"
+        ],
+        "query": "max pooling 2d"
+      },
+      {
+        "expected": [
+          "torch.nn.CrossEntropyLoss"
+        ],
+        "query": "cross entropy loss function"
+      },
+      {
+        "expected": [
+          "torch.optim.Adam"
+        ],
+        "query": "adam optimizer"
+      },
+      {
+        "expected": [
+          "torch.optim.SGD"
+        ],
+        "query": "sgd optimizer"
+      },
+      {
+        "expected": [
+          "torchvision.models.resnet18"
+        ],
+        "query": "resnet18 model architecture"
+      },
+      {
+        "expected": [
+          "torchvision.transforms.RandomHorizontalFlip"
+        ],
+        "query": "random horizontal flip data augmentation"
+      },
+      {
+        "expected": [
+          "torch.nn.BCEWithLogitsLoss"
+        ],
+        "query": "bce with logits loss"
+      },
+      {
+        "expected": [
+          "torch.nn.Linear"
+        ],
+        "query": "linear layer fully connected"
+      },
+      {
+        "expected": [
+          "torch.nn.ReLU"
+        ],
+        "query": "relu activation"
+      },
+      {
+        "expected": [
+          "torch.nn.Dropout"
+        ],
+        "query": "dropout regularization"
+      },
+      {
+        "expected": [
+          "torchvision.models.mobilenet_v2"
+        ],
+        "query": "mobile net v2"
+      },
+      {
+        "expected": [
+          "torch.optim.lr_scheduler.CosineAnnealingLR"
+        ],
+        "query": "cosine annealing scheduler"
+      }
+    ]
+  },
+  "version": 1
+}
