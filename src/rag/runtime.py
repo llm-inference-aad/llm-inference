@@ -21,6 +21,10 @@ from .retrieval import RetrievedMutation, RetrievalService
 from .vector_db import VectorStoreManager
 
 
+class _DimensionMismatchError(RuntimeError):
+    """Internal: raised when FAISS index dims don't match embedding model dims."""
+
+
 class RagRuntime:
     """Encapsulates the long-lived RAG services."""
 
@@ -31,6 +35,23 @@ class RagRuntime:
         )
         self.store = VectorStoreManager(RAG_DATA_DIR)
         self.embeddings = EmbeddingService(embedding_config)
+
+        # H1: Verify FAISS index dimensions match the configured embedding models.
+        # Detects model drift between ingestion (setup_rag.py) and runtime.
+        for ns_name, embed_fn, label in [
+            (VectorStoreManager.CODE_NAMESPACE, self.embeddings.embed_code, "code"),
+            (VectorStoreManager.TEXT_NAMESPACE, self.embeddings.embed_text, "text"),
+        ]:
+            ns = self.store._namespace(ns_name)
+            if ns.index is not None:
+                probe = embed_fn("dimension probe")
+                if ns.index.d != probe.shape[-1]:
+                    raise _DimensionMismatchError(
+                        f"FAISS {label} index dimension ({ns.index.d}) != "
+                        f"embedding model dimension ({probe.shape[-1]}). "
+                        f"Re-run setup_rag.py to re-index with the current models."
+                    )
+
         self.retrieval = RetrievalService(self.store, self.embeddings)
         self.prompt_enhancer = PromptEnhancer(
             self.retrieval,
@@ -42,12 +63,17 @@ class RagRuntime:
         )
 
     def enhance_template(
-        self, template: str, mutation_type: str | None = None, query_code: str | None = None
+        self,
+        template: str,
+        mutation_type: str | None = None,
+        query_code: str | None = None,
+        gene_id: str | None = None,
     ) -> tuple[str, Sequence[RetrievedMutation]]:
         return self.prompt_enhancer.enhance_template(
             template=template,
             mutation_type=mutation_type,
             query_code=query_code,
+            gene_id=gene_id,
         )
 
     def log_mutation_code(self, content: str, metadata: dict) -> str | None:
@@ -71,7 +97,11 @@ _runtime_instance: RagRuntime | None = None
 
 
 def get_runtime() -> RagRuntime | None:
-    """Return the singleton RAG runtime if enabled."""
+    """Return the singleton RAG runtime if enabled.
+
+    Soft-disables RAG (returns None) if the FAISS index dimensions don't match
+    the configured embedding models, preventing silent retrieval corruption.
+    """
     if not RAG_ENABLED:
         return None
 
@@ -79,6 +109,13 @@ def get_runtime() -> RagRuntime | None:
     if _runtime_instance is None:
         with _runtime_lock:
             if _runtime_instance is None:
-                _runtime_instance = RagRuntime()
+                try:
+                    _runtime_instance = RagRuntime()
+                except _DimensionMismatchError as exc:
+                    import warnings
+                    warnings.warn(
+                        f"[RAG] {exc} — RAG disabled for this session.",
+                        stacklevel=2,
+                    )
+                    return None
     return _runtime_instance
-

@@ -12,6 +12,8 @@ RUN_DIR = os.environ.get("RUN_DIR", os.path.join(ROOT_DIR, "runs", RUN_ID))
 RUN_LOG_DIR = os.environ.get("RUN_LOG_DIR", os.path.join(RUN_DIR, "logs"))
 #: Directory for analyzable metrics and evaluation outputs.
 RUN_METRICS_DIR = os.environ.get("RUN_METRICS_DIR", os.path.join(RUN_DIR, "metrics"))
+#: Directory for error logs.
+RUN_ERRORS_DIR = os.environ.get("RUN_ERRORS_DIR", os.path.join(RUN_DIR, "errors"))
 #: DATA_PATH absolute or relative to ExquisiteNetV2
 DATA_PATH = "./cifar10"
 #: Location where the current seed repo resides
@@ -20,6 +22,8 @@ SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
 #: Directory for aggregated Slurm logs
 SLURM_LOG_DIR = os.environ.get("SLURM_LOG_DIR", RUN_LOG_DIR)
+#: Directory for aggregated Slurm error logs
+SLURM_ERROR_DIR = os.environ.get("SLURM_ERROR_DIR", RUN_ERRORS_DIR)
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
 # For RAG TESTING: Set to True for simpler debugging, serial execution
 # For BASELINE/PARALLEL: Set to False for parallel evaluation (requires Phase 2 modifications)
@@ -81,6 +85,11 @@ RAG_TOP_K = int(os.environ.get("RAG_TOP_K", 5))
 RAG_MIN_ACCURACY = float(os.environ.get("RAG_MIN_ACCURACY", 0.9))
 RAG_MAX_PARAMETERS = _parse_optional_float(os.environ.get("RAG_MAX_PARAMETERS"))
 RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", 0.3))  # Minimum similarity threshold for filtering irrelevant results
+RAG_TEXT_TOP_K = int(os.environ.get("RAG_TEXT_TOP_K", 3))  # Number of text chunks (PDFs, docs) to retrieve
+RAG_USE_CODE_CONTEXT = os.environ.get("RAG_USE_CODE_CONTEXT", "true").lower() in {"1", "true", "yes"}
+RAG_USE_TEXT_CONTEXT = os.environ.get("RAG_USE_TEXT_CONTEXT", "true").lower() in {"1", "true", "yes"}
+RAG_RERANKER_ENABLED = os.environ.get("RAG_RERANKER_ENABLED", "false").lower() in {"1", "true", "yes"}
+RAG_RERANKER_MODEL = os.environ.get("RAG_RERANKER_MODEL", "BAAI/bge-reranker-v2-m3")
 
 # Evolution Constants/Params
 # --------------------------
@@ -114,13 +123,13 @@ PROB_EOT = 0.25
 # ========================================================
 
 #: Number of generations to run for
-num_generations = 15  # BASELINE: 15 generations for initial experiments
+num_generations = int(os.environ.get("NUM_GENERATIONS", 15))  # BASELINE: 15 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = int(os.environ.get("START_POPULATION_SIZE", 16))  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
-population_size = 16  # BASELINE: Keep consistent with start_population_size
+population_size = int(os.environ.get("POPULATION_SIZE", 16))  # BASELINE: Keep consistent with start_population_size
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual
@@ -154,7 +163,7 @@ PYTHON_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH -n 12
 #SBATCH -N 1
 #SBATCH --output={slurm_log_dir}/eval-%j.out
-#SBATCH --error={slurm_log_dir}/eval-%j.err
+#SBATCH --error={slurm_error_dir}/eval-%j.err
 echo "Launching Python Evaluation"
 hostname
 
@@ -202,7 +211,7 @@ LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH -n 12
 #SBATCH -N 1
 #SBATCH --output={slurm_log_dir}/llm-%j.out
-#SBATCH --error={slurm_log_dir}/llm-%j.err
+#SBATCH --error={slurm_error_dir}/llm-%j.err
 echo "Launching AIsurBL"
 hostname
 
@@ -213,7 +222,9 @@ module load python/3.12.5
 
 # Load environment variables
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    set -a
+    source .env
+    set +a
 fi
 
 # Ensure uv is in PATH
@@ -241,7 +252,9 @@ def ensure_slurm_log_dir():
     """
     os.makedirs(RUN_LOG_DIR, exist_ok=True)
     os.makedirs(RUN_METRICS_DIR, exist_ok=True)
+    os.makedirs(RUN_ERRORS_DIR, exist_ok=True)
     os.makedirs(SLURM_LOG_DIR, exist_ok=True)
+    os.makedirs(SLURM_ERROR_DIR, exist_ok=True)
 
 
 # Misc. Non-sense

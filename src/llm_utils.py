@@ -255,6 +255,7 @@ def _augment_template_with_rag(template_text: str, mutation_label: str | None, q
         template=template_text,
         mutation_type=mutation_label,
         query_code=query_code,
+        gene_id=None,
     )
     duration_ms = (time.perf_counter() - start) * 1000
     record_metric(

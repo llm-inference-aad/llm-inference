@@ -80,6 +80,7 @@ def _apply_rag_context(template_txt: str, mutation_type: str | None, query_code:
         template=template_txt,
         mutation_type=mutation_type,
         query_code=query_code,
+        gene_id=None,
     )
     duration_ms = (time.perf_counter() - start) * 1000
     record_metric(
@@ -283,6 +284,7 @@ def write_bash_script(python_file, input_filename_x, output_filename, gene_id_ch
         gpu_constraint=gpu,
         python_runline=python_runline,
         slurm_log_dir=SLURM_LOG_DIR,
+        slurm_error_dir=SLURM_ERROR_DIR,
     )
     return bash_script_content
 
@@ -475,11 +477,11 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
     start_time = time.time()
     # Use correct log path based on LOCAL mode
     if LOCAL:
-        output_file = f'slurm-{job_id}.out'
-        error_file = f'slurm-{job_id}.err'
+        output_file = os.path.join(RUN_LOG_DIR, f'slurm-{job_id}.out')
+        error_file = os.path.join(RUN_ERRORS_DIR, f'slurm-{job_id}.err')
     else:
         output_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.out')
-        error_file = os.path.join(SLURM_LOG_DIR, f'llm-{job_id}.err')
+        error_file = os.path.join(SLURM_ERROR_DIR, f'llm-{job_id}.err')
 
     while True:
         # Check if the timeout is reached
@@ -593,6 +595,7 @@ def submit_run(gene_id):
         bash_script_content = PYTHON_BASH_SCRIPT_TEMPLATE.format(
             python_runline=python_runline,
             slurm_log_dir=SLURM_LOG_DIR,
+            slurm_error_dir=SLURM_ERROR_DIR,
             root_dir=ROOT_DIR,
         )
         return bash_script_content
@@ -741,7 +744,7 @@ def check4results(gene_id):
         # there is no local output, so process with slurm
         # Use correct log path for evaluation jobs
         output_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.out')
-        error_file = os.path.join(SLURM_LOG_DIR, f'eval-{job_id}.err')
+        error_file = os.path.join(SLURM_ERROR_DIR, f'eval-{job_id}.err')
 
         # Check stderr file first for errors
         if os.path.exists(error_file):
@@ -1355,6 +1358,56 @@ if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
     print(DNA_TXT)
+
+    # -------------------------------------------------------------------------
+    # Experiment determinism (best-effort)
+    # -------------------------------------------------------------------------
+    seed_env = os.getenv("EXPERIMENT_SEED", "").strip()
+    if seed_env:
+        try:
+            seed = int(seed_env)
+            random.seed(seed)
+            np.random.seed(seed)
+            try:
+                import torch  # torch is already a dependency in run environments
+                torch.manual_seed(seed)
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed_all(seed)
+            except Exception:
+                pass
+            print(f"[EXPERIMENT] Seeded RNGs with EXPERIMENT_SEED={seed}", flush=True)
+        except Exception:
+            print(f"[EXPERIMENT] Invalid EXPERIMENT_SEED='{seed_env}' (expected int)", flush=True)
+
+    # -------------------------------------------------------------------------
+    # Best-effort run metadata enrichment for downstream analysis
+    # -------------------------------------------------------------------------
+    try:
+        run_dir = os.getenv("RUN_DIR", "")
+        if run_dir:
+            import json as _json
+            meta_path = Path(run_dir) / "run_metadata.json"
+            if meta_path.exists():
+                meta = _json.loads(meta_path.read_text(encoding="utf-8"))
+                if isinstance(meta, dict):
+                    meta.setdefault("experiment", {})
+                    exp = meta["experiment"] if isinstance(meta["experiment"], dict) else {}
+                    exp.update(
+                        {
+                            "seed": int(seed_env) if seed_env.isdigit() else seed_env or None,
+                            "RAG_ENABLED": os.getenv("RAG_ENABLED"),
+                            "RAG_USE_CODE_CONTEXT": os.getenv("RAG_USE_CODE_CONTEXT"),
+                            "RAG_USE_TEXT_CONTEXT": os.getenv("RAG_USE_TEXT_CONTEXT"),
+                            "RAG_RERANKER_ENABLED": os.getenv("RAG_RERANKER_ENABLED"),
+                            "NUM_GENERATIONS": os.getenv("NUM_GENERATIONS"),
+                            "POPULATION_SIZE": os.getenv("POPULATION_SIZE"),
+                            "START_POPULATION_SIZE": os.getenv("START_POPULATION_SIZE"),
+                        }
+                    )
+                    meta["experiment"] = exp
+                    meta_path.write_text(_json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    except Exception:
+        pass
 
     # Block until the HTTP server (or LB) is up
     wait_for_server_ready()
