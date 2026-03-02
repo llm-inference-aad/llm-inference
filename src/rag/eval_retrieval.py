@@ -14,11 +14,13 @@ from pathlib import Path
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from src.cfg.constants import RAG_DATA_DIR, RAG_TOP_K
 from src.rag.vector_db import VectorStoreManager
 from src.rag.embeddings import EmbeddingService
 
 DEFAULT_GOLDEN_PATH = Path(__file__).with_name("golden_queries.json")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_RAG_DATA_DIR = os.environ.get("RAG_DATA_DIR", str(REPO_ROOT / "rag_data"))
+DEFAULT_TOP_K = int(os.environ.get("RAG_TOP_K", "5"))
 
 
 def load_golden_dataset(path: Path, tier: str, limit: int | None = None) -> list[dict]:
@@ -36,7 +38,7 @@ def load_golden_dataset(path: Path, tier: str, limit: int | None = None) -> list
 def evaluate_retrieval(top_k: int = 5, *, dataset: list[dict]) -> None:
     print(f"Initializing RAG Components (Top-K={top_k})...")
     try:
-        store = VectorStoreManager(RAG_DATA_DIR)
+        store = VectorStoreManager(DEFAULT_RAG_DATA_DIR)
         embeddings = EmbeddingService()
     except Exception as e:
         print(f"Error initializing: {e}")
@@ -92,7 +94,7 @@ def evaluate_retrieval(top_k: int = 5, *, dataset: list[dict]) -> None:
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--k", type=int, default=5, help="Top-K documents to retrieve")
+    parser.add_argument("--k", type=int, default=DEFAULT_TOP_K, help="Top-K documents to retrieve")
     parser.add_argument(
         "--tier",
         type=str,

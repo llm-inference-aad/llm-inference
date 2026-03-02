@@ -28,6 +28,8 @@ from src.rag.vector_db import VectorStoreManager
 
 
 DEFAULT_GOLDEN_PATH = Path(__file__).with_name("golden_queries.json")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_RAG_DATA_DIR = os.environ.get("RAG_DATA_DIR", str(REPO_ROOT / "rag_data"))
 
 
 def load_golden_dataset(path: Path, tier: str, limit: int | None = None) -> list[dict]:
@@ -144,6 +146,12 @@ def main() -> None:
         type=str,
         default="rag_data_eval",
         help="Root directory for evaluation indices.",
+    )
+    parser.add_argument(
+        "--rag-data-dir",
+        type=str,
+        default=DEFAULT_RAG_DATA_DIR,
+        help="Existing RAG data directory to reuse (ignored if you reindex into rag-data-root).",
     )
     parser.add_argument(
         "--json-path",
