@@ -1,4 +1,17 @@
 #!/bin/bash
+# NOTE: SBATCH directives are evaluated at submission time.
+# To make this "modular" per-model, override these on the `sbatch` command line.
+# Example overrides:
+# - `sbatch -p coe-gpu -C H100 --gpus-per-node=2 server.sh`
+# - `sbatch -p ice-bw-gpu --gpus-per-node=2 server.sh`
+#
+# Defaults below are tuned for the current production baseline:
+# - `meta-llama/Llama-3.3-70B-Instruct` in BF16 via vLLM
+# - requires 2x80GB-class GPUs (H100/A100) with `TENSOR_PARALLEL_SIZE=2`
+#
+# IMPORTANT: GGUF models (e.g. `*GGUF` repos with `Q5_K_M`) are not loadable by
+# `server_vllm.py`'s Hugging Face loader path. Stage GGUF files for llama.cpp,
+# or use a non-GGUF HF checkpoint for vLLM.
 #SBATCH --job-name=LLMGE01_Server
 #SBATCH -t 08:00:00
 #SBATCH -C "H100"
@@ -20,16 +33,28 @@ module load cuda
 # Load environment variables from .env file
 if [ -f .env ]; then
     echo "Loading environment variables from .env file"
-    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    set -a
+    source .env
+    set +a
 else
     echo "Warning: .env file not found. Using default values."
     # Set defaults if .env doesn't exist
     export LLM_INFERENCE_ROOT_DIR="$(pwd)"
+    export RUN_ID="server-only"
+    export RUN_DIR="${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}"
+    export RUN_LOG_DIR="${RUN_DIR}/logs"
+    export RUN_METRICS_DIR="${RUN_DIR}/metrics"
+    export RUN_ERRORS_DIR="${RUN_DIR}/errors"
+    export SLURM_LOG_DIR="${RUN_LOG_DIR}"
+    export SLURM_ERROR_DIR="${RUN_ERRORS_DIR}"
+    export METRICS_PATH="${RUN_METRICS_DIR}"
     export VENV_PATH="$(pwd)/.venv"
     export SERVER_HOST="0.0.0.0"
     export SERVER_PORT="8000"
     export SERVER_WORKERS="1"
-    export HOSTNAME_LOG_FILE="$(pwd)/runs/server-only/logs/hostname.log"
+    export HOSTNAME_LOG_FILE="${RUN_LOG_DIR}/hostname.log"
+    export LOADBALANCER_LOG_FILE="${RUN_LOG_DIR}/loadbalancer.log"
+    export SERVER_REGISTRY_FILE="${RUN_LOG_DIR}/servers.json"
     export CUDA_VISIBLE_DEVICES="0"
     export MKL_THREADING_LAYER="GNU"
 fi
@@ -56,18 +81,21 @@ export RUN_ID=${RUN_ID:-server-only}
 export RUN_DIR=${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}
 export RUN_LOG_DIR=${RUN_LOG_DIR:-${RUN_DIR}/logs}
 export RUN_METRICS_DIR=${RUN_METRICS_DIR:-${RUN_DIR}/metrics}
+export RUN_ERRORS_DIR=${RUN_ERRORS_DIR:-${RUN_DIR}/errors}
 export SLURM_LOG_DIR=${SLURM_LOG_DIR:-${RUN_LOG_DIR}}
+export SLURM_ERROR_DIR=${SLURM_ERROR_DIR:-${RUN_ERRORS_DIR}}
 export METRICS_PATH=${METRICS_PATH:-${RUN_METRICS_DIR}}
 export HOSTNAME_LOG_FILE=${HOSTNAME_LOG_FILE:-"${RUN_LOG_DIR}/hostname.log"}
 export LOADBALANCER_LOG_FILE=${LOADBALANCER_LOG_FILE:-"${RUN_LOG_DIR}/loadbalancer.log"}
 export SERVER_REGISTRY_FILE=${SERVER_REGISTRY_FILE:-"${RUN_LOG_DIR}/servers.json"}
 
-mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" "${SLURM_LOG_DIR}" "${RUN_METRICS_DIR}/gpu"
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" "${RUN_ERRORS_DIR}" "${SLURM_LOG_DIR}" "${SLURM_ERROR_DIR}" "${RUN_METRICS_DIR}/gpu"
 exec > >(tee -a "${RUN_LOG_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.out") \
-     2> >(tee -a "${RUN_LOG_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.err" >&2)
+     2> >(tee -a "${RUN_ERRORS_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.err" >&2)
 echo "RUN_ID: ${RUN_ID}"
 echo "RUN_LOG_DIR: ${RUN_LOG_DIR}"
 echo "RUN_METRICS_DIR: ${RUN_METRICS_DIR}"
+echo "RUN_ERRORS_DIR: ${RUN_ERRORS_DIR}"
 
 # Activate virtual environment
 if [ -d "${VENV_PATH}/bin" ]; then
@@ -222,6 +250,7 @@ VLLM_BACKEND=${VLLM_BACKEND:-true}
 
 if [ "$VLLM_BACKEND" = "true" ]; then
     echo "Starting vLLM backend (PagedAttention + prefix caching)"
+    export VLLM_WORKER_MULTIPROC_METHOD=spawn
     # vLLM manages multi-GPU internally via tensor_parallel_size — use 1 worker
     python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1
 else
