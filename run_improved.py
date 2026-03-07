@@ -1297,7 +1297,7 @@ GLOBAL_DATA_ANCESTRY = {}
 GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
 
 
-def wait_for_server_ready(timeout=7200, interval=5):
+def wait_for_server_ready(timeout=43200, interval=5):
     """
     Poll the HTTP server (or load balancer) until it responds, or time out.
     This prevents early connection refusals while the model is still loading.

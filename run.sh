@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=llm_opt
-#SBATCH -t 15:00:00                # Runtime in D-HH:MM
+#SBATCH -t 16:00:00                # Runtime in D-HH:MM
 #SBATCH --mem-per-gpu=16G
 #SBATCH -n 1                      # number of CPU cores
 #SBATCH -N 1
@@ -167,6 +167,12 @@ nvidia-smi || true
 # ----------------------------
 # Run your job
 # ----------------------------
+echo "=== Launching LLM Server ==="
+SERVER_JOB_ID=$(sbatch --parsable server.sh)
+echo "Server job submitted with ID: ${SERVER_JOB_ID}"
+
+# (The server job ID is securely recorded by server.sh into HOSTNAME_LOG_FILE_server_job.txt)
+
 echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
 uv run python run_improved.py "${RUN_DIR}/checkpoints"
 
