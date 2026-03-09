@@ -6,6 +6,7 @@ Requires-Python: >=3.12
 Description-Content-Type: text/markdown
 Requires-Dist: accelerate>=0.20.0
 Requires-Dist: aiohttp>=3.8.0
+Requires-Dist: bitsandbytes>=0.43.0
 Requires-Dist: deap==1.4.1
 Requires-Dist: fastapi>=0.100.0
 Requires-Dist: flake8>=7.2.0
@@ -16,18 +17,26 @@ Requires-Dist: hydra-core==1.3.2
 Requires-Dist: matplotlib>=3.9.0
 Requires-Dist: numpy>=2.0.2
 Requires-Dist: omegaconf>=2.3.0
+Requires-Dist: pdfplumber>=0.10.0
 Requires-Dist: pandas>=1.5.0
+Requires-Dist: PyPDF2>=3.0.0
 Requires-Dist: pydantic>=2.0.0
 Requires-Dist: pytest>=8.3.5
 Requires-Dist: pyyaml>=6.0
 Requires-Dist: requests>=2.25.0
+Requires-Dist: sentence-transformers>=2.2.0
 Requires-Dist: seaborn>=0.11.0
 Requires-Dist: sphinx>=8.2.3
 Requires-Dist: torch==2.6.0
 Requires-Dist: torchvision
 Requires-Dist: transformers>=4.30.0
+Requires-Dist: faiss-cpu>=1.7.4
 Requires-Dist: tqdm>=4.64.0
 Requires-Dist: uvicorn>=0.20.0
+Provides-Extra: pageindex
+Requires-Dist: pymupdf==1.27.1; extra == "pageindex"
+Requires-Dist: python-dotenv==1.2.2; extra == "pageindex"
+Requires-Dist: tiktoken==0.12.0; extra == "pageindex"
 
 ## Guided Evolution:
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence
+from typing import List, Protocol, Sequence
 
 import numpy as np
 
@@ -21,8 +21,36 @@ class RetrievedMutation:
     metadata: dict
 
 
-class RetrievalService:
-    """High-level retrieval facade combining the vector DB and embedding service."""
+class RetrievalBackend(Protocol):
+    """Backend contract for retrieval and indexing operations."""
+
+    @property
+    def backend_name(self) -> str: ...
+
+    def index_mutations(self, records: Sequence[MutationRecord]) -> List[str]: ...
+
+    def index_text_documents(self, documents: Sequence[dict]) -> List[str]: ...
+
+    def log_mutation_code(self, content: str, metadata: dict) -> str | None: ...
+
+    def retrieve_similar_mutations(
+        self, query_code: str, top_k: int = 5, min_similarity: float = 0.3
+    ) -> List[RetrievedMutation]: ...
+
+    def retrieve_high_performers(
+        self,
+        min_accuracy: float = 0.9,
+        max_parameters: float | None = None,
+        limit: int = 5,
+    ) -> List[RetrievedMutation]: ...
+
+    def retrieve_by_mutation_type(self, mutation_type: str, limit: int = 5) -> List[RetrievedMutation]: ...
+
+    def format_context(self, mutations: Sequence[RetrievedMutation]) -> str: ...
+
+
+class FaissRetrievalBackend:
+    """FAISS retrieval backend using embedding similarity and metadata filters."""
 
     def __init__(self, store: VectorStoreManager, embeddings: EmbeddingService):
         self.store = store
@@ -48,6 +76,13 @@ class RetrievalService:
         metadata = [doc["metadata"] for doc in documents]
         embeddings = self.embeddings.embed_text(contents)
         return self.store.add_text_documents(contents, embeddings, metadata)
+
+    def log_mutation_code(self, content: str, metadata: dict) -> str | None:
+        if not content.strip():
+            return None
+        embeddings = self.embeddings.embed_code(content)
+        document_ids = self.store.add_code_documents([content], embeddings, [metadata])
+        return document_ids[0] if document_ids else None
 
     # ------------------------------------------------------------------ #
     # Retrieval helpers
@@ -177,6 +212,57 @@ class RetrievalService:
             code=result.document.content,
             metadata=metadata,
         )
+
+    @property
+    def backend_name(self) -> str:
+        return "faiss"
+
+
+class RetrievalService:
+    """Facade delegating retrieval calls to a pluggable backend."""
+
+    def __init__(self, backend: RetrievalBackend):
+        self.backend = backend
+
+    @property
+    def backend_name(self) -> str:
+        return self.backend.backend_name
+
+    def index_mutations(self, records: Sequence[MutationRecord]) -> List[str]:
+        return self.backend.index_mutations(records)
+
+    def index_text_documents(self, documents: Sequence[dict]) -> List[str]:
+        return self.backend.index_text_documents(documents)
+
+    def log_mutation_code(self, content: str, metadata: dict) -> str | None:
+        return self.backend.log_mutation_code(content=content, metadata=metadata)
+
+    def retrieve_similar_mutations(
+        self, query_code: str, top_k: int = 5, min_similarity: float = 0.3
+    ) -> List[RetrievedMutation]:
+        return self.backend.retrieve_similar_mutations(
+            query_code=query_code,
+            top_k=top_k,
+            min_similarity=min_similarity,
+        )
+
+    def retrieve_high_performers(
+        self,
+        min_accuracy: float = 0.9,
+        max_parameters: float | None = None,
+        limit: int = 5,
+    ) -> List[RetrievedMutation]:
+        return self.backend.retrieve_high_performers(
+            min_accuracy=min_accuracy,
+            max_parameters=max_parameters,
+            limit=limit,
+        )
+
+    def retrieve_by_mutation_type(self, mutation_type: str, limit: int = 5) -> List[RetrievedMutation]:
+        return self.backend.retrieve_by_mutation_type(mutation_type=mutation_type, limit=limit)
+
+    def format_context(self, mutations: Sequence[RetrievedMutation]) -> str:
+        return self.backend.format_context(mutations)
 
 
 

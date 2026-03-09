@@ -220,6 +220,8 @@ def _augment_template_with_rag(template_text: str, mutation_label: str | None, q
     runtime = get_runtime()
     if runtime is None:
         return template_text
+    if not query_code:
+        query_code = template_text
     start = time.perf_counter()
     augmented_template, mutations = runtime.enhance_template(
         template=template_text,
@@ -230,6 +232,7 @@ def _augment_template_with_rag(template_text: str, mutation_label: str | None, q
     record_metric(
         "rag_prompt_enhancement",
         {
+            "backend": runtime.backend_name,
             "mutation_type": mutation_label,
             "retrieval_ms": duration_ms,
             "retrieved_mutations": len(mutations),
@@ -260,6 +263,7 @@ def _prepend_rag_context_to_prompt(prompt_text: str, mutation_label: str | None)
     record_metric(
         "rag_prompt_rephrase_context",
         {
+            "backend": runtime.backend_name,
             "mutation_type": mutation_label,
             "retrieval_ms": duration_ms,
             "retrieved_mutations": len(mutations),

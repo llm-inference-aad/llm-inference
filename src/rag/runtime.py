@@ -6,9 +6,17 @@ import threading
 from typing import List, Sequence
 
 from cfg.constants import (
+    PAGEINDEX_API_KEY,
+    PAGEINDEX_DATA_DIR,
+    PAGEINDEX_MODEL,
+    PAGEINDEX_POLL_INTERVAL_SEC,
+    PAGEINDEX_QUERY_THINKING,
+    PAGEINDEX_TREE_TIMEOUT_SEC,
+    RAG_BACKEND,
     RAG_CODE_EMBED_MODEL,
     RAG_DATA_DIR,
     RAG_ENABLED,
+    RAG_FAIL_OPEN,
     RAG_MAX_PARAMETERS,
     RAG_MIN_ACCURACY,
     RAG_TEXT_EMBED_MODEL,
@@ -17,7 +25,7 @@ from cfg.constants import (
 
 from .embeddings import EmbeddingConfig, EmbeddingService
 from .prompt_enhancer import PromptEnhancer, PromptEnhancerConfig
-from .retrieval import RetrievedMutation, RetrievalService
+from .retrieval import FaissRetrievalBackend, RetrievedMutation, RetrievalBackend, RetrievalService
 from .vector_db import VectorStoreManager
 
 
@@ -31,7 +39,9 @@ class RagRuntime:
         )
         self.store = VectorStoreManager(RAG_DATA_DIR)
         self.embeddings = EmbeddingService(embedding_config)
-        self.retrieval = RetrievalService(self.store, self.embeddings)
+        backend = self._build_backend()
+        self.retrieval = RetrievalService(backend)
+        self.backend_name = self.retrieval.backend_name
         self.prompt_enhancer = PromptEnhancer(
             self.retrieval,
             PromptEnhancerConfig(
@@ -40,6 +50,30 @@ class RagRuntime:
                 max_parameters=RAG_MAX_PARAMETERS,
             ),
         )
+
+    def _build_backend(self) -> RetrievalBackend:
+        selected = RAG_BACKEND
+        if selected == "pageindex":
+            try:
+                from .pageindex_backend import PageIndexRetrievalBackend
+
+                backend = PageIndexRetrievalBackend(
+                    data_dir=PAGEINDEX_DATA_DIR,
+                    model_name=PAGEINDEX_MODEL,
+                    api_key=PAGEINDEX_API_KEY,
+                    tree_timeout_sec=PAGEINDEX_TREE_TIMEOUT_SEC,
+                    poll_interval_sec=PAGEINDEX_POLL_INTERVAL_SEC,
+                    query_thinking=PAGEINDEX_QUERY_THINKING,
+                )
+                if backend.client is None:
+                    raise RuntimeError("PAGEINDEX_API_KEY is missing; cannot enable true PageIndex tree retrieval.")
+                return backend
+            except Exception as exc:
+                if not RAG_FAIL_OPEN:
+                    raise RuntimeError("Failed to initialize PageIndex backend.") from exc
+                print(f"[RAG] PageIndex backend unavailable ({exc}). Falling back to FAISS backend.")
+
+        return FaissRetrievalBackend(self.store, self.embeddings)
 
     def enhance_template(
         self, template: str, mutation_type: str | None = None, query_code: str | None = None
@@ -53,9 +87,7 @@ class RagRuntime:
     def log_mutation_code(self, content: str, metadata: dict) -> str | None:
         if not content.strip():
             return None
-        embeddings = self.embeddings.embed_code(content)
-        document_ids = self.store.add_code_documents([content], embeddings, [metadata])
-        return document_ids[0] if document_ids else None
+        return self.retrieval.log_mutation_code(content=content, metadata=metadata)
 
     def collect_context(
         self, mutation_type: str | None = None, query_code: str | None = None

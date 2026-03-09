@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import pickle
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,6 +13,16 @@ import pdfplumber
 
 
 FitnessTuple = Sequence[float]
+
+
+def _format_param_count(value: object) -> str:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return "unknown"
+    if not math.isfinite(numeric):
+        return "unknown"
+    return str(int(numeric))
 
 
 def _safe_load_checkpoint(path: Path) -> dict | None:
@@ -69,7 +80,7 @@ def build_mutation_description(
         metrics = ", ".join(
             [
                 f"Test Acc: {fitness[0]:.4f}" if len(fitness) > 0 else "",
-                f"Params: {int(fitness[1])}" if len(fitness) > 1 else "",
+                f"Params: {_format_param_count(fitness[1])}" if len(fitness) > 1 else "",
                 f"Val Acc: {fitness[2]:.4f}" if len(fitness) > 2 else "",
                 f"Train Time: {fitness[3]:.2f}s" if len(fitness) > 3 else "",
             ]

@@ -66,6 +66,8 @@ def _parse_optional_float(value: str | None) -> float | None:
 
 #: Retrieval-Augmented Generation (RAG) configuration
 RAG_ENABLED = os.environ.get("RAG_ENABLED", "true").lower() in {"1", "true", "yes"}
+RAG_BACKEND = os.environ.get("RAG_BACKEND", "faiss").strip().lower()
+RAG_FAIL_OPEN = os.environ.get("RAG_FAIL_OPEN", "true").lower() in {"1", "true", "yes"}
 RAG_DATA_DIR = os.environ.get("RAG_DATA_DIR", os.path.join(ROOT_DIR, "rag_data"))
 RAG_CODE_EMBED_MODEL = os.environ.get("RAG_CODE_EMBED_MODEL", "microsoft/codebert-base")
 RAG_TEXT_EMBED_MODEL = os.environ.get("RAG_TEXT_EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
@@ -73,6 +75,12 @@ RAG_TOP_K = int(os.environ.get("RAG_TOP_K", 5))
 RAG_MIN_ACCURACY = float(os.environ.get("RAG_MIN_ACCURACY", 0.9))
 RAG_MAX_PARAMETERS = _parse_optional_float(os.environ.get("RAG_MAX_PARAMETERS"))
 RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", 0.3))  # Minimum similarity threshold for filtering irrelevant results
+PAGEINDEX_DATA_DIR = os.environ.get("PAGEINDEX_DATA_DIR", os.path.join(ROOT_DIR, "rag_data", "pageindex"))
+PAGEINDEX_MODEL = os.environ.get("PAGEINDEX_MODEL", "gpt-4o-2024-11-20")
+PAGEINDEX_API_KEY = os.environ.get("PAGEINDEX_API_KEY", "")
+PAGEINDEX_TREE_TIMEOUT_SEC = int(os.environ.get("PAGEINDEX_TREE_TIMEOUT_SEC", 900))
+PAGEINDEX_POLL_INTERVAL_SEC = float(os.environ.get("PAGEINDEX_POLL_INTERVAL_SEC", 5.0))
+PAGEINDEX_QUERY_THINKING = os.environ.get("PAGEINDEX_QUERY_THINKING", "true").lower() in {"1", "true", "yes"}
 
 # Evolution Constants/Params
 # --------------------------
@@ -85,13 +93,13 @@ INVALID_FITNESS_MAX = tuple([float(x*np.inf*-1) for x in FITNESS_WEIGHTS])
 PLACEHOLDER_FITNESS = tuple([int(x*9999999999*-1) for x in FITNESS_WEIGHTS])
 
 #: Number of elite individuals to utilize within the Evolution of Thought (EOT) operation
-NUM_EOT_ELITES = 2
+NUM_EOT_ELITES = 1
 
 #: Cycle in the optimization and output directory where intermediate data will be stored.
 GENERATION = 0
 
-PROB_QC = 0.0
-PROB_EOT = 0.25
+PROB_QC = 0.7
+PROB_EOT = 0.10
 
 # =============================================================================
 # BASELINE CONFIGURATION FOR LLM INFERENCE OPTIMIZATION
@@ -114,11 +122,11 @@ start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py
 #: Population size to utilize in each generation after optimization begins
 population_size = 16  # BASELINE: Keep consistent with start_population_size
 
-crossover_probability = 0.35  #: Probability of mating two individuals
-mutation_probability = 0.8 	  #: Probability of mutating an individual
+crossover_probability = 0.20  #: Probability of mating two individuals
+mutation_probability = 0.45 	  #: Probability of mutating an individual
 
 #: Number of elites to consider
-num_elites = 8
+num_elites = 4
 #: Number of individuals to keep in the hall of fame across the optimization
 hof_size = 8
 
