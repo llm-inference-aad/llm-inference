@@ -90,6 +90,9 @@ RAG_USE_CODE_CONTEXT = os.environ.get("RAG_USE_CODE_CONTEXT", "true").lower() in
 RAG_USE_TEXT_CONTEXT = os.environ.get("RAG_USE_TEXT_CONTEXT", "true").lower() in {"1", "true", "yes"}
 RAG_RERANKER_ENABLED = os.environ.get("RAG_RERANKER_ENABLED", "false").lower() in {"1", "true", "yes"}
 RAG_RERANKER_MODEL = os.environ.get("RAG_RERANKER_MODEL", "BAAI/bge-reranker-v2-m3")
+# RAG memory store: persist and retrieve past interactions (queries, responses, outcomes) for episodic context
+RAG_MEMORY_STORE_ENABLED = os.environ.get("RAG_MEMORY_STORE_ENABLED", "false").lower() in {"1", "true", "yes"}
+RAG_MEMORY_TOP_K = int(os.environ.get("RAG_MEMORY_TOP_K", 3))  # Number of memory entries to retrieve per prompt
 
 # Evolution Constants/Params
 # --------------------------

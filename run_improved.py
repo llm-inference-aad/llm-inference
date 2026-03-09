@@ -136,6 +136,10 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
         "source": "runtime_log",
     }
     runtime.log_mutation_code(content=f"{description}\n\nCode:\n{code.strip()}", metadata=metadata)
+    # RAG memory store: log episodic memory for retrieval in future prompts
+    if runtime.memory_store is not None:
+        memory_summary = f"{mutation_type or 'mutation'} on parent {parent_gene_id or 'unknown'}: {description}"
+        runtime.log_memory_entry(summary=memory_summary, metadata=metadata)
     record_metric(
         "rag_mutation_logged",
         {
@@ -1396,6 +1400,7 @@ if __name__ == "__main__":
                         {
                             "seed": int(seed_env) if seed_env.isdigit() else seed_env or None,
                             "RAG_ENABLED": os.getenv("RAG_ENABLED"),
+                            "RAG_MEMORY_STORE_ENABLED": os.getenv("RAG_MEMORY_STORE_ENABLED"),
                             "RAG_USE_CODE_CONTEXT": os.getenv("RAG_USE_CODE_CONTEXT"),
                             "RAG_USE_TEXT_CONTEXT": os.getenv("RAG_USE_TEXT_CONTEXT"),
                             "RAG_RERANKER_ENABLED": os.getenv("RAG_RERANKER_ENABLED"),

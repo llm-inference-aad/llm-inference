@@ -5,9 +5,11 @@ from __future__ import annotations
 import hashlib
 import os
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence
+from typing import List, Sequence
 
 from cfg.constants import (
+    RAG_MEMORY_STORE_ENABLED,
+    RAG_MEMORY_TOP_K,
     RAG_MIN_SIMILARITY,
     RAG_RERANKER_ENABLED,
     RAG_TEXT_TOP_K,
@@ -16,6 +18,7 @@ from cfg.constants import (
     RUN_ID,
 )
 
+from .memory_store import MemoryStore
 from .reranker import Reranker
 from .retrieval import RetrievedContext, RetrievedMutation, RetrievalService, RetrievalStats
 from utils.rag_metrics import record_metric
@@ -45,9 +48,15 @@ class PromptEnhancerConfig:
 class PromptEnhancer:
     """Build augmented prompt text that includes retrieval context."""
 
-    def __init__(self, retrieval_service: RetrievalService, config: PromptEnhancerConfig | None = None):
+    def __init__(
+        self,
+        retrieval_service: RetrievalService,
+        config: PromptEnhancerConfig | None = None,
+        memory_store: MemoryStore | None = None,
+    ):
         self.retrieval = retrieval_service
         self.config = config or PromptEnhancerConfig()
+        self.memory_store = memory_store
 
     def build_context(
         self,
@@ -220,6 +229,27 @@ class PromptEnhancer:
 
         sections: list[str] = []
 
+        # Section 0: Episodic memory (past interactions from this/prior runs)
+        if RAG_MEMORY_STORE_ENABLED and self.memory_store:
+            memory_query_parts: list[str] = []
+            if mutation_type:
+                memory_query_parts.append(f"{mutation_type} mutation")
+            if query_code:
+                code_snippet = "\n".join(query_code.strip().splitlines()[:5])
+                memory_query_parts.append(code_snippet)
+            if memory_query_parts:
+                memory_entries = self.memory_store.search_similar(
+                    " ".join(memory_query_parts),
+                    top_k=RAG_MEMORY_TOP_K,
+                    min_similarity=RAG_MIN_SIMILARITY,
+                )
+                if memory_entries:
+                    memory_lines = [f"- {e.content}" for e in memory_entries]
+                    sections.append(
+                        "Relevant past attempts from prior runs (for episodic context):\n"
+                        + "\n".join(memory_lines)
+                    )
+
         # Section 1: Domain knowledge from text namespace (PyTorch docs, papers)
         if text_contexts:
             text_block = self.retrieval.format_text_context(text_contexts)
@@ -238,6 +268,7 @@ class PromptEnhancer:
                 f"{context_block}"
             )
 
+        # Only augment if we have at least one section (memory, text, or code)
         if not sections:
             return template, []
 

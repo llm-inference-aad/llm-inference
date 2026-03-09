@@ -9,6 +9,7 @@ from cfg.constants import (
     RAG_CODE_EMBED_MODEL,
     RAG_DATA_DIR,
     RAG_ENABLED,
+    RAG_MEMORY_STORE_ENABLED,
     RAG_MAX_PARAMETERS,
     RAG_MIN_ACCURACY,
     RAG_TEXT_EMBED_MODEL,
@@ -16,6 +17,7 @@ from cfg.constants import (
 )
 
 from .embeddings import EmbeddingConfig, EmbeddingService
+from .memory_store import MemoryStore
 from .prompt_enhancer import PromptEnhancer, PromptEnhancerConfig
 from .retrieval import RetrievedMutation, RetrievalService
 from .vector_db import VectorStoreManager
@@ -41,6 +43,7 @@ class RagRuntime:
         for ns_name, embed_fn, label in [
             (VectorStoreManager.CODE_NAMESPACE, self.embeddings.embed_code, "code"),
             (VectorStoreManager.TEXT_NAMESPACE, self.embeddings.embed_text, "text"),
+            (VectorStoreManager.MEMORY_NAMESPACE, self.embeddings.embed_text, "memory"),
         ]:
             ns = self.store._namespace(ns_name)
             if ns.index is not None:
@@ -53,6 +56,8 @@ class RagRuntime:
                     )
 
         self.retrieval = RetrievalService(self.store, self.embeddings)
+        memory_store = MemoryStore(self.store, self.embeddings) if RAG_MEMORY_STORE_ENABLED else None
+        self.memory_store = memory_store
         self.prompt_enhancer = PromptEnhancer(
             self.retrieval,
             PromptEnhancerConfig(
@@ -60,6 +65,7 @@ class RagRuntime:
                 min_accuracy=RAG_MIN_ACCURACY,
                 max_parameters=RAG_MAX_PARAMETERS,
             ),
+            memory_store=memory_store,
         )
 
     def enhance_template(
@@ -82,6 +88,12 @@ class RagRuntime:
         embeddings = self.embeddings.embed_code(content)
         document_ids = self.store.add_code_documents([content], embeddings, [metadata])
         return document_ids[0] if document_ids else None
+
+    def log_memory_entry(self, summary: str, metadata: dict) -> str | None:
+        """Log a memory entry (past interaction) when RAG memory store is enabled."""
+        if self.memory_store is None:
+            return None
+        return self.memory_store.add_entry(summary=summary, metadata=metadata)
 
     def collect_context(
         self, mutation_type: str | None = None, query_code: str | None = None
