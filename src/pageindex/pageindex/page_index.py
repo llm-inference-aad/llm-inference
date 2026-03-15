@@ -89,7 +89,11 @@ async def check_title_appearance_in_start_concurrent(structure, page_list, model
             tasks.append(check_title_appearance_in_start(item['title'], page_text, model=model, logger=logger))
             valid_items.append(item)
 
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    sem = asyncio.Semaphore(5)
+    async def _bounded(coro):
+        async with sem:
+            return await coro
+    results = await asyncio.gather(*[_bounded(t) for t in tasks], return_exceptions=True)
     for item, result in zip(valid_items, results):
         if isinstance(result, Exception):
             if logger:
@@ -831,7 +835,11 @@ async def fix_incorrect_toc(toc_with_page_number, page_list, incorrect_results, 
         process_and_check_item(item)
         for item in incorrect_results
     ]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    sem = asyncio.Semaphore(5)
+    async def _bounded_fix(coro):
+        async with sem:
+            return await coro
+    results = await asyncio.gather(*[_bounded_fix(t) for t in tasks], return_exceptions=True)
     for item, result in zip(incorrect_results, results):
         if isinstance(result, Exception):
             print(f"Processing item {item} generated an exception: {result}")
@@ -926,7 +934,11 @@ async def verify_toc(page_list, list_result, start_index=1, N=None, model=None):
         check_title_appearance(item, page_list, start_index, model)
         for item in indexed_sample_list
     ]
-    results = await asyncio.gather(*tasks)
+    sem = asyncio.Semaphore(5)
+    async def _bounded_verify(coro):
+        async with sem:
+            return await coro
+    results = await asyncio.gather(*[_bounded_verify(t) for t in tasks])
     
     # Process results
     correct_count = 0
@@ -1014,7 +1026,11 @@ async def process_large_node_recursively(node, page_list, opt=None, logger=None)
             process_large_node_recursively(child_node, page_list, opt, logger=logger)
             for child_node in node['nodes']
         ]
-        await asyncio.gather(*tasks)
+        sem = asyncio.Semaphore(3)
+        async def _bounded_node(coro):
+            async with sem:
+                return await coro
+        await asyncio.gather(*[_bounded_node(t) for t in tasks])
     
     return node
 
@@ -1050,7 +1066,11 @@ async def tree_parser(page_list, opt, doc=None, logger=None):
         process_large_node_recursively(node, page_list, opt, logger=logger)
         for node in toc_tree
     ]
-    await asyncio.gather(*tasks)
+    sem = asyncio.Semaphore(3)
+    async def _bounded_tree(coro):
+        async with sem:
+            return await coro
+    await asyncio.gather(*[_bounded_tree(t) for t in tasks])
     
     return toc_tree
 
