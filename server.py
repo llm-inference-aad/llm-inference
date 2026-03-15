@@ -14,6 +14,12 @@ from pathlib import Path
 from src.cfg.constants import *
 from evaluator import OutputEvaluator
 
+DEFAULT_CODE_GEN_PROMPT = """Output a single fenced code block with runnable Python code and nothing else.
+Do not include explanations, comments outside the code block, or extra code fences.
+Begin with ```python and end with ```. If you cannot comply, output exactly FAIL.
+
+"""
+
 app = FastAPI(title="LLM API", version="1.0")
 
 # Path To Local Large Language Model (from environment variable)
@@ -108,6 +114,10 @@ class LLMRequest(BaseModel):
     temperature: float = 0.7
     job_id: str | None = "default"  # Add job identifier to match with slurm file
     gene_id: str | None = None  # Identifier for the individual this request belongs to
+    use_system_prompt: bool = True
+    system_prompt_override: str | None = None
+    do_sample: bool = True
+    repetition_penalty: float = 1.1  # backward-compat default for code-gen
 
 class LLMModel:
     _instance = None
@@ -186,12 +196,6 @@ class LLMModel:
             tokenizer=self.tokenizer,
             return_full_text=False,
             task="text-generation",
-            temperature=0.1,
-            top_p=0.15,
-            top_k=0,
-            max_new_tokens=1024,
-            repetition_penalty=1.1,
-            do_sample=True,
             batch_size=BATCH_SIZE
         )
         
@@ -253,20 +257,25 @@ class LLMModel:
                         print(f"Current VRAM: {torch.cuda.memory_allocated()/1024**3:.2f} GB / {torch.cuda.max_memory_allocated()/1024**3:.2f} GB (Peak)", flush=True)
                     
                     prompts = [req["prompt"] for req in batch]
-                    
+
                     max_new_tokens = max(req["max_new_tokens"] for req in batch)
-                    
+
                     # all temps and top_p are same
-                    temperature = batch[0]["temperature"] 
+                    temperature = batch[0]["temperature"]
                     top_p = batch[0]["top_p"]
-                    
+                    do_sample = batch[0].get("do_sample", True)
+                    repetition_penalty = batch[0].get("repetition_penalty", 1.1)
+
                     start_time = time.time()
-                    
+
                     results = self.pipeline(
-                        prompts, 
+                        prompts,
                         max_new_tokens=max_new_tokens,
                         temperature=temperature,
-                        top_p=top_p
+                        top_p=top_p,
+                        top_k=0,
+                        do_sample=do_sample,
+                        repetition_penalty=repetition_penalty,
                     )
                     
                     response_time = round(time.time() - start_time, 2)
@@ -274,12 +283,17 @@ class LLMModel:
                     # for every future, set its result
                     for i, (result, future) in enumerate(zip(results, futures)):
                         output_txt = result[0].get("generated_text", str(result))
-                        
+
+                        # Detect finish_reason based on generated token count
+                        gen_tokens = len(self.tokenizer(output_txt, add_special_tokens=False)["input_ids"])
+                        finish_reason = "length" if gen_tokens >= max_new_tokens - 1 else "stop"
+
                         # Calculate queue wait time for this specific request
                         queue_wait_time = batch_processing_start - batch[i].get("queue_start_time", batch_processing_start)
-                        
+
                         future.set_result({
                             "generated_text": output_txt,
+                            "finish_reason": finish_reason,
                             "response_time_sec": response_time,
                             "batch_size": batch_size,
                             "queue_wait_time_sec": round(queue_wait_time, 4)
@@ -352,28 +366,43 @@ async def generate_text(request: LLMRequest):
     _start_time = time.time()
     
     try:
-        # Add system prompt to all requests (configurable via environment variable)
-        system_prompt = os.getenv("SYSTEM_PROMPT", """Output a single fenced code block with runnable Python code and nothing else.
-Do not include explanations, comments outside the code block, or extra code fences.
-Begin with ```python and end with ```. If you cannot comply, output exactly FAIL.
+        # Resolve system prompt
+        if request.use_system_prompt:
+            if request.system_prompt_override:
+                system_prompt = request.system_prompt_override
+            else:
+                system_prompt = os.getenv("SYSTEM_PROMPT", DEFAULT_CODE_GEN_PROMPT)
+        else:
+            system_prompt = None
 
-""")
-        
-        # Combine system prompt with user prompt
-        full_prompt = system_prompt + request.prompt
-        
+        # Get the model instance (already loaded at startup)
+        model = LLMModel()
+
+        # Apply chat template for proper role tokens
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": request.prompt})
+
+        try:
+            full_prompt = model.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+        except Exception:
+            # Fallback for models without chat template
+            full_prompt = (system_prompt + "\n\n" + request.prompt) if system_prompt else request.prompt
+
         # Convert request to dict
         request_dict = {
             "prompt": full_prompt,
             "max_new_tokens": request.max_new_tokens,
             "top_p": request.top_p,
             "temperature": request.temperature,
-            "job_id": request.job_id,  # Include job identifier
-            "gene_id": request.gene_id  # Include gene_id for individual tracking
+            "job_id": request.job_id,
+            "gene_id": request.gene_id,
+            "do_sample": request.do_sample,
+            "repetition_penalty": request.repetition_penalty,
         }
-        
-        # Get the model instance (already loaded at startup)
-        model = LLMModel()
         
         # Track queue wait time
         queue_start_time = time.time()
@@ -398,8 +427,11 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         completion_tokens = len(tokenizer(generated_text, add_special_tokens=False)["input_ids"]) if generated_text else 0
         total_tokens = prompt_tokens + completion_tokens
 
-        # Calculate evaluation score for the generated text
-        evaluation_score = OutputEvaluator.calculate_evaluation_score(generated_text)
+        # Calculate evaluation score (skip for PageIndex requests)
+        if request.gene_id == "pageindex":
+            evaluation_score = None
+        else:
+            evaluation_score = OutputEvaluator.calculate_evaluation_score(generated_text)
         
         # Save latency metrics
         save_latency_metrics(
@@ -418,11 +450,12 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         
         print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")
         
-        # Add run hash, e2e latency, and evaluation score to response
+        # Add run hash, e2e latency, finish_reason, and evaluation score to response
         result["_latency_sec"] = round(e2e_time, 4)
         result["e2e_latency_sec"] = round(e2e_time, 4)
         result["run_hash"] = RUN_HASH
         result["evaluationScore"] = evaluation_score
+        result["finish_reason"] = result.get("finish_reason", "stop")
         
         return result
     except Exception as e:
