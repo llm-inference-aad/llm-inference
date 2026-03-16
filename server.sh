@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=LLMGE01_Server
-#SBATCH -t 12:00:00
+#SBATCH -t 4:00:00
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:h100:2
+#SBATCH --gres=gpu:h200:2
 #SBATCH --mem 160G
 #SBATCH -c 16
 #SBATCH --output=slurm-results/slurm-server-%j.out
