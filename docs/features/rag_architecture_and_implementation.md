@@ -1,7 +1,7 @@
 # Retrieval-Augmented Generation (RAG) Architecture & Implementation
 
-> **Last updated:** February 24, 2026  
-> **Status:** Active — Phase 1 implemented (dual-namespace retrieval + reranker), Phase 2 feature branches planned  
+> **Last updated:** March 17, 2026  
+> **Status:** Active — retrieval hardening implemented for FixedPrompts grounding, source-aware text selection, richer diagnostics, and section-aware text ingestion  
 > **Canonical doc:** This file unifies all prior RAG documentation (`02_rag_feature.md`, `rag_implementation_review.md`, `rag_and_inference_refactor_summary.md`, `rag_small_improvements.md`).
 
 ---
@@ -319,7 +319,10 @@ All RAG settings live in `src/cfg/constants.py` and can be overridden via enviro
 | `RAG_CODE_EMBED_MODEL` | `microsoft/codebert-base` | Code embedding model |
 | `RAG_TEXT_EMBED_MODEL` | `sentence-transformers/all-MiniLM-L6-v2` | Text embedding model |
 | `RAG_TOP_K` | `5` | Number of code mutations to retrieve |
-| `RAG_TEXT_TOP_K` | `3` | Number of text chunks (PDFs, docs) to retrieve |
+| `RAG_TEXT_TOP_K` | `3` | Maximum total number of text chunks injected into the prompt |
+| `RAG_TEXT_CANDIDATE_K` | `24` | Number of text candidates to pull from FAISS before reranking and source-aware selection |
+| `RAG_TEXT_TOP_K_API` | `2` | Maximum number of API-doc chunks injected for architecture-style prompts |
+| `RAG_TEXT_TOP_K_PDF` | `1` | Maximum number of PDF chunks injected for architecture-style prompts |
 | `RAG_USE_CODE_CONTEXT` | `true` | Enable/disable code-namespace context (ablation toggle) |
 | `RAG_USE_TEXT_CONTEXT` | `true` | Enable/disable text-namespace context (ablation toggle) |
 | `RAG_MIN_ACCURACY` | `0.9` | Minimum test accuracy to index/retrieve |
@@ -351,6 +354,9 @@ uv run python scripts/setup_rag.py
 
 # Or with a custom pytorch.json path
 uv run python scripts/setup_rag.py --pytorch-json /path/to/pytorch.json
+
+# Rebuild the text namespace from scratch after changing chunking / filters
+uv run python scripts/setup_rag.py --pytorch-json rag_corpus/pytorch.json --rebuild-text
 ```
 
 ### Retrieval Evaluation (Golden Queries)
@@ -389,10 +395,15 @@ Location: `run_improved.py:_log_mutation_result()`
 ### 1. Template Generation — `run_improved.py:generate_template()`
 
 ```python
-template_txt = _apply_rag_context(template_txt, mute_type, query_code=x)
+template_txt = _apply_rag_context(
+    template_txt,
+    mute_type,
+    query_code=parent_code_or_seed_code,
+    gene_id=gene_id,
+)
 ```
 
-After selecting a template (EoT or FixedPrompts), RAG context is injected. The resulting augmented prompt is sent to the LLM.
+After selecting a template, RAG context is injected before the LLM call. The EoT path passes the sampled code snippet, while the FixedPrompts path now loads the full parent model source so retrieval is grounded in the current architecture rather than prompt prose alone.
 
 ### 2. Prompt Mutation — `src/llm_utils.py:mutate_prompts()`
 
@@ -593,34 +604,57 @@ rag_data/
 
 ## Metrics & Observability
 
-RAG metrics are logged to `metrics/rag_metrics.jsonl`:
+RAG metrics are logged to `${RUN_METRICS_DIR}/rag_metrics.jsonl` (run-scoped when configured, otherwise repo-level fallback):
 
 ```json
 {
-  "event_type": "rag_prompt_enhancement",
+  "event_type": "rag_context_built",
   "timestamp": 1234567890.123,
+  "gene_id": "xXxbh7x41Ztpdp4K8ffUF0eWIXi",
   "mutation_type": "Complex",
-  "retrieval_ms": 45.2,
-  "retrieved_mutations": 5,
-  "prompt_tokens": 1234
+  "query_code_present": true,
+  "text_query_preview": "Architecture snippet: class Network(nn.Module): ... Conv2d ...",
+  "candidate_text_n": 24,
+  "retrieved_text_n": 3,
+  "text_selection_mode": "hybrid",
+  "selected_text_api_n": 2,
+  "selected_text_pdf_n": 1,
+  "text_candidates_pre_rerank": [
+    {
+      "document_id": "torch.nn.Conv2d::api_summary",
+      "doc_type": "api_summary",
+      "pre_score": 0.61
+    }
+  ],
+  "text_candidates_post_rerank": [
+    {
+      "document_id": "torch.nn.Conv2d::api_summary",
+      "doc_type": "api_summary",
+      "post_score": 0.98
+    }
+  ]
 }
 ```
 
 | Event Type | Trigger |
 |---|---|
-| `rag_prompt_enhancement` | Template enhancement in `generate_template()` |
-| `rag_prompt_rephrase_context` | Prompt rephrasing in `mutate_prompts()` |
-| `rag_generation_context` | Generation context injection |
+| `rag_runtime_status` | Runtime init status (`ready`, `disabled`, `dimension_mismatch`, init failure) |
+| `rag_query_code_loaded` / `rag_query_code_load_failed` | FixedPrompts parent-code load outcome |
+| `rag_generation_skipped` / `rag_generation_failed` | Injection skipped or errored before prompt augmentation |
+| `rag_context_built` | Full retrieval/injection event with candidate-level diagnostics |
+| `rag_generation_context` | Final selected counts after generation-context injection |
 | `rag_mutation_logged` | Successful mutation indexed to vector DB |
+
+The relevance values rendered into prompts are the **post-rerank cross-encoder scores**, not raw FAISS cosine similarity. Very small displayed scores therefore indicate the reranker also considered the match weak.
 
 ### Retrieval Quality Baseline
 
-From `src/rag/eval_retrieval.py` benchmark (13 golden queries):
+From `src/rag/eval_retrieval.py` benchmark on the `medium` tier (200 deterministic PyTorch queries):
 
 | Metric | Value |
 |---|---|
-| **Recall@5** | 76.9% (10/13 in top-5) |
-| **MRR@5** | 0.6667 |
+| **Recall@5** | 85.0% (170/200 in top-5) |
+| **MRR@5** | 0.6996 |
 
 ---
 
@@ -637,7 +671,8 @@ From `src/rag/eval_retrieval.py` benchmark (13 golden queries):
 |---|---|
 | Vector DB not initialized | Run `scripts/setup_rag.py` |
 | No mutations meet accuracy threshold | Lower `RAG_MIN_ACCURACY` or wait for better mutations |
-| Query code doesn't match any indexed mutations | Normal during novel exploration |
+| FixedPrompts query is built only from prompt prose | Ensure parent-model source is being loaded (`rag_query_code_loaded`, `query_code_present=true`) |
+| PDFs dominate weak architecture queries | Tune `RAG_TEXT_TOP_K_API`, `RAG_TEXT_TOP_K_PDF`, `RAG_TEXT_CANDIDATE_K` and inspect candidate logs |
 
 ### Mutant Files Contain Code Instead of Prompts
 
@@ -654,7 +689,7 @@ All timestamped milestones that shaped the current RAG stack:
 - **FAISS dual-namespace vector database** with separate code/text indices
 - **Three-stage integration:** Template Generation (`generate_template()`), Prompt Mutation (`mutate_prompts()`), Post-Evaluation Logging
 - **Config-driven:** `RAG_ENABLED` toggle, `RAG_MIN_ACCURACY` quality gate
-- **Retrieval evaluation:** Baseline Recall@5 = 76.9%, MRR@5 = 0.667 on 13 golden PyTorch queries
+- **Retrieval evaluation:** Medium-tier baseline Recall@5 = 85.0%, MRR@5 = 0.6996 on 200 deterministic PyTorch queries
 
 ### November–December 2025 — Inference Refactor & Architecture Redesign
 
@@ -670,18 +705,19 @@ All timestamped milestones that shaped the current RAG stack:
 3. **Score-Based Sorting 🎯:** Deterministic ordering by relevance score in `build_context()`, ensuring best examples appear first.
 4. **Minimum Similarity Threshold 🎯:** `RAG_MIN_SIMILARITY=0.3` rejects sub-threshold noise from context.
 
-### February 2026 — Phase 1: Dual-Namespace Retrieval + Reranker
+### February-March 2026 — Dual-Namespace Retrieval Hardening + Diagnostics
 
 Critical fix and enhancement addressing the text namespace retrieval gap:
 
-1. **Text Namespace Retrieval Fix 🔧:** `PromptEnhancer.build_text_context()` now queries the FAISS `text` namespace alongside the existing `code` namespace. Previously, PDFs and PyTorch docs were indexed but **never retrieved** — a critical data flow gap.
-2. **PyTorch API Docs Wired In 📚:** `setup_rag.py` now calls `ingest_pytorch_docs()` to index `pytorch.json` (API signatures, docstrings, code examples) into the text namespace. Added `--pytorch-json` CLI argument and deduplication guards.
-3. **`RetrievedContext` Type 📋:** New dataclass for text documents — distinct from `RetrievedMutation` — with `document_id`, `content`, `source`, `doc_type` fields.
-4. **Two-Section Prompt Structure 📝:** Augmented prompts now have two clearly separated sections: (1) domain knowledge from text namespace, framed as informational context, and (2) historical mutations from code namespace, framed as examples.
-5. **Cross-Encoder Reranker 🎯:** New `src/rag/reranker.py` module using `BAAI/bge-reranker-v2-m3` (~300M params, CPU). Lazy-loaded, disabled by default (`RAG_RERANKER_ENABLED=false`). Generic `content_fn` API works with both `RetrievedMutation` and `RetrievedContext`.
-6. **New Constants:** `RAG_TEXT_TOP_K` (default 3), `RAG_RERANKER_ENABLED`, `RAG_RERANKER_MODEL` — all env-configurable.
+1. **Text Namespace Retrieval Fix 🔧:** `PromptEnhancer.build_text_context()` queries the FAISS `text` namespace alongside the existing `code` namespace. Previously, PDFs and PyTorch docs were indexed but never retrieved.
+2. **FixedPrompts Query Grounding 🧠:** `run_improved.py:generate_template()` now loads the full parent model source and passes it to `_apply_rag_context(...)`, so FixedPrompts retrieval is grounded in architecture code rather than prompt prose alone.
+3. **Source-Aware Text Selection 🎛️:** Text retrieval now pulls a broader candidate pool, reranks it, then applies an API/PDF selection policy. Hyperparameter-oriented prompts are restricted to API docs; architecture prompts are capped to mostly API docs with at most one PDF by default.
+4. **Candidate-Level Diagnostics 🔍:** `rag_context_built` now records pre/post-rerank candidates, selected sources, doc types, names, and query previews. `scripts/inspect_rag_context.py` provides a human-readable view for a single run or gene.
+5. **Cleaner Text Corpus 🧹:** PDF ingestion now filters OCR/table-heavy chunks, and PyTorch ingestion now section-chunks each API entry into summary, parameters, behavior, and examples for more coherent retrieval.
+6. **Cross-Encoder Reranker 🎯:** `src/rag/reranker.py` uses `BAAI/bge-reranker-v2-m3` (~300M params, CPU). The prompt shows post-rerank scores, not raw vector similarity.
+7. **New Constants:** `RAG_TEXT_TOP_K`, `RAG_TEXT_CANDIDATE_K`, `RAG_TEXT_TOP_K_API`, `RAG_TEXT_TOP_K_PDF`, `RAG_RERANKER_ENABLED`, `RAG_RERANKER_MODEL` — all env-configurable.
 
-**Files modified:** `src/rag/retrieval.py`, `src/rag/prompt_enhancer.py`, `src/rag/reranker.py` (new), `src/rag/__init__.py`, `src/cfg/constants.py`, `scripts/setup_rag.py`
+**Files modified:** `run_improved.py`, `src/rag/retrieval.py`, `src/rag/prompt_enhancer.py`, `src/rag/data_ingestion.py`, `src/rag/runtime.py`, `src/rag/reranker.py`, `src/cfg/constants.py`, `scripts/setup_rag.py`, `scripts/analyze_rag_impact.py`, `scripts/inspect_rag_context.py`
 
 ---
 
