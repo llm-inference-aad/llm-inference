@@ -16,7 +16,7 @@ from src.utils.print_utils import print_population, print_scores, box_print, pri
 from src.llm_utils import split_file, retrieve_base_code, mutate_prompts
 from utils.rag_metrics import record_metric
 from rag.data_ingestion import build_mutation_description, calculate_fitness_improvement
-from rag.runtime import get_runtime
+from rag.runtime import get_runtime, get_runtime_status
 from src.cfg.constants import *
 import concurrent.futures
 import uuid
@@ -71,21 +71,84 @@ def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None,
     return ancestry
 
 
-def _apply_rag_context(template_txt: str, mutation_type: str | None, query_code: str | None = None) -> str:
+def _load_parent_query_code(
+    parent_model_path: str | None,
+    gene_id: str | None,
+    mutation_type: str | None,
+) -> str | None:
+    if not parent_model_path:
+        return None
+    try:
+        code = Path(parent_model_path).read_text(encoding="utf-8")
+    except OSError as exc:
+        record_metric(
+            "rag_query_code_load_failed",
+            {
+                "gene_id": gene_id,
+                "mutation_type": mutation_type,
+                "parent_model_path": parent_model_path,
+                "error": f"{type(exc).__name__}: {exc}",
+            },
+        )
+        return None
+    record_metric(
+        "rag_query_code_loaded",
+        {
+            "gene_id": gene_id,
+            "mutation_type": mutation_type,
+            "parent_model_path": parent_model_path,
+            "query_code_lines": len(code.splitlines()),
+            "query_code_words": len(code.split()),
+        },
+    )
+    return code
+
+
+def _apply_rag_context(
+    template_txt: str,
+    mutation_type: str | None,
+    query_code: str | None = None,
+    gene_id: str | None = None,
+) -> str:
     runtime = get_runtime()
     if runtime is None:
+        status = get_runtime_status()
+        record_metric(
+            "rag_generation_skipped",
+            {
+                "gene_id": gene_id,
+                "mutation_type": mutation_type,
+                "query_code_present": bool(query_code and query_code.strip()),
+                "runtime_state": status.get("state"),
+                "runtime_reason": status.get("reason"),
+                "runtime_details": status.get("details"),
+            },
+        )
         return template_txt
     start = time.perf_counter()
-    augmented_template, mutations = runtime.enhance_template(
-        template=template_txt,
-        mutation_type=mutation_type,
-        query_code=query_code,
-        gene_id=None,
-    )
+    try:
+        augmented_template, mutations = runtime.enhance_template(
+            template=template_txt,
+            mutation_type=mutation_type,
+            query_code=query_code,
+            gene_id=gene_id,
+        )
+    except Exception as exc:
+        record_metric(
+            "rag_generation_failed",
+            {
+                "gene_id": gene_id,
+                "mutation_type": mutation_type,
+                "query_code_present": bool(query_code and query_code.strip()),
+                "error": f"{type(exc).__name__}: {exc}",
+            },
+        )
+        return template_txt
     duration_ms = (time.perf_counter() - start) * 1000
     record_metric(
         "rag_generation_context",
         {
+            "gene_id": gene_id,
             "mutation_type": mutation_type,
             "retrieved_mutations": len(mutations),
             "retrieval_ms": duration_ms,
@@ -149,7 +212,16 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
     )
 
 
-def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR):
+def generate_template(
+    PROB_EOT,
+    GEN_COUNT,
+    TOP_N_GENES,
+    SOTA_ROOT,
+    SEED_NETWORK,
+    ROOT_DIR,
+    parent_model_path,
+    gene_id: str | None = None,
+):
     """
     Generates a template based on given probabilities and gene information.
     
@@ -193,7 +265,7 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
             
         template_txt = eot_template_txt.format(x, y, "{}")
         mute_type = "EoT"
-        template_txt = _apply_rag_context(template_txt, mute_type, query_code=x)
+        template_txt = _apply_rag_context(template_txt, mute_type, query_code=x, gene_id=gene_id)
     else:
         print("\t‣ FixedPrompts")
         prompt_templates = glob.glob(f'{ROOT_DIR}/templates/FixedPrompts/*/*.txt')
@@ -204,7 +276,13 @@ def generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK,
         with open(f'{ROOT_DIR}/templates/ConstantRules.txt', 'r') as file:
             rules_txt = file.read()
         template_txt = f'{template_txt}\n{rules_txt}'
-        template_txt = _apply_rag_context(template_txt, mute_type)
+        query_code = _load_parent_query_code(parent_model_path, gene_id=gene_id, mutation_type=mute_type)
+        template_txt = _apply_rag_context(
+            template_txt,
+            mute_type,
+            query_code=query_code,
+            gene_id=gene_id,
+        )
 
     return template_txt, mute_type
 
@@ -526,7 +604,16 @@ def create_individual(container, temp_min=0.05, temp_max=0.4):
     # Select prompte and temp
     temperature = round(random.uniform(temp_min, temp_max), 2)
     # Generate template for initial creation (like mutation)
-    template_txt, mute_type = generate_template(PROB_EOT, GENERATION, TOP_N_GENES, SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
+    template_txt, mute_type = generate_template(
+        PROB_EOT,
+        GENERATION,
+        TOP_N_GENES,
+        SOTA_ROOT,
+        SEED_NETWORK,
+        ROOT_DIR,
+        parent_model_path=f'{SOTA_ROOT}/network.py',
+        gene_id=gene_id,
+    )
     # Assign a file path and name for the model creation bash
     # Assign a file path and name for the model creation bash
     file_path = os.path.join(out_dir, f'{gene_id}.sh')
@@ -1142,8 +1229,16 @@ def customMutation(individual, indpb, temp_min=0.02, temp_max=0.35):
     temperature = round(random.uniform(temp_min, temp_max), 2)
     
     # Generate template for mutation
-    template_txt, mute_type = generate_template(PROB_EOT, GEN_COUNT, TOP_N_GENES, 
-                                                 SOTA_ROOT, SEED_NETWORK, ROOT_DIR)
+    template_txt, mute_type = generate_template(
+        PROB_EOT,
+        GEN_COUNT,
+        TOP_N_GENES,
+        SOTA_ROOT,
+        SEED_NETWORK,
+        ROOT_DIR,
+        parent_model_path=f'{SOTA_ROOT}/models/network_{old_gene_id}.py',
+        gene_id=new_gene_id,
+    )
 
     # Surya: Prevent mutation of zombie parents
     parent_model_path = f'{SOTA_ROOT}/models/network_{old_gene_id}.py'
@@ -1548,8 +1643,8 @@ if __name__ == "__main__":
         hof.update(population)
         save_checkpoint(gen, folder_name=args.checkpoints)
         LINKED_GENES = {}
-        # mutate x prompts
-        mutate_prompts()
+        # disable mutate_prompts pending redesign (tracks tasks/todo.md M2)
+        # mutate_prompts()
         
     print("-- End of Evolution --")
     best_ind = tools.selBest(population, 1)[0]
