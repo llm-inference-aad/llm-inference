@@ -12,16 +12,16 @@ RUN_DIR = os.environ.get("RUN_DIR", os.path.join(ROOT_DIR, "runs", RUN_ID))
 RUN_LOG_DIR = os.environ.get("RUN_LOG_DIR", os.path.join(RUN_DIR, "logs"))
 #: Directory for analyzable metrics and evaluation outputs.
 RUN_METRICS_DIR = os.environ.get("RUN_METRICS_DIR", os.path.join(RUN_DIR, "metrics"))
-#: Directory for error logs.
-RUN_ERRORS_DIR = os.environ.get("RUN_ERRORS_DIR", os.path.join(RUN_DIR, "errors"))
+#: Directory for error logs (like validation_errors.csv)
+RUN_ERRORS_DIR = os.environ.get("RUN_ERRORS_DIR", os.path.join(RUN_LOG_DIR, "errors"))
 #: DATA_PATH absolute or relative to ExquisiteNetV2
 DATA_PATH = "./cifar10"
 #: Location where the current seed repo resides
 SOTA_ROOT = os.path.join(ROOT_DIR, 'sota/ExquisiteNetV2')
 #: Location where the network architecture for the seed resides
 SEED_NETWORK = os.path.join(SOTA_ROOT, "network.py")
-#: Directory for aggregated Slurm logs
-SLURM_LOG_DIR = os.environ.get("SLURM_LOG_DIR", RUN_LOG_DIR)
+#: Directory for aggregated Slurm eval logs
+SLURM_LOG_DIR = os.environ.get("SLURM_LOG_DIR", os.path.join(RUN_LOG_DIR, "eval"))
 #: Directory for aggregated Slurm error logs
 SLURM_ERROR_DIR = os.environ.get("SLURM_ERROR_DIR", RUN_ERRORS_DIR)
 #: Whether to run llm-ge locally (True) or distribute across a slurm cluster  (False)
@@ -86,6 +86,9 @@ RAG_MIN_ACCURACY = float(os.environ.get("RAG_MIN_ACCURACY", 0.9))
 RAG_MAX_PARAMETERS = _parse_optional_float(os.environ.get("RAG_MAX_PARAMETERS"))
 RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", 0.3))  # Minimum similarity threshold for filtering irrelevant results
 RAG_TEXT_TOP_K = int(os.environ.get("RAG_TEXT_TOP_K", 3))  # Number of text chunks (PDFs, docs) to retrieve
+RAG_TEXT_CANDIDATE_K = int(os.environ.get("RAG_TEXT_CANDIDATE_K", 24))
+RAG_TEXT_TOP_K_API = int(os.environ.get("RAG_TEXT_TOP_K_API", 2))
+RAG_TEXT_TOP_K_PDF = int(os.environ.get("RAG_TEXT_TOP_K_PDF", 1))
 RAG_USE_CODE_CONTEXT = os.environ.get("RAG_USE_CODE_CONTEXT", "true").lower() in {"1", "true", "yes"}
 RAG_USE_TEXT_CONTEXT = os.environ.get("RAG_USE_TEXT_CONTEXT", "true").lower() in {"1", "true", "yes"}
 RAG_RERANKER_ENABLED = os.environ.get("RAG_RERANKER_ENABLED", "false").lower() in {"1", "true", "yes"}

@@ -247,7 +247,7 @@ def load_latency_metrics(run_dir: Path, run_id: str) -> Dict[str, Any]:
     }
 
 
-def load_rag_usage(run_dir: Path) -> Dict[str, Any]:
+def load_rag_usage(run_dir: Path, run_id: str, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # Prefer run-scoped metrics if present; fall back to repo-level file.
     candidates = []
     run_scoped = run_dir / "metrics" / "rag_metrics.jsonl"
@@ -258,6 +258,7 @@ def load_rag_usage(run_dir: Path) -> Dict[str, Any]:
         candidates.append(repo_scoped)
 
     events: List[Dict[str, Any]] = []
+    used_run_scoped = False
     for path in candidates:
         try:
             for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
@@ -268,24 +269,62 @@ def load_rag_usage(run_dir: Path) -> Dict[str, Any]:
                 except Exception:
                     continue
                 if isinstance(obj, dict):
+                    if path == repo_scoped:
+                        event_run_id = obj.get("run_id")
+                        if str(event_run_id or "") != str(run_id):
+                            continue
                     events.append(obj)
         except Exception:
             continue
 
         # If we found a run-scoped file, do not mix in the repo-scoped file.
         if path == run_scoped:
+            used_run_scoped = True
             break
 
+    runtime_events = [e for e in events if e.get("event_type") == "rag_runtime_status"]
+    skipped_events = [e for e in events if e.get("event_type") == "rag_generation_skipped"]
+    failed_events = [e for e in events if e.get("event_type") == "rag_generation_failed"]
     context_events = [e for e in events if e.get("event_type") == "rag_context_built"]
+    latest_runtime = runtime_events[-1] if runtime_events else {}
     if not context_events:
+        reason = None
+        if latest_runtime:
+            reason = latest_runtime.get("reason") or latest_runtime.get("state")
+        elif skipped_events:
+            reason = skipped_events[-1].get("runtime_reason") or skipped_events[-1].get("runtime_state")
+        elif failed_events:
+            reason = failed_events[-1].get("error")
+        elif isinstance(metadata, dict):
+            exp = metadata.get("experiment")
+            if isinstance(exp, dict) and str(exp.get("RAG_ENABLED")).lower() == "false":
+                reason = "rag_disabled_by_config"
+        elif not candidates:
+            reason = "rag_metrics_file_missing"
         return {
+            "rag_metrics_file_present": bool(used_run_scoped or events),
             "rag_events_total": len(events),
+            "rag_runtime_events": len(runtime_events),
+            "rag_generation_skipped_events": len(skipped_events),
+            "rag_generation_failed_events": len(failed_events),
             "rag_context_events": 0,
+            "rag_last_runtime_state": latest_runtime.get("state"),
+            "rag_last_runtime_reason": latest_runtime.get("reason"),
+            "rag_last_runtime_details": latest_runtime.get("details"),
+            "rag_observed_issue": reason,
             "rag_nonempty_fraction": None,
             "avg_retrieved_code_n": None,
             "avg_retrieved_text_n": None,
             "avg_context_words_code": None,
             "avg_context_words_text": None,
+            "avg_selected_text_api_n": None,
+            "avg_selected_text_pdf_n": None,
+            "avg_selected_text_other_n": None,
+            "param_events_with_pdf_fraction": None,
+            "rag_text_events_with_api_fraction": None,
+            "rag_text_events_with_pdf_fraction": None,
+            "avg_text_top_pre_rerank_score": None,
+            "avg_text_top_post_rerank_score": None,
         }
 
     code_ns = [int(e.get("retrieved_code_n") or 0) for e in context_events]
@@ -293,18 +332,70 @@ def load_rag_usage(run_dir: Path) -> Dict[str, Any]:
     nonempty = [1 for c, t in zip(code_ns, text_ns) if (c + t) > 0]
     words_code = [int(e.get("context_words_code") or 0) for e in context_events]
     words_text = [int(e.get("context_words_text") or 0) for e in context_events]
+    selected_api = [int(e.get("selected_text_api_n") or 0) for e in context_events]
+    selected_pdf = [int(e.get("selected_text_pdf_n") or 0) for e in context_events]
+    selected_other = [int(e.get("selected_text_other_n") or 0) for e in context_events]
+
+    param_events = [e for e in context_events if "param" in str(e.get("mutation_type") or "").lower()]
+    param_events_with_pdf = [
+        e for e in param_events if int(e.get("selected_text_pdf_n") or 0) > 0
+    ]
+    events_with_api = [e for e in context_events if int(e.get("selected_text_api_n") or 0) > 0]
+    events_with_pdf = [e for e in context_events if int(e.get("selected_text_pdf_n") or 0) > 0]
+
+    def _top_score(events_list: List[Dict[str, Any]], key: str, score_field: str) -> List[float]:
+        scores: List[float] = []
+        for event in events_list:
+            candidates = event.get(key) or []
+            if not isinstance(candidates, list) or not candidates:
+                continue
+            try:
+                score = candidates[0].get(score_field)
+                if score is not None:
+                    scores.append(float(score))
+            except Exception:
+                continue
+        return scores
+
+    top_pre_scores = _top_score(context_events, "text_candidates_pre_rerank", "post_score")
+    top_post_scores = _top_score(context_events, "text_candidates_post_rerank", "post_score")
 
     def _avg(xs: List[int]) -> float:
         return float(sum(xs) / max(len(xs), 1))
 
+    def _avg_float(xs: List[float]) -> Optional[float]:
+        if not xs:
+            return None
+        return float(sum(xs) / len(xs))
+
     return {
+        "rag_metrics_file_present": bool(used_run_scoped or events),
         "rag_events_total": len(events),
+        "rag_runtime_events": len(runtime_events),
+        "rag_generation_skipped_events": len(skipped_events),
+        "rag_generation_failed_events": len(failed_events),
         "rag_context_events": len(context_events),
+        "rag_last_runtime_state": latest_runtime.get("state"),
+        "rag_last_runtime_reason": latest_runtime.get("reason"),
+        "rag_last_runtime_details": latest_runtime.get("details"),
+        "rag_observed_issue": None,
         "rag_nonempty_fraction": len(nonempty) / max(len(context_events), 1),
         "avg_retrieved_code_n": _avg(code_ns),
         "avg_retrieved_text_n": _avg(text_ns),
         "avg_context_words_code": _avg(words_code),
         "avg_context_words_text": _avg(words_text),
+        "avg_selected_text_api_n": _avg(selected_api),
+        "avg_selected_text_pdf_n": _avg(selected_pdf),
+        "avg_selected_text_other_n": _avg(selected_other),
+        "param_events_with_pdf_fraction": (
+            len(param_events_with_pdf) / len(param_events)
+            if param_events
+            else None
+        ),
+        "rag_text_events_with_api_fraction": len(events_with_api) / len(context_events),
+        "rag_text_events_with_pdf_fraction": len(events_with_pdf) / len(context_events),
+        "avg_text_top_pre_rerank_score": _avg_float(top_pre_scores),
+        "avg_text_top_post_rerank_score": _avg_float(top_post_scores),
     }
 
 
@@ -350,7 +441,7 @@ def main() -> None:
     invalid_stats = load_invalid_code_stats(run_dir)
     fallback_stats = load_fallback_rate(results, run_created_at=created_at)
     latency_stats = load_latency_metrics(run_dir, run_id=run_id)
-    rag_usage = load_rag_usage(run_dir)
+    rag_usage = load_rag_usage(run_dir, run_id=run_id, metadata=metadata if isinstance(metadata, dict) else None)
 
     wall_time_to_thresh_s = None
     if created_at is not None and evals_to_thresh is not None and results:
@@ -403,4 +494,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

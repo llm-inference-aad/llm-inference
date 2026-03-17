@@ -5,12 +5,15 @@ from __future__ import annotations
 import hashlib
 import os
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence
+from typing import List
 
 from cfg.constants import (
     RAG_MIN_SIMILARITY,
     RAG_RERANKER_ENABLED,
+    RAG_TEXT_CANDIDATE_K,
     RAG_TEXT_TOP_K,
+    RAG_TEXT_TOP_K_API,
+    RAG_TEXT_TOP_K_PDF,
     RAG_USE_CODE_CONTEXT,
     RAG_USE_TEXT_CONTEXT,
     RUN_ID,
@@ -37,7 +40,10 @@ def _get_reranker() -> Reranker:
 @dataclass(frozen=True)
 class PromptEnhancerConfig:
     top_k: int = 5
+    text_candidate_k: int = RAG_TEXT_CANDIDATE_K
     text_top_k: int = RAG_TEXT_TOP_K
+    text_top_k_api: int = RAG_TEXT_TOP_K_API
+    text_top_k_pdf: int = RAG_TEXT_TOP_K_PDF
     min_accuracy: float = 0.9
     max_parameters: float | None = None
 
@@ -143,15 +149,10 @@ class PromptEnhancer:
         if not RAG_USE_TEXT_CONTEXT:
             return []
 
-        # Build a natural-language query from available signal
-        query_parts: list[str] = []
-        if mutation_type:
-            query_parts.append(f"CNN architecture {mutation_type} mutation")
-        if query_code:
-            # Use first few lines of code as query context
-            code_snippet = "\n".join(query_code.strip().splitlines()[:10])
-            query_parts.append(code_snippet)
-
+        query_parts = self._build_text_query_parts(
+            query_code=query_code,
+            mutation_type=mutation_type,
+        )
         if not query_parts:
             return []
 
@@ -160,8 +161,170 @@ class PromptEnhancer:
             query, top_k=self.config.text_top_k, min_similarity=RAG_MIN_SIMILARITY
         )
 
+    @staticmethod
+    def _trim_words(text: str, limit: int) -> str:
+        words = text.split()
+        if len(words) <= limit:
+            return " ".join(words)
+        return " ".join(words[:limit]).strip()
+
+    def _build_template_hint(self, template: str | None, mutation_type: str | None) -> str:
+        if template:
+            instruction = template.split("```")[0].strip()
+            if instruction:
+                return self._trim_words(instruction, 40)
+        if mutation_type:
+            return f"CNN mutation objective: {mutation_type}"
+        return ""
+
+    def _build_code_query_snippet(self, query_code: str | None) -> str:
+        if not query_code:
+            return ""
+        lines = [line.rstrip() for line in query_code.strip().splitlines() if line.strip()]
+        if not lines:
+            return ""
+        return "\n".join(lines[:20])[:1600].strip()
+
+    def _build_text_query_parts(
+        self,
+        template: str | None = None,
+        query_code: str | None = None,
+        mutation_type: str | None = None,
+    ) -> list[str]:
+        query_parts: list[str] = []
+        code_snippet = self._build_code_query_snippet(query_code)
+        if code_snippet:
+            query_parts.append(f"Architecture snippet:\n{code_snippet}")
+        if mutation_type:
+            query_parts.append(f"Mutation type: {mutation_type}")
+        template_hint = self._build_template_hint(template, mutation_type)
+        if template_hint:
+            query_parts.append(f"Task hint: {template_hint}")
+        return query_parts
+
+    @staticmethod
+    def _is_hyperparameter_query(mutation_type: str | None, text_query: str) -> bool:
+        query_lower = text_query.lower()
+        if mutation_type and "param" in mutation_type.lower():
+            return True
+        keywords = (
+            "optimizer",
+            "learning rate",
+            "schedule",
+            "weight decay",
+            "hyperparameter",
+        )
+        return any(keyword in query_lower for keyword in keywords)
+
+    def _select_text_contexts(
+        self,
+        candidates: List[RetrievedContext],
+        mutation_type: str | None,
+        text_query: str,
+    ) -> tuple[List[RetrievedContext], dict]:
+        if not candidates:
+            return [], {
+                "mode": "empty",
+                "selected_api": 0,
+                "selected_pdf": 0,
+                "selected_other": 0,
+            }
+
+        mode = "hyperparameter_api_only" if self._is_hyperparameter_query(mutation_type, text_query) else "hybrid"
+        selected: list[RetrievedContext] = []
+        selected_ids: set[str] = set()
+        selected_api = 0
+        selected_pdf = 0
+        selected_other = 0
+
+        if mode == "hyperparameter_api_only":
+            for ctx in candidates:
+                if not self.retrieval.is_api_context(ctx):
+                    continue
+                selected.append(ctx)
+                selected_ids.add(ctx.document_id)
+                selected_api += 1
+                if len(selected) >= self.config.text_top_k:
+                    break
+        else:
+            for ctx in candidates:
+                if self.retrieval.is_api_context(ctx) and selected_api < self.config.text_top_k_api:
+                    selected.append(ctx)
+                    selected_ids.add(ctx.document_id)
+                    selected_api += 1
+                elif self.retrieval.is_pdf_context(ctx) and selected_pdf < self.config.text_top_k_pdf:
+                    selected.append(ctx)
+                    selected_ids.add(ctx.document_id)
+                    selected_pdf += 1
+                if len(selected) >= self.config.text_top_k:
+                    break
+
+            if len(selected) < self.config.text_top_k:
+                for ctx in candidates:
+                    if ctx.document_id in selected_ids:
+                        continue
+                    selected.append(ctx)
+                    selected_ids.add(ctx.document_id)
+                    if self.retrieval.is_api_context(ctx):
+                        selected_api += 1
+                    elif self.retrieval.is_pdf_context(ctx):
+                        selected_pdf += 1
+                    else:
+                        selected_other += 1
+                    if len(selected) >= self.config.text_top_k:
+                        break
+
+        if mode == "hyperparameter_api_only":
+            selected_other = 0
+            selected_pdf = 0
+        else:
+            selected_other = max(
+                0,
+                len(selected) - selected_api - selected_pdf,
+            )
+
+        return selected, {
+            "mode": mode,
+            "selected_api": selected_api,
+            "selected_pdf": selected_pdf,
+            "selected_other": selected_other,
+        }
+
+    @staticmethod
+    def _candidate_payloads(items: List[object], pre_scores: dict[str, float] | None = None) -> list[dict]:
+        payloads: list[dict] = []
+        for item in items:
+            if isinstance(item, RetrievedContext):
+                identifier = item.document_id
+                payloads.append(
+                    {
+                        "document_id": identifier,
+                        "source": item.source,
+                        "doc_type": item.doc_type,
+                        "name": item.metadata.get("name"),
+                        "pre_score": None if pre_scores is None else pre_scores.get(identifier),
+                        "post_score": float(item.score),
+                        "content_preview": (item.content or "")[:160],
+                    }
+                )
+            elif isinstance(item, RetrievedMutation):
+                identifier = item.gene_id
+                payloads.append(
+                    {
+                        "document_id": identifier,
+                        "source": item.metadata.get("source", "code"),
+                        "doc_type": "code_mutation",
+                        "name": item.metadata.get("gene_id", identifier),
+                        "pre_score": None if pre_scores is None else pre_scores.get(identifier),
+                        "post_score": float(item.score),
+                        "content_preview": (item.description or item.code or "")[:160],
+                    }
+                )
+        return payloads
+
     def build_text_context_with_stats(
         self,
+        template: str | None = None,
         query_code: str | None = None,
         mutation_type: str | None = None,
     ) -> tuple[List[RetrievedContext], RetrievalStats | None]:
@@ -169,20 +332,22 @@ class PromptEnhancer:
         if not RAG_USE_TEXT_CONTEXT:
             return [], None
 
-        query_parts: list[str] = []
-        if mutation_type:
-            query_parts.append(f"CNN architecture {mutation_type} mutation")
-        if query_code:
-            code_snippet = "\n".join(query_code.strip().splitlines()[:10])
-            query_parts.append(code_snippet)
+        query_parts = self._build_text_query_parts(
+            template=template,
+            query_code=query_code,
+            mutation_type=mutation_type,
+        )
         if not query_parts:
             return [], None
 
         query = " ".join(query_parts)
-        contexts, stats = self.retrieval.retrieve_similar_text_with_stats(
-            query, top_k=self.config.text_top_k, min_similarity=RAG_MIN_SIMILARITY
+        contexts, stats = self.retrieval.retrieve_text_candidates_with_stats(
+            query,
+            candidate_k=self.config.text_candidate_k,
+            min_similarity=RAG_MIN_SIMILARITY,
         )
-        return contexts, stats
+        selected, _policy = self._select_text_contexts(contexts, mutation_type=mutation_type, text_query=query)
+        return selected, stats
 
     def enhance_template(
         self,
@@ -194,29 +359,57 @@ class PromptEnhancer:
         mutations, code_stats = self.build_context_with_stats(
             mutation_type=mutation_type, query_code=query_code
         )
-        text_contexts, text_stats = self.build_text_context_with_stats(
-            query_code=query_code, mutation_type=mutation_type
+        text_candidates, text_stats = self.retrieval.retrieve_text_candidates_with_stats(
+            " ".join(
+                self._build_text_query_parts(
+                    template=template,
+                    query_code=query_code,
+                    mutation_type=mutation_type,
+                )
+            ),
+            candidate_k=self.config.text_candidate_k,
+            min_similarity=RAG_MIN_SIMILARITY,
+        ) if RAG_USE_TEXT_CONTEXT else ([], None)
+        text_query_parts = self._build_text_query_parts(
+            template=template,
+            query_code=query_code,
+            mutation_type=mutation_type,
         )
+        text_query = " ".join(text_query_parts)
+        pre_rerank_code_scores = {mutation.gene_id: float(mutation.score) for mutation in mutations}
+        pre_rerank_text_scores = {ctx.document_id: float(ctx.score) for ctx in text_candidates}
+        code_candidates_pre_rerank = self._candidate_payloads(list(mutations))
+        text_candidates_pre_rerank = self._candidate_payloads(list(text_candidates))
 
         # Rerank both result sets if enabled
         reranker_used = False
-        if RAG_RERANKER_ENABLED and (mutations or text_contexts):
+        if RAG_RERANKER_ENABLED and (mutations or text_candidates):
             reranker = _get_reranker()
-            rerank_query = query_code or mutation_type or ""
-            # M4: Truncate to avoid cross-encoder CPU bottleneck at population scale
-            if rerank_query:
-                lines = rerank_query.strip().splitlines()
+            code_rerank_query = query_code or mutation_type or ""
+            text_rerank_query = text_query or mutation_type or ""
+            if code_rerank_query:
+                lines = code_rerank_query.strip().splitlines()
                 if len(lines) > _RERANK_MAX_QUERY_LINES:
-                    rerank_query = "\n".join(lines[:_RERANK_MAX_QUERY_LINES])
+                    code_rerank_query = "\n".join(lines[:_RERANK_MAX_QUERY_LINES])
             if mutations:
                 mutations = reranker.rerank(
-                    rerank_query, mutations, content_fn=lambda m: m.code, top_k=self.config.top_k
+                    code_rerank_query, mutations, content_fn=lambda m: m.code, top_k=self.config.top_k
                 )
-            if text_contexts:
-                text_contexts = reranker.rerank(
-                    rerank_query, text_contexts, content_fn=lambda c: c.content, top_k=self.config.text_top_k
+            if text_candidates:
+                text_candidates = reranker.rerank(
+                    text_rerank_query, text_candidates, content_fn=lambda c: c.content, top_k=len(text_candidates)
                 )
             reranker_used = True
+        code_candidates_post_rerank = self._candidate_payloads(list(mutations), pre_scores=pre_rerank_code_scores)
+        text_candidates_post_rerank = self._candidate_payloads(
+            list(text_candidates),
+            pre_scores=pre_rerank_text_scores,
+        )
+        text_contexts, text_selection = self._select_text_contexts(
+            text_candidates,
+            mutation_type=mutation_type,
+            text_query=text_query,
+        )
 
         sections: list[str] = []
 
@@ -233,15 +426,18 @@ class PromptEnhancer:
         if mutations:
             context_block = self.retrieval.format_context(mutations)
             sections.append(
-                "Consider the following historically successful mutations. "
-                "Emphasize ideas that balance accuracy gains with parameter reductions.\n"
+                "### RAG Code Examples\n"
+                "The following code blocks are historically successful mutations from this exact codebase. "
+                "Notice the `accuracy_delta` and `parameters_delta` metadata to understand their impact. "
+                "Do NOT copy them exactly. Extract the architectural motifs (e.g., where they placed SiLU, "
+                "how they grouped convolutions, or their choice of optimizer) and apply those lessons to "
+                "your current task.\n"
                 f"{context_block}"
             )
 
-        if not sections:
-            return template, []
-
-        augmented_template = "\n\n".join(sections) + f"\n\n{template.strip()}"
+        augmented_template = template
+        if sections:
+            augmented_template = "\n\n".join(sections) + f"\n\n{template.strip()}"
 
         # Emit a structured event so analysis can verify RAG was actually used.
         try:
@@ -264,10 +460,26 @@ class PromptEnhancer:
                     "min_similarity": RAG_MIN_SIMILARITY,
                     "retrieved_code_n": len(mutations),
                     "retrieved_text_n": len(text_contexts),
+                    "template_augmented": bool(sections),
+                    "query_code_present": bool(query_code and query_code.strip()),
+                    "text_query_present": bool(text_query.strip()),
+                    "text_query_words": len(text_query.split()),
+                    "text_query_preview": text_query[:240],
+                    "text_selection_mode": text_selection["mode"],
+                    "selected_text_api_n": text_selection["selected_api"],
+                    "selected_text_pdf_n": text_selection["selected_pdf"],
+                    "selected_text_other_n": text_selection["selected_other"],
                     "selected_doc_ids_code": [m.gene_id for m in mutations],
                     "selected_doc_ids_text": [c.document_id for c in text_contexts],
+                    "selected_text_doc_types": [c.doc_type for c in text_contexts],
+                    "selected_text_sources": [c.source for c in text_contexts],
+                    "selected_text_names": [c.metadata.get("name") for c in text_contexts],
                     "context_words_code": sum(len((m.code or "").split()) for m in mutations),
                     "context_words_text": sum(len((c.content or "").split()) for c in text_contexts),
+                    "code_candidates_pre_rerank": code_candidates_pre_rerank,
+                    "code_candidates_post_rerank": code_candidates_post_rerank,
+                    "text_candidates_pre_rerank": text_candidates_pre_rerank,
+                    "text_candidates_post_rerank": text_candidates_post_rerank,
                     "code_search": None
                     if code_stats is None
                     else {
@@ -283,10 +495,17 @@ class PromptEnhancer:
                         "returned_k": text_stats.returned_k,
                         "filtered_k": text_stats.filtered_k,
                         "min_similarity": text_stats.min_similarity,
+                        "selection_mode": text_selection["mode"],
+                        "selected_api": text_selection["selected_api"],
+                        "selected_pdf": text_selection["selected_pdf"],
+                        "selected_other": text_selection["selected_other"],
                     },
                 },
             )
         except Exception:
             pass
+
+        if not sections:
+            return template, []
 
         return augmented_template, mutations

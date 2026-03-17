@@ -7,6 +7,8 @@ from typing import Iterable, List, Sequence, Tuple
 
 import numpy as np
 
+from cfg.constants import RAG_TEXT_CANDIDATE_K
+
 from .data_ingestion import MutationRecord
 from .embeddings import EmbeddingService
 from .vector_db import RetrievalResult, StoredDocument, VectorStoreManager
@@ -138,25 +140,38 @@ class RetrievalService:
         )
         return contexts
 
-    def retrieve_similar_text_with_stats(
-        self, query: str, top_k: int = 3, min_similarity: float = 0.3
+    def retrieve_text_candidates_with_stats(
+        self,
+        query: str,
+        candidate_k: int = RAG_TEXT_CANDIDATE_K,
+        min_similarity: float = 0.3,
     ) -> Tuple[List[RetrievedContext], RetrievalStats]:
-        """Like retrieve_similar_text(), but also returns search stats."""
+        """Return filtered text candidates prior to source-policy selection."""
         if not query.strip():
             return [], RetrievalStats(candidate_k=0, returned_k=0, filtered_k=0, min_similarity=min_similarity)
 
         query_embedding = self.embeddings.embed_text(query)[0]
-        candidate_k = max(1, top_k * 2)
-        results = self.store.search_text(query_embedding, top_k=candidate_k)
+        effective_k = max(1, candidate_k)
+        results = self.store.search_text(query_embedding, top_k=effective_k)
         filtered = [r for r in results if r.score >= min_similarity]
-        sliced = filtered[:top_k]
         stats = RetrievalStats(
-            candidate_k=candidate_k,
+            candidate_k=effective_k,
             returned_k=len(results),
             filtered_k=len(filtered),
             min_similarity=min_similarity,
         )
-        return [self._to_context(result) for result in sliced], stats
+        return [self._to_context(result) for result in filtered], stats
+
+    def retrieve_similar_text_with_stats(
+        self, query: str, top_k: int = 3, min_similarity: float = 0.3
+    ) -> Tuple[List[RetrievedContext], RetrievalStats]:
+        """Like retrieve_similar_text(), but also returns search stats."""
+        contexts, stats = self.retrieve_text_candidates_with_stats(
+            query=query,
+            candidate_k=max(1, top_k * 2),
+            min_similarity=min_similarity,
+        )
+        return contexts[:top_k], stats
 
     def retrieve_high_performers(
         self,
@@ -251,6 +266,19 @@ class RetrievalService:
             label = ctx.doc_type.replace("_", " ").title()
             lines.append(f"- [{label}] (relevance {ctx.score:.3f})\n{content}")
         return "\n\n".join(lines)
+
+    @staticmethod
+    def is_api_context(ctx: RetrievedContext) -> bool:
+        source = (ctx.source or "").lower()
+        source_type = str(ctx.metadata.get("source_type") or "").lower()
+        return source.endswith("pytorch.json") or source_type == "api"
+
+    @staticmethod
+    def is_pdf_context(ctx: RetrievedContext) -> bool:
+        source = (ctx.source or "").lower()
+        source_type = str(ctx.metadata.get("source_type") or "").lower()
+        metadata_type = str(ctx.metadata.get("type") or "").lower()
+        return source.endswith(".pdf") or source_type == "pdf" or metadata_type == "pdf"
 
     def _to_mutation(self, result: RetrievalResult) -> RetrievedMutation:
         metadata = {**result.document.metadata}

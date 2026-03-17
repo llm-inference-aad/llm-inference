@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import os
 import threading
-from typing import List, Sequence
+from typing import Any, Dict, List, Sequence
 
 from cfg.constants import (
     RAG_CODE_EMBED_MODEL,
@@ -12,8 +13,13 @@ from cfg.constants import (
     RAG_MAX_PARAMETERS,
     RAG_MIN_ACCURACY,
     RAG_TEXT_EMBED_MODEL,
+    RAG_TEXT_CANDIDATE_K,
+    RAG_TEXT_TOP_K,
+    RAG_TEXT_TOP_K_API,
+    RAG_TEXT_TOP_K_PDF,
     RAG_TOP_K,
 )
+from utils.rag_metrics import record_metric
 
 from .embeddings import EmbeddingConfig, EmbeddingService
 from .prompt_enhancer import PromptEnhancer, PromptEnhancerConfig
@@ -57,6 +63,10 @@ class RagRuntime:
             self.retrieval,
             PromptEnhancerConfig(
                 top_k=RAG_TOP_K,
+                text_candidate_k=RAG_TEXT_CANDIDATE_K,
+                text_top_k=RAG_TEXT_TOP_K,
+                text_top_k_api=RAG_TEXT_TOP_K_API,
+                text_top_k_pdf=RAG_TEXT_TOP_K_PDF,
                 min_accuracy=RAG_MIN_ACCURACY,
                 max_parameters=RAG_MAX_PARAMETERS,
             ),
@@ -94,6 +104,46 @@ class RagRuntime:
 
 _runtime_lock = threading.Lock()
 _runtime_instance: RagRuntime | None = None
+_runtime_status: Dict[str, Any] = {
+    "state": "unknown",
+    "reason": None,
+    "details": {},
+}
+_runtime_status_signature: tuple[Any, ...] | None = None
+
+
+def _emit_runtime_status(state: str, reason: str | None = None, **details: Any) -> None:
+    global _runtime_status, _runtime_status_signature
+    _runtime_status = {
+        "state": state,
+        "reason": reason,
+        "details": details,
+    }
+    signature = (
+        state,
+        reason,
+        tuple(sorted((str(k), str(v)) for k, v in details.items())),
+    )
+    if signature == _runtime_status_signature:
+        return
+    _runtime_status_signature = signature
+    record_metric(
+        "rag_runtime_status",
+        {
+            "run_id": os.getenv("RUN_ID"),
+            "state": state,
+            "reason": reason,
+            **details,
+        },
+    )
+
+
+def get_runtime_status() -> Dict[str, Any]:
+    return {
+        "state": _runtime_status.get("state"),
+        "reason": _runtime_status.get("reason"),
+        "details": dict(_runtime_status.get("details") or {}),
+    }
 
 
 def get_runtime() -> RagRuntime | None:
@@ -103,6 +153,12 @@ def get_runtime() -> RagRuntime | None:
     the configured embedding models, preventing silent retrieval corruption.
     """
     if not RAG_ENABLED:
+        _emit_runtime_status(
+            "disabled",
+            "rag_disabled_by_config",
+            rag_enabled=False,
+            rag_data_dir=RAG_DATA_DIR,
+        )
         return None
 
     global _runtime_instance
@@ -111,11 +167,36 @@ def get_runtime() -> RagRuntime | None:
             if _runtime_instance is None:
                 try:
                     _runtime_instance = RagRuntime()
+                    _emit_runtime_status(
+                        "ready",
+                        None,
+                        rag_enabled=True,
+                        rag_data_dir=RAG_DATA_DIR,
+                        code_model=RAG_CODE_EMBED_MODEL,
+                        text_model=RAG_TEXT_EMBED_MODEL,
+                    )
                 except _DimensionMismatchError as exc:
                     import warnings
+
+                    _emit_runtime_status(
+                        "disabled",
+                        "dimension_mismatch",
+                        rag_enabled=True,
+                        rag_data_dir=RAG_DATA_DIR,
+                        error=str(exc),
+                    )
                     warnings.warn(
                         f"[RAG] {exc} — RAG disabled for this session.",
                         stacklevel=2,
                     )
                     return None
+                except Exception as exc:
+                    _emit_runtime_status(
+                        "failed",
+                        "runtime_init_exception",
+                        rag_enabled=True,
+                        rag_data_dir=RAG_DATA_DIR,
+                        error=f"{type(exc).__name__}: {exc}",
+                    )
+                    raise
     return _runtime_instance
