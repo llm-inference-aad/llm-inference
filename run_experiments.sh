@@ -12,7 +12,7 @@
 #   bash run_experiments.sh batchsweep  # only batch sweep
 # ==============================================================================
 
-set -Eeuo pipefail
+set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${REPO_ROOT}"
@@ -59,26 +59,50 @@ submit_and_wait() {
 }
 EOF
 
-    # Submit server job
-    SERVER_JOB_ID=$(sbatch \
-        --job-name="server_${label}" \
-        --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},BATCH_WAIT_TIME=0,RUN_ID=${RUN_ID}" \
-        --output="${SLURM_LOG_DIR}/slurm-server-%j.out" \
-        --error="${SLURM_LOG_DIR}/slurm-server-%j.err" \
-        server.sh \
-        | awk '{print $NF}')
+    # Submit server job — retry up to 10 times (handles Kerberos expiry)
+    local max_retries=10
+    local retry_wait=300  # 5 minutes between retries
+    SERVER_JOB_ID=""
+    for attempt in $(seq 1 ${max_retries}); do
+        SERVER_JOB_ID=$(sbatch \
+            --job-name="server_${label}" \
+            --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},BATCH_WAIT_TIME=0,RUN_ID=${RUN_ID}" \
+            --output="${SLURM_LOG_DIR}/slurm-server-%j.out" \
+            --error="${SLURM_LOG_DIR}/slurm-server-%j.err" \
+            server.sh 2>&1 | awk '{print $NF}')
+        if [[ "${SERVER_JOB_ID}" =~ ^[0-9]+$ ]]; then
+            break
+        fi
+        log "  sbatch failed (attempt ${attempt}/${max_retries}): ${SERVER_JOB_ID} — retrying in ${retry_wait}s"
+        sleep ${retry_wait}
+    done
+    if [[ ! "${SERVER_JOB_ID}" =~ ^[0-9]+$ ]]; then
+        log "  ERROR: could not submit server job after ${max_retries} attempts. Exiting."
+        exit 1
+    fi
 
     log "  Server job: ${SERVER_JOB_ID}"
 
-    # Submit evolution job — starts once server is running
-    MAIN_JOB_ID=$(sbatch \
-        --job-name="run_${label}" \
-        --dependency="after:${SERVER_JOB_ID}" \
-        --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},RUN_ID=${RUN_ID}" \
-        --output="${SLURM_LOG_DIR}/slurm-main-%j.out" \
-        --error="${SLURM_LOG_DIR}/slurm-main-%j.err" \
-        run.sh \
-        | awk '{print $NF}')
+    # Submit evolution job — retry same way
+    MAIN_JOB_ID=""
+    for attempt in $(seq 1 ${max_retries}); do
+        MAIN_JOB_ID=$(sbatch \
+            --job-name="run_${label}" \
+            --dependency="after:${SERVER_JOB_ID}" \
+            --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},RUN_ID=${RUN_ID}" \
+            --output="${SLURM_LOG_DIR}/slurm-main-%j.out" \
+            --error="${SLURM_LOG_DIR}/slurm-main-%j.err" \
+            run.sh 2>&1 | awk '{print $NF}')
+        if [[ "${MAIN_JOB_ID}" =~ ^[0-9]+$ ]]; then
+            break
+        fi
+        log "  sbatch failed (attempt ${attempt}/${max_retries}): ${MAIN_JOB_ID} — retrying in ${retry_wait}s"
+        sleep ${retry_wait}
+    done
+    if [[ ! "${MAIN_JOB_ID}" =~ ^[0-9]+$ ]]; then
+        log "  ERROR: could not submit evolution job after ${max_retries} attempts. Exiting."
+        exit 1
+    fi
 
     log "  Evolution job: ${MAIN_JOB_ID} (depends on ${SERVER_JOB_ID})"
     log "  Run dir: ${RUN_DIR}"
