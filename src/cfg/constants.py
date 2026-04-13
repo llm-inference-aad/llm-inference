@@ -90,6 +90,8 @@ RAG_USE_CODE_CONTEXT = os.environ.get("RAG_USE_CODE_CONTEXT", "true").lower() in
 RAG_USE_TEXT_CONTEXT = os.environ.get("RAG_USE_TEXT_CONTEXT", "true").lower() in {"1", "true", "yes"}
 RAG_RERANKER_ENABLED = os.environ.get("RAG_RERANKER_ENABLED", "false").lower() in {"1", "true", "yes"}
 RAG_RERANKER_MODEL = os.environ.get("RAG_RERANKER_MODEL", "BAAI/bge-reranker-v2-m3")
+RAG_BACKEND = os.environ.get("RAG_BACKEND", "faiss")
+RAG_FAIL_OPEN = os.environ.get("RAG_FAIL_OPEN", "true").lower() in {"1", "true", "yes"}
 
 # Evolution Constants/Params
 # --------------------------

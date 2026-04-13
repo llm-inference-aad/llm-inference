@@ -3,58 +3,69 @@
 from __future__ import annotations
 
 import threading
-from typing import List, Sequence
+import warnings
+from typing import Sequence
 
 from cfg.constants import (
+    RAG_BACKEND,
     RAG_CODE_EMBED_MODEL,
     RAG_DATA_DIR,
     RAG_ENABLED,
+    RAG_FAIL_OPEN,
     RAG_MAX_PARAMETERS,
     RAG_MIN_ACCURACY,
     RAG_TEXT_EMBED_MODEL,
     RAG_TOP_K,
 )
 
-from .embeddings import EmbeddingConfig, EmbeddingService
+from .backends.base import RetrievalBackend
 from .prompt_enhancer import PromptEnhancer, PromptEnhancerConfig
-from .retrieval import RetrievedMutation, RetrievalService
-from .vector_db import VectorStoreManager
+from .retrieval import RetrievedMutation
 
 
-class _DimensionMismatchError(RuntimeError):
-    """Internal: raised when FAISS index dims don't match embedding model dims."""
+def _build_backend() -> RetrievalBackend:
+    """Construct the retrieval backend selected by ``RAG_BACKEND``."""
+    selected = RAG_BACKEND.lower().strip()
+
+    if selected == "pageindex":
+        try:
+            from .backends.pageindex_backend import PageIndexRetrievalBackend
+
+            return PageIndexRetrievalBackend()
+        except Exception as exc:
+            if not RAG_FAIL_OPEN:
+                raise RuntimeError(
+                    f"PageIndex backend failed to initialise: {exc}"
+                ) from exc
+            warnings.warn(
+                f"[RAG] PageIndex backend unavailable ({exc}). "
+                "Falling back to FAISS backend.",
+                stacklevel=2,
+            )
+            # Fall through to FAISS
+
+    if selected not in {"faiss", "pageindex"}:
+        raise ValueError(
+            f"Unknown RAG_BACKEND={selected!r}. "
+            "Supported values: 'faiss', 'pageindex'."
+        )
+
+    from .backends.faiss_backend import FaissRetrievalBackend
+
+    return FaissRetrievalBackend(
+        rag_data_dir=RAG_DATA_DIR,
+        code_embed_model=RAG_CODE_EMBED_MODEL,
+        text_embed_model=RAG_TEXT_EMBED_MODEL,
+    )
 
 
 class RagRuntime:
     """Encapsulates the long-lived RAG services."""
 
     def __init__(self) -> None:
-        embedding_config = EmbeddingConfig(
-            code_model_name=RAG_CODE_EMBED_MODEL,
-            text_model_name=RAG_TEXT_EMBED_MODEL,
-        )
-        self.store = VectorStoreManager(RAG_DATA_DIR)
-        self.embeddings = EmbeddingService(embedding_config)
-
-        # H1: Verify FAISS index dimensions match the configured embedding models.
-        # Detects model drift between ingestion (setup_rag.py) and runtime.
-        for ns_name, embed_fn, label in [
-            (VectorStoreManager.CODE_NAMESPACE, self.embeddings.embed_code, "code"),
-            (VectorStoreManager.TEXT_NAMESPACE, self.embeddings.embed_text, "text"),
-        ]:
-            ns = self.store._namespace(ns_name)
-            if ns.index is not None:
-                probe = embed_fn("dimension probe")
-                if ns.index.d != probe.shape[-1]:
-                    raise _DimensionMismatchError(
-                        f"FAISS {label} index dimension ({ns.index.d}) != "
-                        f"embedding model dimension ({probe.shape[-1]}). "
-                        f"Re-run setup_rag.py to re-index with the current models."
-                    )
-
-        self.retrieval = RetrievalService(self.store, self.embeddings)
+        self.backend = _build_backend()
         self.prompt_enhancer = PromptEnhancer(
-            self.retrieval,
+            self.backend,
             PromptEnhancerConfig(
                 top_k=RAG_TOP_K,
                 min_accuracy=RAG_MIN_ACCURACY,
@@ -77,11 +88,7 @@ class RagRuntime:
         )
 
     def log_mutation_code(self, content: str, metadata: dict) -> str | None:
-        if not content.strip():
-            return None
-        embeddings = self.embeddings.embed_code(content)
-        document_ids = self.store.add_code_documents([content], embeddings, [metadata])
-        return document_ids[0] if document_ids else None
+        return self.backend.log_mutation_code(content, metadata)
 
     def collect_context(
         self, mutation_type: str | None = None, query_code: str | None = None
@@ -89,7 +96,7 @@ class RagRuntime:
         return self.prompt_enhancer.build_context(mutation_type=mutation_type, query_code=query_code)
 
     def format_context(self, mutations: Sequence[RetrievedMutation]) -> str:
-        return self.retrieval.format_context(mutations)
+        return self.backend.format_context(mutations)
 
 
 _runtime_lock = threading.Lock()
@@ -99,8 +106,8 @@ _runtime_instance: RagRuntime | None = None
 def get_runtime() -> RagRuntime | None:
     """Return the singleton RAG runtime if enabled.
 
-    Soft-disables RAG (returns None) if the FAISS index dimensions don't match
-    the configured embedding models, preventing silent retrieval corruption.
+    Soft-disables RAG (returns None) if the selected backend fails to
+    initialise, preventing silent retrieval corruption.
     """
     if not RAG_ENABLED:
         return None
@@ -111,8 +118,7 @@ def get_runtime() -> RagRuntime | None:
             if _runtime_instance is None:
                 try:
                     _runtime_instance = RagRuntime()
-                except _DimensionMismatchError as exc:
-                    import warnings
+                except RuntimeError as exc:
                     warnings.warn(
                         f"[RAG] {exc} — RAG disabled for this session.",
                         stacklevel=2,

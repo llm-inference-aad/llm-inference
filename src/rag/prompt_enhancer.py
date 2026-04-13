@@ -16,8 +16,9 @@ from cfg.constants import (
     RUN_ID,
 )
 
+from .backends.base import RetrievalBackend
 from .reranker import Reranker
-from .retrieval import RetrievedContext, RetrievedMutation, RetrievalService, RetrievalStats
+from .retrieval import RetrievedContext, RetrievedMutation, RetrievalStats
 from utils.rag_metrics import record_metric
 
 # M4: Maximum lines of query code sent to cross-encoder to avoid CPU bottleneck
@@ -45,7 +46,7 @@ class PromptEnhancerConfig:
 class PromptEnhancer:
     """Build augmented prompt text that includes retrieval context."""
 
-    def __init__(self, retrieval_service: RetrievalService, config: PromptEnhancerConfig | None = None):
+    def __init__(self, retrieval_service: RetrievalBackend, config: PromptEnhancerConfig | None = None):
         self.retrieval = retrieval_service
         self.config = config or PromptEnhancerConfig()
 
