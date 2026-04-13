@@ -21,17 +21,32 @@ from src.pageindex.pageindex.utils import (
     structure_to_list,
 )
 
-TREE_SEARCH_PROMPT = """You are given a query and the tree structure of a document.
-You need to find all nodes that are likely to contain the answer.
+TREE_SEARCH_PROMPT = """You are a domain expert evaluating document sections for relevance to a query.
+The document "{doc_name}" is organized as a tree. Each node has a node_id, title, and summary.
+
+Domain context: This system supports CNN evolution research for CIFAR-10 image classification.
+The documents cover CNN architectures, training techniques, and retrieval-augmented generation.
 
 Query: {query}
 
-Document tree structure: {compact_tree_json}
+Document tree structure:
+{compact_tree_json}
 
-Reply in the following JSON format:
+Instructions:
+- Select nodes whose content is likely to answer or inform the query.
+- Prefer leaf nodes (nodes without children) over parent nodes when both cover the same content.
+  Parent nodes aggregate child text, so selecting a parent when a specific child suffices adds noise.
+- For each selected node, assign a relevance score from 1 to 5:
+  1 = Marginally related  2 = Somewhat related  3 = Relevant  4 = Highly relevant  5 = Perfectly relevant
+- Only include nodes with relevance >= 3.
+
+Reply in JSON:
 {{
-  "thinking": <your reasoning about which nodes are relevant>,
-  "node_list": [node_id1, node_id2, ...]
+  "thinking": "<your reasoning>",
+  "selected_nodes": [
+    {{"node_id": "<id>", "relevance": <int 1-5>}},
+    ...
+  ]
 }}"""
 
 
@@ -46,6 +61,8 @@ class PageIndexResult:
     summary: str
     source: str        # pdf filename
     thinking: str      # LLM's reasoning for selecting this node
+    relevance_score: float = 0.0  # 1-5 from LLM, 0 = unscored (legacy)
+    is_leaf: bool = True          # whether node has no children
 
 
 @dataclass
@@ -61,7 +78,7 @@ class _LoadedTree:
 class PageIndexRetriever:
     """Retrieves relevant document sections via LLM tree search over PageIndex structures."""
 
-    def __init__(self, trees_dir: str, model: str = "gpt-4o-2024-11-20"):
+    def __init__(self, trees_dir: str, model: str = "local_server"):
         self.trees_dir = Path(trees_dir)
         self.model = model
         self._trees: list[_LoadedTree] = []
@@ -110,7 +127,10 @@ class PageIndexRetriever:
             results = self._search_tree(query, tree)
             all_results.extend(results)
 
-        # Trim to top_k (results are already ordered per-document)
+        # Cross-document ranking: highest relevance first, leaf nodes break ties
+        all_results.sort(
+            key=lambda r: (r.relevance_score, r.is_leaf), reverse=True
+        )
         all_results = all_results[:top_k]
 
         latency_ms = (time.time() - t0) * 1000
@@ -130,6 +150,7 @@ class PageIndexRetriever:
 
         prompt = TREE_SEARCH_PROMPT.format(
             query=query,
+            doc_name=tree.doc_name,
             compact_tree_json=compact_tree_json,
         )
 
@@ -139,14 +160,29 @@ class PageIndexRetriever:
 
         parsed = extract_json(response)
         thinking = parsed.get("thinking", "")
-        node_ids = parsed.get("node_list", [])
+
+        # Parse new format (selected_nodes with relevance) or legacy (node_list)
+        selected_nodes = parsed.get("selected_nodes", [])
+        if selected_nodes:
+            node_entries = [
+                (str(sn.get("node_id", "")), float(sn.get("relevance", 0)))
+                for sn in selected_nodes
+            ]
+        else:
+            # Backward compat: flat node_list with no relevance scores
+            node_ids = parsed.get("node_list", [])
+            node_entries = [(str(nid), 0.0) for nid in node_ids]
 
         results: list[PageIndexResult] = []
-        for nid in node_ids:
-            nid_str = str(nid).zfill(4) if str(nid).isdigit() else str(nid)
+        for raw_nid, relevance in node_entries:
+            nid_str = raw_nid.zfill(4) if raw_nid.isdigit() else raw_nid
             node = tree.node_map.get(nid_str)
             if node is None:
                 continue
+            # Filter by minimum relevance threshold when scores are available
+            if relevance > 0 and relevance < 3:
+                continue
+            is_leaf = not bool(node.get("nodes"))
             results.append(PageIndexResult(
                 document_id=f"{tree.stem}:{nid_str}",
                 node_id=nid_str,
@@ -155,6 +191,8 @@ class PageIndexRetriever:
                 summary=node.get("summary", ""),
                 source=tree.doc_name,
                 thinking=thinking,
+                relevance_score=relevance,
+                is_leaf=is_leaf,
             ))
 
         return results

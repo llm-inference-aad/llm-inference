@@ -1,0 +1,75 @@
+{
+  "_comment": "Ground-truth annotations for the 5 benchmark queries in compare_rag_mvp.py. Updated 2026-03-16 after tree rebuild with page-level dedup.",
+  "queries": {
+    "q1": {
+      "query": "CNN architecture parameter reduction techniques for CIFAR-10",
+      "expected_pageindex": [
+        {
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevant_node_ids": ["0003", "0004", "0005", "0006", "0007", "0009", "0010", "0011"]
+        },
+        {
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevant_node_ids": ["0004"]
+        }
+      ],
+      "expected_vector_keywords": ["parameter", "CIFAR-10", "architecture", "CNN", "reduction", "regularization"]
+    },
+    "q2": {
+      "query": "CNN architecture Expert_Params mutation depthwise separable convolution",
+      "expected_pageindex": [
+        {
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevant_node_ids": ["0003", "0004", "0005"]
+        },
+        {
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevant_node_ids": ["0004"]
+        }
+      ],
+      "expected_vector_keywords": ["convolution", "CNN", "architecture", "separable", "depthwise"]
+    },
+    "q3": {
+      "query": "data augmentation strategies for CIFAR-10 classification",
+      "expected_pageindex": [
+        {
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevant_node_ids": ["0001", "0009", "0010", "0011", "0016"]
+        },
+        {
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevant_node_ids": ["0004"]
+        }
+      ],
+      "expected_vector_keywords": ["augmentation", "CIFAR-10", "training", "data", "classification"]
+    },
+    "q4": {
+      "query": "CNN architecture Complex mutation residual connections batch normalization",
+      "expected_pageindex": [
+        {
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevant_node_ids": ["0003", "0004", "0005", "0006"]
+        },
+        {
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevant_node_ids": ["0004"]
+        }
+      ],
+      "expected_vector_keywords": ["batch normalization", "residual", "CNN", "architecture", "convolution"]
+    },
+    "q5": {
+      "query": "CNN architecture EoT mutation (code-bearing query)",
+      "expected_pageindex": [
+        {
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevant_node_ids": ["0003", "0004", "0005", "0006"]
+        },
+        {
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevant_node_ids": ["0004"]
+        }
+      ],
+      "expected_vector_keywords": ["Conv2d", "BatchNorm", "architecture", "CNN", "convolution"]
+    }
+  }
+}

@@ -3,12 +3,14 @@
 MVP comparison: Vector RAG vs PageIndex RAG on the text namespace.
 
 Runs both retrieval methods on the same set of queries and compares
-latency, chunk count, context size, and (optionally) LLM-judged relevance.
+latency, chunk count, context size, Recall@K (with golden annotations),
+relevance density, and (optionally) LLM-judged relevance.
 
 Usage:
     python scripts/compare_rag_mvp.py
     python scripts/compare_rag_mvp.py --eval-relevance
-    python scripts/compare_rag_mvp.py --top-k 5 --model gpt-4o-2024-11-20
+    python scripts/compare_rag_mvp.py --top-k 5 --model local_server
+    python scripts/compare_rag_mvp.py --golden scripts/comparison_golden.json --output-json results/comparison.json
 """
 
 import argparse
@@ -31,6 +33,7 @@ from src.cfg.constants import RAG_DATA_DIR, RAG_MIN_SIMILARITY, RAG_TEXT_TOP_K
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TREES_DIR = Path(RAG_DATA_DIR) / "pageindex_trees"
+DEFAULT_GOLDEN = REPO_ROOT / "scripts" / "comparison_golden.json"
 
 # ---------------------------------------------------------------------------
 # Benchmark queries
@@ -74,11 +77,6 @@ QUERIES = [
         ),
         "type": "Mixed code+text",
     },
-    {
-        "id": "q6",
-        "query": "retrieval augmented generation techniques for knowledge-intensive tasks",
-        "type": "RAG survey content",
-    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -101,14 +99,14 @@ Retrieved passage:
 Reply with ONLY a JSON object: {{"score": <int 1-5>, "reason": "<brief explanation>"}}"""
 
 
-def judge_relevance(query: str, passage: str, model: str) -> int:
+def judge_relevance(query: str, passage: str, model: str, max_words: int = 1500) -> int:
     """Use an LLM to score passage relevance on 1-5 scale."""
     from src.pageindex.pageindex.utils import ChatGPT_API, extract_json
 
     # Truncate passage to avoid token blow-up
     words = passage.split()
-    if len(words) > 500:
-        passage = " ".join(words[:500]) + "..."
+    if len(words) > max_words:
+        passage = " ".join(words[:max_words]) + "..."
 
     prompt = RELEVANCE_PROMPT.format(query=query, passage=passage)
     response = ChatGPT_API(model=model, prompt=prompt)
@@ -120,6 +118,62 @@ def judge_relevance(query: str, passage: str, model: str) -> int:
         return max(1, min(5, int(score)))
     except (TypeError, ValueError):
         return 0
+
+
+# ---------------------------------------------------------------------------
+# Recall@K computation
+# ---------------------------------------------------------------------------
+
+def load_golden(path: str | Path | None) -> dict:
+    """Load golden annotations. Returns empty dict if path is None or missing."""
+    if path is None:
+        return {}
+    p = Path(path)
+    if not p.exists():
+        print(f"  Warning: golden file not found at {p}, skipping Recall@K")
+        return {}
+    data = json.loads(p.read_text(encoding="utf-8"))
+    return data.get("queries", {})
+
+
+def compute_recall_vector(result: dict, golden_entry: dict) -> float:
+    """Recall@K for Vector RAG: fraction of expected keywords found in retrieved content."""
+    expected = golden_entry.get("expected_vector_keywords", [])
+    if not expected:
+        return 0.0
+    combined_content = " ".join(c["content"] for c in result["chunks"]).lower()
+    hits = sum(1 for kw in expected if kw.lower() in combined_content)
+    return hits / len(expected)
+
+
+def compute_recall_pageindex(result: dict, golden_entry: dict) -> float:
+    """Recall@K for PageIndex: fraction of expected node_ids found in retrieved results."""
+    expected_entries = golden_entry.get("expected_pageindex", [])
+    if not expected_entries:
+        return 0.0
+    # Flatten all expected node_ids across documents
+    all_expected = set()
+    for entry in expected_entries:
+        for nid in entry.get("relevant_node_ids", []):
+            all_expected.add(nid)
+    if not all_expected:
+        return 0.0
+    retrieved_ids = {c["node_id"] for c in result["chunks"] if "node_id" in c}
+    hits = len(all_expected & retrieved_ids)
+    return hits / len(all_expected)
+
+
+# ---------------------------------------------------------------------------
+# Relevance density
+# ---------------------------------------------------------------------------
+
+def compute_relevance_density(result: dict) -> float:
+    """avg_relevance / (context_word_count / 100). Higher = more signal per word."""
+    avg_rel = result.get("avg_relevance", 0.0)
+    words = result.get("context_word_count", 0)
+    if words == 0 or avg_rel == 0:
+        return 0.0
+    return round(avg_rel / (words / 100), 3)
 
 
 # ---------------------------------------------------------------------------
@@ -178,6 +232,8 @@ def run_pageindex_rag(
             "summary": r.summary,
             "source": r.source,
             "content": r.content,
+            "relevance_score": r.relevance_score,
+            "is_leaf": r.is_leaf,
         })
         if r.thinking and r.thinking not in thinking_parts:
             thinking_parts.append(r.thinking)
@@ -194,10 +250,10 @@ def run_pageindex_rag(
     }
 
 
-def add_relevance_scores(result: dict, query: str, model: str) -> None:
+def add_relevance_scores(result: dict, query: str, model: str, max_words: int = 1500) -> None:
     scores = []
     for chunk in result["chunks"]:
-        score = judge_relevance(query, chunk["content"], model)
+        score = judge_relevance(query, chunk["content"], model, max_words=max_words)
         scores.append(score)
     result["relevance_scores"] = scores
     result["avg_relevance"] = round(sum(scores) / len(scores), 2) if scores else 0.0
@@ -207,7 +263,14 @@ def add_relevance_scores(result: dict, query: str, model: str) -> None:
 # Output formatting
 # ---------------------------------------------------------------------------
 
-def print_query_table(query_info: dict, vector_result: dict, pi_result: dict) -> None:
+def _method_name(res: dict) -> str:
+    name = res["method"].capitalize()
+    return "PageIndex" if name == "Pageindex" else name
+
+
+def print_query_table(
+    query_info: dict, vector_result: dict, pi_result: dict, has_golden: bool
+) -> None:
     qid = query_info["id"]
     qtext = query_info["query"][:80] + ("..." if len(query_info["query"]) > 80 else "")
     print(f"\nQuery {qid}: \"{qtext}\"")
@@ -216,24 +279,40 @@ def print_query_table(query_info: dict, vector_result: dict, pi_result: dict) ->
     header = f"{'Method':<12} {'Latency':>10} {'Chunks':>8} {'Words':>8}"
     has_rel = "avg_relevance" in vector_result
     if has_rel:
-        header += f" {'Relevance':>11}"
+        header += f" {'Relevance':>11} {'Density':>9}"
+    if has_golden:
+        header += f" {'Recall@K':>10}"
+
+    # PageIndex-specific columns
+    pi_header = ""
+    if any("relevance_score" in c for c in pi_result.get("chunks", [])):
+        pi_header = "  (PI chunks: relevance_score, is_leaf)"
+
     print(f"  {header}")
     print(f"  {'-' * len(header)}")
 
     for res in [vector_result, pi_result]:
-        name = res["method"].capitalize()
-        if name == "Pageindex":
-            name = "PageIndex"
+        name = _method_name(res)
         line = f"  {name:<12} {res['latency_ms']:>8.0f}ms {res['retrieved_chunks']:>8} {res['context_word_count']:>8}"
         if has_rel:
-            line += f" {res.get('avg_relevance', 0):>8.1f}/5"
+            density = compute_relevance_density(res)
+            line += f" {res.get('avg_relevance', 0):>8.1f}/5 {density:>9.2f}"
+        if has_golden:
+            line += f" {res.get('recall_at_k', 0):>9.1%}"
         print(line)
 
+    if pi_header:
+        print(pi_header)
+        for c in pi_result.get("chunks", []):
+            rel = c.get("relevance_score", 0)
+            leaf = c.get("is_leaf", True)
+            print(f"    node {c.get('node_id','?'):>4}  rel={rel:.0f}  leaf={leaf}  \"{c.get('title', '')[:50]}\"")
 
-def print_aggregate(all_vector: list[dict], all_pi: list[dict]) -> None:
-    print("\n" + "=" * 60)
+
+def print_aggregate(all_vector: list[dict], all_pi: list[dict], has_golden: bool) -> None:
+    print("\n" + "=" * 70)
     print("AGGREGATE SUMMARY")
-    print("=" * 60)
+    print("=" * 70)
 
     def avg(results: list[dict], key: str) -> float:
         vals = [r[key] for r in results if key in r]
@@ -260,6 +339,83 @@ def print_aggregate(all_vector: list[dict], all_pi: list[dict]) -> None:
         p_rel = avg(all_pi, "avg_relevance")
         print(f"{'Avg Relevance':<25} {v_rel:>12.1f}/5 {p_rel:>12.1f}/5")
 
+        v_density = avg(all_vector, "relevance_density")
+        p_density = avg(all_pi, "relevance_density")
+        print(f"{'Avg Relevance Density':<25} {v_density:>14.3f} {p_density:>14.3f}")
+
+    if has_golden:
+        v_recall = avg(all_vector, "recall_at_k")
+        p_recall = avg(all_pi, "recall_at_k")
+        print(f"{'Avg Recall@K':<25} {v_recall:>13.1%} {p_recall:>13.1%}")
+
+
+# ---------------------------------------------------------------------------
+# JSON output
+# ---------------------------------------------------------------------------
+
+def build_json_output(
+    args, all_vector: list[dict], all_pi: list[dict], has_golden: bool
+) -> dict:
+    """Build structured JSON output with config, per-query, and aggregate data."""
+
+    def avg(results: list[dict], key: str) -> float:
+        vals = [r[key] for r in results if key in r]
+        return round(sum(vals) / len(vals), 4) if vals else 0.0
+
+    # Strip full content from chunks to keep JSON manageable
+    def slim_chunks(chunks: list[dict]) -> list[dict]:
+        out = []
+        for c in chunks:
+            slim = {k: val for k, val in c.items() if k != "content"}
+            slim["content_words"] = len(c.get("content", "").split())
+            out.append(slim)
+        return out
+
+    per_query = []
+    for v_res, p_res in zip(all_vector, all_pi):
+        entry = {
+            "query_id": v_res["query_id"],
+            "vector": {k: val for k, val in v_res.items() if k != "chunks"},
+            "pageindex": {k: val for k, val in p_res.items() if k != "chunks"},
+            "vector_chunks": slim_chunks(v_res["chunks"]),
+            "pageindex_chunks": slim_chunks(p_res["chunks"]),
+        }
+        per_query.append(entry)
+
+    aggregate = {
+        "vector": {
+            "avg_latency_ms": avg(all_vector, "latency_ms"),
+            "avg_chunks": avg(all_vector, "retrieved_chunks"),
+            "avg_context_words": avg(all_vector, "context_word_count"),
+        },
+        "pageindex": {
+            "avg_latency_ms": avg(all_pi, "latency_ms"),
+            "avg_chunks": avg(all_pi, "retrieved_chunks"),
+            "avg_context_words": avg(all_pi, "context_word_count"),
+        },
+    }
+    if "avg_relevance" in all_vector[0]:
+        aggregate["vector"]["avg_relevance"] = avg(all_vector, "avg_relevance")
+        aggregate["pageindex"]["avg_relevance"] = avg(all_pi, "avg_relevance")
+        aggregate["vector"]["avg_relevance_density"] = avg(all_vector, "relevance_density")
+        aggregate["pageindex"]["avg_relevance_density"] = avg(all_pi, "relevance_density")
+    if has_golden:
+        aggregate["vector"]["avg_recall_at_k"] = avg(all_vector, "recall_at_k")
+        aggregate["pageindex"]["avg_recall_at_k"] = avg(all_pi, "recall_at_k")
+
+    return {
+        "config": {
+            "top_k": args.top_k,
+            "min_similarity": args.min_similarity,
+            "model": args.model,
+            "eval_relevance": args.eval_relevance,
+            "golden_file": str(args.golden) if args.golden else None,
+            "judge_max_words": args.judge_max_words,
+        },
+        "per_query": per_query,
+        "aggregate": aggregate,
+    }
+
 
 # ---------------------------------------------------------------------------
 # Main
@@ -276,8 +432,8 @@ def main() -> None:
         help=f"Min similarity for vector RAG (default: {RAG_MIN_SIMILARITY})",
     )
     parser.add_argument(
-        "--model", type=str, default="gpt-4o-2024-11-20",
-        help="Model for PageIndex tree search and relevance eval",
+        "--model", type=str, default="local_server",
+        help="Model for PageIndex tree search and relevance eval (default: local_server)",
     )
     parser.add_argument(
         "--trees-dir", type=str, default=str(DEFAULT_TREES_DIR),
@@ -287,7 +443,26 @@ def main() -> None:
         "--eval-relevance", action="store_true",
         help="Run LLM-as-judge relevance scoring (adds latency & cost)",
     )
+    parser.add_argument(
+        "--golden", type=str, default=str(DEFAULT_GOLDEN),
+        help="Path to golden annotations JSON (set to '' to disable)",
+    )
+    parser.add_argument(
+        "--judge-max-words", type=int, default=1500,
+        help="Max words sent to LLM judge per passage (default: 1500)",
+    )
+    parser.add_argument(
+        "--output-json", type=str, default=None,
+        help="Write structured JSON results to this path",
+    )
     args = parser.parse_args()
+
+    # --- Load golden annotations ---
+    golden_path = args.golden if args.golden else None
+    golden = load_golden(golden_path)
+    has_golden = bool(golden)
+    if has_golden:
+        print(f"Loaded golden annotations for {len(golden)} queries")
 
     # --- Init Vector RAG ---
     print("Initializing Vector RAG...")
@@ -309,7 +484,7 @@ def main() -> None:
 
     print(f"\nRunning {len(QUERIES)} queries (top_k={args.top_k})...")
     if args.eval_relevance:
-        print("  (with LLM relevance evaluation)")
+        print(f"  (with LLM relevance evaluation, judge_max_words={args.judge_max_words})")
 
     for q in QUERIES:
         query_text = q["query"]
@@ -324,11 +499,19 @@ def main() -> None:
 
         # Optional relevance eval
         if args.eval_relevance:
-            add_relevance_scores(v_result, query_text, args.model)
-            add_relevance_scores(pi_result, query_text, args.model)
+            add_relevance_scores(v_result, query_text, args.model, max_words=args.judge_max_words)
+            add_relevance_scores(pi_result, query_text, args.model, max_words=args.judge_max_words)
+            v_result["relevance_density"] = compute_relevance_density(v_result)
+            pi_result["relevance_density"] = compute_relevance_density(pi_result)
+
+        # Recall@K from golden annotations
+        if has_golden and q["id"] in golden:
+            g = golden[q["id"]]
+            v_result["recall_at_k"] = round(compute_recall_vector(v_result, g), 4)
+            pi_result["recall_at_k"] = round(compute_recall_pageindex(pi_result, g), 4)
 
         # Print per-query table
-        print_query_table(q, v_result, pi_result)
+        print_query_table(q, v_result, pi_result, has_golden)
 
         # Log metrics (strip full chunk content to keep metrics lean)
         for res in [v_result, pi_result]:
@@ -339,8 +522,16 @@ def main() -> None:
         all_pi_results.append(pi_result)
 
     # --- Aggregate ---
-    print_aggregate(all_vector_results, all_pi_results)
+    print_aggregate(all_vector_results, all_pi_results, has_golden)
     print(f"\nMetrics logged to rag_metrics.jsonl")
+
+    # --- JSON output ---
+    if args.output_json:
+        out_path = Path(args.output_json)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = build_json_output(args, all_vector_results, all_pi_results, has_golden)
+        out_path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+        print(f"JSON results written to {out_path}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,508 @@
+{
+  "config": {
+    "top_k": 3,
+    "min_similarity": 0.3,
+    "model": "local_server",
+    "eval_relevance": true,
+    "golden_file": "scripts/comparison_golden.json",
+    "judge_max_words": 1500
+  },
+  "per_query": [
+    {
+      "query_id": "q1",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 18327.2,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q1",
+        "relevance_scores": [
+          4,
+          2,
+          3
+        ],
+        "avg_relevance": 3.0,
+        "relevance_density": 0.25,
+        "recall_at_k": 0.6667
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 28094.5,
+        "retrieved_chunks": 3,
+        "context_word_count": 997,
+        "pageindex_thinking": "The query requires sections that discuss or imply methods for reducing parameters in CNN architectures for the CIFAR-10 dataset. The Method, Results, and Discussion sections are most relevant as they describe the model's architecture, its performance, and potential optimizations. | The selected nodes are those that directly address techniques for reducing parameters or improving the efficiency of CNN architectures for the CIFAR-10 dataset. This includes discussions on regularization, dropout, and specific architectural choices that contribute to parameter reduction or efficiency.",
+        "pageindex_metadata": {
+          "latency_ms": 28094.5,
+          "trees_searched": 2,
+          "total_results": 3
+        },
+        "query_id": "q1",
+        "relevance_scores": [
+          2,
+          2,
+          4
+        ],
+        "avg_relevance": 2.67,
+        "relevance_density": 0.268,
+        "recall_at_k": 0.375
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.6647,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612-1",
+          "score": 0.5254,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/4388-Article Text-28466-1-10-20230612.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.5008,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0004",
+          "node_id": "0004",
+          "title": "Discussion",
+          "summary": "The model makes correct predictions more frequently than incorrect ones, with an accuracy of 66.89% on the validation set, and tends to make more incorrect guesses between images of similar objects. The model performs better at predicting classes of inorganic objects than organic objects, and its performance may be improved by combining similar classes or fine-tuning hyperparameters. The model's training accuracy and loss show a positive and negative trend, respectively, but overfitting is evident, with the difference between training and test accuracy and loss increasing over epochs.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 644
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0009",
+          "node_id": "0009",
+          "title": "Regularization",
+          "summary": "Regularization methods, such as data augmentation and adding a penalty term to the cost function, can prevent overfitting in neural networks. Overfitting occurs when a model learns the training data too well and fails to generalize to new data, resulting in a generalization gap between training and test performance. A model is considered well-fit when it has low training and validation loss, whereas underfitting and overfitting are characterized by high training and validation loss, and low training but high validation loss, respectively.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 167
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0010",
+          "node_id": "0010",
+          "title": "Dropout",
+          "summary": "Dropout and regularization techniques are used to reduce the risk of overfitting in models. Regularization methods, such as weight decay, add a penalty term to the loss function to constrain the model and prevent large weights, with the regularization strength controlled by a hyperparameter. Dropout randomly drops out neurons during training to encourage individual neurons to learn useful features without relying on others, and can be used in conjunction with data augmentation to prevent overfitting.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 186
+        }
+      ]
+    },
+    {
+      "query_id": "q2",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 14665.0,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q2",
+        "relevance_scores": [
+          2,
+          2,
+          2
+        ],
+        "avg_relevance": 2.0,
+        "relevance_density": 0.167,
+        "recall_at_k": 0.4
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 26488.0,
+        "retrieved_chunks": 3,
+        "context_word_count": 708,
+        "pageindex_thinking": "The query is focused on specific aspects of CNN architecture. The 'Method' section is the most relevant as it discusses the development and architecture of the CNN model used. Other sections provide context or results but are less directly related to the query specifics. | The query is focused on CNN architecture and specific techniques or parameters related to it. The document sections that discuss the architecture of the CNN, its components like convolutional layers, and the optimization of its parameters are most relevant. Since 'Expert_Params mutation' and 'depthwise separable convolution' are not directly mentioned, the selected nodes are based on their relevance to CNN architecture and parameter optimization.",
+        "pageindex_metadata": {
+          "latency_ms": 26487.9,
+          "trees_searched": 2,
+          "total_results": 3
+        },
+        "query_id": "q2",
+        "relevance_scores": [
+          2,
+          2,
+          2
+        ],
+        "avg_relevance": 2.0,
+        "relevance_density": 0.282,
+        "recall_at_k": 0.3333
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.5181,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-3",
+          "score": 0.4879,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.4627,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0002",
+          "node_id": "0002",
+          "title": "Method",
+          "summary": "The CIFAR-10 dataset, consisting of 60,000 32\u00d732 color images, was preprocessed using one-hot encoding and feature normalization before being used to develop a convolutional neural network model. The model was trained for 5 epochs with a specific architecture, including convolutional and dense layers, to classify images into 10 mutually exclusive classes. The model's performance was evaluated using a confusion matrix, with metrics including accuracy, precision, recall, and F1-score.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0004",
+          "node_id": "0004",
+          "title": "Convolutional layers",
+          "summary": "Convolutional neural networks capture local spatial patterns in image data by performing 2D convolutions between the image array and a stack of filters. The output of a convolution layer is a stack of filtered image arrays, where each filtered image represents how well a filter matched a part of the original image. The network consists of 6 convolution layers with pooling layers in between, taking a single image as input and producing a stack of 32 filtered images at the first convolution layer.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 178
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0002",
+          "node_id": "0002",
+          "title": "THE ARCHITECTURE",
+          "summary": "The convolutional neural network architecture consists of 6 convolution layers, 3 pooling layers, and 3 fully connected layers. The architecture is summarized in figure 1, which highlights key features of the network. The network's design includes multiple layers for convolution, pooling, and fully connected operations.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": false,
+          "content_words": 41
+        }
+      ]
+    },
+    {
+      "query_id": "q3",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 13612.5,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q3",
+        "relevance_scores": [
+          2,
+          4,
+          2
+        ],
+        "avg_relevance": 2.67,
+        "relevance_density": 0.223,
+        "recall_at_k": 1.0
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 23428.1,
+        "retrieved_chunks": 2,
+        "context_word_count": 1133,
+        "pageindex_thinking": "The document does not explicitly discuss data augmentation strategies for CIFAR-10 classification. However, sections related to the methodology and discussion of the model's performance might provide indirect insights or contexts where data augmentation could be relevant.",
+        "pageindex_metadata": {
+          "latency_ms": 23428.1,
+          "trees_searched": 2,
+          "total_results": 2
+        },
+        "query_id": "q3",
+        "relevance_scores": [
+          2,
+          2
+        ],
+        "avg_relevance": 2.0,
+        "relevance_density": 0.177,
+        "recall_at_k": 0.1667
+      },
+      "vector_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612-1",
+          "score": 0.5952,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/4388-Article Text-28466-1-10-20230612.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.5801,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612-0",
+          "score": 0.5135,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/4388-Article Text-28466-1-10-20230612.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0002",
+          "node_id": "0002",
+          "title": "Method",
+          "summary": "The CIFAR-10 dataset, consisting of 60,000 32\u00d732 color images, was preprocessed using one-hot encoding and feature normalization before being used to develop a convolutional neural network model. The model was trained for 5 epochs with a specific architecture, including convolutional and dense layers, to classify images into 10 mutually exclusive classes. The model's performance was evaluated using a confusion matrix, with metrics including accuracy, precision, recall, and F1-score.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0004",
+          "node_id": "0004",
+          "title": "Discussion",
+          "summary": "The model makes correct predictions more frequently than incorrect ones, with an accuracy of 66.89% on the validation set, and tends to make more incorrect guesses between images of similar objects. The model performs better at predicting classes of inorganic objects than organic objects, and its performance may be improved by combining similar classes or fine-tuning hyperparameters. The model's training accuracy and loss show a positive and negative trend, respectively, but overfitting is evident, with the difference between training and test accuracy and loss increasing over epochs.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 644
+        }
+      ]
+    },
+    {
+      "query_id": "q4",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 13999.2,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q4",
+        "relevance_scores": [
+          4,
+          4,
+          3
+        ],
+        "avg_relevance": 3.67,
+        "relevance_density": 0.306,
+        "recall_at_k": 0.6
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 27781.0,
+        "retrieved_chunks": 2,
+        "context_word_count": 1133,
+        "pageindex_thinking": "The Method section is directly relevant as it discusses the CNN model's architecture. The Discussion section, while less directly relevant, touches upon potential improvements that could involve complex mutations or adjustments to batch normalization.",
+        "pageindex_metadata": {
+          "latency_ms": 27781.0,
+          "trees_searched": 2,
+          "total_results": 2
+        },
+        "query_id": "q4",
+        "relevance_scores": [
+          3,
+          2
+        ],
+        "avg_relevance": 2.5,
+        "relevance_density": 0.221,
+        "recall_at_k": 0.25
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.5602,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-3",
+          "score": 0.525,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.4345,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0002",
+          "node_id": "0002",
+          "title": "Method",
+          "summary": "The CIFAR-10 dataset, consisting of 60,000 32\u00d732 color images, was preprocessed using one-hot encoding and feature normalization before being used to develop a convolutional neural network model. The model was trained for 5 epochs with a specific architecture, including convolutional and dense layers, to classify images into 10 mutually exclusive classes. The model's performance was evaluated using a confusion matrix, with metrics including accuracy, precision, recall, and F1-score.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0004",
+          "node_id": "0004",
+          "title": "Discussion",
+          "summary": "The model makes correct predictions more frequently than incorrect ones, with an accuracy of 66.89% on the validation set, and tends to make more incorrect guesses between images of similar objects. The model performs better at predicting classes of inorganic objects than organic objects, and its performance may be improved by combining similar classes or fine-tuning hyperparameters. The model's training accuracy and loss show a positive and negative trend, respectively, but overfitting is evident, with the difference between training and test accuracy and loss increasing over epochs.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 644
+        }
+      ]
+    },
+    {
+      "query_id": "q5",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 27417.7,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q5",
+        "relevance_scores": [
+          4,
+          4,
+          2
+        ],
+        "avg_relevance": 3.33,
+        "relevance_density": 0.278,
+        "recall_at_k": 0.4
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 24205.8,
+        "retrieved_chunks": 3,
+        "context_word_count": 1311,
+        "pageindex_thinking": "The query requires identification of sections that discuss CNN architectures and potential mutations or improvements. The Method, Results, and Discussion sections are most relevant as they detail the model's architecture, its performance, and areas for improvement. | The selected nodes are chosen based on their relevance to CNN architecture and its evolution, focusing on components and techniques that directly contribute to the design, training, and optimization of CNNs.",
+        "pageindex_metadata": {
+          "latency_ms": 24205.8,
+          "trees_searched": 2,
+          "total_results": 3
+        },
+        "query_id": "q5",
+        "relevance_scores": [
+          2,
+          2,
+          4
+        ],
+        "avg_relevance": 2.67,
+        "relevance_density": 0.204,
+        "recall_at_k": 0.25
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.4695,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.4429,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-3",
+          "score": 0.4206,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0002",
+          "node_id": "0002",
+          "title": "Method",
+          "summary": "The CIFAR-10 dataset, consisting of 60,000 32\u00d732 color images, was preprocessed using one-hot encoding and feature normalization before being used to develop a convolutional neural network model. The model was trained for 5 epochs with a specific architecture, including convolutional and dense layers, to classify images into 10 mutually exclusive classes. The model's performance was evaluated using a confusion matrix, with metrics including accuracy, precision, recall, and F1-score.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0004",
+          "node_id": "0004",
+          "title": "Discussion",
+          "summary": "The model makes correct predictions more frequently than incorrect ones, with an accuracy of 66.89% on the validation set, and tends to make more incorrect guesses between images of similar objects. The model performs better at predicting classes of inorganic objects than organic objects, and its performance may be improved by combining similar classes or fine-tuning hyperparameters. The model's training accuracy and loss show a positive and negative trend, respectively, but overfitting is evident, with the difference between training and test accuracy and loss increasing over epochs.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 644
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0004",
+          "node_id": "0004",
+          "title": "Convolutional layers",
+          "summary": "Convolutional neural networks capture local spatial patterns in image data by performing 2D convolutions between the image array and a stack of filters. The output of a convolution layer is a stack of filtered image arrays, where each filtered image represents how well a filter matched a part of the original image. The network consists of 6 convolution layers with pooling layers in between, taking a single image as input and producing a stack of 32 filtered images at the first convolution layer.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 178
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "vector": {
+      "avg_latency_ms": 17604.32,
+      "avg_chunks": 3.0,
+      "avg_context_words": 1200.0,
+      "avg_relevance": 2.934,
+      "avg_relevance_density": 0.2448,
+      "avg_recall_at_k": 0.6133
+    },
+    "pageindex": {
+      "avg_latency_ms": 25999.48,
+      "avg_chunks": 2.6,
+      "avg_context_words": 1056.4,
+      "avg_relevance": 2.368,
+      "avg_relevance_density": 0.2304,
+      "avg_recall_at_k": 0.275
+    }
+  }
+}

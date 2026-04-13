@@ -1,0 +1,630 @@
+{
+  "config": {
+    "top_k": 3,
+    "min_similarity": 0.3,
+    "model": "gpt-4o-2024-11-20",
+    "eval_relevance": true,
+    "golden_file": "scripts/comparison_golden.json",
+    "judge_max_words": 1500
+  },
+  "per_query": [
+    {
+      "query_id": "q1",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 25506.6,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q1",
+        "relevance_scores": [
+          3,
+          2,
+          3
+        ],
+        "avg_relevance": 2.67,
+        "relevance_density": 0.223,
+        "recall_at_k": 0.6667
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 13283.7,
+        "retrieved_chunks": 3,
+        "context_word_count": 2119,
+        "pageindex_thinking": "The query focuses on techniques for reducing CNN architecture parameters specifically for CIFAR-10 image classification. Relevant nodes should discuss CNN architecture, parameter optimization, or techniques that could indirectly inform parameter reduction (e.g., class merging, hyperparameter tuning, or architectural design). Nodes that only provide general information about CNNs, CIFAR-10, or performance metrics without addressing architecture or parameter reduction are less relevant. Leaf nodes are preferred over parent nodes when they provide specific details. Based on this, I will evaluate the nodes for relevance. | The query focuses on techniques for reducing CNN architecture parameters specifically for CIFAR-10 classification. Relevant content would include discussions on parameter reduction methods, regularization techniques, dropout, and optimization methods that indirectly contribute to parameter efficiency. Nodes discussing overfitting reduction, regularization, and optimization techniques are particularly relevant. Parent nodes are avoided when specific child nodes provide sufficient detail. Nodes that focus on general architecture descriptions or unrelated aspects like dataset details are excluded.",
+        "pageindex_metadata": {
+          "latency_ms": 13283.7,
+          "trees_searched": 3,
+          "total_results": 3
+        },
+        "query_id": "q1",
+        "relevance_scores": [
+          2,
+          2,
+          2
+        ],
+        "avg_relevance": 2.0,
+        "relevance_density": 0.094,
+        "recall_at_k": 0.375
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.6647,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612-1",
+          "score": 0.5254,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/4388-Article Text-28466-1-10-20230612.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.5008,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0003",
+          "node_id": "0003",
+          "title": "Method",
+          "summary": "The partial document describes the methodology for classifying images in the CIFAR-10 dataset using a convolutional neural network (CNN). It begins by introducing the CIFAR-10 dataset, which consists of 60,000 32\u00d732 color images across 10 classes, and highlights the challenges of identifying patterns due to the small image size. Preprocessing steps included one-hot encoding of labels and feature normalization by scaling pixel values to a range of 0 to 1. \n\nThe CNN architecture is detailed, consisting of an input layer, a convolutional layer with ReLU activation, max pooling, flattening, a dense layer with 1024 channels and ReLU activation, and a final dense layer with 10 channels and softmax activation. The model was trained for 5 epochs, with an explanation of how increasing epochs improves predictions by optimizing calculations based on recognized patterns.\n\nTo address the challenge of unclear patterns between classes, a high number of filters in the convolutional layer and channels in the dense layer were used. Model performance was evaluated using a confusion matrix, with metrics such as accuracy, precision, recall, and F1-score reported.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0009",
+          "node_id": "0009",
+          "title": "Regularization",
+          "summary": "The partial document covers the following main points:\n\n1. **Softmax Function and Cross-Entropy Loss**: Explanation of the Softmax function as a probability distribution over mutually exclusive alternatives and its use with the Cross-Entropy loss function. It discusses the behavior of gradients in the loss function and their impact on optimization.\n\n2. **Overfitting and Generalization**: Discussion on overfitting, its detection through training and validation error comparison, and methods to reduce it, such as regularization, dropout, and data augmentation. It also explains the concept of generalization gap and the classification of loss curves.\n\n3. **Regularization Techniques**: Introduction to regularization methods, including weight decay, which penalizes large weights to encourage simpler models and reduce overfitting.\n\n4. **Dropout**: Explanation of dropout as a technique to randomly deactivate neurons during training to prevent overfitting and encourage independent feature learning.\n\n5. **Function Optimization**: Overview of optimization techniques, focusing on gradient descent and its variants (stochastic gradient descent and mini-batch gradient descent). It highlights the challenges of gradient descent, such as slow convergence for large datasets and oscillations in difficult functions.\n\n6. **Gradient Descent Variants**: Comparison of standard gradient descent, stochastic gradient descent, and mini-batch gradient descent, emphasizing their trade-offs in terms of speed, noise, and convergence.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 815
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0010",
+          "node_id": "0010",
+          "title": "Dropout",
+          "summary": "The partial document discusses key concepts in machine learning, focusing on Softmax activation, overfitting, regularization, and optimization techniques. It explains the Softmax function as a probability distribution over mutually exclusive alternatives and highlights the use of cross-entropy as the appropriate cost function. Overfitting is addressed by splitting data into training and validation sets, with solutions like regularization, dropout, and data augmentation to improve generalization. Regularization penalizes complex models, while dropout randomly deactivates neurons during training to prevent reliance on specific features. The document also covers function optimization, emphasizing gradient descent and its variants, including stochastic and mini-batch gradient descent, to minimize loss functions and optimize model parameters. Challenges like slow convergence and noisy updates in optimization methods are also discussed.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 815
+        }
+      ]
+    },
+    {
+      "query_id": "q2",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 10004.0,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q2",
+        "relevance_scores": [
+          2,
+          1,
+          2
+        ],
+        "avg_relevance": 1.67,
+        "relevance_density": 0.139,
+        "recall_at_k": 0.4
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 6728.3,
+        "retrieved_chunks": 3,
+        "context_word_count": 1118,
+        "pageindex_thinking": "The query focuses on CNN architecture, specifically mentioning 'Expert_Params mutation' and 'depthwise separable convolution.' The document primarily discusses CNNs for CIFAR-10 image classification, but the query's emphasis on specific architectural details like 'depthwise separable convolution' and 'Expert_Params mutation' suggests a need for technical details about CNN architecture and its components. Nodes that describe the CNN architecture, training techniques, or performance analysis are more likely to be relevant. However, the document does not explicitly mention 'Expert_Params mutation' or 'depthwise separable convolution,' so relevance will depend on how closely the content aligns with the broader topic of CNN architecture and its components. I will prioritize nodes that detail the CNN architecture and its methodology, as these are most likely to inform the query. | The query focuses on CNN architecture, specifically mentioning 'Expert_Params mutation' and 'depthwise separable convolution.' The document tree primarily discusses CNN architectures, training techniques, and optimization methods. To address the query, I need to identify nodes that discuss CNN architecture in detail, particularly those that might touch on advanced architectural components or parameter tuning. Nodes that focus on general optimization techniques or unrelated aspects like overfitting mitigation are less relevant. Leaf nodes are preferred over parent nodes when they provide specific details. Based on the query, nodes discussing convolutional layers, architecture details, and advanced techniques are most relevant.",
+        "pageindex_metadata": {
+          "latency_ms": 6728.3,
+          "trees_searched": 3,
+          "total_results": 3
+        },
+        "query_id": "q2",
+        "relevance_scores": [
+          1,
+          4,
+          2
+        ],
+        "avg_relevance": 2.33,
+        "relevance_density": 0.208,
+        "recall_at_k": 0.75
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.5181,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-3",
+          "score": 0.4879,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.4627,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0003",
+          "node_id": "0003",
+          "title": "Method",
+          "summary": "The partial document describes the methodology for classifying images in the CIFAR-10 dataset using a convolutional neural network (CNN). It begins by introducing the CIFAR-10 dataset, which consists of 60,000 32\u00d732 color images across 10 classes, and highlights the challenges of identifying patterns due to the small image size. Preprocessing steps included one-hot encoding of labels and feature normalization by scaling pixel values to a range of 0 to 1. \n\nThe CNN architecture is detailed, consisting of an input layer, a convolutional layer with ReLU activation, max pooling, flattening, a dense layer with 1024 channels and ReLU activation, and a final dense layer with 10 channels and softmax activation. The model was trained for 5 epochs, with an explanation of how increasing epochs improves predictions by optimizing calculations based on recognized patterns.\n\nTo address the challenge of unclear patterns between classes, a high number of filters in the convolutional layer and channels in the dense layer were used. Model performance was evaluated using a confusion matrix, with metrics such as accuracy, precision, recall, and F1-score reported.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0004",
+          "node_id": "0004",
+          "title": "Convolutional layers",
+          "summary": "The partial document discusses the main points related to the content provided, including its key themes, topics, or arguments. It summarizes the essential aspects and highlights the primary focus areas covered in the text.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 0
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0005",
+          "node_id": "0005",
+          "title": "Batch Normalization",
+          "summary": "The partial document describes the architecture and components of a Convolutional Neural Network (ConvNet). It includes the following main points:\n\n1. **ConvNet Architecture**: Details of the network structure, including convolutional layers, pooling layers, dropout layers, and dense layers, with specific dimensions and configurations.\n\n2. **Convolutional Layers**: Explanation of how convolutional layers work, including the use of filters to extract spatial patterns from input images, resulting in feature maps. The network contains six convolutional layers with pooling layers in between.\n\n3. **Batch Normalization**: Description of batch normalization to reduce covariate shift, stabilize hidden layer inputs, and accelerate training. It includes steps for normalization and the learnable parameters (\u03b2 and \u03b3) that allow layers to control non-linearity.\n\n4. **Max Pooling Layers**: Explanation of max pooling layers applied after every two convolutional layers to reduce the size of feature maps by retaining maximum values, with three pooling layers of size 2x2 in total.\n\n5. **Loss Function**: Use of ReLU activation in convolutional and hidden layers, and Softmax activation in the output layer for classification into 10 classes, ensuring outputs represent a probability distribution.\n\nThe document provides a detailed overview of the ConvNet's components and their roles in image classification tasks.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 629
+        }
+      ]
+    },
+    {
+      "query_id": "q3",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 16144.2,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q3",
+        "relevance_scores": [
+          2,
+          3,
+          2
+        ],
+        "avg_relevance": 2.33,
+        "relevance_density": 0.194,
+        "recall_at_k": 1.0
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 7603.8,
+        "retrieved_chunks": 3,
+        "context_word_count": 4544,
+        "pageindex_thinking": "The query seeks information on data augmentation strategies for CIFAR-10 classification. Data augmentation is mentioned in several nodes, particularly in the context of reducing overfitting and improving generalization. Nodes that explicitly discuss data augmentation or its role in the training process are most relevant. Parent nodes that aggregate content without adding specific details are avoided in favor of leaf nodes that directly address the topic. Nodes that focus on unrelated aspects, such as optimization techniques or activation functions, are excluded. Based on this, I selected nodes that explicitly mention data augmentation and its impact on CIFAR-10 classification.",
+        "pageindex_metadata": {
+          "latency_ms": 7603.8,
+          "trees_searched": 3,
+          "total_results": 3
+        },
+        "query_id": "q3",
+        "relevance_scores": [
+          3,
+          2,
+          2
+        ],
+        "avg_relevance": 2.33,
+        "relevance_density": 0.051,
+        "recall_at_k": 0.5
+      },
+      "vector_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612-1",
+          "score": 0.5952,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/4388-Article Text-28466-1-10-20230612.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.5801,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612-0",
+          "score": 0.5135,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/4388-Article Text-28466-1-10-20230612.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0003",
+          "node_id": "0003",
+          "title": "Leaky ReLu Activation Function",
+          "summary": "The partial document describes the implementation of a deep convolutional neural network (CNN) for image classification using the CIFAR-10 dataset. Key points covered include:\n\n1. **Dataset Overview**: The CIFAR-10 dataset, consisting of 60,000 32x32 color images across 10 classes, is used for training and testing the model.\n\n2. **Network Architecture**: The CNN architecture includes 6 convolutional layers, 3 pooling layers, 3 fully connected layers, and dropout layers to prevent overfitting. Leaky ReLU is used as the activation function, and Softmax is applied in the output layer for classification.\n\n3. **Optimization Techniques**: Adam optimizer is employed for weight updates, and comparisons are made with other optimization methods like stochastic gradient descent (SGD) and RMSprop. Batch normalization is used to stabilize and accelerate training.\n\n4. **Overfitting Mitigation**: Regularization techniques, dropout, and data augmentation are applied to reduce overfitting and improve generalization. The document discusses the impact of these methods on training and validation performance.\n\n5. **Loss Function**: Cross-entropy loss is used in conjunction with Softmax activation for classification tasks.\n\n6. **Results**: The model achieves 90% accuracy on the training data and 87.57% accuracy on the test data after 100 epochs. Graphs illustrate the effects of overfitting and the improvements achieved through data augmentation.\n\n7. **Conclusion**: The paper concludes that the CNN, optimized with Adam and regularization techniques, effectively classifies CIFAR-10 images with high accuracy.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 5.0,
+          "is_leaf": true,
+          "content_words": 2914
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0009",
+          "node_id": "0009",
+          "title": "Regularization",
+          "summary": "The partial document covers the following main points:\n\n1. **Softmax Function and Cross-Entropy Loss**: Explanation of the Softmax function as a probability distribution over mutually exclusive alternatives and its use with the Cross-Entropy loss function. It discusses the behavior of gradients in the loss function and their impact on optimization.\n\n2. **Overfitting and Generalization**: Discussion on overfitting, its detection through training and validation error comparison, and methods to reduce it, such as regularization, dropout, and data augmentation. It also explains the concept of generalization gap and the classification of loss curves.\n\n3. **Regularization Techniques**: Introduction to regularization methods, including weight decay, which penalizes large weights to encourage simpler models and reduce overfitting.\n\n4. **Dropout**: Explanation of dropout as a technique to randomly deactivate neurons during training to prevent overfitting and encourage independent feature learning.\n\n5. **Function Optimization**: Overview of optimization techniques, focusing on gradient descent and its variants (stochastic gradient descent and mini-batch gradient descent). It highlights the challenges of gradient descent, such as slow convergence for large datasets and oscillations in difficult functions.\n\n6. **Gradient Descent Variants**: Comparison of standard gradient descent, stochastic gradient descent, and mini-batch gradient descent, emphasizing their trade-offs in terms of speed, noise, and convergence.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 815
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0010",
+          "node_id": "0010",
+          "title": "Dropout",
+          "summary": "The partial document discusses key concepts in machine learning, focusing on Softmax activation, overfitting, regularization, and optimization techniques. It explains the Softmax function as a probability distribution over mutually exclusive alternatives and highlights the use of cross-entropy as the appropriate cost function. Overfitting is addressed by splitting data into training and validation sets, with solutions like regularization, dropout, and data augmentation to improve generalization. Regularization penalizes complex models, while dropout randomly deactivates neurons during training to prevent reliance on specific features. The document also covers function optimization, emphasizing gradient descent and its variants, including stochastic and mini-batch gradient descent, to minimize loss functions and optimize model parameters. Challenges like slow convergence and noisy updates in optimization methods are also discussed.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 815
+        }
+      ]
+    },
+    {
+      "query_id": "q4",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 35956.5,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q4",
+        "relevance_scores": [
+          3,
+          2,
+          2
+        ],
+        "avg_relevance": 2.33,
+        "relevance_density": 0.194,
+        "recall_at_k": 0.6
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 7218.4,
+        "retrieved_chunks": 3,
+        "context_word_count": 4032,
+        "pageindex_thinking": "The query focuses on CNN architecture, complex mutations, residual connections, and batch normalization. To address this, I need to identify nodes that discuss CNN architecture, advanced techniques like batch normalization, and potentially related optimization or structural innovations. Nodes that delve into residual connections or similar advanced architectural features would be particularly relevant. I will prioritize leaf nodes over parent nodes to avoid redundancy and ensure specificity. Nodes that only discuss general CNN concepts or unrelated topics will be excluded. | The query focuses on CNN architecture, complex mutation, residual connections, and batch normalization. These are specific technical aspects of CNN design and training. The document primarily discusses the application of CNNs for CIFAR-10 image classification, with sections on methodology, results, and discussion. To address the query, I need to identify nodes that discuss CNN architecture, training techniques, or related challenges. Nodes that focus on general performance metrics, dataset descriptions, or high-level conclusions are less relevant. Based on the document structure, the 'Method' section is the most likely to contain relevant details about CNN architecture and training techniques. The 'Discussion' and 'Conclusion' sections may also touch on architectural considerations or limitations but are less likely to provide detailed technical insights. I will prioritize leaf nodes that directly address the query and assign relevance scores accordingly.",
+        "pageindex_metadata": {
+          "latency_ms": 7218.3,
+          "trees_searched": 3,
+          "total_results": 3
+        },
+        "query_id": "q4",
+        "relevance_scores": [
+          3,
+          2,
+          2
+        ],
+        "avg_relevance": 2.33,
+        "relevance_density": 0.058,
+        "recall_at_k": 0.5
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.5602,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-3",
+          "score": 0.525,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.4345,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0005",
+          "node_id": "0005",
+          "title": "Batch Normalization",
+          "summary": "The partial document describes the architecture and components of a Convolutional Neural Network (ConvNet). It includes the following main points:\n\n1. **ConvNet Architecture**: Details of the network structure, including convolutional layers, pooling layers, dropout layers, and dense layers, with specific dimensions and configurations.\n\n2. **Convolutional Layers**: Explanation of how convolutional layers work, including the use of filters to extract spatial patterns from input images, resulting in feature maps. The network contains six convolutional layers with pooling layers in between.\n\n3. **Batch Normalization**: Description of batch normalization to reduce covariate shift, stabilize hidden layer inputs, and accelerate training. It includes steps for normalization and the learnable parameters (\u03b2 and \u03b3) that allow layers to control non-linearity.\n\n4. **Max Pooling Layers**: Explanation of max pooling layers applied after every two convolutional layers to reduce the size of feature maps by retaining maximum values, with three pooling layers of size 2x2 in total.\n\n5. **Loss Function**: Use of ReLU activation in convolutional and hidden layers, and Softmax activation in the output layer for classification into 10 classes, ensuring outputs represent a probability distribution.\n\nThe document provides a detailed overview of the ConvNet's components and their roles in image classification tasks.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 5.0,
+          "is_leaf": true,
+          "content_words": 629
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0003",
+          "node_id": "0003",
+          "title": "Method",
+          "summary": "The partial document describes the methodology for classifying images in the CIFAR-10 dataset using a convolutional neural network (CNN). It begins by introducing the CIFAR-10 dataset, which consists of 60,000 32\u00d732 color images across 10 classes, and highlights the challenges of identifying patterns due to the small image size. Preprocessing steps included one-hot encoding of labels and feature normalization by scaling pixel values to a range of 0 to 1. \n\nThe CNN architecture is detailed, consisting of an input layer, a convolutional layer with ReLU activation, max pooling, flattening, a dense layer with 1024 channels and ReLU activation, and a final dense layer with 10 channels and softmax activation. The model was trained for 5 epochs, with an explanation of how increasing epochs improves predictions by optimizing calculations based on recognized patterns.\n\nTo address the challenge of unclear patterns between classes, a high number of filters in the convolutional layer and channels in the dense layer were used. Model performance was evaluated using a confusion matrix, with metrics such as accuracy, precision, recall, and F1-score reported.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0003",
+          "node_id": "0003",
+          "title": "Leaky ReLu Activation Function",
+          "summary": "The partial document describes the implementation of a deep convolutional neural network (CNN) for image classification using the CIFAR-10 dataset. Key points covered include:\n\n1. **Dataset Overview**: The CIFAR-10 dataset, consisting of 60,000 32x32 color images across 10 classes, is used for training and testing the model.\n\n2. **Network Architecture**: The CNN architecture includes 6 convolutional layers, 3 pooling layers, 3 fully connected layers, and dropout layers to prevent overfitting. Leaky ReLU is used as the activation function, and Softmax is applied in the output layer for classification.\n\n3. **Optimization Techniques**: Adam optimizer is employed for weight updates, and comparisons are made with other optimization methods like stochastic gradient descent (SGD) and RMSprop. Batch normalization is used to stabilize and accelerate training.\n\n4. **Overfitting Mitigation**: Regularization techniques, dropout, and data augmentation are applied to reduce overfitting and improve generalization. The document discusses the impact of these methods on training and validation performance.\n\n5. **Loss Function**: Cross-entropy loss is used in conjunction with Softmax activation for classification tasks.\n\n6. **Results**: The model achieves 90% accuracy on the training data and 87.57% accuracy on the test data after 100 epochs. Graphs illustrate the effects of overfitting and the improvements achieved through data augmentation.\n\n7. **Conclusion**: The paper concludes that the CNN, optimized with Adam and regularization techniques, effectively classifies CIFAR-10 images with high accuracy.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 2914
+        }
+      ]
+    },
+    {
+      "query_id": "q5",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 28429.6,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 6,
+          "min_similarity": 0.3
+        },
+        "query_id": "q5",
+        "relevance_scores": [
+          2,
+          2,
+          2
+        ],
+        "avg_relevance": 2.0,
+        "relevance_density": 0.167,
+        "recall_at_k": 0.4
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 6630.0,
+        "retrieved_chunks": 3,
+        "context_word_count": 4124,
+        "pageindex_thinking": "The query 'CNN architecture EoT mutation' suggests a focus on the architecture of convolutional neural networks (CNNs) and potentially their evolution or transformation (mutation). The document primarily discusses CNNs for CIFAR-10 image classification, including architecture, training, and performance evaluation. To address the query, I will prioritize nodes that describe CNN architectures, their design, and any modifications or challenges related to their structure. Nodes discussing general performance metrics, results, or applications without specific architectural details are less relevant. Leaf nodes will be preferred over parent nodes to avoid redundancy. | The query focuses on 'CNN architecture EoT mutation' and mentions a specific class, 'ExquisiteNetV2,' which suggests interest in CNN architectural design, particularly modifications or innovations in architecture. Relevant nodes should discuss CNN architecture, layers, activation functions, and optimization techniques that could relate to architectural evolution or mutation. Nodes discussing general training techniques, dataset descriptions, or results without specific architectural insights are less relevant. Leaf nodes are preferred for specificity, and only nodes with relevance >= 3 are included.",
+        "pageindex_metadata": {
+          "latency_ms": 6629.9,
+          "trees_searched": 3,
+          "total_results": 3
+        },
+        "query_id": "q5",
+        "relevance_scores": [
+          2,
+          2,
+          1
+        ],
+        "avg_relevance": 1.67,
+        "relevance_density": 0.04,
+        "recall_at_k": 0.5
+      },
+      "vector_chunks": [
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-0",
+          "score": 0.4695,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-2",
+          "score": 0.4429,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network-3",
+          "score": 0.4206,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0003",
+          "node_id": "0003",
+          "title": "Method",
+          "summary": "The partial document describes the methodology for classifying images in the CIFAR-10 dataset using a convolutional neural network (CNN). It begins by introducing the CIFAR-10 dataset, which consists of 60,000 32\u00d732 color images across 10 classes, and highlights the challenges of identifying patterns due to the small image size. Preprocessing steps included one-hot encoding of labels and feature normalization by scaling pixel values to a range of 0 to 1. \n\nThe CNN architecture is detailed, consisting of an input layer, a convolutional layer with ReLU activation, max pooling, flattening, a dense layer with 1024 channels and ReLU activation, and a final dense layer with 10 channels and softmax activation. The model was trained for 5 epochs, with an explanation of how increasing epochs improves predictions by optimizing calculations based on recognized patterns.\n\nTo address the challenge of unclear patterns between classes, a high number of filters in the convolutional layer and channels in the dense layer were used. Model performance was evaluated using a confusion matrix, with metrics such as accuracy, precision, recall, and F1-score reported.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 489
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0003",
+          "node_id": "0003",
+          "title": "Leaky ReLu Activation Function",
+          "summary": "The partial document describes the implementation of a deep convolutional neural network (CNN) for image classification using the CIFAR-10 dataset. Key points covered include:\n\n1. **Dataset Overview**: The CIFAR-10 dataset, consisting of 60,000 32x32 color images across 10 classes, is used for training and testing the model.\n\n2. **Network Architecture**: The CNN architecture includes 6 convolutional layers, 3 pooling layers, 3 fully connected layers, and dropout layers to prevent overfitting. Leaky ReLU is used as the activation function, and Softmax is applied in the output layer for classification.\n\n3. **Optimization Techniques**: Adam optimizer is employed for weight updates, and comparisons are made with other optimization methods like stochastic gradient descent (SGD) and RMSprop. Batch normalization is used to stabilize and accelerate training.\n\n4. **Overfitting Mitigation**: Regularization techniques, dropout, and data augmentation are applied to reduce overfitting and improve generalization. The document discusses the impact of these methods on training and validation performance.\n\n5. **Loss Function**: Cross-entropy loss is used in conjunction with Softmax activation for classification tasks.\n\n6. **Results**: The model achieves 90% accuracy on the training data and 87.57% accuracy on the test data after 100 epochs. Graphs illustrate the effects of overfitting and the improvements achieved through data augmentation.\n\n7. **Conclusion**: The paper concludes that the CNN, optimized with Adam and regularization techniques, effectively classifies CIFAR-10 images with high accuracy.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 4.0,
+          "is_leaf": true,
+          "content_words": 2914
+        },
+        {
+          "document_id": "4388-Article Text-28466-1-10-20230612:0005",
+          "node_id": "0005",
+          "title": "Discussion",
+          "summary": "The partial document discusses the performance and limitations of a convolutional neural network (CNN) model in classifying images. Key points include:\n\n1. **Model Performance**: The model achieves an accuracy of 66.89% on the validation set, with correct predictions being more frequent than incorrect ones. Misclassifications are more common between similar objects (e.g., automobile and truck) than dissimilar ones (e.g., automobile and cat).\n\n2. **Class Merging**: Combining similar classes (e.g., automobile and truck into a road vehicle class) could improve performance by reducing the complexity of distinguishing between similar features.\n\n3. **Organic vs. Inorganic Objects**: The model performs better on inorganic objects (e.g., ships) than organic ones (e.g., birds), likely due to the shared features among organic objects.\n\n4. **Overfitting**: Training accuracy and loss show clear trends, but the increasing gap between training and test metrics suggests overfitting, where the model focuses too much on training data noise.\n\n5. **Limitations**: The study did not compare CNN with other methods or optimize hyperparameters, which could improve performance. Future research should address these aspects and explore combining approaches for better results.\n\n6. **Conclusion**: CNNs are effective in identifying real-life objects, even in low-resolution images, with potential applications in areas like driving assistance technology. Despite limitations, the model achieved reasonable accuracy in a short training time.",
+          "source": "4388-Article Text-28466-1-10-20230612.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 721
+        }
+      ]
+    },
+    {
+      "query_id": "q6",
+      "vector": {
+        "method": "vector",
+        "latency_ms": 30036.9,
+        "retrieved_chunks": 3,
+        "context_word_count": 1200,
+        "retrieval_stats": {
+          "candidate_k": 6,
+          "returned_k": 6,
+          "filtered_k": 5,
+          "min_similarity": 0.3
+        },
+        "query_id": "q6",
+        "relevance_scores": [
+          5,
+          4,
+          3
+        ],
+        "avg_relevance": 4.0,
+        "relevance_density": 0.333,
+        "recall_at_k": 1.0
+      },
+      "pageindex": {
+        "method": "pageindex",
+        "latency_ms": 6638.5,
+        "retrieved_chunks": 3,
+        "context_word_count": 16796,
+        "pageindex_thinking": "The query focuses on retrieval-augmented generation techniques for knowledge-intensive tasks. The document tree contains two nodes: the 'Preface' and the main document node. The 'Preface' provides a detailed summary of the document's content, including discussions on retrieval mechanisms (sparse, dense, hybrid), text structuring techniques, and their integration with large language models (LLMs) for enhanced performance in natural language processing tasks. This aligns well with the query, as it directly addresses retrieval-augmented generation methods and their applications. The second node, which is the main document node, appears to be a high-level aggregation of references and topics, including knowledge graphs, query rewriting, and information extraction. While it is relevant, it is less specific than the 'Preface' in addressing the query. Based on the instructions, I will prioritize the 'Preface' node as it is more specific and directly relevant to the query. | The query focuses on retrieval-augmented generation techniques for knowledge-intensive tasks. The document primarily discusses CNN architectures, training techniques, and optimization methods for CIFAR-10 image classification. While the document does not explicitly mention retrieval-augmented generation, certain sections related to optimization techniques, training processes, and generalization may provide indirect insights into methods that could be adapted for knowledge-intensive tasks. However, most of the content is focused on CNN-specific implementations and does not directly address retrieval-augmented generation. Based on this, I will select nodes that are somewhat relevant to the query, particularly those discussing optimization techniques and generalization, as they may inform related methodologies.",
+        "pageindex_metadata": {
+          "latency_ms": 6638.4,
+          "trees_searched": 3,
+          "total_results": 3
+        },
+        "query_id": "q6",
+        "relevance_scores": [
+          5,
+          1,
+          1
+        ],
+        "avg_relevance": 2.33,
+        "relevance_density": 0.014,
+        "recall_at_k": 0.5
+      },
+      "vector_chunks": [
+        {
+          "document_id": "survey_rag_llm-0",
+          "score": 0.6335,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/survey_rag_llm.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "survey_rag_llm-3",
+          "score": 0.4086,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/survey_rag_llm.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        },
+        {
+          "document_id": "survey_rag_llm-2",
+          "score": 0.4056,
+          "source": "/storage/ice1/6/6/bcharest3/llm-inference/llm-inference/rag_corpus/survey_rag_llm.pdf",
+          "doc_type": "pdf",
+          "content_words": 400
+        }
+      ],
+      "pageindex_chunks": [
+        {
+          "document_id": "survey_rag_llm:0000",
+          "node_id": "0000",
+          "title": "Preface",
+          "summary": "The partial document titled \"A Survey on Retrieval And Structuring Augmented Generation with Large Language Models\" discusses the integration of Retrieval And Structuring (RAS) methods with Large Language Models (LLMs) to enhance their performance in natural language processing tasks. It highlights the challenges faced by LLMs, such as hallucination, outdated knowledge, and limited domain expertise, and presents RAS as a solution that combines dynamic information retrieval with structured knowledge representations. The survey covers various retrieval mechanisms (sparse, dense, and hybrid), text structuring techniques (taxonomy construction, hierarchical classification, and information extraction), and their integration with LLMs through prompt-based methods and reasoning frameworks. It identifies technical challenges in retrieval efficiency, structure quality, and knowledge integration, while also pointing out research opportunities in multimodal retrieval, cross-lingual structures, and interactive systems. The document aims to provide insights into RAS methods, applications, and future directions for researchers and practitioners in the field.",
+          "source": "survey_rag_llm.pdf",
+          "relevance_score": 5.0,
+          "is_leaf": true,
+          "content_words": 15131
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0012",
+          "node_id": "0012",
+          "title": "Stochastic gradient descent",
+          "summary": "The partial document covers the following main points:\n\n1. **Softmax Activation and Cross-Entropy Loss**: Explanation of the Softmax function, its role in probability distribution over mutually exclusive alternatives, and the use of Cross-Entropy as the appropriate cost function. It discusses the gradient behavior of the cost function and its implications.\n\n2. **Overfitting and Regularization**: Discussion on overfitting, its detection through training and validation error graphs, and methods to reduce it, such as regularization and data augmentation. Regularization techniques like weight decay and dropout are explained, emphasizing their role in reducing model complexity and improving generalization.\n\n3. **Function Optimization**: Overview of optimization techniques, including gradient descent, stochastic gradient descent (SGD), and mini-batch gradient descent. Challenges like noisy updates and oscillations in SGD are highlighted, along with improvements like momentum and Nesterov momentum to stabilize convergence.\n\n4. **Adaptive Learning Rate Methods**: Introduction to advanced optimization methods like RMSprop and Adam, which adapt learning rates based on gradient steps, improving convergence speed and stability.\n\n5. **Training Results and Performance**: Results of training a model on the CIFAR-10 dataset, including accuracy and loss metrics for training, validation, and testing data. The document also compares the convergence rates of SGD and Adam, showing Adam's faster convergence.\n\n6. **Overfitting Visualization**: Presentation of training results before applying data augmentation, highlighting overfitting through differences in training and validation loss curves.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 1240
+        },
+        {
+          "document_id": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network:0013",
+          "node_id": "0013",
+          "title": "RMS prop",
+          "summary": "The partial document discusses optimization techniques for training machine learning models, focusing on improvements over gradient descent. It covers methods like Momentum and Nesterov Momentum, which aim to reduce oscillations and improve convergence by incorporating past gradients. The document also introduces adaptive learning rate methods such as RMSprop and Adam, highlighting their advantages in faster convergence compared to Stochastic Gradient Descent (SGD). Results from training a model on the CIFAR-10 dataset are presented, including accuracy and loss metrics for training, validation, and testing data. Figures and tables compare the performance of different optimization methods, showing Adam's superior convergence rate and addressing issues like overfitting.",
+          "source": "Cifar-10_Classification_using_Deep_Convolutional_Neural_Network.pdf",
+          "relevance_score": 3.0,
+          "is_leaf": true,
+          "content_words": 425
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "vector": {
+      "avg_latency_ms": 24346.3,
+      "avg_chunks": 3.0,
+      "avg_context_words": 1200.0,
+      "avg_relevance": 2.5,
+      "avg_relevance_density": 0.2083,
+      "avg_recall_at_k": 0.6778
+    },
+    "pageindex": {
+      "avg_latency_ms": 8017.1167,
+      "avg_chunks": 3.0,
+      "avg_context_words": 5455.5,
+      "avg_relevance": 2.165,
+      "avg_relevance_density": 0.0775,
+      "avg_recall_at_k": 0.5208
+    }
+  }
+}

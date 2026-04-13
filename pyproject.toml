@@ -7,7 +7,7 @@ name = "llm-guided-evolution"
 version = "0.1.0"
 description = "llm-guided-evolution, virtual environment that includes packages necessary for local llm integration & model evaluation."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12, <3.14"
 dependencies = [
     "accelerate>=0.20.0",
     "aiohttp>=3.8.0",
@@ -41,4 +41,5 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "tqdm>=4.64.0",
     "uvicorn>=0.20.0",
+    "vllm>=0.19.0",
 ]

@@ -121,9 +121,8 @@ def toc_detector_single_page(content, model=None):
     Please note: abstract,summary, notation list, figure list, table list, etc. are not table of contents."""
 
     response = ChatGPT_API(model=model, prompt=prompt)
-    # print('response', response)
-    json_content = extract_json(response)    
-    return json_content['toc_detected']
+    json_content = extract_json(response)
+    return json_content.get('toc_detected', 'no')
 
 
 def check_if_toc_extraction_is_complete(content, toc, model=None):
@@ -141,7 +140,7 @@ def check_if_toc_extraction_is_complete(content, toc, model=None):
     prompt = prompt + '\n Document:\n' + content + '\n Table of contents:\n' + toc
     response = ChatGPT_API(model=model, prompt=prompt)
     json_content = extract_json(response)
-    return json_content['completed']
+    return json_content.get('completed', 'no')
 
 
 def check_if_toc_transformation_is_complete(content, toc, model=None):
@@ -159,7 +158,7 @@ def check_if_toc_transformation_is_complete(content, toc, model=None):
     prompt = prompt + '\n Raw Table of contents:\n' + content + '\n Cleaned Table of contents:\n' + toc
     response = ChatGPT_API(model=model, prompt=prompt)
     json_content = extract_json(response)
-    return json_content['completed']
+    return json_content.get('completed', 'no')
 
 def extract_toc_content(content, model=None):
     prompt = f"""
@@ -175,29 +174,24 @@ def extract_toc_content(content, model=None):
     if if_complete == "yes" and finish_reason == "finished":
         return response
     
-    chat_history = [
-        {"role": "user", "content": prompt}, 
-        {"role": "assistant", "content": response},    
-    ]
-    prompt = f"""please continue the generation of table of contents , directly output the remaining part of the structure"""
-    new_response, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt, chat_history=chat_history)
-    response = response + new_response
-    if_complete = check_if_toc_transformation_is_complete(content, response, model)
-    
+    continuation_attempts = 0
+    max_continuations = 5
+
     while not (if_complete == "yes" and finish_reason == "finished"):
-        chat_history = [
-            {"role": "user", "content": prompt}, 
-            {"role": "assistant", "content": response},    
-        ]
-        prompt = f"""please continue the generation of table of contents , directly output the remaining part of the structure"""
-        new_response, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt, chat_history=chat_history)
+        continuation_attempts += 1
+        if continuation_attempts > max_continuations:
+            raise Exception('Failed to complete table of contents after maximum retries')
+
+        prompt = (
+            f"The original text was:\n{content}\n\n"
+            f"The incomplete extraction so far:\n{response}\n\n"
+            f"Please continue extracting the remaining table of contents. "
+            f"Output only the remaining part."
+        )
+        new_response, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt)
         response = response + new_response
         if_complete = check_if_toc_transformation_is_complete(content, response, model)
-        
-        # Optional: Add a maximum retry limit to prevent infinite loops
-        if len(chat_history) > 5:  # Arbitrary limit of 10 attempts
-            raise Exception('Failed to complete table of contents after maximum retries')
-    
+
     return response
 
 def detect_page_index(toc_content, model=None):
@@ -218,7 +212,7 @@ def detect_page_index(toc_content, model=None):
 
     response = ChatGPT_API(model=model, prompt=prompt)
     json_content = extract_json(response)
-    return json_content['page_index_given_in_toc']
+    return json_content.get('page_index_given_in_toc', 'no')
 
 def toc_extractor(page_list, toc_page_list, model):
     def transform_dots_to_colon(text):
@@ -273,6 +267,7 @@ def toc_index_extractor(toc, content, model=None):
 
 def toc_transformer(toc_content, model=None):
     print('start toc_transformer')
+    log = logging.getLogger("pageindex")
     init_prompt = """
     You are given a table of contents, You job is to transform the whole table of content into a JSON format included table_of_contents.
 
@@ -296,18 +291,27 @@ def toc_transformer(toc_content, model=None):
     last_complete, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt)
     if_complete = check_if_toc_transformation_is_complete(toc_content, last_complete, model)
     if if_complete == "yes" and finish_reason == "finished":
-        last_complete = extract_json(last_complete)
-        cleaned_response=convert_page_to_int(last_complete['table_of_contents'])
-        return cleaned_response
+        parsed = extract_json(last_complete)
+        if 'table_of_contents' in parsed:
+            cleaned_response=convert_page_to_int(parsed['table_of_contents'])
+            return cleaned_response
+        # Fall through to continuation if extract_json didn't return expected key
+        log.warning("[toc_transformer] extract_json returned keys=%s, falling through to continuation", list(parsed.keys()) if parsed else "empty")
     
     last_complete = get_json_content(last_complete)
+    continuation_attempts = 0
+    max_continuations = 10
     while not (if_complete == "yes" and finish_reason == "finished"):
+        continuation_attempts += 1
+        if continuation_attempts > max_continuations:
+            print(f"[toc_transformer] Max continuations ({max_continuations}) reached, using best effort result")
+            break
         position = last_complete.rfind('}')
         if position != -1:
             last_complete = last_complete[:position+2]
         prompt = f"""
         Your task is to continue the table of contents json structure, directly output the remaining part of the json structure.
-        The response should be in the following JSON format: 
+        The response should be in the following JSON format:
 
         The raw table of contents json structure is:
         {toc_content}
@@ -319,14 +323,17 @@ def toc_transformer(toc_content, model=None):
 
         new_complete, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt)
 
-        if new_complete.startswith('```json'):
-            new_complete =  get_json_content(new_complete)
-            last_complete = last_complete+new_complete
+        # Extract JSON content whether or not it starts with ```json
+        new_complete = get_json_content(new_complete)
+        if new_complete.strip():
+            last_complete = last_complete + new_complete
 
         if_complete = check_if_toc_transformation_is_complete(toc_content, last_complete, model)
         
 
-    last_complete = json.loads(last_complete)
+    last_complete = extract_json(last_complete)
+    if not last_complete or 'table_of_contents' not in last_complete:
+        raise Exception('Failed to parse table of contents JSON from model output')
 
     cleaned_response=convert_page_to_int(last_complete['table_of_contents'])
     return cleaned_response
@@ -500,34 +507,216 @@ def remove_first_physical_index_section(text):
     return text
 
 ### add verify completeness
+
+# Common section headings found in academic papers.  Used by
+# ``check_toc_completeness`` to detect sections the TOC may have missed.
+# Common section headings found in academic papers.  Used by
+# ``check_toc_completeness`` to detect sections the TOC may have missed.
+# Excludes overly generic words ("Data", "Dataset") that cause false positives
+# when they appear as table labels or body text.
+_COMMON_HEADINGS = [
+    "Abstract", "Introduction", "Background", "Related Work",
+    "Literature Review", "Method", "Methods", "Methodology",
+    "Experimental Setup", "Experiments",
+    "Results", "Evaluation", "Discussion", "Analysis",
+    "Conclusion", "Conclusions", "Summary",
+    "Future Work", "Limitations",
+    "Acknowledgments", "Acknowledgements", "Acknowledgment",
+    "References", "Bibliography",
+]
+
+
+def _intra_char_pattern(word):
+    """Build a regex allowing optional whitespace between characters of *word*.
+
+    Handles PDF extraction artifacts like "R ESULTS" for "RESULTS".
+    """
+    return r'\s*'.join(re.escape(c) for c in word)
+
+
+def check_toc_completeness(toc_items, page_list, start_index=1):
+    """Scan document text for common section headings missing from the TOC.
+
+    For each heading found in the text (as a line-start match) that isn't
+    already covered by an existing TOC entry, append a new entry so that
+    sections like Results, Conclusion, and References are never silently
+    absorbed into a neighbour.
+
+    Handles PDF extraction artifacts where intra-word spaces appear
+    (e.g. "R ESULTS" instead of "RESULTS").
+
+    Returns the (possibly extended) toc_items list.
+    """
+    if not toc_items:
+        return toc_items
+
+    # Build concatenated text with page-boundary tracking
+    combined = ""
+    page_char_starts = {}
+    for pn in range(len(page_list)):
+        page_char_starts[pn + start_index] = len(combined)
+        combined += page_list[pn][0]
+
+    # Collect existing TOC titles (normalised) for dedup
+    existing = set()
+    for item in toc_items:
+        title = item.get('title', '').strip()
+        existing.add(title.lower())
+        # Also add without leading numbering (e.g. "VI. RESULTS" → "results")
+        stripped = re.sub(r'^[IVXLC]+\.\s*', '', title, flags=re.IGNORECASE).strip()
+        # Collapse intra-word spaces for dedup (e.g. "R EDUCING" → "reducing")
+        collapsed = re.sub(r'\s+', '', stripped).lower()
+        existing.add(stripped.lower())
+        existing.add(collapsed)
+
+    # Determine next structure index for appended items
+    max_top = 0
+    for item in toc_items:
+        struct = item.get('structure', '0')
+        top_level = struct.split('.')[0] if struct else '0'
+        try:
+            max_top = max(max_top, int(top_level))
+        except ValueError:
+            pass
+    next_struct = max_top + 1
+
+    added = []
+    for heading in _COMMON_HEADINGS:
+        if heading.lower() in existing:
+            continue
+
+        # Build intra-char variant for the heading (handles "R ESULTS" etc.)
+        heading_intra = _intra_char_pattern(heading)
+
+        # Search for the heading.  All patterns use intra-char whitespace
+        # to handle PDF extraction artifacts like "R ESULTS" for "RESULTS".
+        #
+        # Multi-column PDF extraction can squeeze a heading mid-line, e.g.
+        # "wt = wt-1- αgt VI. R ESULTS\n".  For headings carrying a Roman
+        # numeral prefix, the prefix itself is a strong signal that it's a
+        # heading, so we relax the line-start requirement.  Plain headings
+        # without a numeral still require a line-start match to avoid
+        # matching body text occurrences of the word.
+        patterns = [
+            # Plain heading on its own line
+            r'(?:^|\n)\s*' + heading_intra + r'\s*(?:\n|$)',
+            # With Roman numeral prefix — allow mid-line start but still
+            # require end-of-line after the heading
+            r'\b[IVXLC]+\.\s*' + heading_intra + r'\s*(?:\n|$)',
+        ]
+
+        match = None
+        for pat in patterns:
+            match = re.search(pat, combined, re.IGNORECASE)
+            if match:
+                break
+        if not match:
+            continue
+
+        # Determine the page this heading appears on
+        match_pos = match.start()
+        page_num = start_index
+        for pn in sorted(page_char_starts.keys()):
+            if page_char_starts[pn] <= match_pos:
+                page_num = pn
+            else:
+                break
+
+        # Extract the actual matched title text (trimmed)
+        matched_text = match.group(0).strip()
+
+        print(f'[toc_completeness] found missing heading: "{matched_text}" on page {page_num}')
+
+        added.append({
+            'structure': str(next_struct),
+            'title': matched_text,
+            'physical_index': page_num,
+            'appear_start': 'yes',
+        })
+        existing.add(heading.lower())
+        existing.add(matched_text.lower())
+        next_struct += 1
+
+    if added:
+        toc_items = list(toc_items) + added
+        print(f'[toc_completeness] added {len(added)} missing section(s)')
+
+    return toc_items
+
+
+def validate_toc(toc_items, page_contents_raw):
+    """Deterministic post-LLM validation of TOC entries.
+
+    1. Remove entries with no physical_index.
+    2. Deduplicate by title (case-insensitive, keep first occurrence).
+    3. Verify each title exists in the source text via find_title_offset();
+       drop entries whose titles cannot be located.
+    """
+    if not toc_items:
+        return toc_items
+
+    # Strip physical_index tags to get clean document text for matching
+    clean_text = re.sub(r'</?physical_index_\d+>\n?', '', page_contents_raw)
+
+    # Step 1: remove entries with no physical_index
+    filtered = [item for item in toc_items if item.get('physical_index') is not None]
+
+    # Step 2: deduplicate by title
+    seen_titles = set()
+    deduped = []
+    for item in filtered:
+        key = item.get('title', '').strip().lower()
+        if not key:
+            continue
+        if key in seen_titles:
+            print(f'[validate_toc] dropping duplicate section: {item.get("title")}')
+            continue
+        seen_titles.add(key)
+        deduped.append(item)
+
+    # Step 3: verify titles exist in source text
+    verified = []
+    for item in deduped:
+        title = item.get('title', '')
+        offset = find_title_offset(clean_text, title)
+        if offset is not None:
+            verified.append(item)
+        else:
+            print(f'[validate_toc] dropping section (title not found in text): {title}')
+
+    return verified
+
+
 def generate_toc_continue(toc_content, part, model="gpt-4o-2024-11-20"):
     print('start generate_toc_continue')
-    prompt = """
-    You are an expert in extracting hierarchical tree structure.
-    You are given a tree structure of the previous part and the text of the current part.
-    Your task is to continue the tree structure from the previous part to include the current part.
+    prompt = """You are an expert at extracting the hierarchical table of contents from a document.
 
-    The structure variable is the numeric system which represents the index of the hierarchy section in the table of contents. For example, the first section has structure index 1, the first subsection has structure index 1.1, the second subsection has structure index 1.2, etc.
+You are given:
+1. A tree structure extracted from the PREVIOUS part of the document.
+2. The text of the CURRENT part of the document.
 
-    For the title, you need to extract the original title from the text, only fix the space inconsistency.
+TASK: Extract ONLY the NEW section headings that appear in the current part and are NOT already listed in the previous tree structure. Do NOT repeat any section from the previous structure.
 
-    The provided text contains tags like <physical_index_X> and <physical_index_X> to indicate the start and end of page X. \
-    
-    For the physical_index, you need to extract the physical index of the start of the section from the text. Keep the <physical_index_X> format.
+RULES:
+1. Only extract ACTUAL SECTION HEADINGS (numbered headings, standalone heading lines). Do NOT list body-text mentions.
+2. Copy titles exactly as they appear in the text, only normalizing whitespace.
+3. The "structure" numbering must continue from where the previous tree left off.
+4. The "physical_index" is the <physical_index_X> tag where the section STARTS.
+5. If a section from the previous tree continues into the current part, do NOT re-list it.
+6. If the current part contains NO new sections, return an empty array: []
 
-    The response should be in the following format. 
-        [
-            {
-                "structure": <structure index, "x.x.x"> (string),
-                "title": <title of the section, keep the original title>,
-                "physical_index": "<physical_index_X> (keep the format)"
-            },
-            ...
-        ]    
+OUTPUT FORMAT — a JSON array of NEW sections only:
+[
+    {
+        "structure": <structure index, continuing from previous>,
+        "title": <exact title from text>,
+        "physical_index": "<physical_index_X>"
+    }
+]
 
-    Directly return the additional part of the final JSON structure. Do not output anything else."""
+Directly return the JSON array of NEW sections only. Do not output anything else."""
 
-    prompt = prompt + '\nGiven text\n:' + part + '\nPrevious tree structure\n:' + json.dumps(toc_content, indent=2)
+    prompt = prompt + '\nCurrent text\n:' + part + '\nPrevious tree structure\n:' + json.dumps(toc_content, indent=2)
     response, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt)
     if finish_reason == 'finished':
         return extract_json(response)
@@ -537,29 +726,30 @@ def generate_toc_continue(toc_content, part, model="gpt-4o-2024-11-20"):
 ### add verify completeness
 def generate_toc_init(part, model=None):
     print('start generate_toc_init')
-    prompt = """
-    You are an expert in extracting hierarchical tree structure, your task is to generate the tree structure of the document.
+    prompt = """You are an expert at extracting the hierarchical table of contents from a document.
 
-    The structure variable is the numeric system which represents the index of the hierarchy section in the table of contents. For example, the first section has structure index 1, the first subsection has structure index 1.1, the second subsection has structure index 1.2, etc.
+TASK: Given the full text of a document with page markers, produce a JSON list of all section headings in the order they appear.
 
-    For the title, you need to extract the original title from the text, only fix the space inconsistency.
+RULES:
+1. Only extract ACTUAL SECTION HEADINGS that appear in the document (e.g., numbered headings like "I. INTRODUCTION", "II. METHOD", or standalone heading lines like "Abstract", "Conclusion", "References"). Do NOT list body-text mentions of topics as sections.
+2. Every title you output MUST appear verbatim in the text as a heading. Copy the title exactly as written, only normalizing extra whitespace between or within words.
+3. Do NOT invent or paraphrase section titles. If a heading reads "IV. REDUCING OVERFITTING", output exactly that — not "Reducing Overfitting" or "Overfitting".
+4. The "structure" field is hierarchical numbering: "1" for top-level sections, "1.1" for the first subsection of section 1, "1.2" for the second, etc.
+5. The "physical_index" is the <physical_index_X> tag where the section STARTS. Keep the tag format.
+6. List ALL sections from the very beginning (title page, abstract) through the end (conclusion, acknowledgments, references).
+7. If a section heading like "Discussion" only appears as a word within the body text of another section (e.g., inside "Results"), do NOT list it as a separate section.
 
-    The provided text contains tags like <physical_index_X> and <physical_index_X> to indicate the start and end of page X. 
+The text contains page boundary markers: <physical_index_X> ... <physical_index_X> around page X.
 
-    For the physical_index, you need to extract the physical index of the start of the section from the text. Keep the <physical_index_X> format.
+OUTPUT FORMAT — a JSON array, nothing else:
+[
+    {{"structure": "1", "title": "ABSTRACT", "physical_index": "<physical_index_1>"}},
+    {{"structure": "2", "title": "Introduction", "physical_index": "<physical_index_1>"}},
+    {{"structure": "3", "title": "Method", "physical_index": "<physical_index_2>"}},
+    {{"structure": "3.1", "title": "Dataset", "physical_index": "<physical_index_2>"}}
+]
 
-    The response should be in the following format. 
-        [
-            {{
-                "structure": <structure index, "x.x.x"> (string),
-                "title": <title of the section, keep the original title>,
-                "physical_index": "<physical_index_X> (keep the format)"
-            }},
-            
-        ],
-
-
-    Directly return the final JSON structure. Do not output anything else."""
+Directly return the JSON array. Do not output anything else."""
 
     prompt = prompt + '\nGiven text\n:' + part
     response, finish_reason = ChatGPT_API_with_finish_reason(model=model, prompt=prompt)
@@ -581,9 +771,20 @@ def process_no_toc(page_list, start_index=1, model=None, logger=None):
 
     toc_with_page_number= generate_toc_init(group_texts[0], model)
     for group_text in group_texts[1:]:
-        toc_with_page_number_additional = generate_toc_continue(toc_with_page_number, group_text, model)    
+        toc_with_page_number_additional = generate_toc_continue(toc_with_page_number, group_text, model)
+        # Dedup: remove sections whose titles already exist
+        existing_titles = {item.get('title', '').strip().lower() for item in toc_with_page_number}
+        toc_with_page_number_additional = [
+            item for item in toc_with_page_number_additional
+            if item.get('title', '').strip().lower() not in existing_titles
+        ]
         toc_with_page_number.extend(toc_with_page_number_additional)
     logger.info(f'generate_toc: {toc_with_page_number}')
+
+    # Validate TOC: dedup, verify titles exist in source text, remove None-index entries
+    all_page_text = ''.join(page_contents)
+    toc_with_page_number = validate_toc(toc_with_page_number, all_page_text)
+    logger.info(f'validate_toc: {toc_with_page_number}')
 
     toc_with_page_number = convert_physical_index_to_int(toc_with_page_number)
     logger.info(f'convert_physical_index_to_int: {toc_with_page_number}')
@@ -748,8 +949,8 @@ def single_toc_item_index_fixer(section_title, content, model="gpt-4o-2024-11-20
 
     prompt = toc_extractor_prompt + '\nSection Title:\n' + str(section_title) + '\nDocument pages:\n' + content
     response = ChatGPT_API(model=model, prompt=prompt)
-    json_content = extract_json(response)    
-    return convert_physical_index_to_int(json_content['physical_index'])
+    json_content = extract_json(response)
+    return convert_physical_index_to_int(json_content.get('physical_index'))
 
 
 
@@ -1005,21 +1206,24 @@ async def process_large_node_recursively(node, page_list, opt=None, logger=None)
     node_page_list = page_list[node['start_index']-1:node['end_index']]
     token_num = sum([page[1] for page in node_page_list])
     
-    if node['end_index'] - node['start_index'] > opt.max_page_num_each_node and token_num >= opt.max_token_num_each_node:
+    if node['end_index'] - node['start_index'] > opt.max_page_num_each_node or token_num >= opt.max_token_num_each_node:
         print('large node:', node['title'], 'start_index:', node['start_index'], 'end_index:', node['end_index'], 'token_num:', token_num)
 
-        node_toc_tree = await meta_processor(node_page_list, mode='process_no_toc', start_index=node['start_index'], opt=opt, logger=logger)
-        node_toc_tree = await check_title_appearance_in_start_concurrent(node_toc_tree, page_list, model=opt.model, logger=logger)
-        
-        # Filter out items with None physical_index before post_processing
-        valid_node_toc_items = [item for item in node_toc_tree if item.get('physical_index') is not None]
-        
-        if valid_node_toc_items and node['title'].strip() == valid_node_toc_items[0]['title'].strip():
-            node['nodes'] = post_processing(valid_node_toc_items[1:], node['end_index'])
-            node['end_index'] = valid_node_toc_items[1]['start_index'] if len(valid_node_toc_items) > 1 else node['end_index']
-        else:
-            node['nodes'] = post_processing(valid_node_toc_items, node['end_index'])
-            node['end_index'] = valid_node_toc_items[0]['start_index'] if valid_node_toc_items else node['end_index']
+        try:
+            node_toc_tree = await meta_processor(node_page_list, mode='process_no_toc', start_index=node['start_index'], opt=opt, logger=logger)
+            node_toc_tree = await check_title_appearance_in_start_concurrent(node_toc_tree, page_list, model=opt.model, logger=logger)
+
+            # Filter out items with None physical_index before post_processing
+            valid_node_toc_items = [item for item in node_toc_tree if item.get('physical_index') is not None]
+
+            if valid_node_toc_items and node['title'].strip() == valid_node_toc_items[0]['title'].strip():
+                node['nodes'] = post_processing(valid_node_toc_items[1:], node['end_index'])
+                node['end_index'] = valid_node_toc_items[1]['start_index'] if len(valid_node_toc_items) > 1 else node['end_index']
+            else:
+                node['nodes'] = post_processing(valid_node_toc_items, node['end_index'])
+                node['end_index'] = valid_node_toc_items[0]['start_index'] if valid_node_toc_items else node['end_index']
+        except Exception as exc:
+            print(f'[WARN] Could not sub-divide large node "{node["title"]}": {exc}. Keeping as single node.')
         
     if 'nodes' in node and node['nodes']:
         tasks = [
@@ -1038,29 +1242,47 @@ async def tree_parser(page_list, opt, doc=None, logger=None):
     check_toc_result = check_toc(page_list, opt)
     logger.info(check_toc_result)
 
-    if check_toc_result.get("toc_content") and check_toc_result["toc_content"].strip() and check_toc_result["page_index_given_in_toc"] == "yes":
+    toc_content = check_toc_result.get("toc_content")
+    has_toc = bool(toc_content and toc_content.strip())
+    has_page_index = check_toc_result.get("page_index_given_in_toc") == "yes"
+
+    if has_toc and has_page_index:
         toc_with_page_number = await meta_processor(
-            page_list, 
-            mode='process_toc_with_page_numbers', 
-            start_index=1, 
-            toc_content=check_toc_result['toc_content'], 
-            toc_page_list=check_toc_result['toc_page_list'], 
+            page_list,
+            mode='process_toc_with_page_numbers',
+            start_index=1,
+            toc_content=toc_content,
+            toc_page_list=check_toc_result['toc_page_list'],
+            opt=opt,
+            logger=logger)
+    elif has_toc:
+        toc_with_page_number = await meta_processor(
+            page_list,
+            mode='process_toc_no_page_numbers',
+            start_index=1,
+            toc_content=toc_content,
+            toc_page_list=check_toc_result['toc_page_list'],
             opt=opt,
             logger=logger)
     else:
         toc_with_page_number = await meta_processor(
-            page_list, 
-            mode='process_no_toc', 
-            start_index=1, 
+            page_list,
+            mode='process_no_toc',
+            start_index=1,
             opt=opt,
             logger=logger)
 
     toc_with_page_number = add_preface_if_needed(toc_with_page_number)
+
+    # Check for common section headings missing from the TOC
+    toc_with_page_number = check_toc_completeness(toc_with_page_number, page_list)
+    logger.info(f'check_toc_completeness: {toc_with_page_number}')
+
     toc_with_page_number = await check_title_appearance_in_start_concurrent(toc_with_page_number, page_list, model=opt.model, logger=logger)
-    
+
     # Filter out items with None physical_index before post_processings
     valid_toc_items = [item for item in toc_with_page_number if item.get('physical_index') is not None]
-    
+
     toc_tree = post_processing(valid_toc_items, len(page_list))
     tasks = [
         process_large_node_recursively(node, page_list, opt, logger=logger)
@@ -1093,13 +1315,24 @@ def page_index_main(doc, opt=None):
 
     async def page_index_builder():
         structure = await tree_parser(page_list, opt, doc=doc, logger=logger)
+
+        # Post-processing: structural repairs
+        remove_bogus_nodes(structure)
+        fix_parent_child_page_ranges(structure)
+
         if opt.if_add_node_id == 'yes':
-            write_node_id(structure)    
+            write_node_id(structure)
         if opt.if_add_node_text == 'yes':
-            add_node_text(structure, page_list)
+            fix_node_ranges(structure)
+            compute_all_section_offsets(structure, page_list)
+            add_node_text_deduped(structure, page_list)
+            recover_empty_nodes(structure, page_list)
         if opt.if_add_node_summary == 'yes':
             if opt.if_add_node_text == 'no':
-                add_node_text(structure, page_list)
+                fix_node_ranges(structure)
+                compute_all_section_offsets(structure, page_list)
+                add_node_text_deduped(structure, page_list)
+                recover_empty_nodes(structure, page_list)
             await generate_summaries_for_structure(structure, model=opt.model)
             if opt.if_add_node_text == 'no':
                 remove_structure_text(structure)

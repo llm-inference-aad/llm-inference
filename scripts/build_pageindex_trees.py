@@ -7,12 +7,13 @@ Results are cached in rag_data/pageindex_trees/.
 
 Usage:
     python scripts/build_pageindex_trees.py
-    python scripts/build_pageindex_trees.py --model gpt-4o-2024-11-20
+    python scripts/build_pageindex_trees.py --model local_server
     python scripts/build_pageindex_trees.py --corpus-dir rag_corpus --output-dir rag_data/pageindex_trees
 """
 
 import argparse
 import json
+import logging
 import os
 import sys
 from pathlib import Path
@@ -28,7 +29,7 @@ DEFAULT_CORPUS_DIR = REPO_ROOT / "rag_corpus"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "rag_data" / "pageindex_trees"
 
 
-def build_trees(corpus_dir: Path, output_dir: Path, model: str) -> None:
+def build_trees(corpus_dir: Path, output_dir: Path, model: str, force: bool = False) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     pdfs = sorted(corpus_dir.glob("*.pdf"))
@@ -49,9 +50,13 @@ def build_trees(corpus_dir: Path, output_dir: Path, model: str) -> None:
         stem = pdf_path.stem
         out_path = output_dir / f"{stem}_structure.json"
 
-        if out_path.exists():
+        if out_path.exists() and not force:
             print(f"  [skip] {stem} — tree already exists at {out_path}")
             continue
+
+        if out_path.exists() and force:
+            print(f"  [force] Removing existing tree: {out_path}")
+            out_path.unlink()
 
         print(f"  Building tree for: {pdf_path.name} ...")
         try:
@@ -79,8 +84,8 @@ def build_trees(corpus_dir: Path, output_dir: Path, model: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build PageIndex trees for corpus PDFs")
     parser.add_argument(
-        "--model", type=str, default="gpt-4o-2024-11-20",
-        help="OpenAI model for tree building (default: gpt-4o-2024-11-20)",
+        "--model", type=str, default="local_server",
+        help="Model for tree building (default: local_server)",
     )
     parser.add_argument(
         "--corpus-dir", type=str, default=str(DEFAULT_CORPUS_DIR),
@@ -90,12 +95,27 @@ def main() -> None:
         "--output-dir", type=str, default=str(DEFAULT_OUTPUT_DIR),
         help="Directory to save tree JSON files",
     )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Delete existing trees and rebuild from scratch",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true",
+        help="Enable DEBUG logging for pageindex LLM calls",
+    )
     args = parser.parse_args()
+
+    level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(
+        format="%(asctime)s %(name)s %(levelname)s: %(message)s",
+        level=level,
+    )
 
     build_trees(
         corpus_dir=Path(args.corpus_dir),
         output_dir=Path(args.output_dir),
         model=args.model,
+        force=args.force,
     )
 
 
