@@ -284,15 +284,19 @@ def load_rag_usage(run_dir: Path) -> Dict[str, Any]:
             "rag_nonempty_fraction": None,
             "avg_retrieved_code_n": None,
             "avg_retrieved_text_n": None,
+            "avg_retrieved_memory_n": None,
             "avg_context_words_code": None,
             "avg_context_words_text": None,
+            "avg_context_words_memory": None,
         }
 
     code_ns = [int(e.get("retrieved_code_n") or 0) for e in context_events]
     text_ns = [int(e.get("retrieved_text_n") or 0) for e in context_events]
-    nonempty = [1 for c, t in zip(code_ns, text_ns) if (c + t) > 0]
+    memory_ns = [int(e.get("retrieved_memory_n") or 0) for e in context_events]
+    nonempty = [1 for c, t, m in zip(code_ns, text_ns, memory_ns) if (c + t + m) > 0]
     words_code = [int(e.get("context_words_code") or 0) for e in context_events]
     words_text = [int(e.get("context_words_text") or 0) for e in context_events]
+    words_memory = [int(e.get("context_words_memory") or 0) for e in context_events]
 
     def _avg(xs: List[int]) -> float:
         return float(sum(xs) / max(len(xs), 1))
@@ -303,8 +307,10 @@ def load_rag_usage(run_dir: Path) -> Dict[str, Any]:
         "rag_nonempty_fraction": len(nonempty) / max(len(context_events), 1),
         "avg_retrieved_code_n": _avg(code_ns),
         "avg_retrieved_text_n": _avg(text_ns),
+        "avg_retrieved_memory_n": _avg(memory_ns),
         "avg_context_words_code": _avg(words_code),
         "avg_context_words_text": _avg(words_text),
+        "avg_context_words_memory": _avg(words_memory),
     }
 
 
@@ -396,6 +402,7 @@ def main() -> None:
             "rag_nonempty_fraction": rag_usage.get("rag_nonempty_fraction"),
             "avg_retrieved_code_n": rag_usage.get("avg_retrieved_code_n"),
             "avg_retrieved_text_n": rag_usage.get("avg_retrieved_text_n"),
+            "avg_retrieved_memory_n": rag_usage.get("avg_retrieved_memory_n"),
         }
         write_csv_row(Path(args.csv_out), row)
         print(f"Appended row to {args.csv_out}")

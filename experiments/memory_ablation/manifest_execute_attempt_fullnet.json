@@ -1,0 +1,42 @@
+{
+  "matrix_id": "20260315_142104",
+  "created_at": "2026-03-15T14:21:04-04:00",
+  "planned_runs": [
+    {
+      "condition": "memory_off",
+      "seed": 0,
+      "run_id": "memory_off_seed0_20260315_142104",
+      "env": {
+        "RUN_ID": "memory_off_seed0_20260315_142104",
+        "NUM_GENERATIONS": "1",
+        "POPULATION_SIZE": "4",
+        "START_POPULATION_SIZE": "4",
+        "EXPERIMENT_SEED": "0",
+        "RAG_ENABLED": "true",
+        "RAG_USE_CODE_CONTEXT": "true",
+        "RAG_USE_TEXT_CONTEXT": "true",
+        "RAG_RERANKER_ENABLED": "false",
+        "RAG_MEMORY_TOP_K": "3",
+        "RAG_MEMORY_STORE_ENABLED": "false"
+      }
+    },
+    {
+      "condition": "memory_on",
+      "seed": 0,
+      "run_id": "memory_on_seed0_20260315_142104",
+      "env": {
+        "RUN_ID": "memory_on_seed0_20260315_142104",
+        "NUM_GENERATIONS": "1",
+        "POPULATION_SIZE": "4",
+        "START_POPULATION_SIZE": "4",
+        "EXPERIMENT_SEED": "0",
+        "RAG_ENABLED": "true",
+        "RAG_USE_CODE_CONTEXT": "true",
+        "RAG_USE_TEXT_CONTEXT": "true",
+        "RAG_RERANKER_ENABLED": "false",
+        "RAG_MEMORY_TOP_K": "3",
+        "RAG_MEMORY_STORE_ENABLED": "true"
+      }
+    }
+  ]
+}
