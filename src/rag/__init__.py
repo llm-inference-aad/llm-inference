@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from . import data_ingestion, embeddings, memory_store, prompt_enhancer, retrieval, vector_db
+from . import backends, data_ingestion, embeddings, memory_store, prompt_enhancer, retrieval, vector_db
 
 __all__ = [
+    "backends",
     "data_ingestion",
     "embeddings",
     "memory_store",
@@ -12,6 +13,3 @@ __all__ = [
     "retrieval",
     "vector_db",
 ]
-
-
-

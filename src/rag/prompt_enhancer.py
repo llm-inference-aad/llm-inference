@@ -18,9 +18,10 @@ from cfg.constants import (
     RUN_ID,
 )
 
+from .backends.base import RetrievalBackend
 from .memory_store import MemoryStore
 from .reranker import Reranker
-from .retrieval import RetrievedContext, RetrievedMutation, RetrievalService, RetrievalStats
+from .retrieval import RetrievedContext, RetrievedMutation, RetrievalStats
 from utils.rag_metrics import record_metric
 
 # M4: Maximum lines of query code sent to cross-encoder to avoid CPU bottleneck
@@ -50,7 +51,7 @@ class PromptEnhancer:
 
     def __init__(
         self,
-        retrieval_service: RetrievalService,
+        retrieval_service: RetrievalBackend,
         config: PromptEnhancerConfig | None = None,
         memory_store: MemoryStore | None = None,
     ):
@@ -206,6 +207,7 @@ class PromptEnhancer:
         text_contexts, text_stats = self.build_text_context_with_stats(
             query_code=query_code, mutation_type=mutation_type
         )
+        memory_entries = []
 
         # Rerank both result sets if enabled
         reranker_used = False
@@ -295,10 +297,13 @@ class PromptEnhancer:
                     "min_similarity": RAG_MIN_SIMILARITY,
                     "retrieved_code_n": len(mutations),
                     "retrieved_text_n": len(text_contexts),
+                    "retrieved_memory_n": len(memory_entries),
                     "selected_doc_ids_code": [m.gene_id for m in mutations],
                     "selected_doc_ids_text": [c.document_id for c in text_contexts],
+                    "selected_doc_ids_memory": [m.document_id for m in memory_entries],
                     "context_words_code": sum(len((m.code or "").split()) for m in mutations),
                     "context_words_text": sum(len((c.content or "").split()) for c in text_contexts),
+                    "context_words_memory": sum(len((m.content or "").split()) for m in memory_entries),
                     "code_search": None
                     if code_stats is None
                     else {
