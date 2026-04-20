@@ -327,9 +327,14 @@ echo "Server job submitted with ID: ${SERVER_JOB_ID}"
 echo "${SERVER_JOB_ID}" > "${HOSTNAME_LOG_FILE%.log}_server_job.txt"
 
 echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
-# Capture the exit code before the trap fires so cleanup_server can read it.
-EVOLUTION_EXIT_CODE=0
-uv run python run_improved.py "${RUN_DIR}/checkpoints" || EVOLUTION_EXIT_CODE=$?
+# EVOLUTION_EXIT_CODE is left UNSET until Python actually returns.  Seeding it
+# to 0 here would make the trap mis-read an interruption (SIGTERM arriving
+# mid-Python, before the `|| rc=$?` branch) as a clean completion.  Leaving it
+# unset lets cleanup_server's ${EVOLUTION_EXIT_CODE:-1} default fall through to
+# "cancelled" in the interrupted case.
+_python_rc=0
+uv run python run_improved.py "${RUN_DIR}/checkpoints" || _python_rc=$?
+EVOLUTION_EXIT_CODE=$_python_rc
 export EVOLUTION_EXIT_CODE
 
 # If the evolution succeeded, the cleanup trap (EXIT) will set status=completed.
