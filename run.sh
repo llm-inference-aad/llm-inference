@@ -177,6 +177,10 @@ nvidia-smi || true
 # The function inspects the exit code of the main Python process (captured in
 # $EVOLUTION_EXIT_CODE) rather than $? inside the trap, because traps reset $?
 # to their own return value.
+#
+# NOTE: the body of this function is mirrored in tests/test_run_teardown.sh so
+# the teardown logic can be exercised without loading SLURM/CUDA modules.  Keep
+# the two in sync when editing.
 # =============================================================================
 cleanup_server() {
   local exit_code="${EVOLUTION_EXIT_CODE:-1}"
