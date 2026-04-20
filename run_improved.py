@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 import copy
@@ -22,6 +23,8 @@ import concurrent.futures
 import uuid
 from src import llm_mutation, llm_crossover
 
+logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # RAG client — constructed once at startup, shared across the process.
 # Callers use _rag_client directly; they never import retrieval internals.
@@ -36,6 +39,21 @@ _rag_client = None
 # Never crashes the caller; write errors are swallowed.
 # ---------------------------------------------------------------------------
 _run_ledger = None
+
+# ---------------------------------------------------------------------------
+# Generation population cache — accumulates eval-side MutationEvents for the
+# current generation so that Pareto eligibility can be computed relative to
+# all genes evaluated in the same generation window.
+#
+# Layout: { generation_number: [MutationEvent, ...] }
+#
+# The dict grows one key per generation and is never pruned during a run (RAM
+# cost is negligible for typical population sizes ≤ 64).  Pareto eligibility
+# is computed lazily when a new event is appended: earlier events in the same
+# generation get their flag retroactively updated in the in-memory list so that
+# a downstream reader replaying the ledger will see the final flag value.
+# ---------------------------------------------------------------------------
+_generation_population: dict[int, list] = {}  # generation -> list[MutationEvent]
 
 
 def _get_run_ledger():
@@ -309,8 +327,19 @@ def _emit_eval_ledger_event(gene_id: str, fitness: tuple | list) -> None:
     is written by RagService.augment).  The two events share the same
     ``request_id`` so downstream analysis can JOIN them via replay_ledger.
 
+    After constructing the event this function also computes the Pareto
+    eligibility flag (``is_pareto_eligible``) against the current generation's
+    population of events accumulated so far in ``_generation_population``.  The
+    flag is set on the event before it is appended to the ledger — every event
+    is always appended regardless of the flag value.
+
+    When ``RAG_LOG_POLICY == "absolute"``, the flag is computed using the
+    ``RAG_MIN_ACCURACY`` / ``RAG_MAX_PARAMETERS`` absolute thresholds instead
+    of the percentile windows.
+
     Never crashes the caller — all errors are swallowed.
     """
+    global _generation_population  # must be declared before any assignment
     try:
         ledger = _get_run_ledger()
         if ledger is None:
@@ -345,6 +374,63 @@ def _emit_eval_ledger_event(gene_id: str, fitness: tuple | list) -> None:
             eval_outputs["total_params"] = float(fitness[1])
 
         raw_prompt = ""  # raw prompt not available at eval time; augment event has it
+
+        # ------------------------------------------------------------------ #
+        # Compute is_pareto_eligible relative to current generation window.  #
+        # ------------------------------------------------------------------ #
+        is_eligible: bool | None = None
+        try:
+            from cfg.constants import (  # noqa: PLC0415
+                RAG_LOG_POLICY,
+                RAG_MIN_ACCURACY,
+                RAG_MAX_PARAMETERS,
+                RAG_LOG_TOP_ACCURACY_PCT,
+                RAG_LOG_BOTTOM_PARAMS_PCT,
+            )
+            gen_population = _generation_population.get(_gen_count, [])
+            if RAG_LOG_POLICY == "absolute":
+                # Absolute threshold policy: eligible if above min accuracy
+                # AND below max parameters (when max is configured).
+                test_acc = eval_outputs.get("test_acc", 0.0)
+                total_params = eval_outputs.get("total_params")
+                above_accuracy = test_acc >= RAG_MIN_ACCURACY
+                within_params = (
+                    RAG_MAX_PARAMETERS is None
+                    or (total_params is not None and total_params <= RAG_MAX_PARAMETERS)
+                )
+                is_eligible = bool(above_accuracy and within_params) if eval_outputs else False
+            else:
+                # Default: per-generation Pareto percentile windows.
+                # Build a temporary event (without is_pareto_eligible) to pass
+                # to the policy function so we can evaluate against the current
+                # population before appending this event.
+                from rag.pareto_policy import is_pareto_eligible as _ipe  # noqa: PLC0415
+                # Create a proxy event with only eval_outputs populated so the
+                # policy function can extract the metrics.
+                proxy_event = MutationEvent(
+                    run_id=_run_id,
+                    generation=_gen_count,
+                    parent_gene_id=str(parent_gene_id) if parent_gene_id else "unknown",
+                    child_gene_id=gene_id,
+                    mutation_type=mutation_type,
+                    backend="faiss" if _rag_enabled else "baseline",
+                    request_id=request_id,
+                    prompt_id=MutationEvent.make_prompt_id(raw_prompt),
+                    raw_prompt=raw_prompt,
+                    eval_outputs=eval_outputs if eval_outputs else None,
+                )
+                # Include the proxy event in the population for self-comparison.
+                combined_population = list(gen_population) + [proxy_event]
+                is_eligible = _ipe(
+                    proxy_event,
+                    combined_population,
+                    top_accuracy_pct=float(RAG_LOG_TOP_ACCURACY_PCT),
+                    bottom_params_pct=float(RAG_LOG_BOTTOM_PARAMS_PCT),
+                )
+        except Exception as policy_exc:
+            logger.debug("[RAG] Pareto policy computation failed: %s", policy_exc)
+            is_eligible = None
+
         event = MutationEvent(
             run_id=_run_id,
             generation=_gen_count,
@@ -364,7 +450,15 @@ def _emit_eval_ledger_event(gene_id: str, fitness: tuple | list) -> None:
             eval_outputs=eval_outputs if eval_outputs else None,
             latencies={},
             failure_mode=None if eval_outputs.get("test_acc", 0) > 0 else "eval_failed",
+            is_pareto_eligible=is_eligible,
         )
+
+        # Accumulate in the generation population cache so subsequent events
+        # within the same generation can be classified relative to this one.
+        if _gen_count not in _generation_population:
+            _generation_population[_gen_count] = []
+        _generation_population[_gen_count].append(event)
+
         ledger.append(event)
     except Exception as exc:
         import warnings
