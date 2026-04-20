@@ -242,8 +242,22 @@ mkdir -p "${RUN_METRICS_DIR}/gpu"
 nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${RUN_METRICS_DIR}/gpu/server-${SLURM_JOB_ID}.csv" &
 MONITOR_PID=$!
 
-# Ensure monitor is killed when script exits
-trap "kill $MONITOR_PID" EXIT
+# UVICORN_PID is set after the uvicorn launch below; declare it here so the trap
+# can reference it even if the process hasn't started yet.
+UVICORN_PID=""
+
+# On EXIT/SIGTERM: gracefully stop uvicorn so vLLM flushes buffered stdout to
+# the SLURM .out file before the job terminates. Uvicorn's default graceful
+# shutdown window is 30 s, but 5 s is enough for log flushing in practice.
+_server_cleanup() {
+  if [[ -n "${UVICORN_PID}" ]]; then
+    echo "Sending SIGTERM to uvicorn (pid=${UVICORN_PID}) for graceful shutdown..."
+    kill -TERM "${UVICORN_PID}" 2>/dev/null || true
+    sleep 5
+  fi
+  kill "${MONITOR_PID}" 2>/dev/null || true
+}
+trap _server_cleanup EXIT INT TERM
 
 # Select backend: vllm (default, PagedAttention) or hf (legacy HuggingFace pipeline)
 VLLM_BACKEND=${VLLM_BACKEND:-true}
@@ -251,9 +265,15 @@ VLLM_BACKEND=${VLLM_BACKEND:-true}
 if [ "$VLLM_BACKEND" = "true" ]; then
     echo "Starting vLLM backend (PagedAttention + prefix caching)"
     export VLLM_WORKER_MULTIPROC_METHOD=spawn
-    # vLLM manages multi-GPU internally via tensor_parallel_size — use 1 worker
-    python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1
+    # vLLM manages multi-GPU internally via tensor_parallel_size — use 1 worker.
+    # Background the process and capture its PID so the cleanup trap can SIGTERM
+    # it gracefully before the job exits, flushing vLLM's buffered stdout.
+    python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1 &
+    UVICORN_PID=$!
+    wait "${UVICORN_PID}"
 else
     echo "Starting legacy HuggingFace backend"
-    python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
+    python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS &
+    UVICORN_PID=$!
+    wait "${UVICORN_PID}"
 fi
