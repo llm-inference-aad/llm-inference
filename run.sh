@@ -311,6 +311,11 @@ echo "Server submission args: ${SERVER_SBATCH_ARGS[*]} server.sh"
 SERVER_JOB_ID=$(sbatch "${SERVER_SBATCH_ARGS[@]}" server.sh)
 echo "Server job submitted with ID: ${SERVER_JOB_ID}"
 
+# Persist the server job ID so cleanup_server (the EXIT/INT/TERM trap) can
+# scancel it even if the main process is SIGKILL'd before cleanup runs —
+# and even if the main shell env is lost.  cleanup_server reads this file.
+echo "${SERVER_JOB_ID}" > "${HOSTNAME_LOG_FILE%.log}_server_job.txt"
+
 echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
 # Capture the exit code before the trap fires so cleanup_server can read it.
 EVOLUTION_EXIT_CODE=0
