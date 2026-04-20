@@ -327,13 +327,37 @@ echo "Server job submitted with ID: ${SERVER_JOB_ID}"
 echo "${SERVER_JOB_ID}" > "${HOSTNAME_LOG_FILE%.log}_server_job.txt"
 
 echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
-# EVOLUTION_EXIT_CODE is left UNSET until Python actually returns.  Seeding it
-# to 0 here would make the trap mis-read an interruption (SIGTERM arriving
-# mid-Python, before the `|| rc=$?` branch) as a clean completion.  Leaving it
-# unset lets cleanup_server's ${EVOLUTION_EXIT_CODE:-1} default fall through to
-# "cancelled" in the interrupted case.
+# Launch Python in the background and use `wait` so the EXIT/INT/TERM trap
+# is delivered promptly when SLURM's `scancel` sends SIGTERM.  A foreground
+# `uv run python ...` blocks bash in a non-interruptible wait() — the trap
+# would only fire AFTER Python returns, or after SLURM's grace period
+# elapses and SIGKILL arrives (at which point the trap can't run at all).
+#
+# The TERM/INT forwarding trap below also propagates the signal to the
+# Python child so it has a chance to exit gracefully before cleanup_server
+# does its work.
+#
+# EVOLUTION_EXIT_CODE is left UNSET until Python actually returns; seeding
+# it to 0 here would cause cleanup_server to mis-read an interruption as a
+# clean completion.
+uv run python run_improved.py "${RUN_DIR}/checkpoints" &
+PYTHON_PID=$!
+export PYTHON_PID
+
+# Forward SIGTERM/SIGINT to the Python child so it can exit cleanly; then
+# let the script fall through to cleanup_server via the EXIT trap.
+_forward_signal() {
+  local signum="$1"
+  if [[ -n "${PYTHON_PID:-}" ]] && kill -0 "${PYTHON_PID}" 2>/dev/null; then
+    echo "Forwarding ${signum} to Python child (pid=${PYTHON_PID})"
+    kill -"${signum}" "${PYTHON_PID}" 2>/dev/null || true
+  fi
+}
+trap '_forward_signal TERM' TERM
+trap '_forward_signal INT'  INT
+
 _python_rc=0
-uv run python run_improved.py "${RUN_DIR}/checkpoints" || _python_rc=$?
+wait "${PYTHON_PID}" || _python_rc=$?
 EVOLUTION_EXIT_CODE=$_python_rc
 export EVOLUTION_EXIT_CODE
 
