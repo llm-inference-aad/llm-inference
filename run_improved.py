@@ -22,6 +22,11 @@ import concurrent.futures
 import uuid
 from src import llm_mutation, llm_crossover
 
+# PR 8: optional MemoryBackend instance; set in main() when RAG_MEMORY_STORE_ENABLED=true.
+# Using a module-level variable mirrors the existing runtime singleton pattern so
+# _log_mutation_result (which runs inside SLURM eval subprocess contexts) can reach it.
+_MEMORY_BACKEND = None  # type: ignore[assignment]
+
 # Global executor for direct LLM tasks
 LLM_TASK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=population_size)
 LLM_FUTURES = {}
@@ -199,6 +204,25 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
         "source": "runtime_log",
     }
     runtime.log_mutation_code(content=f"{description}\n\nCode:\n{code.strip()}", metadata=metadata)
+
+    # PR 8: also write a compact natural-language summary to the memory namespace.
+    # The summary format is "{mutation_type} on parent {parent}: {description}" where
+    # description is produced by build_mutation_description and already carries
+    # Test Acc / Params / Val Acc / ΔAcc / ΔParams (do not invent a new format).
+    if _MEMORY_BACKEND is not None:
+        try:
+            parent_label = parent_gene_id or "unknown"
+            mtype_label = mutation_type or "mutation"
+            memory_summary = f"{mtype_label} on parent {parent_label}: {description}"
+            _MEMORY_BACKEND.index({
+                "text": memory_summary,
+                "gene_id": gene_id,
+                "parent_gene_id": parent_gene_id,
+                "mutation_type": mutation_type,
+            })
+        except Exception:
+            pass  # Memory indexing is best-effort; never crash the eval loop.
+
     record_metric(
         "rag_mutation_logged",
         {

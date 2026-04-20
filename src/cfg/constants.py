@@ -93,6 +93,10 @@ RAG_USE_CODE_CONTEXT = os.environ.get("RAG_USE_CODE_CONTEXT", "true").lower() in
 RAG_USE_TEXT_CONTEXT = os.environ.get("RAG_USE_TEXT_CONTEXT", "true").lower() in {"1", "true", "yes"}
 RAG_RERANKER_ENABLED = os.environ.get("RAG_RERANKER_ENABLED", "false").lower() in {"1", "true", "yes"}
 RAG_RERANKER_MODEL = os.environ.get("RAG_RERANKER_MODEL", "BAAI/bge-reranker-v2-m3")
+#: Memory backend (PR 8): episodic summaries of past successful mutations
+RAG_MEMORY_STORE_ENABLED = os.environ.get("RAG_MEMORY_STORE_ENABLED", "false").lower() in {"1", "true", "yes"}
+RAG_MEMORY_TOP_K = int(os.environ.get("RAG_MEMORY_TOP_K", 3))
+RAG_MEMORY_MIN_SIMILARITY = float(os.environ.get("RAG_MEMORY_MIN_SIMILARITY", 0.5))  # Tighter than Ajay's 0.3 to cut noise
 
 # Evolution Constants/Params
 # --------------------------

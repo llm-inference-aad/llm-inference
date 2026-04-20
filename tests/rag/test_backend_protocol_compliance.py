@@ -4,6 +4,9 @@ Each backend class must satisfy BackendProtocol structurally and have
 callable retrieve/index. Stubs must raise NotImplementedError (not
 AttributeError). FaissBackend is only checked at the class level because
 constructing one requires FAISS + an EmbeddingService.
+
+PR 8 addition: MemoryBackend is added to the live-instances list because it
+is cheap to construct (FakeVectorStoreManager + FakeEmbeddingService).
 """
 
 from __future__ import annotations
@@ -21,6 +24,8 @@ from src.rag.api_types import RetrieveRequest  # noqa: E402
 from src.rag.backend_protocol import BackendProtocol  # noqa: E402
 from src.rag.backends.graph_backend import GraphBackend  # noqa: E402
 from src.rag.backends.pageindex_backend import PageIndexBackend  # noqa: E402
+from src.rag.backends.memory_backend import MemoryBackend  # noqa: E402
+from tests.rag.fakes import FakeEmbeddingService, FakeVectorStoreManager  # noqa: E402
 
 
 def _sample_request() -> RetrieveRequest:
@@ -31,6 +36,15 @@ def _sample_request() -> RetrieveRequest:
         filters={},
         run_id="test-run",
         request_id="req-0",
+    )
+
+
+def _make_memory_backend() -> MemoryBackend:
+    """Construct a MemoryBackend with cheap in-memory fakes."""
+    return MemoryBackend(
+        vector_store=FakeVectorStoreManager(),
+        embedding_service=FakeEmbeddingService(),
+        min_similarity=0.0,
     )
 
 
@@ -58,6 +72,40 @@ class TestStubBackendCompliance:
     def test_index_raises_not_implemented(self, backend_cls):
         with pytest.raises(NotImplementedError):
             backend_cls().index({"text": "doc"})
+
+
+class TestMemoryBackendProtocolCompliance:
+    """Protocol-compliance tests for the live MemoryBackend (PR 8).
+
+    MemoryBackend is fully instantiable with fakes so we can assert it satisfies
+    BackendProtocol both at the class level and at runtime.
+    """
+
+    def test_isinstance_backend_protocol(self):
+        backend = _make_memory_backend()
+        assert isinstance(backend, BackendProtocol), (
+            "MemoryBackend must satisfy isinstance(..., BackendProtocol)"
+        )
+
+    def test_retrieve_callable(self):
+        backend = _make_memory_backend()
+        assert callable(getattr(backend, "retrieve", None))
+
+    def test_index_callable(self):
+        backend = _make_memory_backend()
+        assert callable(getattr(backend, "index", None))
+
+    def test_retrieve_returns_retrieve_response(self):
+        """retrieve() must return a RetrieveResponse (not raise NotImplementedError)."""
+        from src.rag.api_types import RetrieveResponse
+        backend = _make_memory_backend()
+        resp = backend.retrieve(_sample_request())
+        assert isinstance(resp, RetrieveResponse)
+
+    def test_index_does_not_raise(self):
+        """index() must not raise NotImplementedError for a valid document."""
+        backend = _make_memory_backend()
+        backend.index({"text": "some mutation summary | Test Acc: 0.90, Params: 100000"})
 
 
 class TestFaissBackendClassShape:

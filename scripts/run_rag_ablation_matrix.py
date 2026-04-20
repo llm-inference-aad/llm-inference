@@ -120,17 +120,64 @@ def _parse_sbatch_job_id(s: str) -> str | None:
     return None
 
 
-def build_conditions(include_hybrid_rerank: bool) -> List[Condition]:
+# PR 8: canonical 3-condition comparison set (baseline vs rag-faiss vs rag-faiss+memory).
+# The memory condition is gated by RAG_MEMORY_STORE_ENABLED=true so it activates the
+# MemoryBackend path inside RagService without changing the FAISS code/text retrieval.
+_COMPARE_3_CONDITIONS = [
+    "baseline",
+    "rag-faiss",
+    "rag-faiss+memory",
+]
+
+
+def build_conditions(
+    include_hybrid_rerank: bool = False,
+    compare_3: bool = False,
+) -> List[Condition]:
+    """Build the list of experimental conditions.
+
+    Args:
+        include_hybrid_rerank: Also include the ``hybrid_rerank`` condition.
+        compare_3: When True, return only the canonical 3-condition set for
+            Pareto comparison: ``baseline``, ``rag-faiss``,
+            ``rag-faiss+memory``.  Overrides ``include_hybrid_rerank``.
+    """
+    baseline_cond = Condition(
+        name="baseline",
+        env={
+            "RAG_ENABLED": "false",
+            "RAG_USE_CODE_CONTEXT": "false",
+            "RAG_USE_TEXT_CONTEXT": "false",
+            "RAG_RERANKER_ENABLED": "false",
+            "RAG_MEMORY_STORE_ENABLED": "false",
+        },
+    )
+    rag_faiss_cond = Condition(
+        name="rag-faiss",
+        env={
+            "RAG_ENABLED": "true",
+            "RAG_USE_CODE_CONTEXT": "true",
+            "RAG_USE_TEXT_CONTEXT": "true",
+            "RAG_RERANKER_ENABLED": "false",
+            "RAG_MEMORY_STORE_ENABLED": "false",
+        },
+    )
+    rag_faiss_memory_cond = Condition(
+        name="rag-faiss+memory",
+        env={
+            "RAG_ENABLED": "true",
+            "RAG_USE_CODE_CONTEXT": "true",
+            "RAG_USE_TEXT_CONTEXT": "true",
+            "RAG_RERANKER_ENABLED": "false",
+            "RAG_MEMORY_STORE_ENABLED": "true",
+        },
+    )
+
+    if compare_3:
+        return [baseline_cond, rag_faiss_cond, rag_faiss_memory_cond]
+
     conditions: List[Condition] = [
-        Condition(
-            name="baseline",
-            env={
-                "RAG_ENABLED": "false",
-                "RAG_USE_CODE_CONTEXT": "false",
-                "RAG_USE_TEXT_CONTEXT": "false",
-                "RAG_RERANKER_ENABLED": "false",
-            },
-        ),
+        baseline_cond,
         Condition(
             name="code_only",
             env={
@@ -138,6 +185,7 @@ def build_conditions(include_hybrid_rerank: bool) -> List[Condition]:
                 "RAG_USE_CODE_CONTEXT": "true",
                 "RAG_USE_TEXT_CONTEXT": "false",
                 "RAG_RERANKER_ENABLED": "false",
+                "RAG_MEMORY_STORE_ENABLED": "false",
             },
         ),
         Condition(
@@ -147,6 +195,7 @@ def build_conditions(include_hybrid_rerank: bool) -> List[Condition]:
                 "RAG_USE_CODE_CONTEXT": "false",
                 "RAG_USE_TEXT_CONTEXT": "true",
                 "RAG_RERANKER_ENABLED": "false",
+                "RAG_MEMORY_STORE_ENABLED": "false",
             },
         ),
         Condition(
@@ -156,8 +205,10 @@ def build_conditions(include_hybrid_rerank: bool) -> List[Condition]:
                 "RAG_USE_CODE_CONTEXT": "true",
                 "RAG_USE_TEXT_CONTEXT": "true",
                 "RAG_RERANKER_ENABLED": "false",
+                "RAG_MEMORY_STORE_ENABLED": "false",
             },
         ),
+        rag_faiss_memory_cond,
     ]
     if include_hybrid_rerank:
         conditions.append(
@@ -168,6 +219,7 @@ def build_conditions(include_hybrid_rerank: bool) -> List[Condition]:
                     "RAG_USE_CODE_CONTEXT": "true",
                     "RAG_USE_TEXT_CONTEXT": "true",
                     "RAG_RERANKER_ENABLED": "true",
+                    "RAG_MEMORY_STORE_ENABLED": "false",
                 },
             )
         )
@@ -187,6 +239,14 @@ def main() -> None:
         help="Also run hybrid_rerank condition (RAG_RERANKER_ENABLED=true).",
     )
     parser.add_argument(
+        "--compare-3",
+        action="store_true",
+        help=(
+            "Use only the canonical 3-condition Pareto comparison set: "
+            "baseline, rag-faiss, rag-faiss+memory.  3 × len(seeds) jobs."
+        ),
+    )
+    parser.add_argument(
         "--execute",
         action="store_true",
         help="Actually submit the sbatch jobs (default is dry-run).",
@@ -203,7 +263,10 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    conditions = build_conditions(args.include_hybrid_rerank)
+    conditions = build_conditions(
+        include_hybrid_rerank=args.include_hybrid_rerank,
+        compare_3=args.compare_3,
+    )
     timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 
     planned = []
