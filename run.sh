@@ -187,62 +187,20 @@ cleanup_server() {
 
   echo "=== cleanup_server: exit_code=${exit_code} ==="
 
-  # -- 1. Cancel the nested server job ----------------------------------------
+  # The cleanup is ordered so that state-changing operations required by the
+  # PR 0 acceptance criterion (status flip, tracking-file removal, server
+  # scancel) run FIRST — before any sleep or log-moving.  SLURM SIGKILLs the
+  # script after a short grace period when the main job is scancelled, so any
+  # sleep in the critical path will cause the trap to be cut short.
+
   local server_job_file="${HOSTNAME_LOG_FILE%.log}_server_job.txt"
+  local server_job_id=""
 
   if [[ -f "${server_job_file}" ]]; then
-    local server_job_id
     server_job_id=$(cat "${server_job_file}" 2>/dev/null || true)
-
-    if [[ -n "${server_job_id}" && "${server_job_id}" != "null" ]]; then
-      echo "Cancelling server job: ${server_job_id}"
-      scancel "${server_job_id}" 2>/dev/null || \
-        echo "Warning: scancel ${server_job_id} failed (may have already finished)"
-
-      # Give the server a moment to flush buffered stdout before SLURM yanks it.
-      echo "Waiting for server log flush..."
-      sleep 15
-
-      # Move any legacy server logs that landed under metrics/slurm-results.
-      local legacy_out="${REPO_ROOT}/metrics/slurm-results/slurm-server-${server_job_id}.out"
-      local legacy_err="${REPO_ROOT}/metrics/slurm-results/slurm-server-${server_job_id}.err"
-      [[ -f "${legacy_out}" ]] && mv "${legacy_out}" "${RUN_LOG_DIR}/" && \
-        echo "Moved legacy server .out log"
-      [[ -f "${legacy_err}" ]] && mv "${legacy_err}" "${RUN_ERRORS_DIR}/" && \
-        echo "Moved legacy server .err log"
-    else
-      echo "Warning: No valid server job ID in ${server_job_file}"
-    fi
-
-    # Remove tracking files so nothing is stranded.
-    rm -f "${server_job_file}"
-    rm -f "${HOSTNAME_LOG_FILE}"
-    echo "Removed server tracking files"
-  else
-    echo "Warning: Server job tracking file not found: ${server_job_file}"
-    echo "  Server may need to be shut down manually"
   fi
 
-  # -- 2. Move remaining SLURM logs from the run ------------------------------
-  if [[ -d "${REPO_ROOT}/metrics/slurm-results" ]]; then
-    mkdir -p "${RUN_LOG_DIR}" "${RUN_ERRORS_DIR}"
-
-    if [[ -n "${SLURM_JOB_ID:-}" ]]; then
-      local main_out="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
-      local main_err="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
-      [[ -f "${main_out}" ]] && mv "${main_out}" "${RUN_LOG_DIR}/"  && echo "Moved main job .out log"
-      [[ -f "${main_err}" ]] && mv "${main_err}" "${RUN_ERRORS_DIR}/" && echo "Moved main job .err log"
-    fi
-
-    find "${REPO_ROOT}/metrics/slurm-results" -type f \
-      \( -name "eval-*.out" -o -name "llm-*.out" -o -name "slurm-server-*.out" \) \
-      -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_LOG_DIR}/" \; 2>/dev/null || true
-    find "${REPO_ROOT}/metrics/slurm-results" -type f \
-      \( -name "eval-*.err" -o -name "llm-*.err" -o -name "slurm-server-*.err" \) \
-      -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_ERRORS_DIR}/" \; 2>/dev/null || true
-  fi
-
-  # -- 3. Update run_metadata.json --------------------------------------------
+  # -- 1. Flip run_metadata.json.status (critical) -----------------------------
   if [[ -f "${RUN_DIR}/run_metadata.json" ]]; then
     local status
     if [[ "${exit_code}" -eq 0 ]]; then
@@ -266,6 +224,58 @@ try:
 except Exception as exc:
     print(f"WARNING: could not update run_metadata.json: {exc}", file=sys.stderr)
 PYEOF
+  fi
+
+  # -- 2. Cancel the nested server job (critical) ------------------------------
+  if [[ -n "${server_job_id}" && "${server_job_id}" != "null" ]]; then
+    echo "Cancelling server job: ${server_job_id}"
+    scancel "${server_job_id}" 2>/dev/null || \
+      echo "Warning: scancel ${server_job_id} failed (may have already finished)"
+  elif [[ ! -f "${server_job_file}" ]]; then
+    echo "Warning: Server job tracking file not found: ${server_job_file}"
+    echo "  Server may need to be shut down manually"
+  else
+    echo "Warning: No valid server job ID in ${server_job_file}"
+  fi
+
+  # -- 3. Remove tracking files so nothing is stranded (critical) --------------
+  if [[ -f "${server_job_file}" ]]; then
+    rm -f "${server_job_file}"
+    rm -f "${HOSTNAME_LOG_FILE}"
+    echo "Removed server tracking files"
+  fi
+
+  # -- 4. Best-effort log flush + migration (may be cut short by SIGKILL) ------
+  if [[ -n "${server_job_id}" && "${server_job_id}" != "null" ]]; then
+    # Give the server a brief moment to flush buffered stdout before SLURM
+    # yanks everything.  Kept short so the trap completes inside the default
+    # scancel grace window.
+    sleep 3
+
+    local legacy_out="${REPO_ROOT}/metrics/slurm-results/slurm-server-${server_job_id}.out"
+    local legacy_err="${REPO_ROOT}/metrics/slurm-results/slurm-server-${server_job_id}.err"
+    [[ -f "${legacy_out}" ]] && mv "${legacy_out}" "${RUN_LOG_DIR}/" && \
+      echo "Moved legacy server .out log"
+    [[ -f "${legacy_err}" ]] && mv "${legacy_err}" "${RUN_ERRORS_DIR}/" && \
+      echo "Moved legacy server .err log"
+  fi
+
+  if [[ -d "${REPO_ROOT}/metrics/slurm-results" ]]; then
+    mkdir -p "${RUN_LOG_DIR}" "${RUN_ERRORS_DIR}"
+
+    if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+      local main_out="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.out"
+      local main_err="${REPO_ROOT}/metrics/slurm-results/slurm-main-${SLURM_JOB_ID}.err"
+      [[ -f "${main_out}" ]] && mv "${main_out}" "${RUN_LOG_DIR}/"  && echo "Moved main job .out log"
+      [[ -f "${main_err}" ]] && mv "${main_err}" "${RUN_ERRORS_DIR}/" && echo "Moved main job .err log"
+    fi
+
+    find "${REPO_ROOT}/metrics/slurm-results" -type f \
+      \( -name "eval-*.out" -o -name "llm-*.out" -o -name "slurm-server-*.out" \) \
+      -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_LOG_DIR}/" \; 2>/dev/null || true
+    find "${REPO_ROOT}/metrics/slurm-results" -type f \
+      \( -name "eval-*.err" -o -name "llm-*.err" -o -name "slurm-server-*.err" \) \
+      -newer "${RUN_DIR}/run_metadata.json" -exec mv {} "${RUN_ERRORS_DIR}/" \; 2>/dev/null || true
   fi
 
   echo "=== cleanup_server complete ==="
