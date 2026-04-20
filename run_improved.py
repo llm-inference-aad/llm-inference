@@ -30,6 +30,32 @@ from src import llm_mutation, llm_crossover
 # ---------------------------------------------------------------------------
 _rag_client = None
 
+# ---------------------------------------------------------------------------
+# Run ledger — constructed lazily on first use.
+# Writes one MutationEvent per emit point (augment + eval) to rag_ledger.jsonl.
+# Never crashes the caller; write errors are swallowed.
+# ---------------------------------------------------------------------------
+_run_ledger = None
+
+
+def _get_run_ledger():
+    """Return the module-level RunLedger, constructing it lazily on first call."""
+    global _run_ledger
+    if _run_ledger is not None:
+        return _run_ledger
+    try:
+        from rag.bookkeeping import RunLedger  # noqa: PLC0415
+        _run_ledger = RunLedger(run_id=RUN_ID)
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG] Failed to build RunLedger: {type(exc).__name__}: {exc} — "
+            "bookkeeping disabled for this session.",
+            stacklevel=2,
+        )
+        _run_ledger = None
+    return _run_ledger
+
 def _get_rag_client():
     """Return the module-level RagClient, constructing it lazily on first call.
 
@@ -182,6 +208,13 @@ def _apply_rag_context(
         resp = client.augment(req)
         augmented_template = resp.augmented_prompt
         n_blocks = len(resp.blocks_used)
+        # Store the request_id so _log_mutation_result can link the eval event
+        # to the augment event already written by RagService (two-event approach).
+        # Guard against GLOBAL_DATA not being defined (e.g. when run_improved
+        # is partially loaded in test stubs where deap globals fail to initialise).
+        _global_data = globals().get("GLOBAL_DATA")
+        if gene_id is not None and _global_data is not None and gene_id in _global_data:
+            _global_data[gene_id]["_rag_request_id"] = req.request_id
     except Exception as exc:
         record_metric(
             "rag_generation_failed",
@@ -208,10 +241,18 @@ def _apply_rag_context(
 
 
 def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
+    # --- Bookkeeping ledger: emit eval-side event ----------------------------- #
+    # We use a two-event approach: the augment event is written by RagService
+    # at retrieval time; this function writes the eval event.  Both share the
+    # same request_id (stored in GLOBAL_DATA[gene_id]['_rag_request_id'] by
+    # _apply_rag_context) so a reader can JOIN them via replay_ledger.
+    _emit_eval_ledger_event(gene_id, fitness)
+    # -------------------------------------------------------------------------- #
+
     runtime = get_runtime()
     if runtime is None:
         return
-    
+
     # Filter: Only log mutations that meet minimum quality threshold
     from cfg.constants import RAG_MIN_ACCURACY
     if not fitness or len(fitness) == 0:
@@ -220,7 +261,7 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
     if accuracy < RAG_MIN_ACCURACY:
         # Mutation doesn't meet quality threshold - skip logging
         return
-    
+
     code_path = os.path.join(SOTA_ROOT, f"models/network_{gene_id}.py")
     if not os.path.exists(code_path):
         return
@@ -259,6 +300,78 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
             "parameters_delta": improvement.get("parameters_delta") if improvement else None,
         },
     )
+
+
+def _emit_eval_ledger_event(gene_id: str, fitness: tuple | list) -> None:
+    """Emit the eval-side bookkeeping ledger event for *gene_id*.
+
+    This is the second of two events for the same mutation attempt (the first
+    is written by RagService.augment).  The two events share the same
+    ``request_id`` so downstream analysis can JOIN them via replay_ledger.
+
+    Never crashes the caller — all errors are swallowed.
+    """
+    try:
+        ledger = _get_run_ledger()
+        if ledger is None:
+            return
+
+        from rag.bookkeeping import MutationEvent  # noqa: PLC0415
+
+        # Access globals defensively since this module may be partially loaded
+        # in test environments where DEAP initialisation fails mid-load.
+        _global_data = globals().get("GLOBAL_DATA") or {}
+        _ancestry = globals().get("GLOBAL_DATA_ANCESTRY") or {}
+        _gen_count = globals().get("GEN_COUNT", -1)
+        _run_id = globals().get("RUN_ID", "unknown")
+        _rag_enabled = globals().get("RAG_ENABLED", False)
+
+        gene_data = _global_data.get(gene_id, {})
+        ancestry_info = _ancestry.get(gene_id, {})
+        genes = ancestry_info.get("GENES") or []
+        mutation_types = ancestry_info.get("MUTATE_TYPE") or []
+        parent_gene_id = genes[-2] if len(genes) >= 2 else (genes[0] if genes else "unknown")
+        mutation_type = mutation_types[-1] if mutation_types else "unknown"
+
+        # Retrieve the request_id stored by _apply_rag_context (may be None for
+        # baseline runs or when RAG was disabled for this gene).
+        request_id = gene_data.get("_rag_request_id") or MutationEvent.make_request_id()
+
+        # Build eval_outputs from fitness tuple.
+        eval_outputs: dict = {}
+        if fitness and len(fitness) >= 1:
+            eval_outputs["test_acc"] = float(fitness[0])
+        if fitness and len(fitness) >= 2:
+            eval_outputs["total_params"] = float(fitness[1])
+
+        raw_prompt = ""  # raw prompt not available at eval time; augment event has it
+        event = MutationEvent(
+            run_id=_run_id,
+            generation=_gen_count,
+            parent_gene_id=str(parent_gene_id) if parent_gene_id else "unknown",
+            child_gene_id=gene_id,
+            mutation_type=mutation_type,
+            backend="faiss" if _rag_enabled else "baseline",
+            request_id=request_id,
+            prompt_id=MutationEvent.make_prompt_id(raw_prompt),
+            raw_prompt=raw_prompt,
+            augmented_prompt=None,
+            retrieval_request=None,
+            retrieval_response=None,
+            model_request=None,
+            model_response=None,
+            parsed_artifact=None,
+            eval_outputs=eval_outputs if eval_outputs else None,
+            latencies={},
+            failure_mode=None if eval_outputs.get("test_acc", 0) > 0 else "eval_failed",
+        )
+        ledger.append(event)
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG] Failed to emit eval ledger event for gene {gene_id}: {type(exc).__name__}: {exc}",
+            stacklevel=2,
+        )
 
 
 def generate_template(
