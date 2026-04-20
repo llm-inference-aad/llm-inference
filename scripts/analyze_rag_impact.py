@@ -3,7 +3,8 @@
 Analyze a single LLMGE run and summarize whether/ how RAG was used and what it cost.
 
 Design goals:
-- Standard library only (no torch/deap/faiss imports).
+- Standard library only (no torch/deap/faiss imports) for the legacy path.
+- When rag_ledger.jsonl is present, imports src.rag.bookkeeping for richer metrics.
 - Graceful degradation when some artifacts are missing.
 - Output a single JSON report under the run's metrics directory by default.
 
@@ -12,7 +13,8 @@ Inputs (best-effort):
 - runs/<run_id>/logs/llm/gene_*.log                   # invalid code attempts (if enabled)
 - runs/<run_id>/metrics/latency-*.json                # vLLM token/latency metrics (preferred)
 - metrics/data/latency-*.json                         # fallback location (filter by run_id)
-- runs/<run_id>/metrics/rag_metrics.jsonl             # RAG context events (rag_context_built, etc.)
+- runs/<run_id>/metrics/rag_ledger.jsonl              # bookkeeping ledger (preferred, new)
+- runs/<run_id>/metrics/rag_metrics.jsonl             # RAG context events (legacy fallback)
 - metrics/rag_metrics.jsonl                           # fallback location (unscoped; best-effort)
 - runs/<run_id>/run_metadata.json                     # run metadata/config snapshot (if present)
 """
@@ -399,6 +401,77 @@ def load_rag_usage(run_dir: Path, run_id: str, metadata: Optional[Dict[str, Any]
     }
 
 
+def load_ledger_stats(run_dir: Path, run_id: str) -> Optional[Dict[str, Any]]:
+    """Load richer metrics from rag_ledger.jsonl when available.
+
+    Returns a dict of ledger-derived stats if the ledger exists and can be
+    parsed; otherwise returns None (caller should fall back to load_rag_usage).
+
+    This function imports src.rag.bookkeeping at call time so that the rest of
+    the script remains standard-library-only when the ledger is absent.
+    """
+    ledger_path = run_dir / "metrics" / "rag_ledger.jsonl"
+    if not ledger_path.exists():
+        return None
+
+    try:
+        from src.rag.bookkeeping import replay_ledger  # noqa: PLC0415
+    except ImportError:
+        # src.rag not on sys.path — fall back to legacy path.
+        return None
+
+    try:
+        events = list(replay_ledger(run_id, ledger_path=ledger_path))
+    except Exception:
+        return None
+
+    if not events:
+        return {
+            "ledger_source": str(ledger_path),
+            "ledger_events_total": 0,
+            "ledger_eval_events": 0,
+            "ledger_pareto_eligible": 0,
+            "ledger_backends": [],
+            "ledger_retrieval_events": 0,
+            "ledger_best_test_accuracy": None,
+            "ledger_failure_modes": {},
+        }
+
+    eval_events = [e for e in events if e.eval_outputs is not None]
+    pareto_eligible = [e for e in eval_events if e.is_pareto_eligible is True]
+    backends = sorted(set(e.backend for e in events if e.backend))
+    retrieval_events = [e for e in events if e.retrieval_response is not None]
+
+    best_acc = None
+    for ev in eval_events:
+        eo = ev.eval_outputs
+        acc = eo.get("test_accuracy") if eo.get("test_accuracy") is not None else eo.get("test_acc")
+        if acc is not None:
+            try:
+                fval = float(acc)
+                if best_acc is None or fval > best_acc:
+                    best_acc = fval
+            except (TypeError, ValueError):
+                pass
+
+    failure_modes: Dict[str, int] = {}
+    for ev in events:
+        fm = ev.failure_mode
+        if fm:
+            failure_modes[fm] = failure_modes.get(fm, 0) + 1
+
+    return {
+        "ledger_source": str(ledger_path),
+        "ledger_events_total": len(events),
+        "ledger_eval_events": len(eval_events),
+        "ledger_pareto_eligible": len(pareto_eligible),
+        "ledger_backends": backends,
+        "ledger_retrieval_events": len(retrieval_events),
+        "ledger_best_test_accuracy": best_acc,
+        "ledger_failure_modes": failure_modes,
+    }
+
+
 def write_csv_row(path: Path, row: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     exists = path.exists()
@@ -443,6 +516,9 @@ def main() -> None:
     latency_stats = load_latency_metrics(run_dir, run_id=run_id)
     rag_usage = load_rag_usage(run_dir, run_id=run_id, metadata=metadata if isinstance(metadata, dict) else None)
 
+    # Prefer richer ledger stats when rag_ledger.jsonl is present.
+    ledger_stats = load_ledger_stats(run_dir, run_id=run_id)
+
     wall_time_to_thresh_s = None
     if created_at is not None and evals_to_thresh is not None and results:
         first_hit = results[evals_to_thresh - 1]
@@ -464,6 +540,9 @@ def main() -> None:
         **invalid_stats,
         **latency_stats,
         **rag_usage,
+        # Ledger stats are merged in when available; they add richer fields
+        # without removing any legacy keys so downstream consumers are unaffected.
+        **(ledger_stats or {}),
         "metadata": metadata if isinstance(metadata, dict) else None,
     }
 
