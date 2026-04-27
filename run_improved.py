@@ -205,11 +205,18 @@ def _apply_rag_context(
     start = time.perf_counter()
     try:
         from rag.api_types import AugmentRequest
+        # Generate the request_id here (not inside RagClient) so the caller
+        # has the same value RagService records in the augment ledger event.
+        # AugmentRequest is a frozen dataclass — RagClient._ensure_request_id
+        # uses dataclasses.replace which returns a new instance, so without
+        # passing it in we would not see the id RagService used.
+        request_id = str(uuid.uuid4())
         req = AugmentRequest(
             template=template_txt,
             mutation_type=mutation_type or "",
             query_code=query_code or "",
             gene_id=gene_id,
+            request_id=request_id,
         )
         resp = client.augment(req)
         augmented_template = resp.augmented_prompt
@@ -220,8 +227,8 @@ def _apply_rag_context(
         # GLOBAL_DATA[gene_id] does not yet exist — it is created only after the
         # mutation job is submitted, which happens *after* generate_template
         # (and therefore after this call) returns.
-        if gene_id is not None and req.request_id is not None:
-            _rag_request_id_by_gene[gene_id] = req.request_id
+        if gene_id is not None:
+            _rag_request_id_by_gene[gene_id] = request_id
     except Exception as exc:
         record_metric(
             "rag_generation_failed",
