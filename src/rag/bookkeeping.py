@@ -84,6 +84,12 @@ class MutationEvent:
     # --- Evaluation fields ------------------------------------------------- #
     eval_outputs: Optional[dict] = None  # test_acc, total_params, val_acc, train_time
 
+    # --- Pareto policy field ----------------------------------------------- #
+    # Set by run_improved.py after assembling the generation population.
+    # None means "not yet classified" (e.g. augment-only events, old JSONL).
+    # True/False means the event was classified against its generation window.
+    is_pareto_eligible: Optional[bool] = None
+
     # --- Observability fields ---------------------------------------------- #
     latencies: dict = field(default_factory=dict)  # ms per stage: retrieve, rerank, augment, llm, eval
     failure_mode: Optional[str] = None  # e.g. "syntax_error", "retrieval_empty", None for success

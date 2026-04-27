@@ -94,6 +94,18 @@ RAG_USE_TEXT_CONTEXT = os.environ.get("RAG_USE_TEXT_CONTEXT", "true").lower() in
 RAG_RERANKER_ENABLED = os.environ.get("RAG_RERANKER_ENABLED", "false").lower() in {"1", "true", "yes"}
 RAG_RERANKER_MODEL = os.environ.get("RAG_RERANKER_MODEL", "BAAI/bge-reranker-v2-m3")
 
+# --- Pareto-aware mutation logging policy ---------------------------------- #
+#: Controls which events get the is_pareto_eligible=True flag.
+#: "pareto"   — per-generation percentile windows (default, recommended).
+#: "absolute" — falls back to RAG_MIN_ACCURACY / RAG_MAX_PARAMETERS thresholds.
+RAG_LOG_POLICY: str = os.environ.get("RAG_LOG_POLICY", "pareto").lower()
+#: Top-N% of test_accuracy within the generation that are marked eligible.
+#: Uses math.ceil for inclusivity (e.g. 10% of 7 = ceil(0.7) = 1).
+RAG_LOG_TOP_ACCURACY_PCT: float = float(os.environ.get("RAG_LOG_TOP_ACCURACY_PCT", 10.0))
+#: Bottom-N% of total_params within the generation that are marked eligible.
+#: Uses math.ceil for inclusivity.
+RAG_LOG_BOTTOM_PARAMS_PCT: float = float(os.environ.get("RAG_LOG_BOTTOM_PARAMS_PCT", 10.0))
+
 # Evolution Constants/Params
 # --------------------------
 
