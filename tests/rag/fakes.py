@@ -41,14 +41,27 @@ class FakeEmbeddingService:
 
     @staticmethod
     def _hash_vector(text: str, dim: int) -> np.ndarray:
-        """Return a deterministic, L2-normalised float32 vector for *text*."""
+        """Return a deterministic, L2-normalised float32 vector for *text*.
+
+        The SHA-256 digest is interpreted as 8 unsigned 32-bit integers and
+        rescaled to the range ``[-1.0, 1.0]`` before being tiled out to *dim*
+        elements.  Reading the digest as raw float32 (as a previous version
+        did) yields NaN/Inf values for most inputs, which makes the resulting
+        vector un-normalisable and breaks the documented "cosine similarity =
+        dot product" contract.
+        """
         digest = hashlib.sha256(text.encode("utf-8")).digest()  # 32 bytes
-        # Tile the digest to fill *dim* float32 values.
-        n_floats_from_digest = len(digest) // 4  # 8 floats from 32 bytes
-        seed_floats = np.array(struct.unpack(f"{n_floats_from_digest}f", digest), dtype=np.float32)
+        n_ints_from_digest = len(digest) // 4  # 8 uint32 values
+        seed_ints = np.array(
+            struct.unpack(f"{n_ints_from_digest}I", digest), dtype=np.uint64
+        )
+        # Map uint32 range -> [-1.0, 1.0] deterministically.
+        seed_floats = (
+            seed_ints.astype(np.float64) / np.float64(0xFFFFFFFF) * 2.0 - 1.0
+        ).astype(np.float32)
 
         # Repeat/truncate to the required dimension.
-        repeats = (dim + n_floats_from_digest - 1) // n_floats_from_digest
+        repeats = (dim + n_ints_from_digest - 1) // n_ints_from_digest
         vec = np.tile(seed_floats, repeats)[:dim].copy()
 
         # Avoid zero-vector edge case (all-zero SHA is impossible but guard anyway).
