@@ -42,6 +42,7 @@ dependencies = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+pythonpath = ["."]
 markers = [
     "integration: marks tests as integration tests (require real external services or SLURM)",
     "slow: marks tests as slow (typically >10 s; excluded from fast CI sweeps)",
