@@ -1,0 +1,36 @@
+{
+  "name": "small_validation_v1",
+  "description": "Smoke-test dataset for the RAG isolation harness. 5 cases x 3 trials x 2 arms = 30 paired LLM calls.",
+  "trials_per_case": 3,
+  "temperature": 0.3,
+  "top_p": 0.95,
+  "max_new_tokens": 4096,
+  "base_seed": 1234,
+  "cases": [
+    {
+      "case_id": "seed_param_concise",
+      "parent": "sota/ExquisiteNetV2/network.py",
+      "template": "templates/FixedPrompts/concise/Param.txt"
+    },
+    {
+      "case_id": "seed_significant_concise",
+      "parent": "sota/ExquisiteNetV2/network.py",
+      "template": "templates/FixedPrompts/concise/Significant.txt"
+    },
+    {
+      "case_id": "seed_mutant0_concise",
+      "parent": "sota/ExquisiteNetV2/network.py",
+      "template": "templates/FixedPrompts/concise/mutant0.txt"
+    },
+    {
+      "case_id": "seed_expert_complex_roleplay",
+      "parent": "sota/ExquisiteNetV2/network.py",
+      "template": "templates/FixedPrompts/roleplay/Expert_Complex.txt"
+    },
+    {
+      "case_id": "evolved_param_concise",
+      "parent": "sota/ExquisiteNetV2/models/network_xXx05pyFCl6W1F4K7KnjresKpEk.py",
+      "template": "templates/FixedPrompts/concise/Param.txt"
+    }
+  ]
+}

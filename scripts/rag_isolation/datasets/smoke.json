@@ -1,0 +1,21 @@
+{
+  "name": "smoke_v1",
+  "description": "Minimal smoke test: 2 cases × 2 trials × 2 arms = 8 LLM calls. Exists to verify the harness end-to-end, NOT to provide statistical power.",
+  "trials_per_case": 2,
+  "temperature": 0.3,
+  "top_p": 0.95,
+  "max_new_tokens": 4096,
+  "base_seed": 1234,
+  "cases": [
+    {
+      "case_id": "seed_param_concise",
+      "parent": "sota/ExquisiteNetV2/network.py",
+      "template": "templates/FixedPrompts/concise/Param.txt"
+    },
+    {
+      "case_id": "seed_significant_concise",
+      "parent": "sota/ExquisiteNetV2/network.py",
+      "template": "templates/FixedPrompts/concise/Significant.txt"
+    }
+  ]
+}
