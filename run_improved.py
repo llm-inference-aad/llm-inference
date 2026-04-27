@@ -37,6 +37,12 @@ _rag_client = None
 # ---------------------------------------------------------------------------
 _run_ledger = None
 
+# Maps gene_id -> request_id of the augment-time RAG call that produced its
+# template.  Populated by _apply_rag_context (which runs *before* GLOBAL_DATA
+# is created for the gene) and consumed by _emit_eval_ledger_event so the two
+# ledger events for one mutation share a request_id (enables JOIN at replay).
+_rag_request_id_by_gene: dict[str, str] = {}
+
 
 def _get_run_ledger():
     """Return the module-level RunLedger, constructing it lazily on first call."""
@@ -210,11 +216,12 @@ def _apply_rag_context(
         n_blocks = len(resp.blocks_used)
         # Store the request_id so _log_mutation_result can link the eval event
         # to the augment event already written by RagService (two-event approach).
-        # Guard against GLOBAL_DATA not being defined (e.g. when run_improved
-        # is partially loaded in test stubs where deap globals fail to initialise).
-        _global_data = globals().get("GLOBAL_DATA")
-        if gene_id is not None and _global_data is not None and gene_id in _global_data:
-            _global_data[gene_id]["_rag_request_id"] = req.request_id
+        # We use a module-level mapping (not GLOBAL_DATA) because at this point
+        # GLOBAL_DATA[gene_id] does not yet exist — it is created only after the
+        # mutation job is submitted, which happens *after* generate_template
+        # (and therefore after this call) returns.
+        if gene_id is not None and req.request_id is not None:
+            _rag_request_id_by_gene[gene_id] = req.request_id
     except Exception as exc:
         record_metric(
             "rag_generation_failed",
@@ -334,8 +341,14 @@ def _emit_eval_ledger_event(gene_id: str, fitness: tuple | list) -> None:
         mutation_type = mutation_types[-1] if mutation_types else "unknown"
 
         # Retrieve the request_id stored by _apply_rag_context (may be None for
-        # baseline runs or when RAG was disabled for this gene).
-        request_id = gene_data.get("_rag_request_id") or MutationEvent.make_request_id()
+        # baseline runs or when RAG was disabled for this gene).  Falls back to
+        # the legacy slot inside GLOBAL_DATA[gene_id] for backward compatibility
+        # with any older state that may still be around.
+        request_id = (
+            _rag_request_id_by_gene.get(gene_id)
+            or gene_data.get("_rag_request_id")
+            or MutationEvent.make_request_id()
+        )
 
         # Build eval_outputs from fitness tuple.
         eval_outputs: dict = {}
