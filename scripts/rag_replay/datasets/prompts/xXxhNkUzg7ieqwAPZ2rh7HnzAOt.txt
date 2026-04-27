@@ -1,0 +1,67 @@
+python
+def rephrase(text):
+    return ''.join(text.split())
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_y(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class FCT(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, 4, 2, 1, groups=cin, bias=False)
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_y(2, ceil_mode=True)
+        self.pw = nn.Conv2d(3*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x),
+            self.dw(x),
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x
+
+class Network(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.block1 = FCT(3, 64)
+        self.block2 = FCT(64, 128)
+        self.block3 = FCT(128, 256)
+        self.fc = nn.Linear(256 * 4 * 4, 10)
+
+    def forward(self, x):
+        x = self.block1(x)
+        x = F.relu(x)
+        x = self.block2(x)
+        x = F.relu(x)
+        x = self.block3(x)
+        x = F.relu(x)
+        x = x.view(-1, 256 * 4 * 4)
+        x = self.fc(x)
+        return x
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. This network targets high CIFAR-10 accuracy (≥90%) with efficient parameter usage. Consider how architectural choices influence both objectives.
+9. Explore creative modifications that push performance boundaries—novel layer compositions, unconventional activation patterns, or emergent architectural motifs are encouraged.
+
+A: Think deeply step by step
