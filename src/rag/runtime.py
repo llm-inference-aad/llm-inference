@@ -1,4 +1,25 @@
-"""Runtime helpers for initializing and reusing RAG components."""
+"""Runtime helpers for initializing and reusing RAG components.
+
+.. deprecated::
+    This module is a compatibility shim. New code should use
+    :class:`~src.rag.client.RagClient` directly instead of calling
+    :func:`get_runtime`. The ``RagRuntime`` class will be removed once
+    ``run_improved.py`` has fully migrated to the ``RagClient`` API.
+
+    Migration guide::
+
+        # Old (deprecated):
+        from rag.runtime import get_runtime
+        runtime = get_runtime()
+        augmented, mutations = runtime.enhance_template(template, ...)
+
+        # New:
+        from rag.client import RagClient
+        from rag.api_types import AugmentRequest
+        client = RagClient()
+        resp = client.augment(AugmentRequest(template=template, ...))
+        augmented = resp.augmented_prompt
+"""
 
 from __future__ import annotations
 

@@ -22,6 +22,43 @@ import concurrent.futures
 import uuid
 from src import llm_mutation, llm_crossover
 
+# ---------------------------------------------------------------------------
+# RAG client — constructed once at startup, shared across the process.
+# Callers use _rag_client directly; they never import retrieval internals.
+# When RAG_ENABLED is False, _rag_client remains None and _apply_rag_context
+# returns the template unchanged.
+# ---------------------------------------------------------------------------
+_rag_client = None
+
+def _get_rag_client():
+    """Return the module-level RagClient, constructing it lazily on first call.
+
+    Returns None when RAG_ENABLED is False or when the backend fails to
+    initialise (e.g. dimension mismatch); callers must handle None gracefully.
+    """
+    global _rag_client
+    if _rag_client is not None:
+        return _rag_client
+
+    from cfg.constants import RAG_ENABLED as _RAG_ENABLED
+    if not _RAG_ENABLED:
+        return None
+
+    try:
+        from rag.client import RagClient
+        _rag_client = RagClient()
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG] Failed to build RagClient: {type(exc).__name__}: {exc} — "
+            "RAG disabled for this session.",
+            stacklevel=2,
+        )
+        _rag_client = None  # remain None so callers fall back to plain template
+
+    return _rag_client
+
+
 # Global executor for direct LLM tasks
 LLM_TASK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=population_size)
 LLM_FUTURES = {}
@@ -109,9 +146,17 @@ def _apply_rag_context(
     mutation_type: str | None,
     query_code: str | None = None,
     gene_id: str | None = None,
+    rag_client=None,
 ) -> str:
-    runtime = get_runtime()
-    if runtime is None:
+    """Apply RAG context augmentation to *template_txt*.
+
+    Uses a :class:`~rag.client.RagClient` instance.  If *rag_client* is not
+    provided, the module-level singleton (``_get_rag_client()``) is used.
+    When the client is None (RAG disabled or failed to initialise) the template
+    is returned unchanged.
+    """
+    client = rag_client if rag_client is not None else _get_rag_client()
+    if client is None:
         status = get_runtime_status()
         record_metric(
             "rag_generation_skipped",
@@ -127,12 +172,16 @@ def _apply_rag_context(
         return template_txt
     start = time.perf_counter()
     try:
-        augmented_template, mutations = runtime.enhance_template(
+        from rag.api_types import AugmentRequest
+        req = AugmentRequest(
             template=template_txt,
-            mutation_type=mutation_type,
-            query_code=query_code,
+            mutation_type=mutation_type or "",
+            query_code=query_code or "",
             gene_id=gene_id,
         )
+        resp = client.augment(req)
+        augmented_template = resp.augmented_prompt
+        n_blocks = len(resp.blocks_used)
     except Exception as exc:
         record_metric(
             "rag_generation_failed",
@@ -150,7 +199,7 @@ def _apply_rag_context(
         {
             "gene_id": gene_id,
             "mutation_type": mutation_type,
-            "retrieved_mutations": len(mutations),
+            "retrieved_mutations": n_blocks,
             "retrieval_ms": duration_ms,
             "prompt_tokens": len(augmented_template.split()),
         },
