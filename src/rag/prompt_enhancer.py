@@ -16,20 +16,22 @@ from cfg.constants import (
     RUN_ID,
 )
 
-from .reranker import Reranker
 from .retrieval import RetrievedContext, RetrievedMutation, RetrievalService, RetrievalStats
 from utils.rag_metrics import record_metric
 
 # M4: Maximum lines of query code sent to cross-encoder to avoid CPU bottleneck
 _RERANK_MAX_QUERY_LINES = 20
 
-# Module-level singleton — lazy-loaded only when reranking is enabled
-_reranker: Reranker | None = None
+# Module-level singleton — lazy-loaded only when reranking is enabled.
+# Reranker module is optional and may be absent; import lazily to avoid
+# breaking the rest of the RAG subsystem when unavailable.
+_reranker = None
 
 
-def _get_reranker() -> Reranker:
+def _get_reranker():
     global _reranker
     if _reranker is None:
+        from .reranker import Reranker  # type: ignore  # may raise ImportError
         _reranker = Reranker()
     return _reranker
 

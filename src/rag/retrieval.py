@@ -12,6 +12,28 @@ from .embeddings import EmbeddingService
 from .vector_db import RetrievalResult, StoredDocument, VectorStoreManager
 
 
+def _safe_float_str(value, fmt: str = ".4f") -> str:
+    """Format a float defensively; treat non-finite values as 'unknown'."""
+    try:
+        f = float(value)
+    except (TypeError, ValueError):
+        return "unknown"
+    if not np.isfinite(f):
+        return "unknown"
+    return format(f, fmt)
+
+
+def _safe_int_str(value) -> str:
+    """Format a value as an int defensively; non-finite or non-numeric → 'unknown'."""
+    try:
+        f = float(value)
+    except (TypeError, ValueError):
+        return "unknown"
+    if not np.isfinite(f):
+        return "unknown"
+    return str(int(f))
+
+
 @dataclass(frozen=True)
 class RetrievedContext:
     """A retrieved text chunk (PDF, pytorch.json, etc.) — distinct from code mutations."""
@@ -212,8 +234,8 @@ class RetrievalService:
         lines: list[str] = []
         for mutation in mutations:
             fitness = mutation.metadata.get("fitness") or []
-            accuracy = f"{fitness[0]:.4f}" if fitness else "unknown"
-            params = f"{int(fitness[1])}" if len(fitness) > 1 else "unknown"
+            accuracy = _safe_float_str(fitness[0], ".4f") if fitness else "unknown"
+            params = _safe_int_str(fitness[1]) if len(fitness) > 1 else "unknown"
             
             # Show improvement deltas if available (helps LLM understand what made mutations successful)
             improvement = mutation.metadata.get("improvement") or {}
