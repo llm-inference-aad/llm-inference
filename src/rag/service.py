@@ -21,9 +21,12 @@ level augment operation:
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 import time
 from typing import TYPE_CHECKING, List, Optional
+
+logger = logging.getLogger(__name__)
 
 from .api_types import (
     AugmentRequest,
@@ -35,6 +38,7 @@ from .api_types import (
 
 if TYPE_CHECKING:
     from .backend_protocol import BackendProtocol
+    from .bookkeeping import RunLedger
     from .prompt_enhancer import PromptEnhancerConfig
     from .reranker import Reranker
 
@@ -100,6 +104,7 @@ class RagService:
         backend: Optional["BackendProtocol"] = None,
         reranker: Optional["Reranker"] = _SENTINEL,  # type: ignore[assignment]
         config: Optional["PromptEnhancerConfig"] = None,
+        ledger: Optional["RunLedger"] = None,
     ) -> None:
         self._backend: "BackendProtocol" = backend or self._build_default_backend()
         _pec_cls = _get_prompt_enhancer_config_class()
@@ -113,6 +118,9 @@ class RagService:
             self._reranker: Optional["Reranker"] = self._build_default_reranker()
         else:
             self._reranker = reranker  # type: ignore[assignment]
+
+        # Optional ledger for bookkeeping. When None, no events are emitted.
+        self._ledger: Optional["RunLedger"] = ledger
 
     # ---------------------------------------------------------------------- #
     # Default factory helpers
@@ -245,7 +253,11 @@ class RagService:
             latency_ms=latency_ms,
         )
 
-        return AugmentResponse(
+        # --- Emit bookkeeping ledger event --------------------------------- #
+        # This is an "augment event" — eval_outputs / model_response are None.
+        # A companion "eval event" will be written by run_improved._log_mutation_result
+        # with the same request_id so the two records can be JOINed by reader.
+        response = AugmentResponse(
             augmented_prompt=augmented_prompt,
             blocks_used=all_blocks_used,
             diagnostics={
@@ -258,6 +270,13 @@ class RagService:
             },
             latency_ms=latency_ms,
         )
+        self._emit_ledger_event(
+            request=request,
+            response=response,
+            sections_built=sections_built,
+            latency_ms=latency_ms,
+        )
+        return response
 
     # ---------------------------------------------------------------------- #
     # Private helpers
@@ -465,3 +484,57 @@ class RagService:
             )
         except Exception:
             pass
+
+    def _emit_ledger_event(
+        self,
+        request: AugmentRequest,
+        response: AugmentResponse,
+        sections_built: bool,
+        latency_ms: float,
+    ) -> None:
+        """Emit an augment-time bookkeeping event to the injected ledger.
+
+        This is the first of two events for the same mutation attempt.  The
+        eval-time event is written by run_improved._log_mutation_result and
+        shares the same ``request_id``.
+
+        If ``self._ledger`` is None, nothing is emitted (backward compatible).
+        """
+        if self._ledger is None:
+            return
+        try:
+            from dataclasses import asdict as _asdict  # noqa: PLC0415
+            from .bookkeeping import MutationEvent  # noqa: PLC0415
+
+            # Build a partial MutationEvent with augment-time fields populated.
+            raw_prompt = request.template or ""
+            event = MutationEvent(
+                run_id=request.run_id or os.getenv("RUN_ID", "unknown"),
+                generation=-1,  # generation is unknown at augment time; caller fills via eval event
+                parent_gene_id=request.gene_id or "unknown",
+                child_gene_id=request.gene_id or "unknown",
+                mutation_type=request.mutation_type or "unknown",
+                backend=self._backend.__class__.__name__,
+                request_id=request.request_id or MutationEvent.make_request_id(),
+                prompt_id=MutationEvent.make_prompt_id(raw_prompt),
+                raw_prompt=raw_prompt,
+                augmented_prompt=response.augmented_prompt,
+                retrieval_request=_asdict(request),
+                retrieval_response={
+                    "augmented_prompt": response.augmented_prompt,
+                    "blocks_used": len(response.blocks_used),
+                    "diagnostics": response.diagnostics,
+                    "latency_ms": response.latency_ms,
+                },
+                model_request=None,
+                model_response=None,
+                parsed_artifact=None,
+                eval_outputs=None,
+                latencies={
+                    "augment_ms": latency_ms,
+                },
+                failure_mode=None if sections_built else "retrieval_empty",
+            )
+            self._ledger.append(event)
+        except Exception as exc:
+            logger.warning("[RagService] Failed to emit ledger event: %s", exc)
