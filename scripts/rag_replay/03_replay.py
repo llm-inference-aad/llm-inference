@@ -201,7 +201,9 @@ def _submit(bash_script: str, run_dir: Path, sbatch_dir: Path,
     script_path = sbatch_dir / f"{new_gid}.sh"
     script_path.write_text(bash_script)
     env = os.environ.copy()
-    env["RUN_DIR"] = str(run_dir.relative_to(ROOT_DIR)) if run_dir.is_relative_to(ROOT_DIR) else str(run_dir)
+    # Absolute path: train.py auto-chdir to sota/ExquisiteNetV2/ would resolve
+    # a relative RUN_DIR under that subdir, hiding results from the poll loop.
+    env["RUN_DIR"] = str(run_dir.resolve())
     env["LLM_INFERENCE_ROOT_DIR"] = str(ROOT_DIR)
     cmd = ["sbatch", "--parsable", "--export=ALL", str(script_path)]
     try:
@@ -256,9 +258,41 @@ def _parse_results(path: Path) -> tuple[float, float, float | None, float | None
         return None
 
 
+_CUDA_BUSY_PAT = "CUDA-capable device(s) is/are busy or unavailable"
+
+
+def _is_transient_cuda(slurm_err_dir: Path, job_id: str) -> bool:
+    """Detect the transient driver-busy failure that's worth one retry."""
+    if not job_id:
+        return False
+    candidate = slurm_err_dir / f"eval-{job_id}.err"
+    if not candidate.exists():
+        return False
+    try:
+        return _CUDA_BUSY_PAT in candidate.read_text(errors="replace")
+    except Exception:
+        return False
+
+
+def _resubmit(sbatch_dir: Path, run_dir: Path, new_gid: str) -> tuple[str | None, str | None]:
+    script_path = sbatch_dir / f"{new_gid}.sh"
+    if not script_path.exists():
+        return None, f"missing sbatch script {script_path}"
+    env = os.environ.copy()
+    env["RUN_DIR"] = str(run_dir.resolve())
+    env["LLM_INFERENCE_ROOT_DIR"] = str(ROOT_DIR)
+    out = subprocess.run(["sbatch", "--parsable", "--export=ALL", str(script_path)],
+                         capture_output=True, text=True, env=env, check=False)
+    if out.returncode != 0:
+        return None, (out.stderr or out.stdout).strip()
+    return out.stdout.strip(), None
+
+
 def _poll_results(journal_path: Path, run_dir: Path,
                   results_path: Path, timeout_s: float) -> None:
     """Walk the journal, fill in test_acc/params for any pending entries."""
+    slurm_err_dir = run_dir / "slurm_errors"
+    sbatch_dir = run_dir / "sbatch"
     pending: dict[str, dict] = {}
     final_rows: list[dict] = []
     for row in _journal_iter(journal_path):
@@ -285,6 +319,17 @@ def _poll_results(journal_path: Path, run_dir: Path,
                 state = _slurm_state(jid)
                 if state and state.upper() in {"FAILED", "TIMEOUT", "CANCELLED",
                                                "NODE_FAIL", "OUT_OF_MEMORY", "BOOT_FAIL"}:
+                    if (not row.get("cuda_retry")
+                            and _is_transient_cuda(slurm_err_dir, jid)):
+                        new_jid, err = _resubmit(sbatch_dir, run_dir, gid)
+                        if new_jid:
+                            print(f"[poll] {gid}: CUDA-busy on {jid}, resubmitted as {new_jid}", flush=True)
+                            row["cuda_retry"] = True
+                            row["prev_slurm_job_id"] = jid
+                            row["slurm_job_id"] = new_jid
+                            continue
+                        else:
+                            print(f"[poll] {gid}: CUDA-busy retry failed: {err}", flush=True)
                     row.update(status="failed", slurm_state=state,
                                finished_at=datetime.now(timezone.utc).isoformat())
                     final_rows.append(row); pending.pop(gid)

@@ -9,7 +9,7 @@
 #     scripts/rag_replay/03_replay.sbatch
 #
 #SBATCH --job-name=rag_replay_driver
-#SBATCH -t 04:00:00
+#SBATCH -t 08:00:00
 #SBATCH -n 4
 #SBATCH --mem 16G
 #SBATCH -N 1
