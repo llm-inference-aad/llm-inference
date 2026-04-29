@@ -221,8 +221,24 @@ numbered PR:
 - `d40302d9f fix(rag-replay): absolute RUN_DIR, 8h driver budget, CUDA-busy
   retry` — operational fixes for the replay harness.
 - `04805e342 docs(rag): add eval dataset spec + componentization plan for
-  backend A/B testing` — adds [`docs/rag_replay/05_eval_dataset_spec.md`](../rag_replay/05_eval_dataset_spec.md)
-  alongside this file.
+  backend A/B testing` — adds the full `docs/rag_replay/` documentation set
+  alongside this file:
+  - [`docs/rag_replay/00_overview.md`](../rag_replay/00_overview.md) —
+    motivation, deliverables, success criteria for the paired evaluation.
+  - [`docs/rag_replay/01_aggregate.md`](../rag_replay/01_aggregate.md) —
+    `01_aggregate.py` design: how 156 source genes are pulled from the
+    historical RAG-OFF runs into `past_genes.csv` and prompt files.
+  - [`docs/rag_replay/02_replay_loop.md`](../rag_replay/02_replay_loop.md) —
+    `03_replay.py` design: per-arm sbatch submission, journal-based resume,
+    and the in-process `RagRuntime.enhance_template` call that produces the
+    with-RAG arm.
+  - [`docs/rag_replay/03_metrics.md`](../rag_replay/03_metrics.md) —
+    `04_compare.py` design: paired CSV joining no-RAG / with-RAG arms with
+    syntax-validity, fallback, accuracy, params, train-time, and prompt
+    sizes; goodput / accuracy / cost delta calculations and the stratified
+    fallback sub-cohort.
+  - [`docs/rag_replay/05_eval_dataset_spec.md`](../rag_replay/05_eval_dataset_spec.md) —
+    schema for `past_genes.csv` and the prompt files that feed the harness.
 - `c7c04b665 fix(tests): produce non-NaN deterministic vectors in
   FakeEmbeddingService` — fix for an upstream NaN edge-case from the all-zero
   SHA256 codepath.
