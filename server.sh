@@ -2,22 +2,22 @@
 # NOTE: SBATCH directives are evaluated at submission time.
 # To make this "modular" per-model, override these on the `sbatch` command line.
 # Example overrides:
-# - `sbatch -p coe-gpu -C H100 --gpus-per-node=2 server.sh`
-# - `sbatch -p ice-bw-gpu --gpus-per-node=2 server.sh`
+# - `sbatch -p coe-gpu -C H100 --gpus-per-node=1 server.sh`
+# - `sbatch -p ice-gpu -C gpu-a100 --gpus-per-node=1 server.sh`
 #
-# Defaults below are tuned for the current production baseline:
-# - `meta-llama/Llama-3.3-70B-Instruct` in BF16 via vLLM
-# - requires 2x80GB-class GPUs (H100/A100) with `TENSOR_PARALLEL_SIZE=2`
+# Defaults below are tuned for the current exploratory GLM baseline:
+# - `zai-org/GLM-4.7-Flash`
+# - tentative 1x80GB-class NVIDIA placement with `TENSOR_PARALLEL_SIZE=1`
 #
 # IMPORTANT: GGUF models (e.g. `*GGUF` repos with `Q5_K_M`) are not loadable by
 # `server_vllm.py`'s Hugging Face loader path. Stage GGUF files for llama.cpp,
 # or use a non-GGUF HF checkpoint for vLLM.
 #SBATCH --job-name=LLMGE01_Server
 #SBATCH -t 08:00:00
-#SBATCH -C "H100"
 #SBATCH --gpus-per-node=2
-#SBATCH -p ice-gpu
-#SBATCH --mem 160G
+#SBATCH -C "nvidia-gpu"        # Keep CUDA-capable placement broad unless a submission overrides the constraint.
+#SBATCH -p coe-gpu             # Default to the same queue family typically used by the main run job.
+#SBATCH --mem 80G
 #SBATCH -c 16
 #SBATCH --output=metrics/slurm-results/slurm-server-%j.out
 #SBATCH --error=metrics/slurm-results/slurm-server-%j.err
@@ -44,9 +44,7 @@ else
     export RUN_DIR="${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}"
     export RUN_LOG_DIR="${RUN_DIR}/logs"
     export RUN_METRICS_DIR="${RUN_DIR}/metrics"
-    export RUN_ERRORS_DIR="${RUN_DIR}/errors"
     export SLURM_LOG_DIR="${RUN_LOG_DIR}"
-    export SLURM_ERROR_DIR="${RUN_ERRORS_DIR}"
     export METRICS_PATH="${RUN_METRICS_DIR}"
     export VENV_PATH="$(pwd)/.venv"
     export SERVER_HOST="0.0.0.0"
@@ -81,21 +79,16 @@ export RUN_ID=${RUN_ID:-server-only}
 export RUN_DIR=${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}
 export RUN_LOG_DIR=${RUN_LOG_DIR:-${RUN_DIR}/logs}
 export RUN_METRICS_DIR=${RUN_METRICS_DIR:-${RUN_DIR}/metrics}
-export RUN_ERRORS_DIR=${RUN_ERRORS_DIR:-${RUN_DIR}/errors}
 export SLURM_LOG_DIR=${SLURM_LOG_DIR:-${RUN_LOG_DIR}}
-export SLURM_ERROR_DIR=${SLURM_ERROR_DIR:-${RUN_ERRORS_DIR}}
 export METRICS_PATH=${METRICS_PATH:-${RUN_METRICS_DIR}}
 export HOSTNAME_LOG_FILE=${HOSTNAME_LOG_FILE:-"${RUN_LOG_DIR}/hostname.log"}
 export LOADBALANCER_LOG_FILE=${LOADBALANCER_LOG_FILE:-"${RUN_LOG_DIR}/loadbalancer.log"}
 export SERVER_REGISTRY_FILE=${SERVER_REGISTRY_FILE:-"${RUN_LOG_DIR}/servers.json"}
 
-mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" "${RUN_ERRORS_DIR}" "${SLURM_LOG_DIR}" "${SLURM_ERROR_DIR}" "${RUN_METRICS_DIR}/gpu"
-exec > >(tee -a "${RUN_LOG_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.out") \
-     2> >(tee -a "${RUN_ERRORS_DIR}/server-runtime-${SLURM_JOB_ID:-manual}.err" >&2)
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" "${SLURM_LOG_DIR}" "${RUN_METRICS_DIR}/gpu"
 echo "RUN_ID: ${RUN_ID}"
 echo "RUN_LOG_DIR: ${RUN_LOG_DIR}"
 echo "RUN_METRICS_DIR: ${RUN_METRICS_DIR}"
-echo "RUN_ERRORS_DIR: ${RUN_ERRORS_DIR}"
 
 # Activate virtual environment
 if [ -d "${VENV_PATH}/bin" ]; then

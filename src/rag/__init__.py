@@ -12,6 +12,7 @@ _LAZY_SUBMODULES = {
     "data_ingestion",
     "embeddings",
     "prompt_enhancer",
+    "reranker",
     "retrieval",
     "vector_db",
 }

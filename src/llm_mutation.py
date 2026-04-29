@@ -74,8 +74,8 @@ def augment_network(input_filename='network.py', output_filename='network_x.py',
             
             # Surya: Log validation error for analysis
             try:
-                os.makedirs(RUN_LOG_DIR, exist_ok=True)
-                with open(os.path.join(RUN_LOG_DIR, "validation_errors.csv"), "a") as f:
+                os.makedirs(RUN_ERRORS_DIR, exist_ok=True)
+                with open(os.path.join(RUN_ERRORS_DIR, "validation_errors.csv"), "a") as f:
                     csv.writer(f).writerow([datetime.now(), gene_id, augment_idx, type(exc).__name__, str(exc)])
             except Exception:
                 pass
