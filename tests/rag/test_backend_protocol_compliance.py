@@ -78,3 +78,36 @@ class TestFaissBackendClassShape:
         except ModuleNotFoundError:
             pytest.skip("FaissBackend not available on this base branch")
         assert callable(getattr(FaissBackend, "index", None))
+
+
+class TestMemoryBackendCompliance:
+    """Live MemoryBackend instance — uses fakes so no torch/faiss needed."""
+
+    def _instance(self):
+        from src.rag.backends.memory_backend import MemoryBackend
+        from tests.rag.fakes import FakeEmbeddingService, FakeVectorStoreManager
+
+        return MemoryBackend(
+            vector_store=FakeVectorStoreManager(),
+            embedding_service=FakeEmbeddingService(),
+            min_similarity=0.0,
+        )
+
+    def test_isinstance_backend_protocol(self):
+        assert isinstance(self._instance(), BackendProtocol)
+
+    def test_retrieve_callable(self):
+        assert callable(getattr(self._instance(), "retrieve", None))
+
+    def test_index_callable(self):
+        assert callable(getattr(self._instance(), "index", None))
+
+    def test_retrieve_returns_response(self):
+        from src.rag.api_types import RetrieveResponse
+        resp = self._instance().retrieve(_sample_request())
+        assert isinstance(resp, RetrieveResponse)
+
+    def test_index_accepts_string_and_dict(self):
+        backend = self._instance()
+        backend.index("a plain string summary")
+        backend.index({"text": "dict summary", "gene_id": "g1"})

@@ -171,6 +171,7 @@ class FakeVectorStoreManager:
 
     CODE_NAMESPACE = "code"
     TEXT_NAMESPACE = "text"
+    MEMORY_NAMESPACE = "memory"
 
     def __init__(self, rag_data_dir: str | None = None) -> None:
         # rag_data_dir accepted for API compatibility but ignored.
@@ -199,6 +200,15 @@ class FakeVectorStoreManager:
     ) -> list[str]:
         return self._ns(self.TEXT_NAMESPACE).add_documents(contents, embeddings, metadata)
 
+    def add_memory_documents(
+        self,
+        contents: Sequence[str],
+        embeddings: np.ndarray,
+        metadata: Sequence[dict],
+    ) -> list[str]:
+        """Add episodic memory summaries (uses 384-dim text embeddings)."""
+        return self._ns(self.MEMORY_NAMESPACE).add_documents(contents, embeddings, metadata)
+
     # --- search helpers ----------------------------------------------------
 
     def search_code(self, query_embedding: np.ndarray, top_k: int = 5) -> list:
@@ -206,6 +216,10 @@ class FakeVectorStoreManager:
 
     def search_text(self, query_embedding: np.ndarray, top_k: int = 5) -> list:
         return self._ns(self.TEXT_NAMESPACE).search(query_embedding, top_k)
+
+    def search_memory(self, query_embedding: np.ndarray, top_k: int = 5) -> list:
+        """Search the memory namespace for similar past summaries."""
+        return self._ns(self.MEMORY_NAMESPACE).search(query_embedding, top_k)
 
     # --- introspection helpers (bonus surface) ----------------------------
 

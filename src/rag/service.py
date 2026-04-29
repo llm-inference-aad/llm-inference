@@ -105,8 +105,10 @@ class RagService:
         reranker: Optional["Reranker"] = _SENTINEL,  # type: ignore[assignment]
         config: Optional["PromptEnhancerConfig"] = None,
         ledger: Optional["RunLedger"] = None,
+        memory_backend: Optional["BackendProtocol"] = None,
     ) -> None:
         self._backend: "BackendProtocol" = backend or self._build_default_backend()
+        self._memory_backend: Optional["BackendProtocol"] = memory_backend
         _pec_cls = _get_prompt_enhancer_config_class()
         self._config = config or _pec_cls()
 
@@ -169,6 +171,7 @@ class RagService:
 
         code_blocks: List[RetrievedBlock] = []
         text_blocks: List[RetrievedBlock] = []
+        memory_blocks: List[RetrievedBlock] = []
         reranker_used = False
 
         # --- Code namespace retrieval --------------------------------------- #
@@ -204,6 +207,26 @@ class RagService:
                 text_resp = self._backend.retrieve(text_req)
                 text_blocks = list(text_resp.blocks)
 
+        # --- Memory namespace retrieval ------------------------------------ #
+        if self._memory_backend is not None and getattr(_c, "RAG_MEMORY_STORE_ENABLED", False):
+            mem_query = request.query_code or request.mutation_type or ""
+            if mem_query.strip():
+                mem_top_k = getattr(_c, "RAG_MEMORY_TOP_K", 3)
+                mem_req = RetrieveRequest(
+                    query=mem_query,
+                    namespace="memory",
+                    top_k=mem_top_k,
+                    filters=None,
+                    run_id=request.run_id,
+                    request_id=request.request_id,
+                )
+                try:
+                    mem_resp = self._memory_backend.retrieve(mem_req)
+                    memory_blocks = list(mem_resp.blocks)
+                except Exception as exc:
+                    logger.warning("[RagService] Memory retrieval failed: %s", exc)
+                    memory_blocks = []
+
         # --- Optional reranking -------------------------------------------- #
         if self._reranker is not None and (code_blocks or text_blocks):
             code_rerank_query = self._build_rerank_query(request.query_code, request.mutation_type)
@@ -231,15 +254,20 @@ class RagService:
             mutation_type=request.mutation_type,
         )
 
+        # Dedup: drop memory blocks whose gene_id overlaps a code block
+        # (richer code block wins over a one-line memory bullet).
+        memory_blocks = self._dedup_memory_blocks(memory_blocks, code_blocks)
+
         # --- Format prompt ------------------------------------------------- #
         augmented_prompt, sections_built = self._format_prompt(
             template=request.template,
             code_blocks=code_blocks,
             text_blocks=text_blocks_selected,
+            memory_blocks=memory_blocks,
         )
 
         # --- Collect all blocks used --------------------------------------- #
-        all_blocks_used = list(code_blocks) + list(text_blocks_selected)
+        all_blocks_used = list(code_blocks) + list(text_blocks_selected) + list(memory_blocks)
 
         latency_ms = (time.monotonic() - t0) * 1000.0
 
@@ -264,9 +292,11 @@ class RagService:
                 "reranker_used": reranker_used,
                 "code_blocks_retrieved": len(code_blocks),
                 "text_blocks_retrieved": len(text_blocks_selected),
+                "memory_blocks_retrieved": len(memory_blocks),
                 "sections_built": sections_built,
                 "rag_use_code_context": bool(_c.RAG_USE_CODE_CONTEXT),
                 "rag_use_text_context": bool(_c.RAG_USE_TEXT_CONTEXT),
+                "rag_memory_store_enabled": bool(getattr(_c, "RAG_MEMORY_STORE_ENABLED", False)),
             },
             latency_ms=latency_ms,
         )
@@ -398,10 +428,26 @@ class RagService:
         return selected
 
     @staticmethod
+    def _dedup_memory_blocks(
+        memory_blocks: List[RetrievedBlock],
+        code_blocks: List[RetrievedBlock],
+    ) -> List[RetrievedBlock]:
+        """Drop memory blocks whose gene_id overlaps a code block.
+
+        The richer code block carries the actual mutation source and wins; the
+        memory bullet would be redundant.
+        """
+        if not memory_blocks or not code_blocks:
+            return memory_blocks
+        code_ids = {b.document_id for b in code_blocks}
+        return [m for m in memory_blocks if m.document_id not in code_ids]
+
+    @staticmethod
     def _format_prompt(
         template: str,
         code_blocks: List[RetrievedBlock],
         text_blocks: List[RetrievedBlock],
+        memory_blocks: Optional[List[RetrievedBlock]] = None,
     ) -> tuple[str, bool]:
         """Build the augmented prompt string from retrieved blocks.
 
@@ -409,6 +455,7 @@ class RagService:
             (augmented_prompt, sections_were_built)
         """
         sections: list[str] = []
+        memory_blocks = memory_blocks or []
 
         if text_blocks:
             text_parts = [
@@ -436,6 +483,16 @@ class RagService:
                 "how they grouped convolutions, or their choice of optimizer) and apply those lessons to "
                 "your current task.\n"
                 f"{code_block_str}"
+            )
+
+        if memory_blocks:
+            mem_parts = [f"- {b.content}" for b in memory_blocks]
+            sections.append(
+                "### Past Mutation Attempts (episodic memory)\n"
+                "Lightweight summaries of prior mutations on this run, including both "
+                "successes and failures. Use them to avoid repeating dead-end patterns "
+                "and to bias toward directions that have moved the Pareto front:\n"
+                + "\n".join(mem_parts)
             )
 
         if not sections:
