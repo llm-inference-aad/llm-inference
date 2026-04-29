@@ -335,10 +335,13 @@ class TestFitnessInSummary:
         # run_improved._log_mutation_result builds and passes to memory_backend.index.
         # Since _log_mutation_result depends on run_improved globals, we exercise
         # the format contract through build_mutation_description + index directly.
+        # Prefer src.rag.data_ingestion to avoid picking up the
+        # test_apply_rag_context_integration.py stub that monkey-patches
+        # rag.data_ingestion.build_mutation_description = lambda *a: "desc".
         try:
-            from rag.data_ingestion import build_mutation_description
-        except ModuleNotFoundError:
             from src.rag.data_ingestion import build_mutation_description
+        except ModuleNotFoundError:
+            from rag.data_ingestion import build_mutation_description
 
         fitness = (0.9250, 1_234_567)
         improvement = {"accuracy_delta": 0.0125, "parameters_delta": -50000}
