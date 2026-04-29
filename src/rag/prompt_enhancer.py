@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 from dataclasses import dataclass
-from typing import List
+from typing import TYPE_CHECKING, List, Optional
 
 from cfg.constants import (
     RAG_MIN_SIMILARITY,
@@ -22,6 +22,9 @@ from cfg.constants import (
 from .reranker import Reranker
 from .retrieval import RetrievedContext, RetrievedMutation, RetrievalService, RetrievalStats
 from utils.rag_metrics import record_metric
+
+if TYPE_CHECKING:
+    from .backend_protocol import BackendProtocol
 
 # M4: Maximum lines of query code sent to cross-encoder to avoid CPU bottleneck
 _RERANK_MAX_QUERY_LINES = 20
@@ -49,11 +52,28 @@ class PromptEnhancerConfig:
 
 
 class PromptEnhancer:
-    """Build augmented prompt text that includes retrieval context."""
+    """Build augmented prompt text that includes retrieval context.
 
-    def __init__(self, retrieval_service: RetrievalService, config: PromptEnhancerConfig | None = None):
+    Can be wired to either the legacy :class:`~src.rag.retrieval.RetrievalService`
+    (``retrieval_service`` argument) **or** to any object satisfying
+    :class:`~src.rag.backend_protocol.BackendProtocol` (``backend`` argument).
+    When *backend* is supplied, :meth:`_retrieve_via_backend` is used for the
+    code-context leg of :meth:`build_context_with_stats`.  The text-context leg
+    and all prompt-formatting logic are unchanged.
+
+    Backward compatibility: the *retrieval_service* argument still works and is
+    the default when *backend* is omitted.
+    """
+
+    def __init__(
+        self,
+        retrieval_service: RetrievalService,
+        config: PromptEnhancerConfig | None = None,
+        backend: Optional["BackendProtocol"] = None,
+    ):
         self.retrieval = retrieval_service
         self.config = config or PromptEnhancerConfig()
+        self._backend: Optional["BackendProtocol"] = backend
 
     def build_context(
         self,
@@ -96,12 +116,85 @@ class PromptEnhancer:
         result.sort(key=lambda m: m.score, reverse=True)
         return result
 
+    def _retrieve_via_backend(
+        self,
+        query_code: str,
+    ) -> tuple[list[RetrievedMutation], RetrievalStats | None]:
+        """Thin wrapper: calls the injected BackendProtocol and converts the
+        response back into the (mutations, stats) tuple the rest of this class
+        already knows how to handle.
+
+        This is the only place that branches on whether a backend is wired in.
+        All other methods remain untouched so that the existing fallback path
+        through ``self.retrieval`` continues to work.
+
+        Returns an empty list + None stats if *_backend* is not set.
+        """
+        if self._backend is None:
+            return [], None
+
+        from .api_types import RetrieveRequest
+        from .vector_db import VectorStoreManager
+
+        req = RetrieveRequest(
+            query=query_code,
+            namespace=VectorStoreManager.CODE_NAMESPACE,
+            top_k=self.config.top_k,
+            filters={"min_similarity": RAG_MIN_SIMILARITY},
+        )
+        response = self._backend.retrieve(req)
+
+        # Convert RetrievedBlock → RetrievedMutation so the downstream
+        # formatting helpers in this class keep working without modification.
+        mutations: list[RetrievedMutation] = []
+        for block in response.blocks:
+            block_diag = block.diagnostics or {}
+            mutations.append(
+                RetrievedMutation(
+                    gene_id=block.document_id,
+                    score=block.score,
+                    description=block.title,
+                    code=block.content,
+                    metadata={
+                        "gene_id": block.document_id,
+                        "description": block.title,
+                        "source": block_diag.get("source", "code"),
+                        "mutation_type": block_diag.get("mutation_type"),
+                        # Preserve any extra diagnostics for downstream logging.
+                        **{k: v for k, v in block_diag.items()
+                           if k not in ("source", "mutation_type")},
+                    },
+                )
+            )
+
+        # Synthesize a lightweight RetrievalStats from the response diagnostics.
+        resp_diag = response.diagnostics or {}
+        code_search = resp_diag.get("code_search") or {}
+        stats: RetrievalStats | None = None
+        if code_search:
+            stats = RetrievalStats(
+                candidate_k=int(code_search.get("candidate_count", 0)),
+                returned_k=int(code_search.get("returned_k", len(mutations))),
+                filtered_k=int(code_search.get("filtered_k", len(mutations))),
+                min_similarity=RAG_MIN_SIMILARITY,
+            )
+
+        return mutations, stats
+
     def build_context_with_stats(
         self,
         mutation_type: str | None = None,
         query_code: str | None = None,
     ) -> tuple[List[RetrievedMutation], RetrievalStats | None]:
-        """Build code context and return similarity-search stats (if used)."""
+        """Build code context and return similarity-search stats (if used).
+
+        When a :class:`~src.rag.backend_protocol.BackendProtocol` was supplied
+        at construction time (``backend=...``), the code-similarity leg is
+        dispatched through :meth:`_retrieve_via_backend` so the caller is
+        decoupled from ``RetrievalService`` internals.  The fallback (mutation-
+        type and high-performer retrieval) still uses ``self.retrieval`` directly
+        because those operations have no BackendProtocol equivalent yet.
+        """
         if not RAG_USE_CODE_CONTEXT:
             return [], None
 
@@ -109,9 +202,14 @@ class PromptEnhancer:
         mutations: list[RetrievedMutation] = []
 
         if query_code:
-            similar, stats = self.retrieval.retrieve_similar_mutations_with_stats(
-                query_code, top_k=self.config.top_k, min_similarity=RAG_MIN_SIMILARITY
-            )
+            if self._backend is not None:
+                # New path: delegate to the injected BackendProtocol.
+                similar, stats = self._retrieve_via_backend(query_code)
+            else:
+                # Legacy path: call RetrievalService directly.
+                similar, stats = self.retrieval.retrieve_similar_mutations_with_stats(
+                    query_code, top_k=self.config.top_k, min_similarity=RAG_MIN_SIMILARITY
+                )
             mutations.extend(similar)
 
         if mutation_type and len(mutations) < self.config.top_k:

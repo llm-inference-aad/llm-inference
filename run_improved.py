@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 import copy
@@ -21,6 +22,104 @@ from src.cfg.constants import *
 import concurrent.futures
 import uuid
 from src import llm_mutation, llm_crossover
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# RAG client — constructed once at startup, shared across the process.
+# Callers use _rag_client directly; they never import retrieval internals.
+# When RAG_ENABLED is False, _rag_client remains None and _apply_rag_context
+# returns the template unchanged.
+# ---------------------------------------------------------------------------
+_rag_client = None
+
+# ---------------------------------------------------------------------------
+# Run ledger — constructed lazily on first use.
+# Writes one MutationEvent per emit point (augment + eval) to rag_ledger.jsonl.
+# Never crashes the caller; write errors are swallowed.
+# ---------------------------------------------------------------------------
+_run_ledger = None
+
+# Maps gene_id -> request_id of the augment-time RAG call that produced its
+# template.  Populated by _apply_rag_context (which runs *before* GLOBAL_DATA
+# is created for the gene) and consumed by _emit_eval_ledger_event so the two
+# ledger events for one mutation share a request_id (enables JOIN at replay).
+_rag_request_id_by_gene: dict[str, str] = {}
+
+# ---------------------------------------------------------------------------
+# Generation population cache — accumulates eval-side MutationEvents for the
+# current generation so that Pareto eligibility can be computed relative to
+# all genes evaluated in the same generation window.
+#
+# Layout: { generation_number: [MutationEvent, ...] }
+#
+# The dict grows one key per generation and is never pruned during a run (RAM
+# cost is negligible for typical population sizes ≤ 64).  Pareto eligibility
+# is computed lazily when a new event is appended: earlier events in the same
+# generation get their flag retroactively updated in the in-memory list so that
+# a downstream reader replaying the ledger will see the final flag value.
+# ---------------------------------------------------------------------------
+_generation_population: dict[int, list] = {}  # generation -> list[MutationEvent]
+
+# ---------------------------------------------------------------------------
+# Memory backend — episodic mutation summaries (PR 8).
+#
+# When RAG_MEMORY_STORE_ENABLED=true a MemoryBackend is constructed in main()
+# and stored here.  _log_mutation_result appends a record dict to
+# _pending_memory_writes for every gene it sees (both successes and failures).
+# _flush_memory_buffer is called after save_checkpoint at end of generation
+# and writes the batch to the FAISS memory namespace.
+# ---------------------------------------------------------------------------
+_MEMORY_BACKEND = None  # type: ignore[assignment]
+_pending_memory_writes: list[dict] = []
+
+
+def _get_run_ledger():
+    """Return the module-level RunLedger, constructing it lazily on first call."""
+    global _run_ledger
+    if _run_ledger is not None:
+        return _run_ledger
+    try:
+        from rag.bookkeeping import RunLedger  # noqa: PLC0415
+        _run_ledger = RunLedger(run_id=RUN_ID)
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG] Failed to build RunLedger: {type(exc).__name__}: {exc} — "
+            "bookkeeping disabled for this session.",
+            stacklevel=2,
+        )
+        _run_ledger = None
+    return _run_ledger
+
+def _get_rag_client():
+    """Return the module-level RagClient, constructing it lazily on first call.
+
+    Returns None when RAG_ENABLED is False or when the backend fails to
+    initialise (e.g. dimension mismatch); callers must handle None gracefully.
+    """
+    global _rag_client
+    if _rag_client is not None:
+        return _rag_client
+
+    from cfg.constants import RAG_ENABLED as _RAG_ENABLED
+    if not _RAG_ENABLED:
+        return None
+
+    try:
+        from rag.client import RagClient
+        _rag_client = RagClient()
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG] Failed to build RagClient: {type(exc).__name__}: {exc} — "
+            "RAG disabled for this session.",
+            stacklevel=2,
+        )
+        _rag_client = None  # remain None so callers fall back to plain template
+
+    return _rag_client
+
 
 # Global executor for direct LLM tasks
 LLM_TASK_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=population_size)
@@ -109,9 +208,17 @@ def _apply_rag_context(
     mutation_type: str | None,
     query_code: str | None = None,
     gene_id: str | None = None,
+    rag_client=None,
 ) -> str:
-    runtime = get_runtime()
-    if runtime is None:
+    """Apply RAG context augmentation to *template_txt*.
+
+    Uses a :class:`~rag.client.RagClient` instance.  If *rag_client* is not
+    provided, the module-level singleton (``_get_rag_client()``) is used.
+    When the client is None (RAG disabled or failed to initialise) the template
+    is returned unchanged.
+    """
+    client = rag_client if rag_client is not None else _get_rag_client()
+    if client is None:
         status = get_runtime_status()
         record_metric(
             "rag_generation_skipped",
@@ -127,12 +234,31 @@ def _apply_rag_context(
         return template_txt
     start = time.perf_counter()
     try:
-        augmented_template, mutations = runtime.enhance_template(
+        from rag.api_types import AugmentRequest
+        # Generate the request_id here (not inside RagClient) so the caller
+        # has the same value RagService records in the augment ledger event.
+        # AugmentRequest is a frozen dataclass — RagClient._ensure_request_id
+        # uses dataclasses.replace which returns a new instance, so without
+        # passing it in we would not see the id RagService used.
+        request_id = str(uuid.uuid4())
+        req = AugmentRequest(
             template=template_txt,
-            mutation_type=mutation_type,
-            query_code=query_code,
+            mutation_type=mutation_type or "",
+            query_code=query_code or "",
             gene_id=gene_id,
+            request_id=request_id,
         )
+        resp = client.augment(req)
+        augmented_template = resp.augmented_prompt
+        n_blocks = len(resp.blocks_used)
+        # Store the request_id so _log_mutation_result can link the eval event
+        # to the augment event already written by RagService (two-event approach).
+        # We use a module-level mapping (not GLOBAL_DATA) because at this point
+        # GLOBAL_DATA[gene_id] does not yet exist — it is created only after the
+        # mutation job is submitted, which happens *after* generate_template
+        # (and therefore after this call) returns.
+        if gene_id is not None:
+            _rag_request_id_by_gene[gene_id] = request_id
     except Exception as exc:
         record_metric(
             "rag_generation_failed",
@@ -150,7 +276,7 @@ def _apply_rag_context(
         {
             "gene_id": gene_id,
             "mutation_type": mutation_type,
-            "retrieved_mutations": len(mutations),
+            "retrieved_mutations": n_blocks,
             "retrieval_ms": duration_ms,
             "prompt_tokens": len(augmented_template.split()),
         },
@@ -159,10 +285,25 @@ def _apply_rag_context(
 
 
 def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
+    # --- Bookkeeping ledger: emit eval-side event ----------------------------- #
+    # We use a two-event approach: the augment event is written by RagService
+    # at retrieval time; this function writes the eval event.  Both share the
+    # same request_id (stored in GLOBAL_DATA[gene_id]['_rag_request_id'] by
+    # _apply_rag_context) so a reader can JOIN them via replay_ledger.
+    _emit_eval_ledger_event(gene_id, fitness)
+    # -------------------------------------------------------------------------- #
+
+    # --- Memory backend: enqueue summary regardless of accuracy threshold ----- #
+    # Captures both successes and failures (negative examples are useful
+    # signal).  The actual write is batched in _flush_memory_buffer at end of
+    # generation, alongside save_checkpoint.
+    _enqueue_memory_summary(gene_id, fitness)
+    # -------------------------------------------------------------------------- #
+
     runtime = get_runtime()
     if runtime is None:
         return
-    
+
     # Filter: Only log mutations that meet minimum quality threshold
     from cfg.constants import RAG_MIN_ACCURACY
     if not fitness or len(fitness) == 0:
@@ -171,7 +312,7 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
     if accuracy < RAG_MIN_ACCURACY:
         # Mutation doesn't meet quality threshold - skip logging
         return
-    
+
     code_path = os.path.join(SOTA_ROOT, f"models/network_{gene_id}.py")
     if not os.path.exists(code_path):
         return
@@ -210,6 +351,275 @@ def _log_mutation_result(gene_id: str, fitness: tuple | list) -> None:
             "parameters_delta": improvement.get("parameters_delta") if improvement else None,
         },
     )
+
+
+def _build_memory_backend():
+    """Construct a per-run MemoryBackend rooted at ``runs/<RUN_ID>/rag_memory/``.
+
+    Returns ``None`` when:
+      - ``RAG_MEMORY_STORE_ENABLED`` is False, or
+      - ``RUN_DIR`` is unset (we refuse to mix memory across runs), or
+      - the FAISS / embedding stack fails to import.
+
+    Errors are swallowed and surfaced as a warning; memory is best-effort.
+    """
+    try:
+        from cfg.constants import (
+            RAG_MEMORY_STORE_ENABLED,
+            RAG_MEMORY_MIN_SIMILARITY,
+            RAG_TEXT_EMBED_MODEL,
+            RAG_CODE_EMBED_MODEL,
+        )
+    except Exception:
+        return None
+    if not RAG_MEMORY_STORE_ENABLED:
+        return None
+    run_dir = os.getenv("RUN_DIR", "").strip()
+    if not run_dir:
+        import warnings
+        warnings.warn(
+            "[RAG_MEMORY] RUN_DIR is unset; memory backend disabled to avoid "
+            "cross-run contamination.",
+            stacklevel=2,
+        )
+        return None
+    try:
+        from rag.embeddings import EmbeddingConfig, EmbeddingService
+        from rag.vector_db import VectorStoreManager
+        from rag.backends.memory_backend import MemoryBackend
+        memory_dir = Path(run_dir) / "rag_memory"
+        memory_dir.mkdir(parents=True, exist_ok=True)
+        store = VectorStoreManager(memory_dir)
+        embeddings = EmbeddingService(EmbeddingConfig(
+            code_model_name=RAG_CODE_EMBED_MODEL,
+            text_model_name=RAG_TEXT_EMBED_MODEL,
+        ))
+        return MemoryBackend(
+            vector_store=store,
+            embedding_service=embeddings,
+            min_similarity=RAG_MEMORY_MIN_SIMILARITY,
+        )
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG_MEMORY] Failed to build MemoryBackend: {type(exc).__name__}: {exc}",
+            stacklevel=2,
+        )
+        return None
+
+
+def _enqueue_memory_summary(gene_id: str, fitness: tuple | list) -> None:
+    """Append a compact summary to the memory write buffer.
+
+    Captures both successes and failures.  Each record is a dict accepted by
+    ``MemoryBackend.index``; the actual embed+write happens in
+    :func:`_flush_memory_buffer` at end of generation.
+
+    Never crashes the caller — all errors are swallowed so a memory bug can
+    never tank an evolution run.
+    """
+    if _MEMORY_BACKEND is None:
+        return
+    try:
+        from cfg.constants import RAG_MIN_ACCURACY
+        ancestry_info = (globals().get("GLOBAL_DATA_ANCESTRY") or {}).get(gene_id, {})
+        genes = ancestry_info.get("GENES") or []
+        mutation_types = ancestry_info.get("MUTATE_TYPE") or []
+        parent_gene_id = genes[-2] if len(genes) >= 2 else (genes[0] if genes else None)
+        mutation_type = mutation_types[-1] if mutation_types else None
+        global_data = globals().get("GLOBAL_DATA") or {}
+        parent_fitness = global_data.get(parent_gene_id, {}).get("fitness") if parent_gene_id else None
+        improvement = calculate_fitness_improvement(fitness, parent_fitness)
+        description = build_mutation_description(gene_id, mutation_type, fitness, improvement)
+        accuracy = float(fitness[0]) if fitness else 0.0
+        success = bool(fitness) and accuracy >= RAG_MIN_ACCURACY
+        parent_label = parent_gene_id or "unknown"
+        mtype_label = mutation_type or "mutation"
+        outcome = "success" if success else "failure"
+        summary = f"[{outcome}] {mtype_label} on parent {parent_label}: {description}"
+        _pending_memory_writes.append({
+            "text": summary,
+            "gene_id": gene_id,
+            "parent_gene_id": parent_gene_id,
+            "mutation_type": mutation_type,
+            "success": success,
+        })
+    except Exception:
+        pass
+
+
+def _flush_memory_buffer() -> None:
+    """Embed and persist queued memory summaries to the FAISS memory namespace.
+
+    Called once per generation, right after ``save_checkpoint``, mirroring the
+    checkpoint write rhythm.  Empties the buffer on success.  Errors are
+    swallowed: the buffer is still cleared so a transient embed failure does
+    not pile up across generations.
+    """
+    global _pending_memory_writes
+    if _MEMORY_BACKEND is None or not _pending_memory_writes:
+        return
+    pending = _pending_memory_writes
+    _pending_memory_writes = []
+    for record in pending:
+        try:
+            _MEMORY_BACKEND.index(record)
+        except Exception:
+            continue
+
+
+def _emit_eval_ledger_event(gene_id: str, fitness: tuple | list) -> None:
+    """Emit the eval-side bookkeeping ledger event for *gene_id*.
+
+    This is the second of two events for the same mutation attempt (the first
+    is written by RagService.augment).  The two events share the same
+    ``request_id`` so downstream analysis can JOIN them via replay_ledger.
+
+    After constructing the event this function also computes the Pareto
+    eligibility flag (``is_pareto_eligible``) against the current generation's
+    population of events accumulated so far in ``_generation_population``.  The
+    flag is set on the event before it is appended to the ledger — every event
+    is always appended regardless of the flag value.
+
+    When ``RAG_LOG_POLICY == "absolute"``, the flag is computed using the
+    ``RAG_MIN_ACCURACY`` / ``RAG_MAX_PARAMETERS`` absolute thresholds instead
+    of the percentile windows.
+
+    Never crashes the caller — all errors are swallowed.
+    """
+    global _generation_population  # must be declared before any assignment
+    try:
+        ledger = _get_run_ledger()
+        if ledger is None:
+            return
+
+        from rag.bookkeeping import MutationEvent  # noqa: PLC0415
+
+        # Access globals defensively since this module may be partially loaded
+        # in test environments where DEAP initialisation fails mid-load.
+        _global_data = globals().get("GLOBAL_DATA") or {}
+        _ancestry = globals().get("GLOBAL_DATA_ANCESTRY") or {}
+        _gen_count = globals().get("GEN_COUNT", -1)
+        _run_id = globals().get("RUN_ID", "unknown")
+        _rag_enabled = globals().get("RAG_ENABLED", False)
+
+        gene_data = _global_data.get(gene_id, {})
+        ancestry_info = _ancestry.get(gene_id, {})
+        genes = ancestry_info.get("GENES") or []
+        mutation_types = ancestry_info.get("MUTATE_TYPE") or []
+        parent_gene_id = genes[-2] if len(genes) >= 2 else (genes[0] if genes else "unknown")
+        mutation_type = mutation_types[-1] if mutation_types else "unknown"
+
+        # Retrieve the request_id stored by _apply_rag_context (may be None for
+        # baseline runs or when RAG was disabled for this gene).  Falls back to
+        # the legacy slot inside GLOBAL_DATA[gene_id] for backward compatibility
+        # with any older state that may still be around.
+        request_id = (
+            _rag_request_id_by_gene.get(gene_id)
+            or gene_data.get("_rag_request_id")
+            or MutationEvent.make_request_id()
+        )
+
+        # Build eval_outputs from fitness tuple.
+        eval_outputs: dict = {}
+        if fitness and len(fitness) >= 1:
+            eval_outputs["test_acc"] = float(fitness[0])
+        if fitness and len(fitness) >= 2:
+            eval_outputs["total_params"] = float(fitness[1])
+
+        raw_prompt = ""  # raw prompt not available at eval time; augment event has it
+
+        # ------------------------------------------------------------------ #
+        # Compute is_pareto_eligible relative to current generation window.  #
+        # ------------------------------------------------------------------ #
+        is_eligible: bool | None = None
+        try:
+            from cfg.constants import (  # noqa: PLC0415
+                RAG_LOG_POLICY,
+                RAG_MIN_ACCURACY,
+                RAG_MAX_PARAMETERS,
+                RAG_LOG_TOP_ACCURACY_PCT,
+                RAG_LOG_BOTTOM_PARAMS_PCT,
+            )
+            gen_population = _generation_population.get(_gen_count, [])
+            if RAG_LOG_POLICY == "absolute":
+                # Absolute threshold policy: eligible if above min accuracy
+                # AND below max parameters (when max is configured).
+                test_acc = eval_outputs.get("test_acc", 0.0)
+                total_params = eval_outputs.get("total_params")
+                above_accuracy = test_acc >= RAG_MIN_ACCURACY
+                within_params = (
+                    RAG_MAX_PARAMETERS is None
+                    or (total_params is not None and total_params <= RAG_MAX_PARAMETERS)
+                )
+                is_eligible = bool(above_accuracy and within_params) if eval_outputs else False
+            else:
+                # Default: per-generation Pareto percentile windows.
+                # Build a temporary event (without is_pareto_eligible) to pass
+                # to the policy function so we can evaluate against the current
+                # population before appending this event.
+                from rag.pareto_policy import is_pareto_eligible as _ipe  # noqa: PLC0415
+                # Create a proxy event with only eval_outputs populated so the
+                # policy function can extract the metrics.
+                proxy_event = MutationEvent(
+                    run_id=_run_id,
+                    generation=_gen_count,
+                    parent_gene_id=str(parent_gene_id) if parent_gene_id else "unknown",
+                    child_gene_id=gene_id,
+                    mutation_type=mutation_type,
+                    backend="faiss" if _rag_enabled else "baseline",
+                    request_id=request_id,
+                    prompt_id=MutationEvent.make_prompt_id(raw_prompt),
+                    raw_prompt=raw_prompt,
+                    eval_outputs=eval_outputs if eval_outputs else None,
+                )
+                # Include the proxy event in the population for self-comparison.
+                combined_population = list(gen_population) + [proxy_event]
+                is_eligible = _ipe(
+                    proxy_event,
+                    combined_population,
+                    top_accuracy_pct=float(RAG_LOG_TOP_ACCURACY_PCT),
+                    bottom_params_pct=float(RAG_LOG_BOTTOM_PARAMS_PCT),
+                )
+        except Exception as policy_exc:
+            logger.debug("[RAG] Pareto policy computation failed: %s", policy_exc)
+            is_eligible = None
+
+        event = MutationEvent(
+            run_id=_run_id,
+            generation=_gen_count,
+            parent_gene_id=str(parent_gene_id) if parent_gene_id else "unknown",
+            child_gene_id=gene_id,
+            mutation_type=mutation_type,
+            backend="faiss" if _rag_enabled else "baseline",
+            request_id=request_id,
+            prompt_id=MutationEvent.make_prompt_id(raw_prompt),
+            raw_prompt=raw_prompt,
+            augmented_prompt=None,
+            retrieval_request=None,
+            retrieval_response=None,
+            model_request=None,
+            model_response=None,
+            parsed_artifact=None,
+            eval_outputs=eval_outputs if eval_outputs else None,
+            latencies={},
+            failure_mode=None if eval_outputs.get("test_acc", 0) > 0 else "eval_failed",
+            is_pareto_eligible=is_eligible,
+        )
+
+        # Accumulate in the generation population cache so subsequent events
+        # within the same generation can be classified relative to this one.
+        if _gen_count not in _generation_population:
+            _generation_population[_gen_count] = []
+        _generation_population[_gen_count].append(event)
+
+        ledger.append(event)
+    except Exception as exc:
+        import warnings
+        warnings.warn(
+            f"[RAG] Failed to emit eval ledger event for gene {gene_id}: {type(exc).__name__}: {exc}",
+            stacklevel=2,
+        )
 
 
 def generate_template(
@@ -1507,6 +1917,25 @@ if __name__ == "__main__":
     # Block until the HTTP server (or LB) is up
     wait_for_server_ready()
 
+    # ---------------------------------------------------------------------- #
+    # Initialise per-run memory backend (PR 8) and inject into RagClient.
+    # No-op when RAG_MEMORY_STORE_ENABLED is false; never raises.
+    # ---------------------------------------------------------------------- #
+    _MEMORY_BACKEND = _build_memory_backend()
+    if _MEMORY_BACKEND is not None:
+        try:
+            from rag.client import RagClient
+            from rag.service import RagService
+            _rag_client = RagClient(service=RagService(memory_backend=_MEMORY_BACKEND))
+            print(f"[RAG_MEMORY] Memory backend ready (RUN_DIR/rag_memory/).", flush=True)
+        except Exception as exc:
+            import warnings
+            warnings.warn(
+                f"[RAG_MEMORY] Memory backend built but RagClient wiring failed: "
+                f"{type(exc).__name__}: {exc}",
+                stacklevel=2,
+            )
+
     checkpoint, start_gen = load_checkpoint(folder_name=args.checkpoints)
     if checkpoint:
         box_print("LOADING CHECKPOINT")
@@ -1642,6 +2071,7 @@ if __name__ == "__main__":
         print_scores(population, FITNESS_WEIGHTS)
         hof.update(population)
         save_checkpoint(gen, folder_name=args.checkpoints)
+        _flush_memory_buffer()
         LINKED_GENES = {}
         # disable mutate_prompts pending redesign (tracks tasks/todo.md M2)
         # mutate_prompts()
