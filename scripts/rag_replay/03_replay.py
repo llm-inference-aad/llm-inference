@@ -310,7 +310,7 @@ def main() -> int:
     ap.add_argument("--epochs", type=int,
                     default=int(os.environ.get("EPOCHS", "24")))
     ap.add_argument("--data-path",
-                    default=os.environ.get("DATA_PATH", "./data"))
+                    default=os.environ.get("DATA_PATH", "cifar10"))
     ap.add_argument("--max-rows", type=int, default=None)
     ap.add_argument("--eligible-only", action="store_true",
                     help="Skip genes with orig_eligible_for_rag=False")
@@ -322,6 +322,20 @@ def main() -> int:
     ap.add_argument("--poll-only", action="store_true")
     ap.add_argument("--poll-timeout-hours", type=float, default=12.0)
     args = ap.parse_args()
+
+    # Load .env so VENV_PATH, DATA_PATH, LLM_INFERENCE_ROOT_DIR, etc. propagate
+    # into the env that gets handed to the spawned sbatch jobs via --export=ALL.
+    env_path = ROOT_DIR / ".env"
+    if env_path.exists():
+        for raw in env_path.read_text().splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, _, v = line.partition("=")
+            k = k.strip()
+            v = v.strip().strip('"').strip("'")
+            # Don't clobber values explicitly already set in the parent env
+            os.environ.setdefault(k, os.path.expandvars(v))
 
     args.output.mkdir(parents=True, exist_ok=True)
     journal_path = args.output / "journal.jsonl"
