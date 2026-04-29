@@ -1,11 +1,14 @@
 """Analyze paired RAG isolation results: paired tests + per-template breakdown.
 
 Usage:
-    uv run python scripts/rag_isolation/analyze.py <run_dir>
+    uv run python scripts/rag_isolation/analyze.py <run_dir> [--with-fitness]
 
-Reads <run_dir>/results.jsonl, writes:
+Reads <run_dir>/results.jsonl (or results_with_fitness.jsonl with
+``--with-fitness``), writes:
   - <run_dir>/summary.csv  (one row per arm × metric)
   - <run_dir>/paired.csv   (one row per case × trial with both arms side-by-side)
+  - <run_dir>/tests.csv    (paired statistical tests; includes fitness rows
+                            when --with-fitness is set)
   - <run_dir>/report.md    (human-readable summary with paired tests)
 """
 
@@ -49,6 +52,9 @@ def _pivot_pairs(rows: list[dict]) -> list[dict]:
             "fallback", "prompt_chars", "response_chars", "llm_latency_s",
             "rag_block_chars", "retrieved_n_code", "retrieved_n_text",
             "parent_changed",
+            # Fitness columns — populated only when --with-fitness is used.
+            "fitness_acc", "fitness_params", "fitness_inherited_from",
+            "eval_status", "eval_train_seconds", "eval_val_acc",
         ):
             row[f"{k}_no_rag"] = a.get(k)
             row[f"{k}_with_rag"] = b.get(k)
@@ -108,6 +114,20 @@ def wilcoxon_signed_rank(diffs: list[float]) -> tuple[float, float]:
     # two-sided p from normal approx
     p = math.erfc(abs(z) / math.sqrt(2))
     return float(W), float(p)
+
+
+def binomial_two_sided(k: int, n: int, p: float = 0.5) -> float:
+    """Exact two-sided binomial test p-value for k successes in n trials under H0: p.
+
+    For p=0.5 this is the symmetric sum used by the sign test / Pareto rate test.
+    """
+    if n == 0:
+        return 1.0
+    # P(X = i) under Binomial(n, p); we sum probabilities ≤ P(X = k)
+    pmf = [math.comb(n, i) * (p ** i) * ((1 - p) ** (n - i)) for i in range(n + 1)]
+    threshold = pmf[k]
+    pv = sum(pi for pi in pmf if pi <= threshold + 1e-15)
+    return float(min(1.0, pv))
 
 
 def median_iqr(xs: list[float]) -> tuple[float, float, float]:
@@ -196,6 +216,116 @@ def paired_tests(pairs: list[dict]) -> list[dict]:
     return tests
 
 
+def fitness_paired_tests(pairs: list[dict]) -> list[dict]:
+    """Spec §9 paired tests on fitness columns.
+
+    Only pairs where BOTH arms have a non-null ``fitness_acc`` contribute.
+    """
+    valid = [
+        p for p in pairs
+        if p.get("fitness_acc_no_rag") is not None
+        and p.get("fitness_acc_with_rag") is not None
+        and p.get("fitness_params_no_rag") is not None
+        and p.get("fitness_params_with_rag") is not None
+    ]
+    n_pairs = len(valid)
+    out: list[dict] = []
+    if n_pairs == 0:
+        return out
+
+    # Δ test_acc
+    diffs_acc = [float(p["fitness_acc_with_rag"]) - float(p["fitness_acc_no_rag"])
+                 for p in valid]
+    med, q1, q3 = median_iqr(diffs_acc)
+    W, pv = wilcoxon_signed_rank(diffs_acc)
+    out.append({
+        "metric": "fitness_acc",
+        "label": "Δ test_acc (with_rag − no_rag)",
+        "test": "Wilcoxon signed-rank (normal approx)",
+        "n_pairs": n_pairs,
+        "median_delta": med,
+        "iqr_low": q1,
+        "iqr_high": q3,
+        "statistic": W,
+        "p_value": pv,
+    })
+
+    # Δ params (smaller is better, sign uncertain)
+    diffs_params = [float(p["fitness_params_with_rag"]) - float(p["fitness_params_no_rag"])
+                    for p in valid]
+    med, q1, q3 = median_iqr(diffs_params)
+    W, pv = wilcoxon_signed_rank(diffs_params)
+    out.append({
+        "metric": "fitness_params",
+        "label": "Δ num_params (with_rag − no_rag)",
+        "test": "Wilcoxon signed-rank (normal approx)",
+        "n_pairs": n_pairs,
+        "median_delta": med,
+        "iqr_low": q1,
+        "iqr_high": q3,
+        "statistic": W,
+        "p_value": pv,
+    })
+
+    # Δ acc per million params — efficiency metric
+    def _acc_per_M(acc, params):
+        params_M = max(1.0, float(params)) / 1e6
+        return float(acc) / params_M
+
+    diffs_eff = [
+        _acc_per_M(p["fitness_acc_with_rag"], p["fitness_params_with_rag"])
+        - _acc_per_M(p["fitness_acc_no_rag"], p["fitness_params_no_rag"])
+        for p in valid
+    ]
+    med, q1, q3 = median_iqr(diffs_eff)
+    W, pv = wilcoxon_signed_rank(diffs_eff)
+    out.append({
+        "metric": "fitness_acc_per_M",
+        "label": "Δ test_acc / params_in_M (with_rag − no_rag)",
+        "test": "Wilcoxon signed-rank (normal approx)",
+        "n_pairs": n_pairs,
+        "median_delta": med,
+        "iqr_low": q1,
+        "iqr_high": q3,
+        "statistic": W,
+        "p_value": pv,
+    })
+
+    # Pareto domination rate (with_rag dominates no_rag)
+    wins = 0
+    losses = 0
+    ties = 0
+    for p in valid:
+        a_acc = float(p["fitness_acc_with_rag"])
+        b_acc = float(p["fitness_acc_no_rag"])
+        a_par = float(p["fitness_params_with_rag"])
+        b_par = float(p["fitness_params_no_rag"])
+        with_dominates = (a_acc >= b_acc and a_par <= b_par
+                           and (a_acc > b_acc or a_par < b_par))
+        no_dominates = (b_acc >= a_acc and b_par <= a_par
+                         and (b_acc > a_acc or b_par < a_par))
+        if with_dominates and not no_dominates:
+            wins += 1
+        elif no_dominates and not with_dominates:
+            losses += 1
+        else:
+            ties += 1
+    decided = wins + losses
+    pv = binomial_two_sided(wins, decided, 0.5) if decided > 0 else 1.0
+    out.append({
+        "metric": "pareto_domination_rate",
+        "label": "P(with_rag dominates no_rag | decided pair)",
+        "test": "Exact binomial (two-sided, H0: p=0.5)",
+        "n_pairs": n_pairs,
+        "wins_with_rag": wins,
+        "wins_no_rag": losses,
+        "ties": ties,
+        "rate": (wins / decided) if decided > 0 else None,
+        "p_value": pv,
+    })
+    return out
+
+
 def per_template_breakdown(pairs: list[dict]) -> list[dict]:
     """For each template, summarize pair-level deltas."""
     by_tpl: dict[str, list[dict]] = defaultdict(list)
@@ -232,12 +362,60 @@ def write_csv(path: Path, rows: list[dict]) -> None:
     path.write_text("\n".join(lines))
 
 
+def fitness_section(pairs: list[dict], fitness_tests: list[dict]) -> list[str]:
+    """Markdown lines for the report's optional fitness section."""
+    lines: list[str] = []
+    if not fitness_tests:
+        return lines
+    lines.append("## Fitness comparison (with_rag vs no_rag)\n")
+    lines.append("Networks were trained on CIFAR-10 at 8 epochs, seed=21. "
+                 "Fallback rows inherit fitness from their parent.\n")
+    lines.append("| Metric | Test | n_pairs | Effect | p-value |")
+    lines.append("|---|---|---|---|---|")
+    for t in fitness_tests:
+        if t["metric"] == "pareto_domination_rate":
+            rate = t.get("rate")
+            rate_str = f"{rate:.3f}" if rate is not None else "n/a"
+            effect = (f"with_rag wins {t['wins_with_rag']} / decided {t['wins_with_rag']+t['wins_no_rag']} "
+                      f"(ties {t['ties']}); rate = {rate_str}")
+        else:
+            effect = (f"median Δ = {t['median_delta']:.4g} "
+                      f"(IQR {t['iqr_low']:.4g}–{t['iqr_high']:.4g})")
+        lines.append(f"| `{t['metric']}` | {t['test']} | {t['n_pairs']} | {effect} | "
+                     f"{t['p_value']:.4f} |")
+    lines.append("")
+
+    # Per-pair fitness table for inspection
+    valid = [p for p in pairs
+             if p.get("fitness_acc_no_rag") is not None
+             and p.get("fitness_acc_with_rag") is not None]
+    if valid:
+        lines.append("### Per-pair fitness (decided pairs only)\n")
+        lines.append("| case_id | trial | acc_no_rag | acc_with_rag | params_no_rag | params_with_rag | Δacc |")
+        lines.append("|---|---|---|---|---|---|---|")
+        for p in valid[:50]:
+            d = float(p["fitness_acc_with_rag"]) - float(p["fitness_acc_no_rag"])
+            lines.append(
+                f"| `{p['case_id']}` | {p['trial']} | "
+                f"{float(p['fitness_acc_no_rag']):.4f} | "
+                f"{float(p['fitness_acc_with_rag']):.4f} | "
+                f"{int(p['fitness_params_no_rag'])} | "
+                f"{int(p['fitness_params_with_rag'])} | "
+                f"{d:+.4f} |"
+            )
+        if len(valid) > 50:
+            lines.append(f"\n…{len(valid) - 50} more rows omitted from this table.")
+        lines.append("")
+    return lines
+
+
 def render_report(
     pairs: list[dict],
     arm_summaries: list[dict],
     tests: list[dict],
     by_tpl: list[dict],
     metadata: dict,
+    fitness_tests: list[dict] | None = None,
 ) -> str:
     lines = []
     lines.append(f"# RAG Isolation Report\n")
@@ -282,6 +460,9 @@ def render_report(
             lines.append("| " + " | ".join(_fmt(r.get(k)) for k in keys) + " |")
         lines.append("")
 
+    if fitness_tests:
+        lines.extend(fitness_section(pairs, fitness_tests))
+
     # Quick "interesting case" callout: pairs where one arm worked and other didn't
     flips_syntax = [p for p in pairs
                     if p["syntax_valid_first_try_no_rag"] != p["syntax_valid_first_try_with_rag"]]
@@ -306,11 +487,22 @@ def _fmt(x: Any) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("run_dir", type=Path)
+    ap.add_argument("--with-fitness", action="store_true",
+                    help="Read results_with_fitness.jsonl and emit paired fitness tests")
     args = ap.parse_args()
 
-    rows = _load_jsonl(args.run_dir / "results.jsonl")
+    if args.with_fitness:
+        results_file = args.run_dir / "results_with_fitness.jsonl"
+        if not results_file.exists():
+            print(f"--with-fitness set but {results_file} missing — "
+                  "run collect_fitness.py first", file=sys.stderr)
+            return 1
+    else:
+        results_file = args.run_dir / "results.jsonl"
+
+    rows = _load_jsonl(results_file)
     if not rows:
-        print(f"No rows in {args.run_dir / 'results.jsonl'}", file=sys.stderr)
+        print(f"No rows in {results_file}", file=sys.stderr)
         return 1
 
     metadata = json.loads((args.run_dir / "run_metadata.json").read_text())
@@ -320,11 +512,16 @@ def main() -> int:
     tests = paired_tests(pairs)
     by_tpl = per_template_breakdown(pairs)
 
+    fitness_tests = fitness_paired_tests(pairs) if args.with_fitness else []
+
     write_csv(args.run_dir / "paired.csv", pairs)
     write_csv(args.run_dir / "summary.csv", arm_summaries)
-    write_csv(args.run_dir / "tests.csv", tests)
+    # tests.csv combines the existing paired tests with the fitness tests so a
+    # single CSV remains the source of truth for downstream analysis.
+    write_csv(args.run_dir / "tests.csv", list(tests) + list(fitness_tests))
 
-    report = render_report(pairs, arm_summaries, tests, by_tpl, metadata)
+    report = render_report(pairs, arm_summaries, tests, by_tpl, metadata,
+                           fitness_tests=fitness_tests if args.with_fitness else None)
     (args.run_dir / "report.md").write_text(report)
 
     print(f"Report: {args.run_dir / 'report.md'}")

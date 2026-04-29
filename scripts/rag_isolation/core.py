@@ -78,6 +78,14 @@ class TrialResult:
     code_path: str = ""
     wall_s_total: float = 0.0
     error: str | None = None
+    # Fitness columns — populated by collect_fitness.py, not by execute_trial.
+    fitness_acc: float | None = None
+    fitness_params: int | None = None
+    fitness_inherited_from: str | None = None
+    eval_job_id: str | None = None
+    eval_status: str | None = None
+    eval_train_seconds: float | None = None
+    eval_val_acc: float | None = None
 
     def to_dict(self) -> dict:
         return self.__dict__.copy()
