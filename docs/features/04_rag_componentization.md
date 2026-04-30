@@ -217,7 +217,7 @@ numbered PR:
   genes` — `scripts/rag_replay/{01_aggregate,02_rag_service,03_replay,04_compare}.py`,
   the harness that re-runs 156 historical genes through both the no-RAG and
   with-RAG arms for the paired analysis described in the stand-up plan
-  ([`~/.claude/plans/docs-rag-isolation-00-summary-md-ignore-linked-neumann.md`](https://example.invalid/)).
+  (see the local stand-up plan at `~/.claude/plans/docs-rag-isolation-00-summary-md-ignore-linked-neumann.md`).
 - `d40302d9f fix(rag-replay): absolute RUN_DIR, 8h driver budget, CUDA-busy
   retry` — operational fixes for the replay harness.
 - `04805e342 docs(rag): add eval dataset spec + componentization plan for

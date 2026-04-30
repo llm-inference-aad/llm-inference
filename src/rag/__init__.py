@@ -15,6 +15,20 @@ _LAZY_SUBMODULES = {
     "reranker",
     "retrieval",
     "vector_db",
+    # Componentization-era surfaces (PRs 3-8). Listed here so callers can do
+    # `from src.rag import service` / `from src.rag import client` per the
+    # migration guide in docs/features/04_rag_componentization.md.
+    "service",
+    "client",
+    "bookkeeping",
+    "runtime",
+    "backends",
+    "pareto_policy",
+    # Light surfaces — no heavy deps, but listed here so plain attribute
+    # access (`from src.rag import api_types`) works without relying on a
+    # sibling submodule having imported them as a side effect first.
+    "api_types",
+    "backend_protocol",
 }
 
 
@@ -28,4 +42,4 @@ def __getattr__(name):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-__all__ = sorted(_LAZY_SUBMODULES) + ["api_types", "backend_protocol"]
+__all__ = sorted(_LAZY_SUBMODULES)

@@ -92,8 +92,10 @@ EOF
         fi
         
         echo "Checking server health..."
-        
-        python3 << EOF
+
+        # Use uv run python so the project venv (with `requests`) is on path,
+        # mirroring the rest of this script and add_server.sh.
+        uv run python << EOF
 import json
 import requests
 import sys
