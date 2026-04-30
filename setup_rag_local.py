@@ -9,6 +9,9 @@ from pathlib import Path
 # Load rag modules directly from src/rag to avoid importing src/rag/__init__.py
 project_root = Path(__file__).parent
 src_rag = project_root / "src" / "rag"
+
+# Add src to sys.path for cfg and other modules
+sys.path.insert(0, str(project_root / "src"))
 # Ensure 'rag' package exists in sys.modules so dataclasses and relative
 # module lookups inside rag modules resolve correctly.
 if "rag" not in sys.modules:
@@ -27,11 +30,11 @@ if "cfg" not in sys.modules:
 def _load_module_from_path(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(name, str(path))
     module = importlib.util.module_from_spec(spec)
+    # Register in sys.modules BEFORE exec_module to handle dataclasses and other metaclass operations
+    sys.modules[name] = module
     loader = spec.loader
     assert loader is not None
     loader.exec_module(module)
-    # Ensure the module is visible in sys.modules under its name
-    sys.modules[name] = module
     return module
 
 # Load cfg.constants
@@ -41,10 +44,10 @@ ROOT_DIR = getattr(cfg_mod, "ROOT_DIR")
 SOTA_ROOT = getattr(cfg_mod, "SOTA_ROOT")
 
 # Load individual rag modules
-data_ingestion_mod = _load_module_from_path("data_ingestion_local", src_rag / "data_ingestion.py")
-embeddings_mod = _load_module_from_path("embeddings_local", src_rag / "embeddings.py")
-retrieval_mod = _load_module_from_path("retrieval_local", src_rag / "retrieval.py")
-vector_db_mod = _load_module_from_path("vector_db_local", src_rag / "vector_db.py")
+data_ingestion_mod = _load_module_from_path("rag.data_ingestion", src_rag / "data_ingestion.py")
+embeddings_mod = _load_module_from_path("rag.embeddings", src_rag / "embeddings.py")
+retrieval_mod = _load_module_from_path("rag.retrieval", src_rag / "retrieval.py")
+vector_db_mod = _load_module_from_path("rag.vector_db", src_rag / "vector_db.py")
 
 # Export expected symbols
 extract_mutations_from_checkpoints = getattr(data_ingestion_mod, "extract_mutations_from_checkpoints")
