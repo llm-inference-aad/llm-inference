@@ -10,21 +10,41 @@ import json
 import hashlib
 import uuid
 import re
+import socket
+import multiprocessing as mp
 from datetime import datetime
 from pathlib import Path
 from src.cfg.constants import *
-from evaluator import OutputEvaluator
+from src.evaluator import OutputEvaluator
 
 app = FastAPI(title="LLM API", version="1.0")
 
 # Path To Local Large Language Model (from environment variable)
 MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it")
 
+# Use vLLM for inference when true (requires CUDA and: pip install -e ".[vllm]" or pip install vllm).
+# Default is Hugging Face transformers + pipeline.
+USE_VLLM = os.getenv("USE_VLLM", "").strip().lower() in ("1", "true", "yes")
+
+
+def _env_bool_default_true(name: str) -> bool:
+    """Unset or empty env → True; explicit 0/false/no → False."""
+    v = os.getenv(name, "").strip().lower()
+    if v == "":
+        return True
+    return v in ("1", "true", "yes")
+
+
+# vLLM automatic prefix caching (KV block reuse for shared prompt prefixes). Default on.
+VLLM_ENABLE_PREFIX_CACHING = _env_bool_default_true("VLLM_ENABLE_PREFIX_CACHING") if USE_VLLM else False
+
 # Note: Security middleware removed for compatibility
 # The 404 errors from malicious requests will still be logged by FastAPI
 
-BATCH_SIZE = 1  # num of LLM requests to process at once
-BATCH_WAIT_TIME = 0  # max wait time for batch to fill in s
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "1"))  # num of LLM requests to process at once
+BATCH_WAIT_TIME = float(os.getenv("BATCH_WAIT_TIME", "0"))  # max wait time for batch to fill in s
+WORKER_HOSTNAME = os.getenv("SERVER_HOSTNAME") or socket.gethostname()
+PREFIX_HASH_CHARS = int(os.getenv("PREFIX_HASH_CHARS", "2048"))
 
 # Generate unique run hash for this server session
 RUN_HASH = hashlib.md5(f"{uuid.uuid4()}_{datetime.now().isoformat()}".encode()).hexdigest()[:16]
@@ -52,6 +72,8 @@ metrics_metadata = {
     "run_hash": RUN_HASH,
     "session_start": datetime.now().isoformat(),
     "model_path": MODEL_PATH,
+    "backend": "vllm" if USE_VLLM else "transformers",
+    "vllm_prefix_caching": VLLM_ENABLE_PREFIX_CACHING if USE_VLLM else False,
     "batch_size": BATCH_SIZE,
     "batch_wait_time": BATCH_WAIT_TIME,
     "requests": []
@@ -59,6 +81,19 @@ metrics_metadata = {
 
 with open(METRICS_FILE, 'w') as f:
     json.dump(metrics_metadata, f, indent=2)
+
+
+def compute_prefix_hash(prompt: str) -> str:
+    """Compute the same stable prefix hash used by the gateway."""
+    for marker in ("\nThe current code block:", "\n```python"):
+        marker_index = prompt.find(marker)
+        if marker_index > 0:
+            prefix = prompt[:marker_index].strip()
+            if prefix:
+                return hashlib.sha256(prefix[:PREFIX_HASH_CHARS].encode("utf-8")).hexdigest()
+
+    prefix = prompt[:PREFIX_HASH_CHARS]
+    return hashlib.sha256(prefix.encode("utf-8")).hexdigest()
 
 def strip_thinking_tokens(text: str) -> str:
     """
@@ -82,7 +117,7 @@ def strip_thinking_tokens(text: str) -> str:
     # If no fenced blocks found, return the text as-is (might already be code)
     return text.strip()
 
-def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None, prompt=None, generated_text=None):
+def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_size, queue_wait_time=None, evaluation_score=None, prompt=None, generated_text=None, ttft_sec=None, ttft_measurement=None):
     """Save end-to-end latency metrics to JSON file"""
     try:
         # Read current metrics
@@ -99,10 +134,18 @@ def save_latency_metrics(request_data, e2e_time, batch_processing_time, batch_si
             "temperature": request_data["temperature"],
             "top_p": request_data["top_p"],
             "_latency_sec": round(e2e_time, 4),
+            "ttft_sec": round(ttft_sec, 4) if ttft_sec is not None else None,
+            "ttft_measurement": ttft_measurement,
             "batch_processing_time_sec": round(batch_processing_time, 4),
             "batch_size": batch_size,
             "queue_wait_time_sec": round(queue_wait_time, 4) if queue_wait_time else None,
             "evaluation_score": evaluation_score,
+            "prefix_hash": request_data.get("prefix_hash"),
+            "cache_hit": request_data.get("cache_hit", False),
+            "cache_owner": request_data.get("cache_owner"),
+            "worker_hostname": WORKER_HOSTNAME,
+            "backend": "vllm" if USE_VLLM else "transformers",
+            "vllm_prefix_caching": VLLM_ENABLE_PREFIX_CACHING if USE_VLLM else False,
             "prompt": prompt,
             "generated_text": generated_text
         }
@@ -123,6 +166,9 @@ class LLMRequest(BaseModel):
     temperature: float = 0.7
     job_id: str | None = "default"  # Add job identifier to match with slurm file
     gene_id: str | None = None  # Identifier for the individual this request belongs to
+    prefix_hash: str | None = None
+    cache_hit: bool = False
+    cache_owner: str | None = None
 
 class LLMModel:
     _instance = None
@@ -144,61 +190,115 @@ class LLMModel:
         print(f"[{timestamp}] ===== MODEL LOADING STARTED =====")
         print(f"[{timestamp}] Initializing model components...")
         print(f"[{timestamp}] Model path: {MODEL_PATH}")
-        
-        # Load model
-        print(f"[{timestamp}] Loading model weights and configuration...")
-        model_load_start = time.time()
-        
-        self.model = transformers.AutoModelForCausalLM.from_pretrained(
-            MODEL_PATH,
-            trust_remote_code=True,
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-            attn_implementation="sdpa" # faster inference
-        ).eval()
-        
-        model_load_time = time.time() - model_load_start
-        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] Model weights loaded in {model_load_time:.2f} seconds")
+        print(f"[{timestamp}] Inference backend: {'vLLM' if USE_VLLM else 'transformers (HF pipeline)'}")
 
-        # Load tokenizer
-        print(f"[{timestamp}] Loading tokenizer...")
-        tokenizer_start = time.time()
-        
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_PATH)
-        
-        tokenizer_time = time.time() - tokenizer_start
-        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] Tokenizer loaded in {tokenizer_time:.2f} seconds")
-        
-        # Set pad tokens for batching
-        print(f"[{timestamp}] Configuring tokenizer for batching...")
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-            print(f"[{timestamp}] Set pad_token to eos_token")
-        
-        # Create pipeline
-        print(f"[{timestamp}] Creating text generation pipeline...")
-        pipeline_start = time.time()
-        
-        self.pipeline = transformers.pipeline(
-            model=self.model,
-            tokenizer=self.tokenizer,
-            return_full_text=False,
-            task="text-generation",
-            temperature=0.1,
-            top_p=0.15,
-            top_k=0,
-            max_new_tokens=8192,  # Reasonable default for DeepSeek
-            repetition_penalty=1.1,
-            do_sample=True,
-            batch_size=BATCH_SIZE
-        )
-        
-        pipeline_time = time.time() - pipeline_start
-        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        print(f"[{timestamp}] Pipeline created in {pipeline_time:.2f} seconds")
+        if USE_VLLM:
+            if os.getenv("VLLM_WORKER_MULTIPROC_METHOD", "").lower() == "spawn":
+                try:
+                    mp.set_start_method("spawn", force=True)
+                except RuntimeError:
+                    pass
+            try:
+                from vllm import LLM, SamplingParams
+            except ImportError as e:
+                raise RuntimeError(
+                    "USE_VLLM is set but vllm is not installed. "
+                    'Install with: pip install "vllm>=0.6.0" or pip install -e ".[vllm]"'
+                ) from e
+
+            self._backend = "vllm"
+            self.SamplingParams = SamplingParams
+            tp = int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1"))
+            gpu_mem = float(os.getenv("VLLM_GPU_MEMORY_UTILIZATION", "0.9"))
+            vllm_dtype = os.getenv("VLLM_DTYPE", "bfloat16")
+            max_model_len_env = os.getenv("VLLM_MAX_MODEL_LEN")
+            llm_kwargs = dict(
+                model=MODEL_PATH,
+                trust_remote_code=True,
+                dtype=vllm_dtype,
+                tensor_parallel_size=tp,
+                gpu_memory_utilization=gpu_mem,
+                enable_prefix_caching=VLLM_ENABLE_PREFIX_CACHING,
+            )
+            if max_model_len_env:
+                llm_kwargs["max_model_len"] = int(max_model_len_env)
+
+            print(
+                f"[{timestamp}] Loading vLLM engine (tp={tp}, dtype={vllm_dtype}, gpu_memory_utilization={gpu_mem}, "
+                f"prefix_caching={'on' if VLLM_ENABLE_PREFIX_CACHING else 'off'})..."
+            )
+            model_load_start = time.time()
+            self.llm = LLM(**llm_kwargs)
+            model_load_time = time.time() - model_load_start
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            print(f"[{timestamp}] vLLM engine loaded in {model_load_time:.2f} seconds")
+            if VLLM_ENABLE_PREFIX_CACHING:
+                print(
+                    f"[{timestamp}] vLLM automatic prefix caching is enabled (KV blocks in GPU memory). "
+                    "If you hit OOM, try lowering VLLM_GPU_MEMORY_UTILIZATION or VLLM_MAX_MODEL_LEN."
+                )
+
+            self.model = None
+            self.tokenizer = None
+            self.pipeline = None
+        else:
+            self._backend = "transformers"
+            # Load model
+            print(f"[{timestamp}] Loading model weights and configuration...")
+            model_load_start = time.time()
+
+            self.model = transformers.AutoModelForCausalLM.from_pretrained(
+                MODEL_PATH,
+                trust_remote_code=True,
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+                attn_implementation="sdpa"  # faster inference
+            ).eval()
+
+            model_load_time = time.time() - model_load_start
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            print(f"[{timestamp}] Model weights loaded in {model_load_time:.2f} seconds")
+
+            # Load tokenizer
+            print(f"[{timestamp}] Loading tokenizer...")
+            tokenizer_start = time.time()
+
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained(MODEL_PATH)
+
+            tokenizer_time = time.time() - tokenizer_start
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            print(f"[{timestamp}] Tokenizer loaded in {tokenizer_time:.2f} seconds")
+
+            # Set pad tokens for batching
+            print(f"[{timestamp}] Configuring tokenizer for batching...")
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+                print(f"[{timestamp}] Set pad_token to eos_token")
+
+            # Create pipeline
+            print(f"[{timestamp}] Creating text generation pipeline...")
+            pipeline_start = time.time()
+
+            self.pipeline = transformers.pipeline(
+                model=self.model,
+                tokenizer=self.tokenizer,
+                return_full_text=False,
+                task="text-generation",
+                temperature=0.1,
+                top_p=0.15,
+                top_k=0,
+                max_new_tokens=8192,  # Reasonable default for DeepSeek
+                repetition_penalty=1.1,
+                do_sample=True,
+                batch_size=BATCH_SIZE
+            )
+
+            pipeline_time = time.time() - pipeline_start
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            print(f"[{timestamp}] Pipeline created in {pipeline_time:.2f} seconds")
+
+            self.llm = None
         
         # Initialize async components for batching
         print(f"[{timestamp}] Initializing async batching components...")
@@ -260,16 +360,36 @@ class LLMModel:
                     top_p = batch[0]["top_p"]
                     
                     start_time = time.time()
-                    
-                    results = self.pipeline(
-                        prompts, 
-                        max_new_tokens=max_new_tokens,
-                        temperature=temperature,
-                        top_p=top_p
-                    )
-                    
-                    response_time = round(time.time() - start_time, 2)
-                    
+
+                    if getattr(self, "_backend", None) == "vllm":
+                        sp = self.SamplingParams(
+                            max_tokens=max_new_tokens,
+                            temperature=temperature,
+                            top_p=top_p,
+                            repetition_penalty=1.1,
+                        )
+                        vllm_outputs = await asyncio.to_thread(
+                            self.llm.generate, prompts, sp
+                        )
+                        response_time = round(time.time() - start_time, 2)
+                        results = []
+                        for req_out in vllm_outputs:
+                            if req_out.outputs:
+                                results.append(
+                                    [{"generated_text": req_out.outputs[0].text}]
+                                )
+                            else:
+                                results.append([{"generated_text": ""}])
+                    else:
+                        results = self.pipeline(
+                            prompts,
+                            max_new_tokens=max_new_tokens,
+                            temperature=temperature,
+                            top_p=top_p
+                        )
+
+                        response_time = round(time.time() - start_time, 2)
+
                     # for every future, set its result
                     for i, (result, future) in enumerate(zip(results, futures)):
                         output_txt = result[0].get("generated_text", str(result))
@@ -280,6 +400,8 @@ class LLMModel:
                         future.set_result({
                             "generated_text": output_txt,
                             "response_time_sec": response_time,
+                            "ttft_sec": response_time,
+                            "ttft_measurement": "offline_generate_elapsed",
                             "batch_size": batch_size,
                             "queue_wait_time_sec": round(queue_wait_time, 4)
                         })
@@ -311,7 +433,7 @@ class LLMModel:
     
     async def generate(self, request_dict, queue_start_time=None):
         """Submit a request to the batch processor"""
-        # future is a placeholder for later result
+        # future is placeholder for later result
         future = asyncio.Future()
         
         # Store queue start time with the request
@@ -366,7 +488,10 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             "top_p": request.top_p,
             "temperature": request.temperature,
             "job_id": request.job_id,  # Include job identifier
-            "gene_id": request.gene_id  # Include gene_id for individual tracking
+            "gene_id": request.gene_id,  # Include gene_id for individual tracking
+            "prefix_hash": request.prefix_hash or compute_prefix_hash(request.prompt),
+            "cache_hit": request.cache_hit,
+            "cache_owner": request.cache_owner,
         }
         
         # Get the model instance (already loaded at startup)
@@ -386,6 +511,8 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         batch_processing_time = result.get("response_time_sec", 0)
         batch_size = result.get("batch_size", 1)
         queue_wait_time = result.get("queue_wait_time_sec", 0)
+        ttft_sec = result.get("ttft_sec")
+        ttft_measurement = result.get("ttft_measurement")
         
         # Calculate evaluation score for the generated text
         generated_text = result.get("generated_text", "")
@@ -403,16 +530,27 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
             queue_wait_time,
             evaluation_score,
             prompt=request.prompt,
-            generated_text=generated_text_for_logging
+            generated_text=generated_text_for_logging,
+            ttft_sec=ttft_sec,
+            ttft_measurement=ttft_measurement,
         )
         
-        print(f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s (batch processing), evaluation score: {evaluation_score}")
+        print(
+            f"Request completed in {e2e_time:.2f}s (E2E), {batch_processing_time:.2f}s "
+            f"(batch processing), ttft={ttft_sec}, cache_hit={request.cache_hit}, "
+            f"evaluation score: {evaluation_score}"
+        )
         
         # Add run hash, e2e latency, and evaluation score to response
         result["_latency_sec"] = round(e2e_time, 4)
         result["e2e_latency_sec"] = round(e2e_time, 4)
         result["run_hash"] = RUN_HASH
         result["evaluationScore"] = evaluation_score
+        result["prefix_hash"] = request_dict["prefix_hash"]
+        result["cache_hit"] = request.cache_hit
+        result["worker_hostname"] = WORKER_HOSTNAME
+        result["backend"] = "vllm" if USE_VLLM else "transformers"
+        result["vllm_prefix_caching"] = VLLM_ENABLE_PREFIX_CACHING if USE_VLLM else False
         
         return result
     except Exception as e:
@@ -420,7 +558,13 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
 
 @app.get("/")
 async def root():
-    return {"message": "LLM API is running!"}
+    return {
+        "message": "LLM API is running!",
+        "worker_hostname": WORKER_HOSTNAME,
+        "backend": "vllm" if USE_VLLM else "transformers",
+        "vllm_prefix_caching": VLLM_ENABLE_PREFIX_CACHING if USE_VLLM else False,
+        "metrics_file": str(METRICS_FILE),
+    }
 
 @app.on_event("startup")
 async def startup_event():
@@ -437,8 +581,15 @@ async def startup_event():
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
     print(f"[{timestamp}] ===== SERVER STARTUP COMPLETE =====")
     print(f"[{timestamp}] Server is ready to accept requests!")
+    if USE_VLLM:
+        print(
+            f"[{timestamp}] vLLM prefix caching: "
+            f"{'enabled' if VLLM_ENABLE_PREFIX_CACHING else 'disabled'} "
+            f"(metrics key vllm_prefix_caching)"
+        )
     print(f"[{timestamp}] Available endpoints: /generate (POST), / (GET)")
 
 print('Server running with server-side batching!')
 print(f'Run Hash: {RUN_HASH}')
 print(f'Metrics will be saved to: {METRICS_FILE}')
+print(f'Worker hostname: {WORKER_HOSTNAME}')

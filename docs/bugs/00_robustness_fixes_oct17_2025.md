@@ -228,7 +228,7 @@ ENABLE_LLM_REMOTE_FALLBACK=true
 
 Launch a new run:
 ```bash
-bash run.sh
+bash scripts/run.sh
 ```
 
 The retry logic will surface warnings in the logs if it ever has to fall back:

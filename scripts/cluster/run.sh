@@ -5,7 +5,6 @@
 #SBATCH -n 1                      # number of CPU cores
 #SBATCH -N 1
 #SBATCH --gres=gpu:1
-#SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
 #SBATCH --output=slurm-results/slurm-main-%j.out
 #SBATCH --error=slurm-results/slurm-main-%j.err
 
@@ -18,7 +17,7 @@ set -Eeuo pipefail
 if [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
   REPO_ROOT="${SLURM_SUBMIT_DIR}"
 else
-  REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 fi
 
 # Change to repository root to ensure all paths work correctly
@@ -67,16 +66,14 @@ module load anaconda3 || true     # Load Python 3.12.5 which is compatible with 
 export CUDA_VISIBLE_DEVICES=0
 
 # ----------------------------
-# Ensure uv on PATH
+# Ensure Python tooling on PATH
 # ----------------------------
 export PATH="$HOME/.local/bin:$PATH"
-if ! command -v uv >/dev/null 2>&1; then
-  echo "ERROR: 'uv' not found on PATH. Install with: pipx install uv  (or per your cluster setup)"
-  exit 1
+if command -v uv >/dev/null 2>&1; then
+  echo "UV version: $(uv --version)"
+else
+  echo "uv not found on PATH; continuing with the activated Python environment."
 fi
-
-echo "UV version: $(uv --version)"
-echo "Python via uv: $(uv run python --version)"
 
 # ----------------------------
 # Load environment variables
@@ -91,10 +88,16 @@ set -a
 source .env
 set +a
 
+if [[ -d "${VENV_PATH:-$REPO_ROOT/.venv}/bin" ]]; then
+  echo "Activating virtual environment at: ${VENV_PATH:-$REPO_ROOT/.venv}"
+  source "${VENV_PATH:-$REPO_ROOT/.venv}/bin/activate"
+fi
+echo "Python: $(python --version)"
+
 # Quick masked sanity checks (show only prefixes)
 
 
-: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/satmuri6/scratch/llm-inference}"
+: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/rmanimaran8/scratch/llm-inference/llm-inference}"
 export LLM_INFERENCE_ROOT_DIR
 echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
 
@@ -102,7 +105,7 @@ echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
 # CUDA libs for uv environment (best-effort)
 # ----------------------------
 # Some clusters need nvjitlink visible to the Python env used by uv.
-UV_SITE_PKGS="$(uv run python - <<'PY'
+UV_SITE_PKGS="$(python - <<'PY'
 import site
 print(site.getsitepackages()[0])
 PY
@@ -113,14 +116,60 @@ echo "LD_LIBRARY_PATH updated for nvjitlink (best-effort)."
 # ----------------------------
 # Final info dump
 # ----------------------------
-echo "UV Python path: $(uv run which python)"
+echo "Python path: $(which python)"
 nvidia-smi || true
 
 # ----------------------------
-# Run your job
+# Wait for gateway workers when using load balancer mode
 # ----------------------------
-echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
-uv run python run_improved.py "${RUN_DIR}/checkpoints"
+if [[ "${USE_LOAD_BALANCER:-false}" =~ ^([Tt][Rr][Uu][Ee]|1|[Yy][Ee][Ss])$ ]]; then
+  echo "=== Waiting for load balancer healthy workers ==="
+  python - <<'PY'
+import json
+import os
+import time
+from pathlib import Path
+
+import requests
+
+root = Path(os.environ.get("LLM_INFERENCE_ROOT_DIR", "."))
+host_file = Path(os.environ.get("LOADBALANCER_LOG_FILE", root / "loadbalancer.log"))
+port = int(os.environ.get("LOAD_BALANCER_PORT", "9000"))
+timeout = int(os.environ.get("LLMGE_WAIT_FOR_HEALTHY_SERVERS", "3600"))
+interval = int(os.environ.get("LLMGE_WAIT_INTERVAL", "30"))
+
+if not host_file.exists():
+    raise SystemExit(f"Load balancer host file not found: {host_file}")
+
+host = host_file.read_text().strip()
+url = f"http://{host}:{port}/servers"
+deadline = time.time() + timeout
+last_status = None
+
+while time.time() < deadline:
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        status = response.json()
+        last_status = status
+        print(f"Gateway worker status: {json.dumps(status)}", flush=True)
+        if status.get("healthy_servers", 0) > 0:
+            print("At least one healthy worker is available.", flush=True)
+            raise SystemExit(0)
+    except Exception as exc:
+        print(f"Waiting for healthy workers: {exc}", flush=True)
+    time.sleep(interval)
+
+raise SystemExit(f"Timed out waiting for healthy workers. Last status: {last_status}")
+PY
+fi
+
+# ----------------------------
+# Run your job (unbuffered so logs appear immediately)
+# ----------------------------
+echo "=== Running: python run_improved.py ${RUN_DIR}/checkpoints ==="
+export PYTHONUNBUFFERED=1
+python run_improved.py "${RUN_DIR}/checkpoints"
 
 # Move ALL SLURM logs from this run to run directory for organization
 echo "=== Moving SLURM logs to run directory ==="

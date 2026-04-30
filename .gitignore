@@ -16,22 +16,25 @@ slurm_logs/
 oldSlurm/
 runs/*
 !runs/.gitkeep
-setup_uv.sh
+scripts/setup_uv.sh
 uv.lock
 .env
 hostname.log
+hostname-server-*.log
+hostname-server-*_server_job.txt
 .venv/
 .venv-backup*/
 .vscode/
 sota/ExquisiteNetV2/cifar-10-python.tar.gz
 metrics/
-documentation/
+.cache/
 .cursor/
 notebook.md
 /servers.json
 /loadbalancer.log
 plots/
 hostname_server_job.txt
+0/
 
 # Large files (model weights, checkpoints, datasets)
 *.bin

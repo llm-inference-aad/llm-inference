@@ -51,7 +51,7 @@ else
   echo ""
   echo "To start this run, execute:"
   echo "  export RUN_ID=${RUN_ID}"
-  echo "  sbatch run.sh"
+  echo "  sbatch scripts/run.sh"
   echo ""
   echo "Or modify run.sh to use this run directory directly."
   echo ""

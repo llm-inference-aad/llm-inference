@@ -111,7 +111,7 @@ PYTHON_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=evaluateGene
 #SBATCH -t 8:00:00
 #SBATCH --gres=gpu:1
-#SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
+#SBATCH -C "L40S"
 #SBATCH --mem-per-gpu 16G
 #SBATCH -n 12
 #SBATCH -N 1
@@ -146,11 +146,9 @@ cd "${{LLM_INFERENCE_ROOT_DIR:-{root_dir}}}"
 #: Template script for submitting a prompt to the LLM
 LLM_BASH_SCRIPT_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name=llm_oper
-#SBATCH -t 8:00:00
-#SBATCH --gres=gpu:1
-#SBATCH -C {gpu_constraint}
-#SBATCH --mem-per-gpu 16G
-#SBATCH -n 12
+#SBATCH -t 1:00:00
+#SBATCH --mem=4G
+#SBATCH -c 2
 #SBATCH -N 1
 #SBATCH --output={slurm_log_dir}/llm-%j.out
 #SBATCH --error={slurm_log_dir}/llm-%j.err

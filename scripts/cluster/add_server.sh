@@ -6,11 +6,14 @@
 
 set -e
 
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$REPO_ROOT"
+
 NUM_SERVERS=${1:-1}
 
 # Load environment variables
 if [[ ! -f .env ]]; then
-  echo "ERROR: .env file not found in $(pwd)"
+  echo "ERROR: .env file not found in $REPO_ROOT"
   exit 1
 fi
 
@@ -18,7 +21,7 @@ set -a
 source .env
 set +a
 
-export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$(pwd)}"
+export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$REPO_ROOT}"
 export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${LLM_INFERENCE_ROOT_DIR}/servers.json}"
 export SERVER_BASE_PORT="${SERVER_BASE_PORT:-8000}"
 
@@ -57,7 +60,7 @@ for i in $(seq 1 $NUM_SERVERS); do
     echo "  Starting server $i/$NUM_SERVERS..."
     
     # Submit server job (port will be auto-assigned)
-    SERVER_JOB_OUTPUT=$(SERVER_REGISTRY_FILE=$SERVER_REGISTRY_FILE sbatch server.sh)
+    SERVER_JOB_OUTPUT=$(SERVER_REGISTRY_FILE=$SERVER_REGISTRY_FILE sbatch scripts/cluster/server.sh)
     SERVER_JOB_ID=$(echo "$SERVER_JOB_OUTPUT" | awk '{print $NF}')
     SERVER_JOB_IDS+=("$SERVER_JOB_ID")
     
@@ -75,11 +78,11 @@ echo "  Additional Servers: ${SERVER_JOB_IDS[*]}"
 echo ""
 echo "Monitoring commands:"
 echo "  Check job status:      squeue -u \$USER"
-echo "  Monitor cluster:       ./monitor_cluster.sh"
+echo "  Monitor cluster:       ./scripts/monitor_cluster.sh"
 echo "  View server registry:  cat $SERVER_REGISTRY_FILE | uv run python -m json.tool"
 echo ""
 echo "The servers will auto-assign ports starting from the next available port."
-echo "Wait 2-3 minutes for model loading, then check status with ./monitor_cluster.sh"
+echo "Wait 2-3 minutes for model loading, then check status with ./scripts/monitor_cluster.sh"
 echo ""
 echo "To stop additional servers:"
 echo "  scancel ${SERVER_JOB_IDS[*]}"

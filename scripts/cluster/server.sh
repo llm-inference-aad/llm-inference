@@ -1,11 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=LLMGE01_Server
 #SBATCH -t 12:00:00
-#SBATCH --gres=gpu:1
-#SBATCH --mem 160G
-#SBATCH -c 16
+#SBATCH --gres=gpu:h100:1
+#SBATCH --mem 32G
+#SBATCH -c 4
 #SBATCH --output=slurm-results/slurm-server-%j.out
 #SBATCH --error=slurm-results/slurm-server-%j.err
+
+# Ensure we run from repo root (in case sbatch was called from elsewhere)
+REPO_ROOT="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+cd "$REPO_ROOT"
 
 echo "launching LLM Server"
 
@@ -18,7 +22,13 @@ module load cuda
 # Load environment variables from .env file
 if [ -f .env ]; then
     echo "Loading environment variables from .env file"
-    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    while IFS='=' read -r key value; do
+        [[ -z "$key" || "$key" =~ ^# ]] && continue
+        # Preserve sbatch/command-line overrides.
+        if [ -z "${!key+x}" ]; then
+            export "$key=$value"
+        fi
+    done < .env
 else
     echo "Warning: .env file not found. Using default values."
     # Set defaults if .env doesn't exist
@@ -48,6 +58,13 @@ export MKL_THREADING_LAYER=${MKL_THREADING_LAYER:-GNU}
 
 # Set root directory if not already set
 export LLM_INFERENCE_ROOT_DIR=${LLM_INFERENCE_ROOT_DIR:-$(pwd)}
+export USE_VLLM=${USE_VLLM:-true}
+export VLLM_ENABLE_PREFIX_CACHING=${VLLM_ENABLE_PREFIX_CACHING:-true}
+export VLLM_WORKER_MULTIPROC_METHOD=${VLLM_WORKER_MULTIPROC_METHOD:-spawn}
+export VLLM_MAX_MODEL_LEN=${VLLM_MAX_MODEL_LEN:-8192}
+export VLLM_DTYPE=${VLLM_DTYPE:-bfloat16}
+echo "Inference backend config: USE_VLLM=$USE_VLLM, VLLM_ENABLE_PREFIX_CACHING=$VLLM_ENABLE_PREFIX_CACHING"
+echo "vLLM runtime config: VLLM_WORKER_MULTIPROC_METHOD=$VLLM_WORKER_MULTIPROC_METHOD, VLLM_MAX_MODEL_LEN=$VLLM_MAX_MODEL_LEN, VLLM_DTYPE=$VLLM_DTYPE"
 
 # Activate virtual environment
 if [ -d "${VENV_PATH}/bin" ]; then
@@ -84,29 +101,28 @@ if [ -z "$SERVER_PORT" ]; then
     # Set base port from environment or default
     SERVER_BASE_PORT=${SERVER_BASE_PORT:-8000}
     
-    # Find next available port by checking existing servers
+    # Find next available port by checking existing servers.
     if [ ! -z "$SERVER_REGISTRY_FILE" ] && [ -f "$SERVER_REGISTRY_FILE" ]; then
         # Read existing servers and find highest port
-        HIGHEST_PORT=$(uv run python << EOF
-import json
-import sys
-
+        HIGHEST_PORT=$(python - "$SERVER_REGISTRY_FILE" "$SERVER_BASE_PORT" << 'PYEOF'
+import json, sys
 try:
-    with open('$SERVER_REGISTRY_FILE', 'r') as f:
+    reg_file = sys.argv[1]
+    base = int(sys.argv[2]) if len(sys.argv) > 2 else 8000
+    with open(reg_file, 'r') as f:
         registry = json.load(f)
-    
     servers = registry.get('servers', [])
     if servers:
-        ports = [s.get('port', $SERVER_BASE_PORT) for s in servers]
-        highest = max(ports)
-        print(highest + 1)
+        ports = [int(s.get('port', base)) for s in servers if s.get('port') is not None]
+        print(max(ports) + 1 if ports else base)
     else:
-        print($SERVER_BASE_PORT)
-except Exception as e:
-    print($SERVER_BASE_PORT)
-EOF
+        print(base)
+except Exception:
+    print(8000)
+PYEOF
         )
-        SERVER_PORT=$HIGHEST_PORT
+        SERVER_PORT=$(echo "$HIGHEST_PORT" | tr -d '[:space:]')
+        SERVER_PORT=${SERVER_PORT:-$SERVER_BASE_PORT}
         echo "  Auto-assigned port: $SERVER_PORT"
     else
         # No registry file, use base port
@@ -142,7 +158,7 @@ if [ ! -z "$SERVER_REGISTRY_FILE" ]; then
         fi
         
         # Add new server to registry using Python
-        uv run python << EOF
+        python << EOF
 import json
 import sys
 
@@ -188,4 +204,8 @@ else
     echo "SERVER_REGISTRY_FILE not set, skipping load balancer registration"
 fi
 
-python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
+# Fallback: ensure SERVER_PORT is set (port auto-assign may fail with corrupted registry)
+SERVER_PORT=$(echo "${SERVER_PORT:-}" | tr -d '[:space:]')
+SERVER_PORT=${SERVER_PORT:-8000}
+echo "Starting uvicorn on port $SERVER_PORT"
+python -m uvicorn app.server:app --host "$SERVER_HOST" --port "${SERVER_PORT}" --workers "$SERVER_WORKERS"

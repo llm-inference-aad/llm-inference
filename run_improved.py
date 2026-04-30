@@ -1004,6 +1004,10 @@ GLOBAL_DATA_ANCESTRY = {}
 GLOBAL_DATA_ANCESTRY['network'] = {'GENES': ['network'], 'MUTATE_TYPE': ['SEED']}
 # Main Evolution Loop
 if __name__ == "__main__":
+    import sys
+    print("run_improved.py: starting", flush=True)
+    sys.stdout.flush()
+    sys.stderr.flush()
     parser = argparse.ArgumentParser(description='Run Generation')
     # Add arguments
     parser.add_argument('checkpoints', type=str, help='Save Dir')

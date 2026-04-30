@@ -35,14 +35,14 @@ The entire workflow is launched with two commands.
 1.  **Start the LLM Inference Server**:
     This command submits a job that loads the model and runs the FastAPI server. Monitor its progress to ensure the model loads successfully before proceeding.
     ```bash
-    sbatch server.sh
+    sbatch scripts/server.sh
     ```
     *Watch the log:* `tail -f slurm-results/slurm-server-*.out`
 
 2.  **Start the Evolution Run**:
     Once the server is ready, launch the main evolution job. This will automatically create a new run directory and begin the process.
     ```bash
-    sbatch run.sh
+    sbatch scripts/run.sh
     ```
     *Watch the log:* `tail -f slurm-results/slurm-main-*.out` (initially, then it moves to `runs/{run_id}/logs/`)
 
@@ -52,7 +52,7 @@ To resume an experiment from its last checkpoint, set the `RUN_ID` environment v
 
 ```bash
 export RUN_ID=auto_20251015_120000  # Use the ID of the run you want to continue
-sbatch run.sh
+sbatch scripts/run.sh
 ```
 
 ## 3. Analyzing Results

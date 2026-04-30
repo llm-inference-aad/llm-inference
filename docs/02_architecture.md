@@ -8,7 +8,7 @@ The system uses a two-tier architecture for executing the evolution.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ SLURM Job (sbatch run.sh)                                   │
+│ SLURM Job (sbatch scripts/run.sh)                                   │
 │ ┌─────────────────────────────────────────────────────────┐ │
 │ │ Main Evolution Loop (run_improved.py)                   │ │
 │ │ - Population management & genetic operators             │ │
@@ -52,7 +52,7 @@ runs/
 
 ### Automated Workflow
 
-1.  **Execution**: `sbatch run.sh` initiates a new run.
+1.  **Execution**: `sbatch scripts/run.sh` initiates a new run.
 2.  **Directory Creation**: The script automatically creates a new `runs/auto_YYYYMMDD_HHMMSS/` directory.
 3.  **Environment Variable**: It exports the `RUN_DIR` environment variable, making the path available to all subprocesses.
 4.  **Artifact Storage**:

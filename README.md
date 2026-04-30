@@ -6,12 +6,48 @@
 <br>
 
 
+### Project Structure
+
+```
+llm-inference/
+├── app/                    # Server applications
+│   ├── server.py           # LLM inference server (FastAPI)
+│   ├── load_balancer.py    # Load balancer for multi-server setups
+│   └── dashboard.py        # Streamlit metrics dashboard
+├── src/                    # Core library
+│   ├── llm_mutation.py      # LLM-based mutation operators
+│   ├── llm_crossover.py     # LLM-based crossover
+│   ├── llm_utils.py        # Shared LLM utilities
+│   ├── evaluator.py        # Output evaluation
+│   ├── cfg/                # Configuration and constants
+│   └── utils/              # Print utilities
+├── finetune/               # Model finetuning
+│   ├── finetune_mutation.py # LoRA finetuning for mutation task
+│   └── test_finetune_mutation.py
+├── data/                   # Datasets and data files
+│   ├── dataset.json        # Finetuning dataset (from join_metrics)
+│   └── rag_corpus/
+├── scripts/                # All shell scripts and utilities
+│   ├── run.sh              # SLURM evolution job (sbatch scripts/run.sh)
+│   ├── start_cluster.sh    # Start load balancer + servers
+│   ├── cluster/            # Cluster job scripts
+│   ├── finetune/           # Finetuning SLURM scripts
+│   ├── join_metrics.py    # Build dataset from metrics + slurm logs
+│   └── ...                 # Plotting, analysis scripts
+├── config/                 # Config examples (env.example)
+├── docs/                   # Documentation
+├── archive/                # Archived/backup files
+├── runs/                   # Evolution run outputs
+├── run_improved.py         # Main evolution entry point
+└── ...
+```
+
 ### LLM Inference Setup
 - Add an .env file in your root directory and define the following variables:
 ```env
 GEMINI_API_KEY=sameple_api_key
 LLM_INFERENCE_ROOT_DIR="/home/hice1/kbhavsar31/scratch/llm-inference"
-``` 
+```
 (change the root dir to where you cloned the repo)
 
 ### Introduction:
@@ -73,7 +109,7 @@ DeepMind’s coding agent **AlphaEvolve** highlights our _LLM-Guided Evolution_ 
 
 AlphaEvolve takes the GE idea of letting an LLM propose, mutate, and test code—and scales it to discover state-of-the-art algorithms across mathematics, scheduling, and hardware design.
 
-We’re proud that the techniques first open-sourced here are now influencing frontier research at Google DeepMind.  
+We’re proud that the techniques first open-sourced here are now influencing frontier research at Google DeepMind.
 Read the white-paper below:
 
 <p align="left">

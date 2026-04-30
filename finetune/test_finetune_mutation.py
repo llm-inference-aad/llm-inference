@@ -8,12 +8,17 @@ import sys
 import json
 from pathlib import Path
 
+# Dataset path: data/dataset.json from repo root
+def _dataset_path():
+    repo_root = Path(__file__).resolve().parent.parent
+    return repo_root / "data" / "dataset.json"
+
 # Test 1: Check if dataset.json exists and is valid
 def test_dataset_exists():
     print("Test 1: Checking if dataset.json exists...")
-    dataset_path = Path("dataset.json")
+    dataset_path = _dataset_path()
     if not dataset_path.exists():
-        print("❌ FAIL: dataset.json not found")
+        print(f"❌ FAIL: dataset.json not found at {dataset_path}")
         return False
     print("✅ PASS: dataset.json exists")
     return True
@@ -21,7 +26,7 @@ def test_dataset_exists():
 def test_dataset_valid():
     print("\nTest 2: Checking if dataset.json is valid JSON...")
     try:
-        with open("dataset.json", 'r') as f:
+        with open(_dataset_path(), 'r') as f:
             data = json.load(f)
         if not isinstance(data, list):
             print("❌ FAIL: dataset.json is not a list")
@@ -41,7 +46,7 @@ def test_dataset_valid():
 def test_dataset_structure():
     print("\nTest 3: Checking dataset structure...")
     try:
-        with open("dataset.json", 'r') as f:
+        with open(_dataset_path(), 'r') as f:
             data = json.load(f)
         
         required_fields = ['prompt', 'fitness', 'generated_text']
@@ -68,10 +73,9 @@ def test_data_loading_function():
     print("\nTest 4: Testing load_and_format_data function...")
     try:
         # Import the function
-        sys.path.insert(0, '.')
-        from finetune_mutation import load_and_format_data
+        from finetune.finetune_mutation import load_and_format_data
         
-        dataset = load_and_format_data("dataset.json")
+        dataset = load_and_format_data(str(_dataset_path()))
         
         if len(dataset) == 0:
             print("⚠️  WARN: Dataset is empty after formatting")
@@ -125,7 +129,7 @@ def test_dry_run():
             # Capture output
             f = io.StringIO()
             with redirect_stdout(f), redirect_stderr(f):
-                from finetune_mutation import main
+                from finetune.finetune_mutation import main
                 main()
             
             output = f.getvalue()

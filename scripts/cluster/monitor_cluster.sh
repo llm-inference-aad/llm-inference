@@ -1,9 +1,12 @@
 #!/bin/bash
 
 # Monitor LLM Inference Cluster Status
-# Usage: ./monitor_cluster.sh [OPTIONS]
+# Usage: ./scripts/monitor_cluster.sh [OPTIONS]
 #   -c, --continuous    Continuous monitoring (refresh every 5 seconds)
 #   -h, --help          Show this help message
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$REPO_ROOT"
 
 CONTINUOUS=false
 
@@ -34,7 +37,7 @@ if [[ -f .env ]]; then
     set +a
 fi
 
-export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$(pwd)}"
+export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$REPO_ROOT}"
 export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${LLM_INFERENCE_ROOT_DIR}/loadbalancer.log}"
 export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${LLM_INFERENCE_ROOT_DIR}/servers.json}"
 export LOAD_BALANCER_PORT="${LOAD_BALANCER_PORT:-9000}"
@@ -54,7 +57,7 @@ show_status() {
         echo "❌ Load balancer not found"
         echo "   File missing: $LOADBALANCER_LOG_FILE"
         echo ""
-        echo "Start the cluster with: ./start_cluster.sh [NUM_SERVERS]"
+        echo "Start the cluster with: ./scripts/start_cluster.sh [NUM_SERVERS]"
         return
     fi
     

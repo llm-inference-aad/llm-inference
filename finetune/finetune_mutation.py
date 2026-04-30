@@ -46,11 +46,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Verify setup without loading model")
     parser.add_argument("--output-dir", type=str, default=os.path.expanduser("~/deepseek-mutation-finetune"), help="Output directory for checkpoints")
+    parser.add_argument("--dataset", type=str, default=None, help="Path to dataset.json (default: data/dataset.json)")
     args = parser.parse_args()
 
     # Configuration - Using GPT-2 for testing (124M params - reliable small model)
     model_path = "gpt2"
-    dataset_path = "dataset.json"
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    dataset_path = args.dataset or os.path.join(repo_root, "data", "dataset.json")
     output_dir = args.output_dir
     
     # Create output directory if it doesn't exist
