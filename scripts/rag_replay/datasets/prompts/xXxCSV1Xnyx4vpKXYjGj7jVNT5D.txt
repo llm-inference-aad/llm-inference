@@ -1,0 +1,60 @@
+Example of the modified code: 
+```python
+class ME(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.dw = nn.Conv2d(cin, cin, kernel_size=3, groups=cin, padding=1, bias=False)
+        self.pw = nn.Conv2d(cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.act = nn.ReLU()
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.dw(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x 
+```
+Example of the initial code:
+```python
+class ME(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.pw = nn.Conv2d(cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+
+Q1: Very concisely, let's explore step by step how modifying this code segment enhanced its scoring metrics performance.
+Q2: With the insights from Q1 in mind, can we apply the same principles in a concise manner to update the code snippet below, ensuring the input and output tensor sizes remain unchanged?
+
+Snippet to be augmented:
+```python
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):  
+    if weight_decay != 0:
+        g0, g1, g2 = [], [], []  # optimizer parameter groups
+        for v in model.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):  # bias
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):  # weight (no decay)
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):  # weight (with decay)
+                g1.append(v.weight)
+        
+        opt = SGD(g0, lr, 0.9, nesterov=nesterov)
+        opt.add_param_group({'params': g1, 'weight_decay': weight_decay})  # add g1 with weight_decay
+        opt.add_param_group({'params': g2})  # add g2 (biases)
+    else:
+        opt = SGD(model.parameters(), lr, 0.9, nesterov=nesterov)
+    return opt 
+```
+
+A1: Let us think step by step

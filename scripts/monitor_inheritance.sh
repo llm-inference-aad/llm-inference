@@ -6,22 +6,26 @@ set -euo pipefail
 
 # Default to monitoring the latest run
 RUN_ID=${1:-"latest"}
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RUNS_ROOT="${REPO_ROOT}/runs"
 
 # Determine the run directory
 if [[ "$RUN_ID" == "latest" ]]; then
-    RUN_DIR=$(ls -td /home/hice1/satmuri6/scratch/llm-inference/runs/*/ 2>/dev/null | head -1)
+    RUN_DIR=$(ls -td "${RUNS_ROOT}"/*/ 2>/dev/null | head -1 || true)
     if [[ -z "$RUN_DIR" ]]; then
         echo "❌ No runs found in runs/ directory"
         exit 1
     fi
     RUN_ID=$(basename "$RUN_DIR")
 else
-    RUN_DIR="/home/hice1/satmuri6/scratch/llm-inference/runs/$RUN_ID"
+    RUN_DIR="${RUNS_ROOT}/$RUN_ID"
     if [[ ! -d "$RUN_DIR" ]]; then
         echo "❌ Run directory not found: $RUN_DIR"
         exit 1
     fi
 fi
+
+RUN_LOG_DIR="${RUN_DIR}/logs"
 
 echo "🔍 Monitoring fitness inheritance for run: $RUN_ID"
 echo "📁 Run directory: $RUN_DIR"
@@ -138,7 +142,7 @@ process_log_line() {
 }
 
 # Monitor the log file
-LOG_PATTERN="$RUN_DIR/logs/slurm-main-*.out"
+LOG_PATTERN="$RUN_LOG_DIR/slurm-main-*.out"
 LOG_FILE=$(ls $LOG_PATTERN 2>/dev/null | head -1)
 
 if [[ -n "$LOG_FILE" && -f "$LOG_FILE" ]]; then

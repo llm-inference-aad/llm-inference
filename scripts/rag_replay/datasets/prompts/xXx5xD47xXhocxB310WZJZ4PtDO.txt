@@ -1,0 +1,236 @@
+Example of the modified code: 
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# === Helper Factories & Modules ===
+
+class SE_LN(nn.Module):
+    def __init__(self, cin, use_gate=False):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.ln = nn.LayerNorm(cin)
+        self.act = nn.Sigmoid()
+        self.use_gate = use_gate
+        if use_gate:
+            self.gate = nn.Parameter(torch.tensor(1.0))  # Learnable gate
+    
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.ln(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        if self.use_gate:
+            x = self.gate * x  # Apply learnable gate
+        return x * y
+
+class DepthwiseSeparableBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1):
+        super().__init__()
+        self.depthwise = nn.Conv2d(in_channels, in_channels, kernel_size, stride, kernel_size//2, groups=in_channels)
+        self.pointwise = nn.Conv2d(in_channels, out_channels, 1)
+        self.bn = nn.BatchNorm2d(out_channels)
+        self.act = nn.ReLU()
+    
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x
+
+class ActivationStack(nn.Module):
+    def __init__(self, acts=['relu', 'swish']):
+        super().__init__()
+        self.acts = nn.ModuleList([getattr(F, act) for act in acts])
+    
+    def forward(self, x):
+        for act in self.acts:
+            x = act(x)
+        return x
+
+class AdaptivePooling(nn.Module):
+    def __init__(self, mode='avg'):
+        super().__init__()
+        self.mode = mode
+    
+    def forward(self, x):
+        if self.mode == 'avg':
+            return F.avg_pool2d(x, x.size()[2:])
+        elif self.mode == 'max':
+            return F.max_pool2d(x, x.size()[2:])
+        else:
+            raise ValueError("Invalid pooling mode")
+
+# === Modular Stage Builder ===
+
+class ModularStage(nn.Module):
+    def __init__(self, in_channels, out_channels, num_blocks, 
+                 use_se=True, use_activation_stack=False, pooling_mode='avg'):
+        super().__init__()
+        self.blocks = nn.ModuleList([DepthwiseSeparableBlock(in_channels if i==0 else out_channels, out_channels) for i in range(num_blocks)])
+        self.se = SE_LN(out_channels, use_gate=True) if use_se else None
+        self.activation_stack = ActivationStack() if use_activation_stack else None
+        self.pooling = AdaptivePooling(pooling_mode)
+    
+    def forward(self, x):
+        for block in self.blocks:
+            x = block(x)
+            if self.se:
+                x = self.se(x)
+            if self.activation_stack:
+                x = self.activation_stack(x)
+        x = self.pooling(x)
+        return x
+
+# === Full Model ===
+
+class EfficientCIFARNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.stage1 = ModularStage(3, 16, 2, use_se=True, use_activation_stack=True, pooling_mode='avg')
+        self.stage2 = ModularStage(16, 32, 3, use_se=True, pooling_mode='max')
+        self.stage3 = ModularStage(32, 64, 4, use_activation_stack=True)
+        self.fc = nn.Linear(64, 10)
+    
+    def forward(self, x):
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x 
+```
+Example of the initial code:
+```python
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.ln = nn.LayerNorm(cin)
+        self.act = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.ln(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        return x*y 
+```
+
+Q1: Very concisely, let's explore step by step how modifying this code segment enhanced its scoring metrics performance.
+Q2: With the insights from Q1 in mind, can we apply the same principles in a concise manner to update the code snippet below, ensuring the input and output tensor sizes remain unchanged?
+
+Snippet to be augmented:
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# === Helper Factories & Modules ===
+
+class SE_LN(nn.Module):
+    def __init__(self, cin, use_gate=False):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.ln = nn.LayerNorm(cin)
+        self.act = nn.Sigmoid()
+        self.use_gate = use_gate
+        if use_gate:
+            self.gate = nn.Parameter(torch.tensor(1.0))  # Learnable gate
+    
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1, x.size(1))
+        x = self.ln(x)
+        x = self.act(x)
+        x = x.view(-1, x.size(1), 1, 1)
+        if self.use_gate:
+            x = self.gate * x  # Apply learnable gate
+        return x * y
+
+class DepthwiseSeparableBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1):
+        super().__init__()
+        self.depthwise = nn.Conv2d(in_channels, in_channels, kernel_size, stride, kernel_size//2, groups=in_channels)
+        self.pointwise = nn.Conv2d(in_channels, out_channels, 1)
+        self.bn = nn.BatchNorm2d(out_channels)
+        self.act = nn.ReLU()
+    
+    def forward(self, x):
+        x = self.depthwise(x)
+        x = self.pointwise(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x
+
+class ActivationStack(nn.Module):
+    def __init__(self, acts=['relu', 'swish']):
+        super().__init__()
+        self.acts = nn.ModuleList([getattr(F, act) for act in acts])
+    
+    def forward(self, x):
+        for act in self.acts:
+            x = act(x)
+        return x
+
+class AdaptivePooling(nn.Module):
+    def __init__(self, mode='avg'):
+        super().__init__()
+        self.mode = mode
+    
+    def forward(self, x):
+        if self.mode == 'avg':
+            return F.avg_pool2d(x, x.size()[2:])
+        elif self.mode == 'max':
+            return F.max_pool2d(x, x.size()[2:])
+        else:
+            raise ValueError("Invalid pooling mode")
+
+# === Modular Stage Builder ===
+
+class ModularStage(nn.Module):
+    def __init__(self, in_channels, out_channels, num_blocks, 
+                 use_se=True, use_activation_stack=False, pooling_mode='avg'):
+        super().__init__()
+        self.blocks = nn.ModuleList([DepthwiseSeparableBlock(in_channels if i==0 else out_channels, out_channels) for i in range(num_blocks)])
+        self.se = SE_LN(out_channels, use_gate=True) if use_se else None
+        self.activation_stack = ActivationStack() if use_activation_stack else None
+        self.pooling = AdaptivePooling(pooling_mode)
+    
+    def forward(self, x):
+        for block in self.blocks:
+            x = block(x)
+            if self.se:
+                x = self.se(x)
+            if self.activation_stack:
+                x = self.activation_stack(x)
+        x = self.pooling(x)
+        return x
+
+# === Full Model ===
+
+class EfficientCIFARNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.stage1 = ModularStage(3, 16, 2, use_se=True, use_activation_stack=True, pooling_mode='avg')
+        self.stage2 = ModularStage(16, 32, 3, use_se=True, pooling_mode='max')
+        self.stage3 = ModularStage(32, 64, 4, use_activation_stack=True)
+        self.fc = nn.Linear(64, 10)
+    
+    def forward(self, x):
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x 
+```
+
+A1: Let us think step by step

@@ -35,8 +35,11 @@ if [[ -f .env ]]; then
 fi
 
 export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$(pwd)}"
-export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${LLM_INFERENCE_ROOT_DIR}/loadbalancer.log}"
-export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${LLM_INFERENCE_ROOT_DIR}/servers.json}"
+export RUN_ID="${RUN_ID:-server-only}"
+export RUN_DIR="${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}"
+export RUN_LOG_DIR="${RUN_LOG_DIR:-${RUN_DIR}/logs}"
+export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${RUN_LOG_DIR}/loadbalancer.log}"
+export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${RUN_LOG_DIR}/servers.json}"
 export LOAD_BALANCER_PORT="${LOAD_BALANCER_PORT:-9000}"
 
 # Function to display cluster status
@@ -160,4 +163,3 @@ if [[ "$CONTINUOUS" == true ]]; then
 else
     show_status
 fi
-

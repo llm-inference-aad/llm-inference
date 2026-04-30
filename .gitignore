@@ -31,6 +31,7 @@ metrics/eval/
 rag_data/
 documentation/
 .cursor/
+.mcp.json
 notebook.md
 /servers.json
 /loadbalancer.log
@@ -40,3 +41,13 @@ hostname_server_job.txt
 venv/
 pytorch/
 CONTINUITY.md
+tasks/
+
+# Auto-added for cleaner git status
+rag_corpus/
+sota/
+src/llm_guided_evolution.egg-info/
+.agent/
+.agents/
+0/
+data/

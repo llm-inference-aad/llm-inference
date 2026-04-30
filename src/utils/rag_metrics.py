@@ -8,9 +8,9 @@ import time
 from pathlib import Path
 from typing import Any, Dict
 
-from cfg.constants import ROOT_DIR
+from cfg.constants import RUN_METRICS_DIR
 
-METRICS_FILE = Path(ROOT_DIR) / "metrics" / "rag_metrics.jsonl"
+METRICS_FILE = Path(RUN_METRICS_DIR) / "rag_metrics.jsonl"
 
 
 def record_metric(event_type: str, payload: Dict[str, Any]) -> None:
@@ -28,6 +28,5 @@ def record_metric(event_type: str, payload: Dict[str, Any]) -> None:
             handle.write(json.dumps(entry) + os.linesep)
     except Exception as exc:  # pragma: no cover - metrics must not break core loop
         print(f"[RAG][Metrics] Failed to record event {event_type}: {exc}")
-
 
 
