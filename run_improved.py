@@ -241,6 +241,12 @@ def _apply_rag_context(
         # uses dataclasses.replace which returns a new instance, so without
         # passing it in we would not see the id RagService used.
         request_id = str(uuid.uuid4())
+        # Store the request_id BEFORE calling client.augment so the eval-side
+        # ledger event always shares the same id, even if augment raises after
+        # RagService has already written its augment event (two-event JOIN must
+        # survive partial failures).
+        if gene_id is not None:
+            _rag_request_id_by_gene[gene_id] = request_id
         req = AugmentRequest(
             template=template_txt,
             mutation_type=mutation_type or "",
@@ -251,14 +257,6 @@ def _apply_rag_context(
         resp = client.augment(req)
         augmented_template = resp.augmented_prompt
         n_blocks = len(resp.blocks_used)
-        # Store the request_id so _log_mutation_result can link the eval event
-        # to the augment event already written by RagService (two-event approach).
-        # We use a module-level mapping (not GLOBAL_DATA) because at this point
-        # GLOBAL_DATA[gene_id] does not yet exist — it is created only after the
-        # mutation job is submitted, which happens *after* generate_template
-        # (and therefore after this call) returns.
-        if gene_id is not None:
-            _rag_request_id_by_gene[gene_id] = request_id
     except Exception as exc:
         record_metric(
             "rag_generation_failed",
@@ -1920,6 +1918,8 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------- #
     # Initialise per-run memory backend (PR 8) and inject into RagClient.
     # No-op when RAG_MEMORY_STORE_ENABLED is false; never raises.
+    # The assignments below are at module scope (inside `if __name__ == "__main__":`),
+    # so they update the module-level globals directly — no `global` needed.
     # ---------------------------------------------------------------------- #
     _MEMORY_BACKEND = _build_memory_backend()
     if _MEMORY_BACKEND is not None:

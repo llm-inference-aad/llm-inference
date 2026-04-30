@@ -101,10 +101,19 @@ echo "Python via uv: $(uv run python --version)"
 	OVERRIDE_RAG_USE_CODE_CONTEXT="${RAG_USE_CODE_CONTEXT-}"
 	OVERRIDE_RAG_USE_TEXT_CONTEXT="${RAG_USE_TEXT_CONTEXT-}"
 	OVERRIDE_RAG_RERANKER_ENABLED="${RAG_RERANKER_ENABLED-}"
+	OVERRIDE_RAG_RERANKER_MODEL="${RAG_RERANKER_MODEL-}"
+	OVERRIDE_RAG_TOP_K="${RAG_TOP_K-}"
+	OVERRIDE_RAG_MEMORY_STORE_ENABLED="${RAG_MEMORY_STORE_ENABLED-}"
+	OVERRIDE_RAG_MEMORY_TOP_K="${RAG_MEMORY_TOP_K-}"
+	OVERRIDE_RAG_MEMORY_MIN_SIMILARITY="${RAG_MEMORY_MIN_SIMILARITY-}"
 	OVERRIDE_NUM_GENERATIONS="${NUM_GENERATIONS-}"
 	OVERRIDE_POPULATION_SIZE="${POPULATION_SIZE-}"
 	OVERRIDE_START_POPULATION_SIZE="${START_POPULATION_SIZE-}"
 	OVERRIDE_EXPERIMENT_SEED="${EXPERIMENT_SEED-}"
+	# RUN_ID/RUN_DIR are computed earlier in this script and exported; preserve
+	# them across `source .env` in case the user has a stale value pinned there.
+	OVERRIDE_RUN_ID="${RUN_ID-}"
+	OVERRIDE_RUN_DIR="${RUN_DIR-}"
 
 	# Auto-export all keys defined in .env into this shell's environment
 	set -a
@@ -116,10 +125,17 @@ echo "Python via uv: $(uv run python --version)"
 	[[ -n "${OVERRIDE_RAG_USE_CODE_CONTEXT}" ]] && export RAG_USE_CODE_CONTEXT="${OVERRIDE_RAG_USE_CODE_CONTEXT}"
 	[[ -n "${OVERRIDE_RAG_USE_TEXT_CONTEXT}" ]] && export RAG_USE_TEXT_CONTEXT="${OVERRIDE_RAG_USE_TEXT_CONTEXT}"
 	[[ -n "${OVERRIDE_RAG_RERANKER_ENABLED}" ]] && export RAG_RERANKER_ENABLED="${OVERRIDE_RAG_RERANKER_ENABLED}"
+	[[ -n "${OVERRIDE_RAG_RERANKER_MODEL}" ]] && export RAG_RERANKER_MODEL="${OVERRIDE_RAG_RERANKER_MODEL}"
+	[[ -n "${OVERRIDE_RAG_TOP_K}" ]] && export RAG_TOP_K="${OVERRIDE_RAG_TOP_K}"
+	[[ -n "${OVERRIDE_RAG_MEMORY_STORE_ENABLED}" ]] && export RAG_MEMORY_STORE_ENABLED="${OVERRIDE_RAG_MEMORY_STORE_ENABLED}"
+	[[ -n "${OVERRIDE_RAG_MEMORY_TOP_K}" ]] && export RAG_MEMORY_TOP_K="${OVERRIDE_RAG_MEMORY_TOP_K}"
+	[[ -n "${OVERRIDE_RAG_MEMORY_MIN_SIMILARITY}" ]] && export RAG_MEMORY_MIN_SIMILARITY="${OVERRIDE_RAG_MEMORY_MIN_SIMILARITY}"
 	[[ -n "${OVERRIDE_NUM_GENERATIONS}" ]] && export NUM_GENERATIONS="${OVERRIDE_NUM_GENERATIONS}"
 	[[ -n "${OVERRIDE_POPULATION_SIZE}" ]] && export POPULATION_SIZE="${OVERRIDE_POPULATION_SIZE}"
 	[[ -n "${OVERRIDE_START_POPULATION_SIZE}" ]] && export START_POPULATION_SIZE="${OVERRIDE_START_POPULATION_SIZE}"
 	[[ -n "${OVERRIDE_EXPERIMENT_SEED}" ]] && export EXPERIMENT_SEED="${OVERRIDE_EXPERIMENT_SEED}"
+	[[ -n "${OVERRIDE_RUN_ID}" ]] && export RUN_ID="${OVERRIDE_RUN_ID}"
+	[[ -n "${OVERRIDE_RUN_DIR}" ]] && export RUN_DIR="${OVERRIDE_RUN_DIR}"
 
 # Quick masked sanity checks (show only prefixes)
 
@@ -366,3 +382,8 @@ export EVOLUTION_EXIT_CODE
 # Either way, the trap handles teardown — there is no separate teardown block here.
 echo "=== Job complete (exit_code=${EVOLUTION_EXIT_CODE}) ==="
 date
+
+# Propagate the inner Python exit code to SLURM so sacct/squeue reflect the
+# real outcome.  Without this the script falls off the end with rc=0 and
+# failed evolutions show as COMPLETED.
+exit "${EVOLUTION_EXIT_CODE}"
