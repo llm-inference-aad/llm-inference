@@ -1,0 +1,27 @@
+python
+import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# Define the activation function for the hidden layer
+def activation_function_hidden_layer(x):
+    return np.tanh(x)
+
+# Define the activation function for the output layer
+def activation_function_output_layer(x):
+    return sigmoid(x)
+
+```python
+{}
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. If no change is required, return the original code inside the fenced block.
+
+A: Let us think step by step

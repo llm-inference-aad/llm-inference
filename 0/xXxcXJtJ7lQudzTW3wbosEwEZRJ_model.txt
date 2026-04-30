@@ -1,0 +1,29 @@
+python
+import numpy as np
+
+# Define the function
+def my_function(x):
+    return x**2
+
+# Generate random data
+np.random.seed(0)
+data = np.random.rand(100)
+
+# Apply the function
+result = [my_function(i) for i in data]
+
+print(result)
+
+```python
+{}
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. If no change is required, return the original code inside the fenced block.
+
+A: Let us think step by step

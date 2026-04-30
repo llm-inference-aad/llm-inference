@@ -6,8 +6,8 @@
 # - `sbatch -p ice-bw-gpu --gpus-per-node=2 server.sh`
 #
 # Defaults below are tuned for the current production baseline:
-# - `meta-llama/Llama-3.3-70B-Instruct` in BF16 via vLLM
-# - requires 2x80GB-class GPUs (H100/A100) with `TENSOR_PARALLEL_SIZE=2`
+# - `meta-llama/Llama-3.1-8B-Instruct` in BF16 via vLLM
+# - requires 1x GPU with `TENSOR_PARALLEL_SIZE=1`
 #
 # IMPORTANT: GGUF models (e.g. `*GGUF` repos with `Q5_K_M`) are not loadable by
 # `server_vllm.py`'s Hugging Face loader path. Stage GGUF files for llama.cpp,
@@ -15,10 +15,10 @@
 #SBATCH --job-name=LLMGE01_Server
 #SBATCH -t 08:00:00
 #SBATCH -C "H100"
-#SBATCH --gpus-per-node=2
+#SBATCH --gpus-per-node=1
 #SBATCH -p ice-gpu
-#SBATCH --mem 160G
-#SBATCH -c 16
+#SBATCH --mem 80G
+#SBATCH -c 8
 #SBATCH --output=metrics/slurm-results/slurm-server-%j.out
 #SBATCH --error=metrics/slurm-results/slurm-server-%j.err
 
@@ -245,11 +245,49 @@ MONITOR_PID=$!
 # Ensure monitor is killed when script exits
 trap "kill $MONITOR_PID" EXIT
 
+# ============================================================================
+# Constrained Decoding & Speculative Decoding Configuration
+# ============================================================================
+# NOTE: Constrained decoding and speculative decoding REQUIRE vLLM backend.
+# If constraints are enabled, forced vLLM=true regardless of backend setting.
+#
+# To enable constraints, set these environment variables in your .env:
+#   CONSTRAINT_TYPE=json|grammar|regex (default: from DEFAULT_CONSTRAINT_TYPE)
+#   DEFAULT_JSON_SCHEMA='{"type":"object","properties":{...}}'
+#   ENABLE_SPECULATIVE_DECODING=true|false
+#   VLLM_SPECULATIVE_METHOD=suffix|ngram|draft_model
+#   VLLM_NUM_SPECULATIVE_TOKENS=5
+#
+# For comprehensive configuration, see .env.vllm documentation.
+# ============================================================================
+
+echo "Checking constraints configuration..."
+FORCE_VLLM=false
+
+if [ ! -z "$CONSTRAINT_TYPE" ] && [ "$CONSTRAINT_TYPE" != "" ]; then
+    echo "  Constraint type detected: $CONSTRAINT_TYPE"
+    echo "  Forcing VLLM_BACKEND=true (constraints require vLLM)"
+    FORCE_VLLM=true
+fi
+
+if [ "$ENABLE_SPECULATIVE_DECODING" = "true" ]; then
+    echo "  Speculative decoding enabled: $VLLM_SPECULATIVE_METHOD"
+    echo "  Forcing VLLM_BACKEND=true (speculation requires vLLM)"
+    FORCE_VLLM=true
+fi
+
+if [ "$FORCE_VLLM" = "true" ]; then
+    VLLM_BACKEND=true
+fi
+
 # Select backend: vllm (default, PagedAttention) or hf (legacy HuggingFace pipeline)
 VLLM_BACKEND=${VLLM_BACKEND:-true}
 
 if [ "$VLLM_BACKEND" = "true" ]; then
     echo "Starting vLLM backend (PagedAttention + prefix caching)"
+    if [ "$FORCE_VLLM" = "true" ]; then
+        echo "  With constrained decoding and/or speculative decoding support"
+    fi
     export VLLM_WORKER_MULTIPROC_METHOD=spawn
     # vLLM manages multi-GPU internally via tensor_parallel_size — use 1 worker
     python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1

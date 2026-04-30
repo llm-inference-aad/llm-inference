@@ -1,0 +1,1 @@
+Error calling local server: Error calling local server after 3 attempts: HTTPConnectionPool(host='atl1-1-03-015-30-0.pace.gatech.edu', port=8001): Max retries exceeded with url: /generate (Caused by NewConnectionError("HTTPConnection(host='atl1-1-03-015-30-0.pace.gatech.edu', port=8001): Failed to establish a new connection: [Errno 111] Connection refused"))

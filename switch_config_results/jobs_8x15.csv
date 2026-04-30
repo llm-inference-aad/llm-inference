@@ -1,0 +1,6 @@
+config,job_id,submit_time,num_generations,start_population_size,population_size
+hf,5093549,2026-04-27T16:36:01-04:00,15,8,8
+vllm,5093551,2026-04-27T16:36:04-04:00,15,8,8
+constrained,5093552,2026-04-27T16:36:06-04:00,15,8,8
+speculative,5093553,2026-04-27T16:36:08-04:00,15,8,8
+all,5093554,2026-04-27T16:36:11-04:00,15,8,8

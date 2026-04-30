@@ -1,0 +1,33 @@
+python
+import torch
+from torch import nn
+
+class Model(nn.Module):
+    def __init__(self, input_size=784, hidden_size=512, num_classes=10):
+        super().__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, num_classes)
+
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.out_relu(out)
+        out = self.fc2(out)
+        return out
+
+model = Model()
+print(model)
+
+```python
+{}
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. If no change is required, return the original code inside the fenced block.
+
+A: Let us think step by step

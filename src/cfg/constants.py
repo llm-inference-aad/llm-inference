@@ -126,10 +126,10 @@ PROB_EOT = 0.25
 num_generations = int(os.environ.get("NUM_GENERATIONS", 15))  # BASELINE: 15 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = int(os.environ.get("START_POPULATION_SIZE", 16))  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = int(os.environ.get("START_POPULATION_SIZE", 8))  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
-population_size = int(os.environ.get("POPULATION_SIZE", 16))  # BASELINE: Keep consistent with start_population_size
+population_size = int(os.environ.get("POPULATION_SIZE", 8))  # BASELINE: Keep consistent with start_population_size
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual

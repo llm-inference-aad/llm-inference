@@ -1,0 +1,46 @@
+nohup: ignoring input
+[vLLM] Run Hash: 6c8c2a2199fd4d44
+[vLLM] Metrics: /storage/ice1/5/5/jgil37/llm-inference/runs/server-only/metrics/latency-6c8c2a2199fd4d44.json
+INFO:     Started server process [2163909]
+INFO:     Waiting for application startup.
+[2026-04-28 01:30:59] ===== vLLM SERVER STARTUP =====
+INFO 04-28 01:32:18 [importing.py:44] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 04-28 01:32:18 [importing.py:68] Triton not installed or not compatible; certain GPU-related functions will not be available.
+W0428 01:32:20.020000 2163909 venv/lib/python3.10/site-packages/torch/utils/cpp_extension.py:118] No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'
+[vLLM] Loading model: /storage/ice-shared/vip-vvk/llm_storage/meta-llama/Llama-3.3-70B-Instruct
+[vLLM] model_id=Llama-3.3-70B-Instruct
+[vLLM] model_revision=untracked
+[vLLM] model_version=unknown
+[vLLM] model_quantization=bf16
+[vLLM] tensor_parallel_size=2
+[vLLM] gpu_memory_utilization=0.95
+[vLLM] max_model_len=16384
+[vLLM] dtype=bfloat16
+[vLLM] quantization=None
+[vLLM] enable_prefix_caching=True
+[vLLM] constrained_decoding_enabled, default_constraint_type=
+INFO 04-28 01:32:37 [utils.py:238] non-default args: {'trust_remote_code': True, 'dtype': 'bfloat16', 'max_model_len': 16384, 'tensor_parallel_size': 2, 'enable_prefix_caching': True, 'gpu_memory_utilization': 0.95, 'disable_log_stats': True, 'model': '/storage/ice-shared/vip-vvk/llm_storage/meta-llama/Llama-3.3-70B-Instruct'}
+ERROR:    Traceback (most recent call last):
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/starlette/routing.py", line 694, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/fastapi/routing.py", line 237, in __aenter__
+    await self._router._startup()
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/fastapi/routing.py", line 4880, in _startup
+    await handler()
+  File "/storage/ice1/5/5/jgil37/llm-inference/server_vllm.py", line 534, in startup_event
+    get_llm()
+  File "/storage/ice1/5/5/jgil37/llm-inference/server_vllm.py", line 357, in get_llm
+    _llm = LLM(**llm_kwargs)
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/vllm/entrypoints/llm.py", line 379, in __init__
+    self.llm_engine = LLMEngine.from_engine_args(
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/vllm/v1/engine/llm_engine.py", line 169, in from_engine_args
+    vllm_config = engine_args.create_engine_config(usage_context)
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/vllm/engine/arg_utils.py", line 1457, in create_engine_config
+    device_config = DeviceConfig(device=cast(Device, current_platform.device_type))
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/pydantic/_internal/_dataclasses.py", line 121, in __init__
+    s.__pydantic_validator__.validate_python(ArgsKwargs(args, kwargs), self_instance=s)
+  File "/storage/ice1/5/5/jgil37/llm-inference/venv/lib/python3.10/site-packages/vllm/config/device.py", line 73, in __post_init__
+    self.device = torch.device(self.device_type)
+RuntimeError: Device string must not be empty
+
+ERROR:    Application startup failed. Exiting.

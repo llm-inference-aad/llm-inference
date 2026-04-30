@@ -1,0 +1,75 @@
+RUN_ID: draft_cross
+RUN_LOG_DIR: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/logs
+RUN_METRICS_DIR: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/metrics
+RUN_ERRORS_DIR: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/errors
+Activating virtual environment at: /home/hice1/jgil37/scratch/llm-inference/venv
+Writing server hostname 'atl1-1-03-012-28-0.pace.gatech.edu' to file: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/logs/hostname.log
+Writing server job ID '5093637' to file: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/logs/hostname_server_job.txt
+Starting LLM server on host: atl1-1-03-012-28-0.pace.gatech.edu
+Using specified port: 8001
+Registering server with load balancer...
+  Server: atl1-1-03-012-28-0.pace.gatech.edu:8001
+  Registry: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/logs/servers.json
+  Registration complete
+Starting GPU monitoring...
+Checking constraints configuration...
+  Speculative decoding enabled: draft_model
+  Forcing VLLM_BACKEND=true (speculation requires vLLM)
+Starting vLLM backend (PagedAttention + prefix caching)
+  With constrained decoding and/or speculative decoding support
+[vLLM] Run Hash: 29f542c4c92c8cd1
+[vLLM] Metrics: /home/hice1/jgil37/scratch/llm-inference/switch_config_results/draft_cross/metrics/latency-29f542c4c92c8cd1.json
+[2026-04-28 00:58:00] ===== vLLM SERVER STARTUP =====
+[vLLM] Loading model: /home/hice1/jgil37/scratch/llm_models/meta-llama/Llama-3.1-8B-Instruct
+[vLLM] model_id=Llama-3.1-8B-Instruct
+[vLLM] model_revision=untracked
+[vLLM] model_version=unknown
+[vLLM] model_quantization=bf16
+[vLLM] tensor_parallel_size=1
+[vLLM] gpu_memory_utilization=0.95
+[vLLM] max_model_len=32768
+[vLLM] dtype=bfloat16
+[vLLM] quantization=None
+[vLLM] enable_prefix_caching=True
+[vLLM] speculative_decoding enabled, method=draft_model
+INFO 04-28 00:59:08 [utils.py:238] non-default args: {'trust_remote_code': True, 'dtype': 'bfloat16', 'max_model_len': 32768, 'enable_prefix_caching': True, 'gpu_memory_utilization': 0.95, 'disable_log_stats': True, 'model': '/home/hice1/jgil37/scratch/llm_models/meta-llama/Llama-3.1-8B-Instruct'}
+WARNING 04-28 00:59:08 [envs.py:1710] Unknown vLLM environment variable detected: VLLM_SPECULATIVE_METHOD
+WARNING 04-28 00:59:08 [envs.py:1710] Unknown vLLM environment variable detected: VLLM_SPECULATIVE_MODEL
+WARNING 04-28 00:59:08 [envs.py:1710] Unknown vLLM environment variable detected: VLLM_DTYPE
+WARNING 04-28 00:59:08 [envs.py:1710] Unknown vLLM environment variable detected: VLLM_BACKEND
+WARNING 04-28 00:59:08 [envs.py:1710] Unknown vLLM environment variable detected: VLLM_NUM_SPECULATIVE_TOKENS
+INFO 04-28 00:59:09 [model.py:531] Resolved architecture: LlamaForCausalLM
+INFO 04-28 00:59:09 [model.py:1554] Using max model len 32768
+INFO 04-28 00:59:14 [scheduler.py:231] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 04-28 00:59:14 [vllm.py:747] Asynchronous scheduling is enabled.
+(EngineCore_DP0 pid=64712) INFO 04-28 00:59:30 [core.py:101] Initializing a V1 LLM engine (v0.17.1) with config: model='/home/hice1/jgil37/scratch/llm_models/meta-llama/Llama-3.1-8B-Instruct', speculative_config=None, tokenizer='/home/hice1/jgil37/scratch/llm_models/meta-llama/Llama-3.1-8B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=32768, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False), seed=0, served_model_name=/home/hice1/jgil37/scratch/llm_models/meta-llama/Llama-3.1-8B-Instruct, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'level': None, 'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['none'], 'splitting_ops': ['vllm::unified_attention', 'vllm::unified_attention_with_output', 'vllm::unified_mla_attention', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::linear_attention', 'vllm::plamo2_mamba_mixer', 'vllm::gdn_attention_core', 'vllm::kda_attention', 'vllm::sparse_attn_indexer', 'vllm::rocm_aiter_sparse_attn_indexer', 'vllm::unified_kv_cache_update', 'vllm::unified_mla_kv_cache_update'], 'compile_mm_encoder': False, 'compile_sizes': [], 'compile_ranges_split_points': [16384], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': False, 'fuse_act_quant': False, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False}, 'max_cudagraph_capture_size': 512, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}
+(EngineCore_DP0 pid=64712) INFO 04-28 00:59:39 [parallel_state.py:1393] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://172.27.150.91:41331 backend=nccl
+(EngineCore_DP0 pid=64712) INFO 04-28 00:59:40 [parallel_state.py:1715] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank N/A, EPLB rank N/A
+(EngineCore_DP0 pid=64712) INFO 04-28 00:59:43 [base.py:106] Offloader set to NoopOffloader
+(EngineCore_DP0 pid=64712) INFO 04-28 00:59:43 [gpu_model_runner.py:4281] Starting to load model /home/hice1/jgil37/scratch/llm_models/meta-llama/Llama-3.1-8B-Instruct...
+(EngineCore_DP0 pid=64712) INFO 04-28 01:00:10 [cuda.py:405] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(EngineCore_DP0 pid=64712) INFO 04-28 01:00:10 [flash_attn.py:587] Using FlashAttention version 3
+(EngineCore_DP0 pid=64712) INFO 04-28 01:01:32 [default_loader.py:293] Loading weights took 81.58 seconds
+(EngineCore_DP0 pid=64712) INFO 04-28 01:01:33 [gpu_model_runner.py:4364] Model loading took 14.99 GiB memory and 109.396331 seconds
+(EngineCore_DP0 pid=64712) INFO 04-28 01:01:56 [backends.py:916] Using cache directory: /home/hice1/jgil37/.cache/vllm/torch_compile_cache/49b3d797ce/rank_0_0/backbone for vLLM's torch.compile
+(EngineCore_DP0 pid=64712) INFO 04-28 01:01:56 [backends.py:976] Dynamo bytecode transform time: 22.90 s
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:04 [backends.py:350] Cache the graph of compile range (1, 16384) for later use
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:11 [backends.py:366] Compiling a graph for compile range (1, 16384) takes 13.61 s
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:11 [monitor.py:35] torch.compile takes 38.03 s in total
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:11 [decorators.py:580] saving AOT compiled function to /home/hice1/jgil37/.cache/vllm/torch_compile_cache/torch_aot_compile/b94bbaed368929c01fc170e0a11a01167af5cee718db1a1ad9b01fc3d3c06acd/rank_0_0/model
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:12 [decorators.py:588] saved AOT compiled function to /home/hice1/jgil37/.cache/vllm/torch_compile_cache/torch_aot_compile/b94bbaed368929c01fc170e0a11a01167af5cee718db1a1ad9b01fc3d3c06acd/rank_0_0/model
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:20 [gpu_worker.py:424] Available KV cache memory: 58.15 GiB
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:20 [kv_cache_utils.py:1314] GPU KV cache size: 476,336 tokens
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:20 [kv_cache_utils.py:1319] Maximum concurrency for 32,768 tokens per request: 14.54x
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:25 [gpu_model_runner.py:5386] Graph capturing finished in 4 secs, took -0.66 GiB
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:25 [core.py:282] init engine (profile, create kv cache, warmup model) took 51.87 seconds
+(EngineCore_DP0 pid=64712) INFO 04-28 01:02:26 [vllm.py:747] Asynchronous scheduling is enabled.
+INFO 04-28 01:02:26 [llm.py:388] Supported tasks: ['generate']
+[vLLM] Model loaded in 197.3s
+[2026-04-28 01:02:26] ===== vLLM SERVER READY =====
+[2026-04-28 01:02:26] Endpoints: /generate (POST), / (GET)
+[2026-04-28 01:02:26] Speculative Decoding: ENABLED (draft_model)
+INFO:     127.0.0.1:56812 - "HEAD /.aws/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56822 - "HEAD /.ada/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56826 - "HEAD /.ssh/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56828 - "HEAD /.midway/ HTTP/1.1" 404 Not Found

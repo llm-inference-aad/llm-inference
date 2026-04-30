@@ -7,6 +7,7 @@ import pickle
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, Iterator, List, Sequence
+import math
 
 import pdfplumber
 
@@ -66,14 +67,33 @@ def build_mutation_description(
 
     metrics_line = ""
     if fitness:
-        metrics = ", ".join(
-            [
-                f"Test Acc: {fitness[0]:.4f}" if len(fitness) > 0 else "",
-                f"Params: {int(fitness[1])}" if len(fitness) > 1 else "",
-                f"Val Acc: {fitness[2]:.4f}" if len(fitness) > 2 else "",
-                f"Train Time: {fitness[3]:.2f}s" if len(fitness) > 3 else "",
-            ]
-        )
+        metrics_parts = []
+        if len(fitness) > 0:
+            try:
+                metrics_parts.append(f"Test Acc: {float(fitness[0]):.4f}")
+            except Exception:
+                metrics_parts.append("Test Acc: N/A")
+        if len(fitness) > 1:
+            try:
+                p = fitness[1]
+                if isinstance(p, (int, float)) and math.isfinite(float(p)):
+                    metrics_parts.append(f"Params: {int(p)}")
+                else:
+                    metrics_parts.append(f"Params: {p}")
+            except Exception:
+                metrics_parts.append("Params: N/A")
+        if len(fitness) > 2:
+            try:
+                metrics_parts.append(f"Val Acc: {float(fitness[2]):.4f}")
+            except Exception:
+                metrics_parts.append("Val Acc: N/A")
+        if len(fitness) > 3:
+            try:
+                metrics_parts.append(f"Train Time: {float(fitness[3]):.2f}s")
+            except Exception:
+                metrics_parts.append("Train Time: N/A")
+
+        metrics = ", ".join(metrics_parts)
         metrics_line = metrics.replace(",,", ",").strip(", ")
 
     improvement_line = ""

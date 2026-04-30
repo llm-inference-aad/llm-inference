@@ -1,0 +1,44 @@
+Example of the modified code: 
+```python
+def pad_num_y(k_s):
+    pad_per_side = int((k_s-1)*0.5)
+    return pad_per_side
+    
+class DW(nn.Module):
+    def __init__(self, cin, dw_s):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, dw_s, 1, pad_num_y(dw_s), groups=cin)
+        self.act = nn.Hardswish()
+
+    def forward(self, x):
+        x = self.dw(x)
+        x = self.act(x)
+        return x 
+```
+Example of the initial code:
+```python
+def pad_num_y(k_s):
+    pad_per_side = int((k_s-1)*0.5)
+    return pad_per_side
+    
+class DW(nn.Module):
+    def __init__(self, cin, dw_s):
+        super().__init__()
+        self.dw = nn.Conv2d(cin, cin, dw_s, 1, pad_num_y(dw_s), groups=cin)
+        self.act = nn.Hardswish()
+
+    def forward(self, x):
+        x = self.dw(x)
+        x = self.act(x)
+        return x 
+```
+
+Q1: Very concisely, let's explore step by step how modifying this code segment enhanced its scoring metrics performance.
+Q2: With the insights from Q1 in mind, can we apply the same principles in a concise manner to update the code snippet below, ensuring the input and output tensor sizes remain unchanged?
+
+Snippet to be augmented:
+```python
+{} 
+```
+
+A1: Let us think step by step

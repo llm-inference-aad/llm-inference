@@ -79,13 +79,28 @@ export CUDA_VISIBLE_DEVICES=0
 # Ensure uv on PATH
 # ----------------------------
 export PATH="$HOME/.local/bin:$PATH"
-if ! command -v uv >/dev/null 2>&1; then
-  echo "ERROR: 'uv' not found on PATH. Install with: pipx install uv  (or per your cluster setup)"
-  exit 1
-fi
 
-echo "UV version: $(uv --version)"
-echo "Python via uv: $(uv run python --version)"
+if command -v uv >/dev/null 2>&1; then
+  PYTHON_LAUNCHER=(uv run python)
+  USE_UV=true
+  echo "UV version: $(uv --version)"
+  echo "Python via uv: $(uv run python --version)"
+else
+  USE_UV=false
+  VENV_PYTHON_PATH="${VENV_PATH:-}"
+  if [[ -n "${VENV_PYTHON_PATH}" && -x "${VENV_PYTHON_PATH}/bin/python" ]]; then
+    PYTHON_LAUNCHER=("${VENV_PYTHON_PATH}/bin/python")
+    echo "WARNING: 'uv' not found; falling back to venv python at ${VENV_PYTHON_PATH}/bin/python"
+    echo "Python version: $(${VENV_PYTHON_PATH}/bin/python --version)"
+  elif command -v python3 >/dev/null 2>&1; then
+    PYTHON_LAUNCHER=(python3)
+    echo "WARNING: 'uv' not found; falling back to system python3"
+    echo "Python version: $(python3 --version)"
+  else
+    echo "ERROR: neither 'uv' nor a usable python interpreter was found"
+    exit 1
+  fi
+fi
 
 	# ----------------------------
 	# Load environment variables
@@ -150,18 +165,24 @@ echo "RUN_ERRORS_DIR: ${RUN_ERRORS_DIR}"
 # CUDA libs for uv environment (best-effort)
 # ----------------------------
 # Some clusters need nvjitlink visible to the Python env used by uv.
-UV_SITE_PKGS="$(uv run python - <<'PY'
+if [[ "${USE_UV}" == true ]]; then
+  UV_SITE_PKGS="$(uv run python - <<'PY'
 import site
 print(site.getsitepackages()[0])
 PY
 )"
-export LD_LIBRARY_PATH="$UV_SITE_PKGS/nvidia/nvjitlink/lib:${LD_LIBRARY_PATH:-}"
-echo "LD_LIBRARY_PATH updated for nvjitlink (best-effort)."
+  export LD_LIBRARY_PATH="$UV_SITE_PKGS/nvidia/nvjitlink/lib:${LD_LIBRARY_PATH:-}"
+  echo "LD_LIBRARY_PATH updated for nvjitlink (best-effort)."
+fi
 
 # ----------------------------
 # Final info dump
 # ----------------------------
-echo "UV Python path: $(uv run which python)"
+if [[ "${USE_UV}" == true ]]; then
+  echo "UV Python path: $(uv run which python)"
+else
+  echo "Python launcher: ${PYTHON_LAUNCHER[*]}"
+fi
 nvidia-smi || true
 
 # ----------------------------
@@ -173,8 +194,8 @@ echo "Server job submitted with ID: ${SERVER_JOB_ID}"
 
 # (The server job ID is securely recorded by server.sh into HOSTNAME_LOG_FILE_server_job.txt)
 
-echo "=== Running: uv run python run_improved.py ${RUN_DIR}/checkpoints ==="
-uv run python run_improved.py "${RUN_DIR}/checkpoints"
+echo "=== Running: ${PYTHON_LAUNCHER[*]} run_improved.py ${RUN_DIR}/checkpoints ==="
+"${PYTHON_LAUNCHER[@]}" run_improved.py "${RUN_DIR}/checkpoints"
 
 # Move ALL SLURM logs from this run to the run-scoped logs directory
 echo "=== Moving SLURM logs to run log directory ==="
