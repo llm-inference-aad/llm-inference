@@ -17,7 +17,7 @@ _REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.rag.api_types import RetrieveRequest  # noqa: E402
+from src.rag.api_types import RetrieveRequest, RetrieveResponse  # noqa: E402
 from src.rag.backend_protocol import BackendProtocol  # noqa: E402
 from src.rag.backends.graph_backend import GraphBackend  # noqa: E402
 from src.rag.backends.pageindex_backend import PageIndexBackend  # noqa: E402
@@ -35,7 +35,6 @@ def _sample_request() -> RetrieveRequest:
 
 
 STUB_BACKENDS = [
-    pytest.param(PageIndexBackend, id="PageIndexBackend"),
     pytest.param(GraphBackend, id="GraphBackend"),
 ]
 
@@ -78,6 +77,39 @@ class TestFaissBackendClassShape:
         except ModuleNotFoundError:
             pytest.skip("FaissBackend not available on this base branch")
         assert callable(getattr(FaissBackend, "index", None))
+
+
+class TestPageIndexBackendCompliance:
+    """Live PageIndexBackend instance — uses an empty tmp trees dir and a
+    fake LLM callable so no model calls or filesystem corpus are needed."""
+
+    def _instance(self, tmp_path):
+        return PageIndexBackend(
+            trees_dir=str(tmp_path),
+            llm_call=lambda model, prompt: '{"selected_nodes": []}',
+        )
+
+    def test_isinstance_backend_protocol(self, tmp_path):
+        assert isinstance(self._instance(tmp_path), BackendProtocol)
+
+    def test_retrieve_callable(self, tmp_path):
+        assert callable(getattr(self._instance(tmp_path), "retrieve", None))
+
+    def test_index_callable(self, tmp_path):
+        assert callable(getattr(self._instance(tmp_path), "index", None))
+
+    def test_retrieve_returns_response(self, tmp_path):
+        # Empty trees dir → RetrieveResponse with empty blocks, not an exception.
+        resp = self._instance(tmp_path).retrieve(_sample_request())
+        assert isinstance(resp, RetrieveResponse)
+        assert resp.blocks == []
+        assert (resp.diagnostics or {}).get("source") == "pageindex"
+
+    def test_index_is_noop_shim(self, tmp_path):
+        # PageIndex indexing is owned by the offline tree builder; the
+        # backend's index() is a no-op like FaissBackend's.
+        backend = self._instance(tmp_path)
+        assert backend.index({"text": "ignored"}) is None
 
 
 class TestMemoryBackendCompliance:
