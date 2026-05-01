@@ -13,6 +13,12 @@ from datetime import datetime
 from pathlib import Path
 from src.cfg.constants import *
 from evaluator import OutputEvaluator
+try:
+    from src.rag.runtime import get_runtime
+except Exception:
+    # If RAG modules aren't available in this environment, provide a noop getter
+    def get_runtime():
+        return None
 
 app = FastAPI(title="LLM API", version="1.0")
 
@@ -361,10 +367,28 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
         
         # Combine system prompt with user prompt
         full_prompt = system_prompt + request.prompt
+
+        # Optionally augment prompt with RAG context if enabled and available
+        augmented_prompt = full_prompt
+        try:
+            if globals().get("RAG_ENABLED", False):
+                runtime = get_runtime()
+                if runtime is not None:
+                    augmented_template, mutations = runtime.enhance_template(
+                        template=full_prompt,
+                        mutation_type=None,
+                        query_code=None,
+                        gene_id=request.gene_id,
+                    )
+                    augmented_prompt = augmented_template
+                    # Emit a lightweight log indicating RAG was applied
+                    print(f"RAG context injected: retrieved {len(mutations)} items for gene {request.gene_id}")
+        except Exception as e:
+            print(f"Warning: RAG augmentation failed: {e}")
         
         # Convert request to dict
         request_dict = {
-            "prompt": full_prompt,
+            "prompt": augmented_prompt,
             "max_new_tokens": request.max_new_tokens,
             "top_p": request.top_p,
             "temperature": request.temperature,
@@ -394,7 +418,7 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
 
         # Calculate token usage
         tokenizer = model.tokenizer
-        prompt_tokens = len(tokenizer(full_prompt, add_special_tokens=False)["input_ids"])
+        prompt_tokens = len(tokenizer(augmented_prompt, add_special_tokens=False)["input_ids"])
         completion_tokens = len(tokenizer(generated_text, add_special_tokens=False)["input_ids"]) if generated_text else 0
         total_tokens = prompt_tokens + completion_tokens
 
