@@ -12,6 +12,7 @@ MiniLM (384-dim) + the FAISS indices into memory, which takes ~30s.
 
 from __future__ import annotations
 
+import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +21,15 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
+
+
+# Backend registry — names that may be passed via `RAG_BACKEND`.
+# `faiss` (default) routes through the existing `RagRuntime` path. `pageindex`
+# and `graph` are stubs on this branch (raise NotImplementedError on retrieve);
+# we fail fast at startup so the team running them knows their blocker is the
+# backend port, not the harness.
+_KNOWN_BACKENDS = {"faiss", "pageindex", "graph"}
+_STUB_BACKENDS = {"pageindex", "graph"}
 
 
 @dataclass
@@ -41,15 +51,38 @@ class AugmentResponse:
 _runtime = None
 
 
+def selected_backend() -> str:
+    """Return the RAG_BACKEND env value, defaulting to `faiss`."""
+    return (os.environ.get("RAG_BACKEND") or "faiss").strip().lower()
+
+
 def _get_runtime():
     """Construct and cache `RagRuntime` directly, bypassing the env-gated singleton.
 
     `rag.runtime.get_runtime()` returns `None` when `RAG_ENABLED=false`, but we
     always need the runtime here regardless of the env toggle (the toggle is
     consumed by production, not by us). We instantiate the class directly.
+
+    `RAG_BACKEND` is validated here:
+      - `faiss` (default) → existing RagRuntime path (works today).
+      - `pageindex` / `graph` → stubs on this branch; raise SystemExit with a
+        clear message so the team knows what to port before kickoff.
+      - anything else → unknown backend.
     """
     global _runtime
     if _runtime is None:
+        backend = selected_backend()
+        if backend not in _KNOWN_BACKENDS:
+            raise SystemExit(
+                f"RAG_BACKEND={backend!r} is not in {sorted(_KNOWN_BACKENDS)}. "
+                f"Set RAG_BACKEND=faiss, pageindex, or graph."
+            )
+        if backend in _STUB_BACKENDS:
+            raise SystemExit(
+                f"RAG_BACKEND={backend!r} is a stub on feature/rag-pipeline-surya "
+                f"(src/rag/backends/{backend}_backend.py raises NotImplementedError). "
+                f"Port the backend (and wire it into RagRuntime) before running the replay."
+            )
         from rag.runtime import RagRuntime  # type: ignore
         _runtime = RagRuntime()
     return _runtime

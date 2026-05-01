@@ -414,13 +414,21 @@ def main() -> int:
     Path(os.environ["RUN_ERRORS_DIR"]).mkdir(parents=True, exist_ok=True)
 
     rag_service = _import_sibling("rag_service", "02_rag_service.py")
-    print(f"[setup] warming RagRuntime...", flush=True)
-    rag_service.warmup()
-    print(f"[setup] runtime ready", flush=True)
 
     arms_to_run = ["no_rag", "with_rag"]
     if args.skip_arm:
         arms_to_run = [a for a in arms_to_run if a != args.skip_arm]
+
+    # Only warm the RAG runtime if a with_rag arm is actually scheduled. Step 0
+    # (no_rag baseline) skips this, so it doesn't pay the ~30s embedding-model
+    # load and doesn't trip RAG_BACKEND validation when we don't need any.
+    if "with_rag" in arms_to_run:
+        print(f"[setup] warming RagRuntime (RAG_BACKEND={rag_service.selected_backend()})...",
+              flush=True)
+        rag_service.warmup()
+        print(f"[setup] runtime ready", flush=True)
+    else:
+        print(f"[setup] no_rag-only run; skipping RagRuntime warmup", flush=True)
 
     rows = list(csv.DictReader(args.csv.open()))
     if args.eligible_only:
@@ -437,6 +445,7 @@ def main() -> int:
         "server_url": f"http://{host}:{port}", "arms": arms_to_run,
         "eligible_only": args.eligible_only, "temperature": args.temperature,
         "top_p": args.top_p,
+        "rag_backend": rag_service.selected_backend(),
         "rag_env": {k: os.environ.get(k) for k in
                     ["RAG_USE_CODE_CONTEXT", "RAG_USE_TEXT_CONTEXT",
                      "RAG_TOP_K", "RAG_TEXT_TOP_K", "RAG_MIN_SIMILARITY",
