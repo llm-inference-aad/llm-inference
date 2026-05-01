@@ -28,7 +28,8 @@ metrics/data/
 metrics/gpu/
 metrics/eval/
 !metrics/scripts/
-rag_data/
+rag_data/*
+!rag_data/pageindex_trees/
 rag_data_eval/
 documentation/
 .cursor/
