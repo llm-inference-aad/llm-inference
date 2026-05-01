@@ -32,6 +32,12 @@ from pydantic import BaseModel
 from src.cfg.constants import *
 from evaluator import OutputEvaluator
 
+try:
+    from src.rag.runtime import get_runtime
+except Exception:
+    def get_runtime():
+        return None
+
 # ---------------------------------------------------------------------------
 # App & Config
 # ---------------------------------------------------------------------------
@@ -553,9 +559,31 @@ async def generate_text(request: LLMRequest):
         # Prepend system prompt (prefix-cached by vLLM)
         full_prompt = SYSTEM_PROMPT + request.prompt
 
+        # Optionally augment the prompt with RAG context when enabled.
+        # RAG is intentionally read-only here: it retrieves from the centralized
+        # vector DB and prepends historical mutations / research context.
+        augmented_prompt = full_prompt
+        try:
+            if globals().get("RAG_ENABLED", False):
+                runtime = get_runtime()
+                if runtime is not None:
+                    augmented_template, mutations = runtime.enhance_template(
+                        template=full_prompt,
+                        mutation_type=None,
+                        query_code=request.prompt,
+                        gene_id=request.gene_id,
+                    )
+                    augmented_prompt = augmented_template
+                    print(
+                        f"[vLLM] RAG context injected: retrieved {len(mutations)} items for gene {request.gene_id}",
+                        flush=True,
+                    )
+        except Exception as e:
+            print(f"[vLLM] Warning: RAG augmentation failed: {e}", flush=True)
+
         # Clamp max_tokens so prompt + output fits within MAX_MODEL_LEN
         llm = get_llm()
-        prompt_token_ids = llm.get_tokenizer().encode(full_prompt)
+        prompt_token_ids = llm.get_tokenizer().encode(augmented_prompt)
         prompt_len = len(prompt_token_ids)
         safe_max_tokens = min(request.max_new_tokens, MAX_MODEL_LEN - prompt_len)
         if safe_max_tokens < 1:
@@ -615,7 +643,7 @@ async def generate_text(request: LLMRequest):
         # Generate — vLLM handles batching, KV cache, scheduling internally
         gen_start = time.time()
         llm = get_llm()
-        outputs = llm.generate([full_prompt], params)
+        outputs = llm.generate([augmented_prompt], params)
         gen_time = time.time() - gen_start
 
         output = outputs[0]

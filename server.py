@@ -456,6 +456,25 @@ Begin with ```python and end with ```. If you cannot comply, output exactly FAIL
 async def root():
     return {"message": "LLM API is running!"}
 
+
+@app.get("/rag/context")
+async def rag_context(query: str = "", mutation_type: str | None = None, gene_id: str | None = None):
+    """Return formatted RAG context for a provided query or gene identifier.
+
+    This is a safe, read-only endpoint that will return an empty context if RAG
+    is disabled or unavailable in the current environment.
+    """
+    try:
+        runtime = get_runtime()
+        if runtime is None:
+            return {"enabled": False, "context": "", "count": 0}
+
+        mutations = runtime.collect_context(mutation_type=mutation_type, query_code=query)
+        formatted = runtime.format_context(mutations)
+        return {"enabled": True, "context": formatted, "count": len(mutations)}
+    except Exception as e:
+        return {"enabled": False, "context": "", "count": 0, "error": str(e)}
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize the model when the server starts"""

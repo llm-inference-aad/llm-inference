@@ -23,6 +23,7 @@ class ConstrainedLLMClient:
     def __init__(self, server_url: str = SERVER_URL):
         self.server_url = server_url
         self.generate_endpoint = f"{server_url}/generate"
+        self.rag_endpoint = f"{server_url}/rag/context"
     
     def generate_with_json_schema(
         self,
@@ -30,6 +31,7 @@ class ConstrainedLLMClient:
         json_schema: dict,
         max_new_tokens: int = 512,
         temperature: float = 0.7,
+        use_rag: bool = False,
     ) -> dict:
         """
         Generate output constrained to match a JSON schema.
@@ -43,6 +45,17 @@ class ConstrainedLLMClient:
         Returns:
             Dict with 'generated_text' and other metadata
         """
+        prompt_to_send = prompt
+        if use_rag:
+            try:
+                resp = requests.get(self.rag_endpoint, params={"query": prompt[:512]})
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("enabled") and data.get("context"):
+                        prompt_to_send = f"Relevant context:\n{data['context']}\n\n{prompt}"
+            except Exception:
+                pass
+
         payload = {
             "prompt": prompt,
             "max_new_tokens": max_new_tokens,
@@ -74,6 +87,7 @@ class ConstrainedLLMClient:
         grammar: str,
         max_new_tokens: int = 512,
         temperature: float = 0.7,
+        use_rag: bool = False,
     ) -> dict:
         """
         Generate output constrained to match an LBNF grammar.
@@ -87,6 +101,17 @@ class ConstrainedLLMClient:
         Returns:
             Dict with 'generated_text' and other metadata
         """
+        prompt_to_send = prompt
+        if use_rag:
+            try:
+                resp = requests.get(self.rag_endpoint, params={"query": prompt[:512]})
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("enabled") and data.get("context"):
+                        prompt_to_send = f"Relevant context:\n{data['context']}\n\n{prompt}"
+            except Exception:
+                pass
+
         payload = {
             "prompt": prompt,
             "max_new_tokens": max_new_tokens,
@@ -117,6 +142,7 @@ class ConstrainedLLMClient:
         pattern: str,
         max_new_tokens: int = 256,
         temperature: float = 0.5,
+        use_rag: bool = False,
     ) -> dict:
         """
         Generate output constrained to match a regex pattern.
@@ -130,6 +156,17 @@ class ConstrainedLLMClient:
         Returns:
             Dict with 'generated_text' and other metadata
         """
+        prompt_to_send = prompt
+        if use_rag:
+            try:
+                resp = requests.get(self.rag_endpoint, params={"query": prompt[:512]})
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("enabled") and data.get("context"):
+                        prompt_to_send = f"Relevant context:\n{data['context']}\n\n{prompt}"
+            except Exception:
+                pass
+
         payload = {
             "prompt": prompt,
             "max_new_tokens": max_new_tokens,
@@ -160,8 +197,20 @@ class ConstrainedLLMClient:
         prompt: str,
         max_new_tokens: int = 512,
         temperature: float = 0.7,
+        use_rag: bool = False,
     ) -> dict:
         """Generate without constraints for benchmarking."""
+        prompt_to_send = prompt
+        if use_rag:
+            try:
+                resp = requests.get(self.rag_endpoint, params={"query": prompt[:512]})
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("enabled") and data.get("context"):
+                        prompt_to_send = f"Relevant context:\n{data['context']}\n\n{prompt}"
+            except Exception:
+                pass
+
         payload = {
             "prompt": prompt,
             "max_new_tokens": max_new_tokens,
