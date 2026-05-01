@@ -13,10 +13,10 @@ This doc tells each team exactly what to run for the **6-hour parallel evaluatio
 | | |
 |---|---|
 | Path | `scripts/rag_replay/datasets/past_genes_subset_n30_seed21.csv` |
-| SHA256 | `19bae920f7172ee74fba92cb2eb9443d79aeee0d61b7dec7943cefe16a872cb1` |
+| SHA256 | `93ff252263ee40096ea618feaccd821616bfe2154c85c9cc829c40e7ac126c08` |
 | Rows | 30 (all `TEMPLATE_BASED`, all `orig_eligible_for_rag=True`) |
 | Fallback / non-fallback | 9 / 21 (preserves the 38/130 ≈ 29% ratio in the full eligible cohort) |
-| Sampling | `random.seed(21)` over the eligible cohort, then sorted by `orig_gene_id` |
+| Sampling | Stratified `random.seed(21)` over eligible cohort; **unique on `(orig_parent_id, orig_prompt_path)`** so each row is a distinct (parent network, prompt) tuple. Sorted by `orig_gene_id`. |
 | Source | Stratified subset of `scripts/rag_replay/datasets/past_genes.csv` (sha `89f5449fc0fb6fad18c49327bb51fe2abac12afa8a50e3f505059329cecb6c6c`) |
 
 Verify before kickoff:
@@ -24,7 +24,7 @@ Verify before kickoff:
 ```bash
 cd /storage/ice1/4/5/satmuri6/llm-inference
 sha256sum scripts/rag_replay/datasets/past_genes_subset_n30_seed21.csv
-# expected: 19bae920f7172ee74fba92cb2eb9443d79aeee0d61b7dec7943cefe16a872cb1
+# expected: 93ff252263ee40096ea618feaccd821616bfe2154c85c9cc829c40e7ac126c08
 ```
 
 The 30 referenced prompts live under the existing `scripts/rag_replay/datasets/prompts/` dir — no extra files needed.
@@ -169,7 +169,7 @@ Status as of the integration owner's Step 0 launch (2026-05-01):
 4. ⚠️ **PageIndex / Graph backend ports are still required** before those teams' Step 1 runs will actually retrieve anything. Today both raise `NotImplementedError` in `src/rag/backends/{pageindex,graph}_backend.py`, and the harness fails fast with a pointed error message ("port the backend before running the replay"). The FAISS team can ignore this; the other two teams must implement their backend and wire it into `RagRuntime` before kickoff.
 5. **`hostname.log` location.** The sbatch wrapper falls back to `hostname.log` at repo root; some configs write it under `runs/server-only/logs/`. Symlink before kickoff if needed.
 6. **vLLM server up.** All four runs share one vLLM endpoint to keep LLM stochasticity controlled. Confirm `$SERVER_URL` returns 200 on `/` before any team submits.
-7. **Sha pinned in tracking issue.** Paste both `89f5449f…6c6c` (full dataset) and `19bae920…2cb1` (subset) into the tracking issue so re-runs are byte-verifiable.
+7. **Sha pinned in tracking issue.** Paste both `89f5449f…6c6c` (full dataset) and `93ff2522…6c08` (subset) into the tracking issue so re-runs are byte-verifiable.
 
 ---
 
