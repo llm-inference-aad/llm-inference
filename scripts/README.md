@@ -1,6 +1,6 @@
 # Analysis Scripts
 
-This directory contains analysis and visualization scripts for LLMGE runs.
+This directory contains CRUD and data viz scripts for LLMGE runs.
 
 ## Utility Scripts
 
@@ -22,6 +22,24 @@ Manually migrate SLURM logs to a specific run directory when automatic migration
 - Job was cancelled due to time limit
 - Job failed before log migration step
 - Manual cleanup after debugging
+
+### `test_vllm_sbatch_smoke.py` ✅
+
+End-to-end smoke test for vLLM through Slurm.
+
+It submits `server.sh` via `sbatch`, polls readiness, sends a `/generate` request, verifies run-scoped metrics, and confirms vLLM startup markers in logs.
+
+**Usage:**
+
+```bash
+python scripts/test_vllm_sbatch_smoke.py --repo-root .
+```
+
+Optional:
+
+```bash
+python scripts/test_vllm_sbatch_smoke.py --keep-server
+```
 
 ## Available Scripts
 

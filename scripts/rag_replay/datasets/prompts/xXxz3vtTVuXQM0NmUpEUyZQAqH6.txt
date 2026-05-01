@@ -1,0 +1,78 @@
+Example of the modified code: 
+```python
+class ME(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.dw = nn.Conv2d(cin, cin, kernel_size=3, groups=cin, padding=1, bias=False)
+        self.pw = nn.Conv2d(cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.act = nn.ReLU()
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.dw(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x 
+```
+Example of the initial code:
+```python
+class ME(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.pw = nn.Conv2d(cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+
+Q1: Very concisely, let's explore step by step how modifying this code segment enhanced its scoring metrics performance.
+Q2: With the insights from Q1 in mind, can we apply the same principles in a concise manner to update the code snippet below, ensuring the input and output tensor sizes remain unchanged?
+
+Snippet to be augmented:
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        
+        # Depthwise Separable Convolution
+        self.dw = nn.Conv2d(2*cin, 2*cin, kernel_size=3, groups=2*cin, padding=1, bias=False)
+        self.pw = nn.Conv2d(2*cin, cout, kernel_size=1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.act = nn.ReLU()  # Added Activation
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.dw(x)  # Depthwise Conv
+        x = self.pw(x)   # Pointwise Conv
+        x = self.bn(x)
+        x = self.act(x)  # Apply Activation
+        return x 
+```
+
+A1: Let us think step by step

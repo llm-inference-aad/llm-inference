@@ -19,8 +19,12 @@ source .env
 set +a
 
 export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$(pwd)}"
-export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${LLM_INFERENCE_ROOT_DIR}/servers.json}"
+export RUN_ID="${RUN_ID:-server-only}"
+export RUN_DIR="${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}"
+export RUN_LOG_DIR="${RUN_LOG_DIR:-${RUN_DIR}/logs}"
+export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${RUN_LOG_DIR}/servers.json}"
 export SERVER_BASE_PORT="${SERVER_BASE_PORT:-8000}"
+mkdir -p "${RUN_LOG_DIR}"
 
 echo "===== Adding $NUM_SERVERS Server(s) to Existing Cluster ====="
 echo "Working directory: $LLM_INFERENCE_ROOT_DIR"
@@ -57,7 +61,10 @@ for i in $(seq 1 $NUM_SERVERS); do
     echo "  Starting server $i/$NUM_SERVERS..."
     
     # Submit server job (port will be auto-assigned)
-    SERVER_JOB_OUTPUT=$(SERVER_REGISTRY_FILE=$SERVER_REGISTRY_FILE sbatch server.sh)
+    SERVER_JOB_OUTPUT=$(SERVER_REGISTRY_FILE=$SERVER_REGISTRY_FILE \
+      RUN_ID=$RUN_ID RUN_DIR=$RUN_DIR RUN_LOG_DIR=$RUN_LOG_DIR \
+      SLURM_LOG_DIR=$RUN_LOG_DIR \
+      sbatch --output "${RUN_LOG_DIR}/slurm-server-%j.out" --error "${RUN_LOG_DIR}/slurm-server-%j.err" server.sh)
     SERVER_JOB_ID=$(echo "$SERVER_JOB_OUTPUT" | awk '{print $NF}')
     SERVER_JOB_IDS+=("$SERVER_JOB_ID")
     
@@ -84,5 +91,3 @@ echo ""
 echo "To stop additional servers:"
 echo "  scancel ${SERVER_JOB_IDS[*]}"
 echo ""
-
-

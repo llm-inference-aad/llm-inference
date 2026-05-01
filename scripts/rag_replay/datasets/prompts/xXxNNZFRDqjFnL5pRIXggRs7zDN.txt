@@ -1,0 +1,247 @@
+Example of the modified code: 
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, kernel_size=3, padding=1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+        self.act = nn.SELU()
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        x = self.act(x)
+        return x
+
+class CIFAR10Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.act1 = nn.SELU()
+        
+        self.eve1 = EVE(64, 64)
+        self.eve2 = EVE(64, 64)
+        self.eve3 = EVE(64, 128)
+        self.eve4 = EVE(128, 128)
+        self.eve5 = EVE(128, 256)
+        self.eve6 = EVE(256, 256)
+        
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(256, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        
+        x = self.eve1(x)
+        x = self.eve2(x)
+        x = self.eve3(x)
+        x = self.eve4(x)
+        x = self.eve5(x)
+        x = self.eve6(x)
+        
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x 
+```
+Example of the initial code:
+```python
+class MinPool2d_x(nn.Module):
+    def __init__(self, ks, ceil_mode):
+        super().__init__()
+        self.ks = ks
+        self.ceil_mode = ceil_mode
+
+    def forward(self, x):
+        return -F.max_pool2d(-x, self.ks, ceil_mode=self.ceil_mode)
+
+class EVE(nn.Module):
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(2, ceil_mode=True)
+        self.minpool = MinPool2d_x(2, ceil_mode=True)
+        self.pw = nn.Conv2d(2*cin, cout, 1, 1, bias=False)
+        self.bn = nn.BatchNorm2d(cout)
+
+    def forward(self, x):
+        x = torch.cat((
+            self.maxpool(x),
+            self.minpool(x)
+        ), 1)
+        x = self.pw(x)
+        x = self.bn(x)
+        return x 
+```
+
+Q1: Very concisely, let's explore step by step how modifying this code segment enhanced its scoring metrics performance.
+Q2: With the insights from Q1 in mind, can we apply the same principles in a concise manner to update the code snippet below, ensuring the input and output tensor sizes remain unchanged?
+
+Snippet to be augmented:
+```python
+import torch
+import torch.nn as nn
+
+def pad_num_x(k_s):
+    """Calculates padding size for a given kernel size."""
+    pad_per_side = int((k_s - 1) * 0.5)
+    return pad_per_side
+
+class SE_LN(nn.Module):
+    """Squeeze-and-Excitation Layer with Layer Normalization."""
+    def __init__(self, num_features):
+        super(SE_LN, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Linear(num_features, num_features, bias=True)
+        
+    def forward(self, x):
+        """Forward pass through SE_LN."""
+        b, c, _, _ = x.size()
+        y = self.avg_pool(x).view(b, c)
+        y = torch.sigmoid(self.fc(y))
+        y = y.view(b, c, 1, 1)
+        return x * y
+
+class SE(nn.Module):
+    """Generic Squeeze-and-Excitation Layer."""
+    def __init__(self, num_features, reduction):
+        super(SE, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Sequential(
+            nn.Linear(num_features, num_features // reduction, bias=True),
+            nn.ReLU(inplace=True),
+            nn.Linear(num_features // reduction, num_features, bias=True),
+            nn.Sigmoid()
+        )
+        
+    def forward(self, x):
+        """Forward pass through generic SE layer."""
+        b, c, _, _ = x.size()
+        y = self.avg_pool(x).view(b, c)
+        y = self.fc(y).view(b, c, 1, 1)
+        return x * y
+
+class DFSEBV2(nn.Module):
+    """Depthwise Separable Convolution Block with SE."""
+    def __init__(self, cin, dw_s, is_LN):
+        super().__init__()
+        self.pw1 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(cin)
+        self.act1 = nn.SiLU()
+        self.dw1 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+        # Choose between SE_LN and generic SE based on is_LN flag
+        if is_LN:
+            self.seln = SE_LN(cin)
+        else:
+            self.seln = SE(cin, 3)
+            
+        self.pw2 = nn.Conv2d(cin, cin, 1, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(cin)
+        self.act2 = nn.Hardswish()
+        self.dw2 = nn.Conv2d(cin, cin, dw_s, 1, pad_num_x(dw_s), groups=cin)
+
+    def forward(self, x):
+        """Forward pass through DFSEBV2 block."""
+        y = x
+        x = self.pw1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        x = self.dw1(x)
+        x = self.seln(x)
+        x += y  # Residual connection
+        
+        x = self.pw2(x)       
+        x = self.bn2(x)
+        x = self.act2(x)
+        x = self.dw2(x)
+        x += y  # Additional residual connection for deeper integration
+        return x 
+
+class CIFAR10Model(nn.Module):
+    """Example Model for CIFAR10 Dataset."""
+    def __init__(self):
+        super(CIFAR10Model, self).__init__()
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.act1 = nn.SiLU()
+        
+        # Stack of DFSEBV2 blocks with varying SE types
+        self.block1 = DFSEBV2(16, 3, True)  # Uses SE_LN
+        self.block2 = DFSEBV2(16, 3, False) # Uses Generic SE
+        self.block3 = DFSEBV2(16, 3, True)  # Alternating for demonstration
+        
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(32)
+        self.act2 = nn.Hardswish()
+        
+        self.block4 = DFSEBV2(32, 3, False)
+        self.block5 = DFSEBV2(32, 3, True)
+        self.block6 = DFSEBV2(32, 3, False)
+        
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(64)
+        self.act3 = nn.SiLU()
+        
+        self.block7 = DFSEBV2(64, 3, True)
+        self.block8 = DFSEBV2(64, 3, False)
+        self.block9 = DFSEBV2(64, 3, True)
+        
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.dropout = nn.Dropout(p=0.2)
+        self.fc = nn.Linear(64, 10, bias=True)
+
+    def forward(self, x):
+        """Forward pass through the entire CIFAR10Model."""
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.act1(x)
+        
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        
+        x = self.conv2(x)
+        x = self.bn2(x)
+        x = self.act2(x)
+        
+        x = self.block4(x)
+        x = self.block5(x)
+        x = self.block6(x)
+        
+        x = self.conv3(x)
+        x = self.bn3(x)
+        x = self.act3(x)
+        
+        x = self.block7(x)
+        x = self.block8(x)
+        x = self.block9(x)
+        
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x 
+```
+
+A1: Let us think step by step

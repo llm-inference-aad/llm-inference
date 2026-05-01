@@ -1,0 +1,42 @@
+python
+def calculate_sum(numbers):
+    total = 0
+    for num in numbers:
+        if isinstance(num, (int, float)):
+            total += num
+    return total
+
+numbers_list = [1, 2.5, 'a', 3]
+result = calculate_sum(numbers_list)
+print(result)  # Output: 6.5
+
+```python
+def get_optimizer(model, lr, weight_decay=0, nesterov=True):  
+    if weight_decay != 0:
+        g0, g1, g2 = [], [], []  # optimizer parameter groups
+        for v in model.modules():
+            if hasattr(v, 'bias') and isinstance(v.bias, nn.Parameter):  # bias
+                g2.append(v.bias)
+            if isinstance(v, (nn.BatchNorm2d, nn.LayerNorm)):  # weight (no decay)
+                g0.append(v.weight)
+            elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):  # weight (with decay)
+                g1.append(v.weight)
+        
+        opt = SGD(g0, lr, 0.9, nesterov=nesterov)
+        opt.add_param_group({'params': g1, 'weight_decay': weight_decay})  # add g1 with weight_decay
+        opt.add_param_group({'params': g2})  # add g2 (biases)
+    else:
+        opt = SGD(model.parameters(), lr, 0.9, nesterov=nesterov)
+    return opt
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. This network targets high CIFAR-10 accuracy (≥90%) with efficient parameter usage. Consider how architectural choices influence both objectives.
+9. Explore creative modifications that push performance boundaries—novel layer compositions, unconventional activation patterns, or emergent architectural motifs are encouraged.
+
+A: Think deeply step by step

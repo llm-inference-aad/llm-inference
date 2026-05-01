@@ -3,13 +3,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence
+from typing import Iterable, List, Sequence, Tuple
 
 import numpy as np
+
+from cfg.constants import RAG_TEXT_CANDIDATE_K
 
 from .data_ingestion import MutationRecord
 from .embeddings import EmbeddingService
 from .vector_db import RetrievalResult, StoredDocument, VectorStoreManager
+
+
+@dataclass(frozen=True)
+class RetrievedContext:
+    """A retrieved text chunk (PDF, pytorch.json, etc.) — distinct from code mutations."""
+
+    document_id: str
+    score: float
+    content: str
+    source: str
+    doc_type: str  # "pdf", "api_reference", "code_example", "documentation"
+    metadata: dict
 
 
 @dataclass(frozen=True)
@@ -21,6 +35,16 @@ class RetrievedMutation:
     metadata: dict
 
 
+@dataclass(frozen=True)
+class RetrievalStats:
+    """Lightweight stats for a single vector search (for observability)."""
+
+    candidate_k: int
+    returned_k: int
+    filtered_k: int
+    min_similarity: float
+
+
 class RetrievalService:
     """High-level retrieval facade combining the vector DB and embedding service."""
 
@@ -30,6 +54,19 @@ class RetrievalService:
         # Simple embedding cache to avoid redundant computations
         self._embedding_cache: dict[str, np.ndarray] = {}
         self._max_cache_size = 500  # Limit cache to prevent memory issues
+
+    def _embed_code_cached(self, query_code: str) -> np.ndarray:
+        """Embed code with a small FIFO cache to avoid redundant computation."""
+        cache_key = query_code.strip()
+        if cache_key in self._embedding_cache:
+            return self._embedding_cache[cache_key]
+
+        query_embedding = self.embeddings.embed_code(query_code)[0]
+        if len(self._embedding_cache) >= self._max_cache_size:
+            oldest_key = next(iter(self._embedding_cache))
+            del self._embedding_cache[oldest_key]
+        self._embedding_cache[cache_key] = query_embedding
+        return query_embedding
 
     # ------------------------------------------------------------------ #
     # Indexing helpers
@@ -63,30 +100,78 @@ class RetrievalService:
             top_k: Number of mutations to retrieve
             min_similarity: Minimum similarity score threshold (0.0-1.0) to filter irrelevant results
         """
+        mutations, _stats = self.retrieve_similar_mutations_with_stats(
+            query_code=query_code, top_k=top_k, min_similarity=min_similarity
+        )
+        return mutations
+
+    def retrieve_similar_mutations_with_stats(
+        self, query_code: str, top_k: int = 5, min_similarity: float = 0.3
+    ) -> Tuple[List[RetrievedMutation], RetrievalStats]:
+        """Like retrieve_similar_mutations(), but also returns search stats."""
         if not query_code.strip():
-            return []
+            return [], RetrievalStats(candidate_k=0, returned_k=0, filtered_k=0, min_similarity=min_similarity)
 
-        # Check cache first to avoid redundant embedding computation
-        cache_key = query_code.strip()
-        if cache_key in self._embedding_cache:
-            query_embedding = self._embedding_cache[cache_key]
-        else:
-            query_embedding = self.embeddings.embed_code(query_code)[0]
-            # Cache the embedding (with simple size limit)
-            if len(self._embedding_cache) >= self._max_cache_size:
-                # Remove oldest entry (simple FIFO)
-                oldest_key = next(iter(self._embedding_cache))
-                del self._embedding_cache[oldest_key]
-            self._embedding_cache[cache_key] = query_embedding
-
-        # Retrieve more candidates than needed, then filter by similarity threshold
-        candidate_k = top_k * 2  # Get extra candidates to filter
+        query_embedding = self._embed_code_cached(query_code)
+        candidate_k = max(1, top_k * 2)
         results = self.store.search_code(query_embedding, top_k=candidate_k)
-        
-        # Filter by minimum similarity threshold to avoid irrelevant results
         filtered_results = [r for r in results if r.score >= min_similarity]
-        
-        return [self._to_mutation(result) for result in filtered_results[:top_k]]
+        sliced = filtered_results[:top_k]
+        stats = RetrievalStats(
+            candidate_k=candidate_k,
+            returned_k=len(results),
+            filtered_k=len(filtered_results),
+            min_similarity=min_similarity,
+        )
+        return [self._to_mutation(result) for result in sliced], stats
+
+    def retrieve_similar_text(
+        self, query: str, top_k: int = 3, min_similarity: float = 0.3
+    ) -> List[RetrievedContext]:
+        """Retrieve text documents (PDFs, PyTorch docs) similar to a query.
+
+        Uses the text embedding model (MiniLM) to search the text namespace.
+        This is separate from code retrieval because:
+        - Text uses a different embedding model than code
+        - Results are formatted differently (no gene_id/fitness)
+        """
+        contexts, _stats = self.retrieve_similar_text_with_stats(
+            query=query, top_k=top_k, min_similarity=min_similarity
+        )
+        return contexts
+
+    def retrieve_text_candidates_with_stats(
+        self,
+        query: str,
+        candidate_k: int = RAG_TEXT_CANDIDATE_K,
+        min_similarity: float = 0.3,
+    ) -> Tuple[List[RetrievedContext], RetrievalStats]:
+        """Return filtered text candidates prior to source-policy selection."""
+        if not query.strip():
+            return [], RetrievalStats(candidate_k=0, returned_k=0, filtered_k=0, min_similarity=min_similarity)
+
+        query_embedding = self.embeddings.embed_text(query)[0]
+        effective_k = max(1, candidate_k)
+        results = self.store.search_text(query_embedding, top_k=effective_k)
+        filtered = [r for r in results if r.score >= min_similarity]
+        stats = RetrievalStats(
+            candidate_k=effective_k,
+            returned_k=len(results),
+            filtered_k=len(filtered),
+            min_similarity=min_similarity,
+        )
+        return [self._to_context(result) for result in filtered], stats
+
+    def retrieve_similar_text_with_stats(
+        self, query: str, top_k: int = 3, min_similarity: float = 0.3
+    ) -> Tuple[List[RetrievedContext], RetrievalStats]:
+        """Like retrieve_similar_text(), but also returns search stats."""
+        contexts, stats = self.retrieve_text_candidates_with_stats(
+            query=query,
+            candidate_k=max(1, top_k * 2),
+            min_similarity=min_similarity,
+        )
+        return contexts[:top_k], stats
 
     def retrieve_high_performers(
         self,
@@ -139,33 +224,70 @@ class RetrievalService:
     # Formatting helpers
     # ------------------------------------------------------------------ #
     def format_context(self, mutations: Sequence[RetrievedMutation]) -> str:
-        lines: list[str] = []
+        blocks: list[str] = []
         for mutation in mutations:
             fitness = mutation.metadata.get("fitness") or []
             accuracy = f"{fitness[0]:.4f}" if fitness else "unknown"
             params = f"{int(fitness[1])}" if len(fitness) > 1 else "unknown"
-            
-            # Show improvement deltas if available (helps LLM understand what made mutations successful)
+
             improvement = mutation.metadata.get("improvement") or {}
             acc_delta = improvement.get("accuracy_delta")
             params_delta = improvement.get("parameters_delta")
-            
-            improvement_str = ""
-            if acc_delta is not None or params_delta is not None:
-                delta_parts = []
-                if acc_delta is not None:
-                    delta_parts.append(f"ΔAcc: {acc_delta:+.4f}")
-                if params_delta is not None:
-                    delta_parts.append(f"ΔParams: {params_delta:+.0f}")
-                if delta_parts:
-                    improvement_str = f" | {' | '.join(delta_parts)}"
-            
-            lines.append(
-                f"- Gene {mutation.gene_id} (score {mutation.score:.3f}) "
+
+            delta_parts: list[str] = []
+            if acc_delta is not None:
+                delta_parts.append(f"ΔAcc: {acc_delta:+.4f}")
+            if params_delta is not None:
+                delta_parts.append(f"ΔParams: {params_delta:+.0f}")
+            improvement_str = f" | {' | '.join(delta_parts)}" if delta_parts else ""
+
+            label = mutation.metadata.get("quality_label", "")
+            label_tag = f"[{label}] " if label else ""
+
+            # `mutation.code` contains the document body. Historical artifact:
+            # MutationRecord.to_document concatenated the one-line description
+            # ahead of the actual source as ``"<description>\n\nCode:\n<src>"``.
+            # Strip that prefix (when present) so we surface only the code.
+            code_only = mutation.code
+            if "\nCode:\n" in code_only:
+                code_only = code_only.split("\nCode:\n", 1)[1]
+            code_only = code_only.strip()
+
+            blocks.append(
+                f"{label_tag}Gene {mutation.gene_id} "
+                f"(retrieval score {mutation.score:.3f}) | "
                 f"Accuracy {accuracy}, Params {params}{improvement_str}\n"
-                f"{mutation.description}"
+                f"```python\n{code_only}\n```"
             )
-        return "\n".join(lines)
+        return "\n\n".join(blocks)
+
+    def format_text_context(self, contexts: Sequence[RetrievedContext]) -> str:
+        """Format retrieved text documents for injection into prompts."""
+        if not contexts:
+            return ""
+        lines: list[str] = []
+        for ctx in contexts:
+            # Truncate long context to avoid token bloat (max ~300 words per chunk)
+            content = ctx.content
+            words = content.split()
+            if len(words) > 300:
+                content = " ".join(words[:300]) + "..."
+            label = ctx.doc_type.replace("_", " ").title()
+            lines.append(f"- [{label}] (relevance {ctx.score:.3f})\n{content}")
+        return "\n\n".join(lines)
+
+    @staticmethod
+    def is_api_context(ctx: RetrievedContext) -> bool:
+        source = (ctx.source or "").lower()
+        source_type = str(ctx.metadata.get("source_type") or "").lower()
+        return source.endswith("pytorch.json") or source_type == "api"
+
+    @staticmethod
+    def is_pdf_context(ctx: RetrievedContext) -> bool:
+        source = (ctx.source or "").lower()
+        source_type = str(ctx.metadata.get("source_type") or "").lower()
+        metadata_type = str(ctx.metadata.get("type") or "").lower()
+        return source.endswith(".pdf") or source_type == "pdf" or metadata_type == "pdf"
 
     def _to_mutation(self, result: RetrievalResult) -> RetrievedMutation:
         metadata = {**result.document.metadata}
@@ -178,5 +300,13 @@ class RetrievalService:
             metadata=metadata,
         )
 
-
-
+    def _to_context(self, result: RetrievalResult) -> RetrievedContext:
+        metadata = {**result.document.metadata}
+        return RetrievedContext(
+            document_id=result.document.document_id,
+            score=result.score,
+            content=result.document.content,
+            source=metadata.get("source", "unknown"),
+            doc_type=metadata.get("doc_type", metadata.get("type", "text")),
+            metadata=metadata,
+        )

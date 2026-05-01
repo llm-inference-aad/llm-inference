@@ -21,7 +21,11 @@ from datetime import datetime
 app = FastAPI(title="LLM Load Balancer", version="1.0")
 
 # Configuration
-REGISTRY_FILE = os.getenv("SERVER_REGISTRY_FILE", "./servers.json")
+ROOT_DIR = os.getenv("LLM_INFERENCE_ROOT_DIR", os.getcwd())
+RUN_ID = os.getenv("RUN_ID", "server-only")
+RUN_DIR = os.getenv("RUN_DIR", str(Path(ROOT_DIR) / "runs" / RUN_ID))
+RUN_LOG_DIR = os.getenv("RUN_LOG_DIR", str(Path(RUN_DIR) / "logs"))
+REGISTRY_FILE = os.getenv("SERVER_REGISTRY_FILE", str(Path(RUN_LOG_DIR) / "servers.json"))
 REGISTRY_RELOAD_INTERVAL = 10  # seconds
 HEALTH_CHECK_INTERVAL = 30  # seconds
 HEALTH_CHECK_TIMEOUT = 5  # seconds
@@ -415,5 +419,4 @@ async def shutdown_event():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=9000)
-
 

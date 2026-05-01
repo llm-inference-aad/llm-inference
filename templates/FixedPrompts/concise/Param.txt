@@ -1,4 +1,4 @@
-Q: What hyperparameter adjustments could unlock better training dynamics for this CIFAR-10 network? Think about learning rates, optimizers, regularization schedules, or normalization parameters that might improve convergence or generalization. Architectural structure should remain unchanged. Input/output tensors: `(batch, 3, 32, 32)` → `(batch, 10)`.
+Q: What hyperparameter adjustments could unlock better training dynamics for this CIFAR-10 network? Focus strictly on training dynamics: explore modern optimizers like `torch.optim.AdamW`, distinct learning rate schedules like `CosineAnnealingLR` or `OneCycleLR`, and adjust regularization (e.g., `torch.nn.Dropout`, `Stochastic Depth`, or `BatchNorm2d` momentum). Architectural structure should remain unchanged. Input/output tensors: `(batch, 3, 32, 32)` → `(batch, 10)`.
 
 The current code block:
 ```python

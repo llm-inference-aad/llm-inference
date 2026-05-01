@@ -1,0 +1,35 @@
+What if we tried something a bit... unusual with this CIFAR-10 network? Nothing too crazy, but maybe a creative idea or two? Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
+
+The current code block:
+```python
+class SE(nn.Module):
+    def __init__(self, cin, ratio):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))
+        self.fc1 = nn.Linear(cin, int(cin/ratio), bias=False)
+        self.act1 = nn.ReLU()
+        self.fc2 = nn.Linear(self.fc1.out_features, cin, bias=False)
+        self.act2 = nn.Sigmoid()
+        
+    def forward(self, x):
+        y = x
+        x = self.gavg(x)
+        x = x.view(-1,x.size()[1])
+        x = self.fc1(x)
+        x = self.act1(x)
+        x = self.fc2(x)
+        x = self.act2(x)
+        x = x.view(-1,x.size()[1],1,1)
+        return x*y
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. This network targets high CIFAR-10 accuracy (≥90%) with efficient parameter usage. Consider how architectural choices influence both objectives.
+9. Explore creative modifications that push performance boundaries—novel layer compositions, unconventional activation patterns, or emergent architectural motifs are encouraged.
+
+A: Think deeply step by step

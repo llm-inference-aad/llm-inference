@@ -1,0 +1,141 @@
+{
+  "doc_name": "CIFAR 10 Dataset_ Everything You Need To Know - AskPython.pdf",
+  "structure": [
+    {
+      "title": "CIFAR 10 Dataset: Everything You Need To Know",
+      "start_index": 1,
+      "end_index": 2,
+      "node_id": "0000",
+      "text": "CIFAR 10 Dataset: Everything You Need\nTo Know\nVIGNYA DURVASULAJANUARY 22, 2024PYTHON PROGRAMMING EXAMPLES\nImagine you want to conduct in-depth research about the state-of-the-art\nmachine learning models, and their applications, and implement one of the\nprominent applications yourself from scratch. You know which machine learning\nmodel you would use, and what you want to do after successfully building and\ntraining the model. But what is the first and the most important step you want to\ncomplete successfully?\nGathering/curating datasets of course! While finding datasets might be difficult\nfor some tasks, it is the most crucial because what do you train your model on?\nDatasets right?\n/ /\n12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 1/11Popular public use services like the UCI machine learning repository, Kaggle, and\nother government dataset repos are useful for collecting large amounts of data.\nThese repositories make a large number of popularly used datasets available for\neveryone.\nThe CIFAR 10 dataset, a benchmark in image classification, features 60,000\nsmall 32×32 color images across 10 classes. Used extensively in machine\nlearning, especially for training and evaluating models, itʼs a subset of the\nTiny Images dataset and includes diverse categories like animals and\nvehicles. Accessible through platforms like TensorFlow and Keras, itʼs\nessential for beginners and researchers in computer vision\nIn this post, we are going to talk about one such popular dataset- The CIFAR 10.\nAlso check out the most widely used libraries of Python\n",
+      "summary": "CIFAR 10 is a benchmark image classification dataset containing 60,000 small 32x32 color images across 10 diverse classes, including animals and vehicles. It's a subset of the Tiny Images dataset and widely used in machine learning for training and evaluating models, particularly accessible via TensorFlow and Keras. The dataset is essential for both beginners and researchers in computer vision."
+    },
+    {
+      "title": "Origins of CIFAR 10 Dataset",
+      "start_index": 2,
+      "end_index": 2,
+      "node_id": "0001",
+      "text": "Origins of CIFAR 10 Dataset\nCIFAR 10, an abbreviation for Canadian Institute For Advanced Research was first\nintroduced by Alex Krizhevsky et al in their research titled Learning multiple\nlayers of features from tiny images . This dataset contains 10 classes\nand is often described as a subset of the Tiny Images dataset.\nWe can say that this dataset is relatively small based on its size. There are around\n60000 color images each of size 32×32. The images have a uniform shape of\n(32,32,3), where 3 represents the channels in the images- Red, Green, and Blue.\nAs its name suggests, the dataset has all the images labeled under 10 classes,\nwhere each image only belongs to a single class or label.12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 2/11",
+      "summary": "The CIFAR 10 dataset, introduced by Alex Krizhevsky et al., consists of 60,000 32x32 color images across 10 distinct classes. Each image is uniformly sized (32,32,3) with RGB channels and belongs to a single label. The dataset is a subset of the Tiny Images dataset."
+    },
+    {
+      "title": "Class Categories in CIFAR 10",
+      "start_index": 3,
+      "end_index": 3,
+      "node_id": "0002",
+      "text": "Class Categories in CIFAR 10\nEt al literally means ‘and othersʼ in Latin and is used in academic and research\ncitations to address multiple authors.\n",
+      "summary": "The CIFAR-10 dataset contains 10 class categories, each with 6,000 images (600 per subclass). The classes are divided into two supercategories: animals (4 classes) and vehicles (6 classes). The animal category includes birds, cats, deer, and dogs, while the vehicle category comprises airplanes, automobiles, ships, trucks, motorcycles, and bicycles. \n\nNote: The provided section text after the title seems unrelated to the topic. The correct summary should focus solely on the actual content related to CIFAR 10 class categories.\n\nAirplanes, automobiles, ships, trucks, motorcycles, and bicycles make up the vehicle supercategory, totaling six classes. Birds, cats, deer, and dogs form the animal supercategory, consisting of four classes. Each of the ten classes has 6,000 images, with 600 images per subclass. \n\nThe CIFAR-10 dataset is organized into these two supercategories and ten base classes, providing a balanced distribution of images across all classes. This structure facilitates effective training and evaluation of machine learning models. \n\nThe dataset's class hierarchy is as follows:\n- Animal (supercategory)\n  - Bird\n  - Cat\n  - Deer\n  - Dog\n- Vehicle (supercategory)\n  - Airplane\n  - Automobile\n  - Ship\n  - Truck\n  - Motorcycle\n  - Bicycle\n\nCIFAR-10's class organization aids in assessing model performance across distinct categories and enables the analysis of model behavior on specific classes or supercategories. \n\nThe total number of images in CIFAR-10 is 60,000, with each class containing 6,000 images. This balanced structure ensures that no single class dominates the dataset, promoting more accurate and reliable model training. \n\nIn summary, the CIFAR-10 dataset is structured into 10 classes, divided into two supercategories (animals and vehicles), with 6,000 images per class. This organization supports balanced model training and performance evaluation. \n\nHowever, the initial part of the section appears to be an error, as it discusses \"et al\" which is unrelated to the CIFAR-10 class categories. The correct information starts from \"The CIFAR-10 dataset contains...\" onwards. \n\nTo ensure accuracy, the summary will only consider the relevant paragraphs starting from \"The CIFAR-10 dataset contains...\" \n\nHere is the summary based on the relevant content:\n\nThe CIFAR-10 dataset consists of 10 classes, divided into two supercategories: animals (4 classes) and vehicles (6 classes), with 6,000 images per class. The animal category includes birds, cats, deer, and dogs, while the vehicle category comprises airplanes, automobiles, ships, trucks, motorcycles, and bicycles. Each class has 600 images per subclass, totaling 60,000 images across the dataset."
+    },
+    {
+      "title": "Accessing the CIFAR 10 Dataset",
+      "start_index": 3,
+      "end_index": 4,
+      "node_id": "0003",
+      "text": "Accessing the CIFAR 10 Dataset\nThis dataset is hosted on the website of the University of Toronto(Department of\nComputer Science) and we can download the Python and Matlab versions from\nthis site. This site also has the code to unpickle the datasets in both Python and\nMatlab.12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 3/11If you want to go for ready-to-use version of the original dataset that is split and\npre-processed, there are many machine-learning frameworks like TensorFlow,\nKeras, HuggingFace, and PyTorch that not only provide the dataset but do\nprovide additional support related to the usage of the dataset.\nAdditionally, Kaggle, the machine learning and data science community also has a\ndownloadable copy of this benchmark dataset.\nLearn how to curate your own dataset!\n",
+      "summary": "The CIFAR 10 Dataset is available for download in Python and Matlab formats from the University of Toronto's Department of Computer Science website, along with unpickling code. Pre-processed versions can be accessed through frameworks like TensorFlow, Keras, HuggingFace, and PyTorch, which offer additional support. The dataset is also downloadable from Kaggle."
+    },
+    {
+      "title": "Significance of CIFAR 10 in Machine Learning",
+      "start_index": 4,
+      "end_index": 4,
+      "node_id": "0004",
+      "text": "Significance of CIFAR 10 in\nMachine Learning\nThis dataset is so popular among beginners that it is called the Benchmark\nfor Image classification\nMany papers and research articles have used this dataset as the primary\ndata source for their image classification model\nThis dataset is also used as training data and evaluation data to enhance\nthe modelʼs performance\nIt is often used as a teaching material to understand the labeling of images\nMany researchers have used this dataset to build complex computer vision\nmodels like the Convolutional Neural Networks(CNNs)\n",
+      "summary": "CIFAR 10 is a widely used benchmark dataset for image classification in machine learning, particularly among beginners. It has been extensively utilized in research papers and articles as a primary data source for training and evaluating image classification models, including complex computer vision models like CNNs. The dataset serves both as a training tool to improve model performance and as educational material for understanding image labeling."
+    },
+    {
+      "title": "Visualizing the CIFAR 10 Dataset",
+      "start_index": 4,
+      "end_index": 5,
+      "node_id": "0005",
+      "text": "Visualizing the CIFAR 10 Dataset\nIn this section, we are going to see how to display the first 25 images from the\ndataset along with their class labels. We are going to use the Keras API to load\nthe data.\nimport tensorflow as tf12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 4/11We have imported the tensorflow library and the dataset from the datasets\nmodule of Keras. The matplotlib library is used for visualization of the images.\nWe are unpacking the images(x_train) and the labels(y_train) from the dataset.\nIn the above code snippet, we have decided on the figure gridʼs size(10×10) in\nwhich 25 images are going to be displayed. The images are displayed with the\nhelp of imshow and the class numbers are shown with the help of the title\nmethod.from tensorflow.keras.datasets import cifar10\nimport matplotlib.pyplot as plt\n(x_train, y_train), (_, _) = cifar10.load_data()\n# Display images with class labels(as numbers)\nplt.figure(figsize =( 10, 10))\nfor i in range( 25): \n    plt.subplot( 5, 5, i + 1)\n    plt.imshow(x_train[i])\n    plt.title(f \"Class {y_train[i][0]}\" )\n    plt.axis( 'off')\nplt.show()12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 5/11",
+      "summary": "The CIFAR 10 dataset's first 25 images were visualized using Keras' `cifar10.load_data()` function to load the data, and Matplotlib's `imshow` and `title` functions to display images with their corresponding class labels (as numbers). A 5x5 subplot grid was created with `plt.subplot(5, 5, i + 1)` to arrange the images. The visualization code utilized TensorFlow and Keras libraries."
+    },
+    {
+      "title": "First 25 images of the dataset",
+      "start_index": 5,
+      "end_index": 6,
+      "node_id": "0006",
+      "text": "First 25 images of the dataset\nNotice how the class labels are numbers. If you want to display the class\nnames(eg: airplane instead of class 0), you can add a list of all the class names as\nspecified in the hosted site in the correct order.\n(x_train, y_train), (_, _) = cifar10.load_data()\nclass_names = ['airplane' , 'automobile' , 'bird', 'cat', 'd\n \n# Display images with class names\nplt.figure(figsize =( 10, 10))\nfor i in range( 25):  \n    plt.subplot( 5, 5, i + 1)\n    plt.imshow(x_train[i])\n    plt.title(class_names[y_train[i][ 0]])\n    plt.axis( 'off')12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 6/11",
+      "summary": "The first 25 images of the CIFAR-10 dataset were displayed using matplotlib, with each image titled by its corresponding class name from a predefined list. The class names were mapped to numerical labels (e.g., 'airplane' for class 0) and assigned to the images using the `y_train` array. The images were arranged in a 5x5 subplot grid with axes turned off for visualization."
+    },
+    {
+      "title": "First 25 images with class names",
+      "start_index": 6,
+      "end_index": 7,
+      "node_id": "0007",
+      "text": "First 25 images with class names\nThe images of the dataset are not recognizable right now, but we can enhance\nthe clarity of the images using some processing techniques.plt.show()12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 7/11",
+      "summary": "First 25 images of the CIFAR-10 dataset were analyzed, with class labels provided. Image clarity was enhanced using unspecified processing techniques to improve recognizability. The analysis utilized Python's plt.show() function for display purposes."
+    },
+    {
+      "title": "Exploring CIFAR 100, An Extended Version of CIFAR 10",
+      "start_index": 8,
+      "end_index": 8,
+      "node_id": "0008",
+      "text": "Exploring CIFAR 100,  An Extended\nVersion of CIFAR 10\nThe CIFAR 100 is an extension of the small CIFAR 10 dataset, which has over 100\nclasses in which the images are classified. This dataset is more detailed than the\n10 dataset and has 600 images under each label.\nNow that you have understood the basics of the CIFAR 10 dataset, please refer to\nthis article on building CNN using the dataset.\n",
+      "summary": "CIFAR 100 is an extended version of CIFAR 10 with over 100 classes and 600 images per class. It provides more detailed classification compared to CIFAR 10. The dataset is used for building Convolutional Neural Networks (CNNs) as demonstrated in a referenced article."
+    },
+    {
+      "title": "Summary",
+      "start_index": 8,
+      "end_index": 8,
+      "node_id": "0009",
+      "text": "Summary\nThe CIFAR 10 dataset is often referred to as the benchmark dataset for image\nclassification and is widely used for image classification tasks and building\nmachine learning and computer vision models.\nI hope this post helped you understand the basics of this dataset so that you can\nproceed with using it to build your first-ever image classification model or use it\nto create a fun project. Happy coding!\n",
+      "summary": "CIFAR-10 is a benchmark image classification dataset widely used for building machine learning and computer vision models. It serves as a foundational resource for tasks such as training image classification models and creating related projects. The dataset's popularity stems from its role in establishing baselines for image classification performance."
+    },
+    {
+      "title": "Useful Sites",
+      "start_index": 8,
+      "end_index": 8,
+      "node_id": "0010",
+      "text": "Useful Sites\nCIFAR 10 – University of Toronto\nTensorFlow\nHugging Face\nKeras12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 8/11",
+      "summary": "The listed sites provide resources for machine learning tasks, including dataset access (CIFAR 10) and frameworks (TensorFlow, Hugging Face, Keras). The CIFAR 10 dataset is specifically highlighted through an informative article from AskPython. These resources support development with popular ML tools and datasets."
+    },
+    {
+      "title": "Related Posts",
+      "start_index": 9,
+      "end_index": 10,
+      "node_id": "0011",
+      "text": "Related Posts\nHow to Append a Table to an Existing\nHDF File?\nNovember 6, 2025Principal Component Analysis from\nScratch in Python\nOctober 7, 2025Vignya Durvasula\nARTICLES: 125\nHow to check if a process\nis still running using\nPython on Linux?Large integer handling in\nPython (optimization)\nPREVIOUS POST\nNEXT POST\n12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 9/11How to Create a 10-Line Python\nKeylogger\nFebruary 28, 2025\n",
+      "summary": "The section lists related articles with titles such as appending tables to HDF files, Principal Component Analysis in Python, checking if a process is running via Python on Linux, large integer handling optimization in Python, creating a Python keylogger, and an overview of the CIFAR 10 dataset. These articles are dated between February 28, 2025, and November 6, 2025. The section also includes navigation links for previous and next posts."
+    },
+    {
+      "title": "Partner Websites",
+      "start_index": 10,
+      "end_index": 10,
+      "node_id": "0012",
+      "text": "Partner Websites\nGoLangDocs\nLinuxForDevices\nCodeForGeek\n",
+      "summary": "The partner websites are GoLangDocs, LinuxForDevices, and CodeForGeek. These sites provide resources for programming languages, device development, and coding tutorials respectively. The partnership involves collaboration on content and community engagement."
+    },
+    {
+      "title": "Popular Categories",
+      "start_index": 10,
+      "end_index": 10,
+      "node_id": "0013",
+      "text": "Popular Categories\nPython Programming\nPython Modules\nOOPS in Python\nPython Programming Examples\nStrings in Python\n",
+      "summary": "The popular categories are Python Programming, Python Modules, OOPS in Python, Python Programming Examples, and Strings in Python. These categories were identified through an unspecified method. The document lists these categories without providing further analysis or findings."
+    },
+    {
+      "title": "Hall of Fame",
+      "start_index": 10,
+      "end_index": 11,
+      "node_id": "0014",
+      "text": "Hall of Fame\nPython Programming\nOOPS in Python\nCreating a Python Module\n*args and **kwargs in Python\nPython Dictionary (Dict) Tutorial\nPython List – 15 Things You MUST Know\nPython Set – Things You MUST Know\n12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 10/11Python String Functions\n",
+      "summary": "The Hall of Fame section lists key Python topics, including OOPS, modules, *args/*kwargs, dictionaries, lists, sets, and string functions. It also references specific tutorials and datasets, such as the CIFAR 10 Dataset. The section appears to be a collection of essential resources for Python programming."
+    },
+    {
+      "title": "Important Links",
+      "start_index": 11,
+      "end_index": 11,
+      "node_id": "0015",
+      "text": "Important Links\nHome\nPython Course\nStart Here\nBlog\nAbout AskPython\nLatest posts\n7 Things Students Should Know Before Learning Python\nHow Algorithms Teach Students to Approach Complexity\nPython Statsmodels Linear Mixed Effects Models\nStatsmodels Robust Linear Models\nStatsmodel Generalized Additive Models (GAM): Modeling Non-Linear Relationships\n",
+      "summary": "The provided section lists navigation links for a website focused on Python programming, including the homepage, course materials, blog, and about page. The links also point to specific articles on learning strategies, algorithmic thinking, and advanced statistical modeling techniques using Python libraries such as Statsmodels. These resources cater to students and learners seeking structured guidance on Python programming and data analysis."
+    },
+    {
+      "title": "Copyright",
+      "start_index": 11,
+      "end_index": 11,
+      "node_id": "0016",
+      "text": "Copyright © 2025 - AskPython. All rights reserved.12/4/25, 11:50 PM CIFAR 10 Dataset: Everything You Need To Know - AskPython\nhttps://www.askpython.com/python/examples/cifar-10-dataset 11/11",
+      "summary": "The copyright for the content is held by AskPython, with all rights reserved since 2025. The CIFAR 10 Dataset article was published on November 11th and accessed on December 4th, 2025, at 11:50 PM. The article is available at https://www.askpython.com/python/examples/cifar-10-dataset."
+    }
+  ]
+}

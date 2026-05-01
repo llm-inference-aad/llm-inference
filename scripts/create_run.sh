@@ -22,9 +22,12 @@ fi
 
 # Create run directory structure
 RUN_DIR="runs/${RUN_ID}"
+RUN_LOG_DIR="${RUN_DIR}/logs"
+RUN_METRICS_DIR="${RUN_DIR}/metrics"
 mkdir -p "${RUN_DIR}/checkpoints"
 mkdir -p "${RUN_DIR}/results"
-mkdir -p "${RUN_DIR}/logs"
+mkdir -p "${RUN_LOG_DIR}"
+mkdir -p "${RUN_METRICS_DIR}"
 
 # Create run metadata file
 cat > "${RUN_DIR}/run_metadata.json" <<EOF
@@ -35,6 +38,8 @@ cat > "${RUN_DIR}/run_metadata.json" <<EOF
   "user": "$(whoami)",
   "git_branch": "$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')",
   "git_commit": "$(git rev-parse HEAD 2>/dev/null || echo 'unknown')",
+  "log_dir": "${RUN_LOG_DIR}",
+  "metrics_dir": "${RUN_METRICS_DIR}",
   "status": "initialized"
 }
 EOF

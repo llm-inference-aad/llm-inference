@@ -44,11 +44,25 @@ set +a
 # Set defaults
 # ----------------------------
 export LLM_INFERENCE_ROOT_DIR="${LLM_INFERENCE_ROOT_DIR:-$(pwd)}"
+export RUN_ID="${RUN_ID:-server-only}"
+export RUN_DIR="${RUN_DIR:-${LLM_INFERENCE_ROOT_DIR}/runs/${RUN_ID}}"
+export RUN_LOG_DIR="${RUN_LOG_DIR:-${RUN_DIR}/logs}"
+export RUN_METRICS_DIR="${RUN_METRICS_DIR:-${RUN_DIR}/metrics}"
+export RUN_ERRORS_DIR="${RUN_ERRORS_DIR:-${RUN_DIR}/errors}"
+export SLURM_LOG_DIR="${SLURM_LOG_DIR:-${RUN_LOG_DIR}}"
+export SLURM_ERROR_DIR="${SLURM_ERROR_DIR:-${RUN_ERRORS_DIR}}"
 export LOAD_BALANCER_PORT="${LOAD_BALANCER_PORT:-9000}"
-export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${LLM_INFERENCE_ROOT_DIR}/loadbalancer.log}"
-export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${LLM_INFERENCE_ROOT_DIR}/servers.json}"
+export LOADBALANCER_LOG_FILE="${LOADBALANCER_LOG_FILE:-${RUN_LOG_DIR}/loadbalancer.log}"
+export SERVER_REGISTRY_FILE="${SERVER_REGISTRY_FILE:-${RUN_LOG_DIR}/servers.json}"
+
+mkdir -p "${RUN_LOG_DIR}" "${RUN_METRICS_DIR}" "${RUN_ERRORS_DIR}" "${SLURM_LOG_DIR}" "${SLURM_ERROR_DIR}"
+exec > >(tee -a "${RUN_LOG_DIR}/load-balancer-runtime-${SLURM_JOB_ID:-manual}.out") \
+     2> >(tee -a "${RUN_ERRORS_DIR}/load-balancer-runtime-${SLURM_JOB_ID:-manual}.err" >&2)
 
 echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
+echo "RUN_ID: $RUN_ID"
+echo "RUN_LOG_DIR: $RUN_LOG_DIR"
+echo "RUN_ERRORS_DIR: $RUN_ERRORS_DIR"
 echo "LOAD_BALANCER_PORT: $LOAD_BALANCER_PORT"
 echo "LOADBALANCER_LOG_FILE: $LOADBALANCER_LOG_FILE"
 echo "SERVER_REGISTRY_FILE: $SERVER_REGISTRY_FILE"
@@ -78,5 +92,3 @@ uv run python -m uvicorn load_balancer:app --host 0.0.0.0 --port $LOAD_BALANCER_
 
 echo "===== Load balancer stopped ====="
 date
-
-

@@ -25,29 +25,26 @@ This document describes the **revised** prompt engineering philosophy that enabl
 ## Core Principles
 
 ### 1. Research Goal Alignment
-This is a **research project exploring novel architectures**. The LLM's imaginative reasoning is the primary discovery mechanism. Over-constraining prompts defeats the purpose:
-- We want **unexpected** solutions, not prescribed ones
-- Creative mutations drive evolutionary diversity
-- Novel architectures emerge from open-ended exploration
+This is a **research project exploring novel architectures**. The LLM's imaginative reasoning is the primary discovery mechanism. Over-constraining prompts defeats the purpose, but under-constraining them prevents effective context retrieval. 
+- We want **unexpected** solutions, but within the bounds of verifiable code.
+- Creative mutations drive evolutionary diversity.
+- Aligning the LLM's imagination with explicit PyTorch vocabulary (`torch.nn.SiLU`, `AdamW`) bridges the semantic gap for our RAG database.
 
-### 2. Gentle Guidance
+### 2. Gentle Guidance + RAG-Bounded Action Subspaces
 Prompts should:
-- State the multi-objective goal (accuracy ≥90%, efficient parameters) as **awareness context**, not compliance mandates
-- Preserve technical constraints (tensor shapes must remain `(batch, 3, 32, 32)` → `(batch, 10)`, code must compile)
-- Encourage creative exploration without prescribing specific approaches
-- Trust the LLM to find unexpected paths to the Pareto frontier
+- State the multi-objective goal (accuracy ≥90%, efficient parameters) as **awareness context**, not compliance mandates.
+- Preserve technical constraints (tensor shapes must remain `(batch, 3, 32, 32)` → `(batch, 10)`, code must compile).
+- Encourage creative exploration by **suggesting specific, high-value PyTorch operators** (e.g., `Mish`, `OneCycleLR`, `AdaptiveAvgPool2d`). This bounds the action space to valid API calls and crucially **enables FAISS vector similarity search** to retrieve the correct PyTorch documentation sheets from our ingested corpus.
 
 ### 3. Persona-Driven Diversity
 Different personas change **tone and creative direction**, not objectives:
-- **Expert**: Sophisticated, research-backed innovations
-- **MadScientist**: Energetic, bold, chaotic experimentation  
-- **MrMagoo**: Whimsical, serendipitous, understated discoveries
-
-All personas share awareness of the dual objective but approach it from completely different creative angles.
+- **Expert**: Sophisticated, research-backed innovations.
+- **MadScientist**: Energetic, bold, chaotic experimentation.  
+- **MrMagoo**: Whimsical, serendipitous, understated discoveries.
 
 ## Changes Made
 
-### 1. Simplified ConstantRules.txt
+### 1. Simplified ConstantRules.txt (Preserved)
 
 **Before (Rules 9-12):** 4 prescriptive rules with explicit scaffolds, lever lists, and trade-off mandates
 
@@ -61,82 +58,40 @@ All personas share awareness of the dual objective but approach it from complete
     are encouraged.
 ```
 
-**Key Changes:**
-- "Optimize for the dual objective... changes must justify" → "Consider how choices influence both"
-- Removed mandatory reasoning scaffold
-- Removed explicit architectural lever enumeration
-- "Prefer Pareto-optimal modifications: explain why" → "Explore creative modifications"
+### 2. Transformed Concise Templates: Bridging the RAG Semantic Gap
 
-### 2. Transformed Concise Templates
+Initially, templates were reduced from 28 lines of prescriptive text to 3 lines of pure inspiration. However, pure inspiration lacked the syntactic keywords necessary for the FAISS index to retrieve the correct PyTorch API docs for RAG-Text augmentation. We successfully addressed this by injecting specific keywords into the creative framing.
 
 **Example: Complex.txt**
 
-**Before (28 lines):**
-```
-Context:
-- You are modifying a CIFAR-10 convolutional network using multi-objective optimization.
-- Objective 1: Maximize test accuracy (target ≥90%).
-- Objective 2: Minimize parameter count to keep inference lightweight.
-
-Constraints:
-- Input tensor must remain `(batch, 3, 32, 32)` and output `(batch, 10)`.
-- Code must compile/run without errors and respect ConstantRules.
-
-Architectural Levers Available:
-- Channel widths / expansion ratios, bottlenecks, and skip paths.
-- [... 3 more bullet points]
-
+**Initial State (Prescriptive - 28 lines):**
+```text
 Desired Change:
 - Propose complex architectural enhancements (e.g., channel grouping strategies, 
   attention placement, activation upgrades) that deliver higher accuracy while 
   staying within a justified parameter budget. Reference how each lever influences 
   both objectives.
-
-Trade-off Analysis Required:
-- Estimate the parameter delta for every suggested change.
-- [... 2 more mandatory analysis points]
 ```
 
-**After (3 lines):**
-```
+**Second Iteration (Pure Creativity - 3 lines):**
+```text
 Q: How would you reimagine this CIFAR-10 architecture to achieve breakthrough 
 performance? Consider creative combinations of layer types, attention mechanisms, 
 activation functions, or novel architectural patterns. The network seeks high 
-accuracy (≥90%) with thoughtful parameter management. Input/output tensors must 
-remain `(batch, 3, 32, 32)` → `(batch, 10)`.
+accuracy (≥90%). Input/output tensors must remain `(batch, 3, 32, 32)` → `(batch, 10)`.
 ```
 
-**Key Changes:**
-- From **28 lines of instructions** to **3 lines of inspiration**
-- Removed "Context / Constraints / Levers / Desired Change / Analysis" scaffold
-- Removed explicit lever enumeration
-- Changed "Propose... Reference how... Estimate... Explain..." to "How would you reimagine... Consider..."
-- Kept awareness ("seeks high accuracy ≥90% with thoughtful parameter management") without prescription ("must justify parameter increases")
+**Current State (Bounded Creativity for FAISS RAG - March 2026):**
+```text
+Q: How would you reimagine this CIFAR-10 architecture to achieve breakthrough performance? Explore structural and functional combinations: replace ReLU with advanced activations like `torch.nn.SiLU` or `Mish`, integrate Squeeze-and-Excitation (`SE` blocks) mechanisms or `AdaptiveAvgPool2d`, or leverage depthwise (`groups`) and dilated convolutions. The network seeks high accuracy (≥90%) with thoughtful parameter management. Input/output tensors must remain `(batch, 3, 32, 32)` → `(batch, 10)`.
+```
 
-### 3. Simplified All Template Types
+**Key Improvements:**
+- Maintains the short 3-line format.
+- Removes prescriptive checklists and compliance scoring constraints.
+- Crucially embeds valid PyTorch vocabulary (`torch.nn.SiLU`, `Mish`, `AdaptiveAvgPool2d`, `groups`). When these templates are embedded and queried against the FAISS RAG corpus, the vector search retrieves the precise mathematical formulation and hyperparameter docs for those explicitly named modules, reducing LLM syntax hallucinations.
 
-**Template Coverage:**
-- ✅ **Concise/** (6 files): Complex, Param, RemoveParams, Significant, Weird, ParamWeird
-- ✅ **Roleplay/** (18 files): Expert, MadScientist, MrMagoo × 6 mutation types each
-
-**Before/After Comparison:**
-
-| Template | Before | After | Change |
-|----------|--------|-------|--------|
-| Complex.txt | 28 lines, 5 sections, explicit lever list | 3 lines, open-ended question | -89% |
-| Param.txt | 26 lines, mandatory analysis framework | 2 lines, exploratory prompt | -92% |
-| Expert_Complex.txt | 30 lines, structured reasoning scaffold | 2 lines, persona + inspiration | -93% |
-| MadScientist_Weird.txt | 27 lines, guardrail checklists | 2 lines, energetic exploration | -93% |
-
-**Consistent Pattern:**
-1. **Remove scaffolding** - No more "Context / Constraints / Levers / Desired Change / Analysis"
-2. **Remove checklists** - No more "Estimate delta / Explain trade-offs / List guardrails"
-3. **Remove lever lists** - No pre-specified "available options" that constrain thinking
-4. **Maintain awareness** - Keep dual objective context without making it prescriptive
-5. **Maintain constraints** - Keep tensor shapes and compilation requirements
-6. **Inspire creativity** - Use question framing ("How would you...", "What if...", "Explore...")
-
-### 4. Updated RAG Context Integration
+### 3. Updated RAG Context Integration
 
 **File**: `src/llm_utils.py` - `_prepend_rag_context_to_prompt()`
 
@@ -268,65 +223,56 @@ balance accuracy (≥90%) with parameter efficiency. Input/output: `(batch, 3, 3
 - Template usage analysis: Success rates by persona and mutation type
 - Manual inspection: Review generated architectures for novelty and creativity
 
-## Comparison: Prescriptive vs. Creative Approaches
+## Comparison: Prescriptive vs. Creative vs. Bounded (Current)
 
-| Aspect | Prescriptive (Before) | Creative (After) |
-|--------|----------------------|------------------|
-| **Prompt Length** | 25-30 lines | 2-4 lines |
-| **Structure** | Rigid 5-section scaffold | Open-ended question |
-| **Lever Guidance** | Explicit enumeration | None (organic discovery) |
-| **Trade-off Analysis** | Mandatory checklists | Implied awareness |
-| **LLM Role** | Compliance executor | Creative explorer |
-| **Expected Output** | Predictable variations | Novel discoveries |
-| **Reasoning Style** | Form-filling | Natural ideation |
-| **Diversity** | Constrained by lists | Unbounded exploration |
+| Aspect | Prescriptive (Before) | Creative (Mid) | Bounded for RAG (Current) |
+|--------|----------------------|----------------|--------------------------|
+| **Prompt Length** | 25-30 lines | 2-4 lines | 3-6 lines |
+| **Structure** | Rigid 5-section scaffold | Open-ended question | Open-ended question with semantic keywords |
+| **Lever Guidance** | Explicit enumeration | None (organic discovery) | Suggestive API hooks (`SiLU`, `AdaptiveAvgPool2d`) |
+| **FAISS Retrieval**| N/A | Fails due to vague keywords | Succeeds, retrieves relevant PyTorch documentation |
+| **LLM Role** | Compliance executor | Creative explorer | Informed Creative Explorer |
+| **Diversity** | Constrained by lists | Unbounded exploration | Bounded by valid PyTorch functionality |
 
 ## Implementation Summary
 
 ### Files Modified:
-1. **`templates/ConstantRules.txt`**: Simplified rules 9-12 (removed 3 prescriptive rules, simplified 1)
-2. **`templates/FixedPrompts/concise/*.txt`** (6 files): Reduced from 25-30 lines to 2-4 lines each
-3. **`templates/FixedPrompts/roleplay/*.txt`** (18 files): Reduced from 25-30 lines to 2-4 lines each
-4. **`src/llm_utils.py`**: Simplified RAG context prefix from directive to inspirational
-5. **`templates/ARCHITECTURAL_LEVERS.md`**: Kept as human reference, removed from prompts
-
-### Lines of Code Changed:
-- **Before**: ~700 lines of prescriptive prompt text across all templates
-- **After**: ~80 lines of inspirational prompt text
-- **Reduction**: 89% fewer prompt tokens, 100% more creative freedom
+1. **`templates/ConstantRules.txt`**: Simplified rules 9-12.
+2. **`templates/FixedPrompts/concise/*.txt`**: Reduced layout but injected exact PyTorch operator strings.
+3. **`src/llm_utils.py`**: Simplified RAG context prefix from directive to inspirational.
+4. **`src/rag/data_ingestion.py`**: Implemented `hashlib.sha256(content.encode('utf-8')).hexdigest()` to deduplicate identical code blocks across mutated runs and prevent the FAISS database from being flooded with convergent evolution duplicate solutions.
 
 ### Verification Steps:
 ```bash
 # Check ConstantRules simplified
-cat templates/ConstantRules.txt | grep -A2 "^9\\."
+cat templates/ConstantRules.txt | grep -A2 "^9\."
 
-# Verify concise templates shortened
-wc -l templates/FixedPrompts/concise/*.txt
-
-# Verify roleplay templates shortened  
-wc -l templates/FixedPrompts/roleplay/Expert_*.txt
+# Verify RAG keyword inclusion
+cat templates/FixedPrompts/concise/Complex.txt
 
 # Check RAG context updated
 grep -A5 "rag_prefix =" src/llm_utils.py
+
+# Verify FAISS deduplication
+grep -A3 hashlib src/rag/data_ingestion.py
 ```
 
 ## Future Considerations
 
 ### What We Kept (Deliberately):
-1. **Technical constraints** - Tensor shapes, compilation requirements (necessary for valid code)
-2. **Dual objective awareness** - Mention of accuracy target and parameter efficiency (provides context)
-3. **Persona differentiation** - Expert/MadScientist/MrMagoo voices (drives creative diversity)
+1. **Technical constraints** - Tensor shapes, compilation requirements.
+2. **Dual objective awareness** - Mention of accuracy target and parameter efficiency.
+3. **Keyword Binding** - Explicitly providing correct PyTorch operators to bridge the semantic gap for RAG retrieval.
 
 ### What We Might Adjust:
-1. **Objective target specificity** - Could soften "≥90%" to "high accuracy" for more flexibility
-2. **Persona intensity** - Could experiment with more/less pronounced persona characteristics
-3. **RAG example count** - Could vary number of retrieved examples to balance inspiration vs. anchoring
+1. **Embedding Models** - We have upgraded to `gemini-embedding-2` to further improve semantic retrieval over open-source HuggingFace standard sentence transformers.
+2. **RAG Database Size** - Continuously monitoring `rag_data/metadata/code.jsonl` to see how the code namespace populates.
+3. **Persona Intensity** - Ensuring Expert/MadScientist roles don't drift away from utilizing the retrieved FAISS documentation.
 
 ### Monitoring Plan:
-1. **Generation 0-5**: Baseline diversity and creativity metrics
-2. **Compare to pre-revision runs**: Evaluate if simplified prompts produce more novel architectures
-3. **A/B test specific personas**: Identify which personas benefit most from creative freedom
-4. **Track fitness progression**: Verify Pareto frontier still advances (or accelerates)
+1. **FAISS Ingestion Logs**: Confirm that identical code mutations are rejected by the sha256 hashing.
+2. **Evaluate Validation Logs**: Track `logs/errors/validation_errors.csv` to ensure the bounded prompts actually reduce syntax error rates compared to completely blank open-ended prompts.
+3. **Monitor SOTA**: Verify if RAG+Bounded Prompts actually find Pareto expansions faster than Open-Ended prompts.
 
 ## Related Documentation
 

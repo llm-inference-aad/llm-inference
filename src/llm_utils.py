@@ -7,6 +7,7 @@ import glob
 import inspect
 import torch.nn as nn
 import time
+from datetime import datetime
 import numpy as np
 import transformers
 from torch import bfloat16
@@ -29,6 +30,31 @@ from google.genai import types
 
 from huggingface_hub.utils import HfHubHTTPError
 import os, time, random
+import json
+
+def log_llm_interaction(gene_id, stage, content, is_error=False):
+    """Log LLM interactions to per-gene files under the run log directory."""
+    log_dir = os.path.join(RUN_LOG_DIR, "llm")
+    os.makedirs(log_dir, exist_ok=True)
+    
+    filename = "unknown.log"
+    if gene_id:
+        filename = f"gene_{gene_id}.log"
+    
+    log_path = os.path.join(log_dir, filename)
+    
+    timestamp = datetime.now().isoformat()
+    heading = f"[{timestamp}] {stage}"
+    if is_error:
+        heading += " (ERROR)"
+    
+    with open(log_path, 'a') as f:
+        f.write(f"\n{'='*80}\n")
+        f.write(f"{heading}\n")
+        f.write(f"{'-'*80}\n")
+        f.write(f"{content}\n")
+        f.write(f"{'='*80}\n")
+
 
 
 def retrieve_base_code(idx):
@@ -143,8 +169,9 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         # Inject error message before the final instruction or append it
         txt2llm += error_msg
 
-    box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
-    print(txt2llm)
+    # box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
+    # print(txt2llm)
+    log_llm_interaction(gene_id, "PROMPT TO LLM", txt2llm)
 
     if inference_submission is False:
         if LLM_MODEL == 'local_server':
@@ -174,21 +201,24 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
         else:
             raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
             # Add explicit debug logging for every raw response
-            box_print("TEXT FROM LLM (RAW OUTPUT)", print_bbox_len=60, new_line_end=False)
-            print(raw_response)
+            # box_print("TEXT FROM LLM (RAW OUTPUT)", print_bbox_len=60, new_line_end=False)
+            # print(raw_response)
+            log_llm_interaction(gene_id, "TEXT FROM LLM (RAW)", raw_response)
             candidate_code = clean_code_from_llm(raw_response)
 
         candidate_code = clean_code_from_llm(candidate_code)
 
         is_valid, validation_error = _validate_python_snippet(candidate_code)
         if is_valid:
-            box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
-            print(candidate_code)
+            # box_print("CODE FROM LLM", print_bbox_len=60, new_line_end=False)
+            # print(candidate_code)
+            log_llm_interaction(gene_id, "CODE FROM LLM (VALID)", candidate_code)
             return candidate_code
 
         last_error = validation_error or "unable to extract python code"
-        box_print("INVALID LLM OUTPUT", print_bbox_len=60, new_line_end=False)
-        print(f"Attempt {attempt + 1} failed validation: {last_error}")
+        # box_print("INVALID LLM OUTPUT", print_bbox_len=60, new_line_end=False)
+        # print(f"Attempt {attempt + 1} failed validation: {last_error}")
+        log_llm_interaction(gene_id, f"INVALID LLM OUTPUT (Attempt {attempt+1})", f"Error: {last_error}\n\nCode:\n{candidate_code}", is_error=True)
 
     raise RuntimeError(
         f"LLM failed to provide valid Python after {LLM_GENERATION_MAX_RETRIES} attempts. Last error: {last_error}"
@@ -225,6 +255,7 @@ def _augment_template_with_rag(template_text: str, mutation_label: str | None, q
         template=template_text,
         mutation_type=mutation_label,
         query_code=query_code,
+        gene_id=None,
     )
     duration_ms = (time.perf_counter() - start) * 1000
     record_metric(
@@ -539,7 +570,7 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
         
         if use_load_balancer:
             # Load balancer mode: connect to load balancer
-            loadbalancer_file = os.getenv("LOADBALANCER_LOG_FILE", f"{ROOT_DIR}/loadbalancer.log")
+            loadbalancer_file = os.getenv("LOADBALANCER_LOG_FILE", f"{RUN_LOG_DIR}/loadbalancer.log")
             
             if not os.path.exists(loadbalancer_file):
                 raise Exception("Load balancer hostname file not found. Make sure the load balancer is running.")
@@ -553,7 +584,7 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
             print(f"[INFO] Using load balancer at {api_url}")
         else:
             # Single server mode: connect directly to server (backward compatible)
-            hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{ROOT_DIR}/hostname.log")
+            hostname_file = os.getenv("HOSTNAME_LOG_FILE", f"{RUN_LOG_DIR}/hostname.log")
 
             if not os.path.exists(hostname_file):
                 raise Exception("Server hostname file not found. Make sure the server is running.")

@@ -1,0 +1,40 @@
+EMBRACE THE CHAOS! What gloriously unconventional architectural experiment could we unleash on this CIFAR-10 network? Dynamic routing? Reversible blocks? Let's explore the strange and wonderful! Input/output: `(batch, 3, 32, 32)` → `(batch, 10)`.
+
+The current code block:
+```python
+class SE_LN(nn.Module):
+    def __init__(self, cin):
+        super().__init__()
+        self.gavg = nn.AdaptiveAvgPool2d((1,1))  
+        self.ln = nn.LayerNorm(cin)
+        self.dwsc = nn.Sequential(
+            nn.Conv2d(cin, cin, kernel_size=3, groups=cin, padding=1, bias=False),  
+            nn.Conv2d(cin, cin, kernel_size=1, bias=False)  
+        )
+        self.act = nn.Sigmoid()
+        self.bn = nn.BatchNorm2d(cin)      
+        
+    def forward(self, x):
+        y = x
+        x_avg = self.gavg(x)
+        x_avg = x_avg.view(-1, x_avg.size(1))
+        x_avg = self.ln(x_avg)
+        x_avg = x_avg.view(-1, x_avg.size(1), 1, 1)
+        
+        x_dwsc = self.dwsc(y)
+        x_dwsc = self.bn(x_dwsc)  
+        x_dwsc = nn.ReLU()(x_dwsc)  
+    
+        return x_dwsc * self.act(x_avg)
+```
+1. Retain original class names.
+2. Format the code in Markdown as a single ```python``` fenced block.
+3. Exclude setup/demonstration code.
+4. Retain original tensor input/output sizes.
+5. Provide full code.
+6. Must function with default settings.
+7. Avoid all commentary outside the fenced code block.
+8. This network targets high CIFAR-10 accuracy (≥90%) with efficient parameter usage. Consider how architectural choices influence both objectives.
+9. Explore creative modifications that push performance boundaries—novel layer compositions, unconventional activation patterns, or emergent architectural motifs are encouraged.
+
+A: Think deeply step by step
