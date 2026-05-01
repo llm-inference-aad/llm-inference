@@ -36,7 +36,6 @@ def _sample_request() -> RetrieveRequest:
 
 STUB_BACKENDS = [
     pytest.param(PageIndexBackend, id="PageIndexBackend"),
-    pytest.param(GraphBackend, id="GraphBackend"),
 ]
 
 
@@ -78,6 +77,33 @@ class TestFaissBackendClassShape:
         except ModuleNotFoundError:
             pytest.skip("FaissBackend not available on this base branch")
         assert callable(getattr(FaissBackend, "index", None))
+
+
+class TestGraphBackendCompliance:
+    """Graph backend has a live retrieve implementation."""
+
+    def test_isinstance_backend_protocol(self):
+        assert isinstance(GraphBackend(), BackendProtocol)
+
+    def test_retrieve_callable(self):
+        assert callable(getattr(GraphBackend(), "retrieve", None))
+
+    def test_index_callable(self):
+        assert callable(getattr(GraphBackend(), "index", None))
+
+    def test_retrieve_returns_response(self):
+        from src.rag.api_types import RetrieveResponse
+
+        resp = GraphBackend().retrieve(_sample_request())
+        assert isinstance(resp, RetrieveResponse)
+
+    def test_text_namespace_returns_empty_not_error(self):
+        from src.rag.api_types import RetrieveRequest
+
+        resp = GraphBackend().retrieve(
+            RetrieveRequest(query="docs", namespace="text", top_k=3)
+        )
+        assert resp.blocks == []
 
 
 class TestMemoryBackendCompliance:

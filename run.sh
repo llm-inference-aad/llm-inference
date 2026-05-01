@@ -85,7 +85,15 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 echo "UV version: $(uv --version)"
+
+# Force uv to use Python 3.12 to avoid Python 3.13 source-build failures
+# in transitive deps (e.g., outlines-core via vllm).
+export UV_PYTHON="${UV_PYTHON:-3.12}"
+echo "UV requested Python: ${UV_PYTHON}"
 echo "Python via uv: $(uv run python --version)"
+
+echo "Syncing project dependencies with uv (Python ${UV_PYTHON})..."
+uv sync --python "${UV_PYTHON}"
 
 	# ----------------------------
 	# Load environment variables
@@ -318,8 +326,36 @@ fi
 SERVER_SBATCH_ARGS+=("--output=${RUN_LOG_DIR}/slurm-server-%j.out" "--error=${RUN_LOG_DIR}/slurm-server-%j.err")
 
 echo "Server submission args: ${SERVER_SBATCH_ARGS[*]} server.sh"
-SERVER_JOB_ID=$(sbatch "${SERVER_SBATCH_ARGS[@]}" server.sh)
-echo "Server job submitted with ID: ${SERVER_JOB_ID}"
+SERVER_JOB_ID=""
+SERVER_SUBMIT_MAX_RETRIES="${SERVER_SUBMIT_MAX_RETRIES:-4}"
+SERVER_SUBMIT_RETRY_DELAY_SEC="${SERVER_SUBMIT_RETRY_DELAY_SEC:-8}"
+
+for attempt in $(seq 1 "${SERVER_SUBMIT_MAX_RETRIES}"); do
+  if SERVER_JOB_ID=$(sbatch "${SERVER_SBATCH_ARGS[@]}" server.sh 2>&1); then
+    # sbatch --parsable should return a numeric job id.
+    if [[ "${SERVER_JOB_ID}" =~ ^[0-9]+$ ]]; then
+      echo "Server job submitted with ID: ${SERVER_JOB_ID}"
+      break
+    fi
+
+    echo "WARNING: sbatch returned unexpected output: ${SERVER_JOB_ID}"
+    SERVER_JOB_ID=""
+  else
+    rc=$?
+    echo "WARNING: server sbatch attempt ${attempt}/${SERVER_SUBMIT_MAX_RETRIES} failed (rc=${rc}): ${SERVER_JOB_ID}"
+    SERVER_JOB_ID=""
+  fi
+
+  if [[ "${attempt}" -lt "${SERVER_SUBMIT_MAX_RETRIES}" ]]; then
+    echo "Retrying server submission in ${SERVER_SUBMIT_RETRY_DELAY_SEC}s..."
+    sleep "${SERVER_SUBMIT_RETRY_DELAY_SEC}"
+  fi
+done
+
+if [[ -z "${SERVER_JOB_ID}" ]]; then
+  echo "ERROR: Unable to submit nested server job after ${SERVER_SUBMIT_MAX_RETRIES} attempts."
+  exit 1
+fi
 
 # Persist the server job ID so cleanup_server (the EXIT/INT/TERM trap) can
 # scancel it even if the main process is SIGKILL'd before cleanup runs —

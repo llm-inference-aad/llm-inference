@@ -130,6 +130,17 @@ class RagService:
 
     @staticmethod
     def _build_default_backend() -> "BackendProtocol":
+        backend_name = getattr(_get_constants(), "RAG_BACKEND", "faiss")
+        if backend_name == "graph":
+            from .backends.graph_backend import GraphBackend
+            return GraphBackend()
+        if backend_name == "faiss":
+            from .backends.faiss_backend import FaissBackend
+            return FaissBackend()
+        logger.warning(
+            "[RagService] Unknown RAG_BACKEND='%s'; defaulting to faiss",
+            backend_name,
+        )
         from .backends.faiss_backend import FaissBackend
         return FaissBackend()
 

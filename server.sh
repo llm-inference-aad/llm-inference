@@ -29,6 +29,7 @@ hostname
 mkdir -p metrics/slurm-results
 
 module load cuda
+module load anaconda3 || true
 
 # Load environment variables from .env file
 if [ -f .env ]; then
@@ -90,13 +91,14 @@ echo "RUN_ID: ${RUN_ID}"
 echo "RUN_LOG_DIR: ${RUN_LOG_DIR}"
 echo "RUN_METRICS_DIR: ${RUN_METRICS_DIR}"
 
-# Activate virtual environment
-if [ -d "${VENV_PATH}/bin" ]; then
-    echo "Activating virtual environment at: $VENV_PATH"
-    source "${VENV_PATH}/bin/activate"
-else
-    echo "Warning: Virtual environment not found at: $VENV_PATH"
-fi
+# Force uv to use Python 3.12 to avoid Python 3.13 source-build failures
+# in transitive deps (e.g., outlines-core via vllm).
+export UV_PYTHON=${UV_PYTHON:-3.12}
+echo "UV requested Python: ${UV_PYTHON}"
+echo "Python via uv: $(uv run python --version)"
+
+echo "Syncing project dependencies with uv (Python ${UV_PYTHON})..."
+uv sync --python "${UV_PYTHON}"
 
 export SERVER_HOSTNAME=$(hostname)
 
@@ -261,12 +263,12 @@ if [ "$VLLM_BACKEND" = "true" ]; then
     # vLLM manages multi-GPU internally via tensor_parallel_size — use 1 worker.
     # Background the process and capture its PID so the cleanup trap can SIGTERM
     # it gracefully before the job exits, flushing vLLM's buffered stdout.
-    python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1 &
+    uv run python -m uvicorn server_vllm:app --host $SERVER_HOST --port $SERVER_PORT --workers 1 &
     UVICORN_PID=$!
     wait "${UVICORN_PID}"
 else
     echo "Starting legacy HuggingFace backend"
-    python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS &
+    uv run python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS &
     UVICORN_PID=$!
     wait "${UVICORN_PID}"
 fi
