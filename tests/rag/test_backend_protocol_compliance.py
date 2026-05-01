@@ -17,7 +17,7 @@ _REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.rag.api_types import RetrieveRequest  # noqa: E402
+from src.rag.api_types import RetrieveRequest, RetrieveResponse  # noqa: E402
 from src.rag.backend_protocol import BackendProtocol  # noqa: E402
 from src.rag.backends.graph_backend import GraphBackend  # noqa: E402
 from src.rag.backends.pageindex_backend import PageIndexBackend  # noqa: E402
@@ -34,38 +34,19 @@ def _sample_request() -> RetrieveRequest:
     )
 
 
-STUB_BACKENDS = [
-    pytest.param(PageIndexBackend, id="PageIndexBackend"),
-]
-
-# Scaffolding backends are partially-built stubs that DON'T raise — they
-# return a structured empty :class:`RetrieveResponse` carrying a diagnostic
-# ``reason`` so callers (replays, sanity scripts) get a graceful no-op
-# instead of a traceback mid-batch. Workers flip the implementation status
-# once they fill in the retrieval body. ``index`` remains a no-op shim.
+# Scaffolding backends: partially-built stubs that satisfy BackendProtocol
+# structurally but return a diagnostic empty :class:`RetrieveResponse` rather
+# than raising. Callers (replays, sanity scripts) get a graceful no-op with a
+# structured ``reason`` instead of a traceback mid-batch. Workers flip
+# ``ImplementationStatus.SCAFFOLDING → IMPLEMENTED`` once retrieval is real;
+# at that point the live test class (e.g. :class:`TestPageIndexBackendCompliance`)
+# replaces this entry.
+#
+# After the PageIndex merge, GraphBackend is the only remaining scaffolding
+# backend. PageIndexBackend has its own live-instance compliance class below.
 SCAFFOLDING_BACKENDS = [
     pytest.param(GraphBackend, id="GraphBackend"),
 ]
-
-
-@pytest.mark.parametrize("backend_cls", STUB_BACKENDS)
-class TestStubBackendCompliance:
-    def test_isinstance_backend_protocol(self, backend_cls):
-        assert isinstance(backend_cls(), BackendProtocol)
-
-    def test_retrieve_callable(self, backend_cls):
-        assert callable(getattr(backend_cls(), "retrieve", None))
-
-    def test_index_callable(self, backend_cls):
-        assert callable(getattr(backend_cls(), "index", None))
-
-    def test_retrieve_raises_not_implemented(self, backend_cls):
-        with pytest.raises(NotImplementedError):
-            backend_cls().retrieve(_sample_request())
-
-    def test_index_raises_not_implemented(self, backend_cls):
-        with pytest.raises(NotImplementedError):
-            backend_cls().index({"text": "doc"})
 
 
 @pytest.mark.parametrize("backend_cls", SCAFFOLDING_BACKENDS)
@@ -114,6 +95,39 @@ class TestFaissBackendClassShape:
         except ModuleNotFoundError:
             pytest.skip("FaissBackend not available on this base branch")
         assert callable(getattr(FaissBackend, "index", None))
+
+
+class TestPageIndexBackendCompliance:
+    """Live PageIndexBackend instance — uses an empty tmp trees dir and a
+    fake LLM callable so no model calls or filesystem corpus are needed."""
+
+    def _instance(self, tmp_path):
+        return PageIndexBackend(
+            trees_dir=str(tmp_path),
+            llm_call=lambda model, prompt: '{"selected_nodes": []}',
+        )
+
+    def test_isinstance_backend_protocol(self, tmp_path):
+        assert isinstance(self._instance(tmp_path), BackendProtocol)
+
+    def test_retrieve_callable(self, tmp_path):
+        assert callable(getattr(self._instance(tmp_path), "retrieve", None))
+
+    def test_index_callable(self, tmp_path):
+        assert callable(getattr(self._instance(tmp_path), "index", None))
+
+    def test_retrieve_returns_response(self, tmp_path):
+        # Empty trees dir → RetrieveResponse with empty blocks, not an exception.
+        resp = self._instance(tmp_path).retrieve(_sample_request())
+        assert isinstance(resp, RetrieveResponse)
+        assert resp.blocks == []
+        assert (resp.diagnostics or {}).get("source") == "pageindex"
+
+    def test_index_is_noop_shim(self, tmp_path):
+        # PageIndex indexing is owned by the offline tree builder; the
+        # backend's index() is a no-op like FaissBackend's.
+        backend = self._instance(tmp_path)
+        assert backend.index({"text": "ignored"}) is None
 
 
 class TestMemoryBackendCompliance:

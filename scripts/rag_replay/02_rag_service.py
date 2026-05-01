@@ -1,13 +1,28 @@
 """In-process RAG augmentation service for the replay harness.
 
-Wraps `src.rag.runtime.RagRuntime.enhance_template` behind a single
-`augment_via_rag(...)` function. Shape is deliberately HTTP-ready: the request
-payload + response dataclass mirror what a `POST /augment` endpoint would
-expose, so swapping the call site to `requests.post(...)` is a 5-line change.
+Wraps the production RAG augment surface behind a single ``augment_via_rag(...)``
+function. Shape is deliberately HTTP-ready: the request payload + response
+dataclass mirror what a ``POST /augment`` endpoint would expose, so swapping
+the call site to ``requests.post(...)`` is a 5-line change.
+
+Backend selection
+-----------------
+
+The ``RAG_BACKEND`` env var picks which retrieval backend services the call:
+
+- ``"faiss"`` (default) — the legacy ``RagRuntime.enhance_template`` path
+  (CodeBERT + MiniLM + FAISS).
+- ``"pageindex"`` — the LLM-driven tree-search backend
+  (``src.rag.backends.pageindex_backend.PageIndexBackend``) wrapped in a
+  ``RagService``. Trees must be pre-built under
+  ``${RAG_DATA_DIR}/pageindex_trees/`` via
+  ``scripts/build_pageindex_trees.py``.
+- ``"graph"`` — still a stub; fails fast at warmup with a pointed message.
 
 The runtime is constructed lazily on first call and cached as a module-level
-singleton — this is intentional because building it loads CodeBERT (768-dim) +
-MiniLM (384-dim) + the FAISS indices into memory, which takes ~30s.
+singleton: building either live backend is expensive (FAISS loads ~1 GB of
+indices + embedding models, ~30 s; PageIndex loads tree JSONs cheaply but
+each retrieve fires an LLM tree-search, ~10–80 s).
 """
 
 from __future__ import annotations
@@ -19,17 +34,21 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 SRC_DIR = ROOT_DIR / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+# src/ on the path gives us `from rag.runtime import RagRuntime` etc.; the
+# repo root is needed too because the vendored PageIndex source imports
+# itself as `src.pageindex.pageindex.utils` (no `src.` shortcut alias).
+for _p in (str(ROOT_DIR), str(SRC_DIR)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 
 # Backend registry — names that may be passed via `RAG_BACKEND`.
-# `faiss` (default) routes through the existing `RagRuntime` path. `pageindex`
-# and `graph` are stubs on this branch (raise NotImplementedError on retrieve);
-# we fail fast at startup so the team running them knows their blocker is the
+# `faiss` (default) routes through `RagRuntime`. `pageindex` is wrapped in a
+# `RagService(backend=PageIndexBackend())`. `graph` is still a stub on this
+# branch and fails fast so the team running it knows their blocker is the
 # backend port, not the harness.
 _KNOWN_BACKENDS = {"faiss", "pageindex", "graph"}
-_STUB_BACKENDS = {"pageindex", "graph"}
+_STUB_BACKENDS = {"graph"}
 
 
 @dataclass
@@ -49,6 +68,7 @@ class AugmentResponse:
 
 
 _runtime = None
+_runtime_backend: str | None = None
 
 
 def selected_backend() -> str:
@@ -56,40 +76,62 @@ def selected_backend() -> str:
     return (os.environ.get("RAG_BACKEND") or "faiss").strip().lower()
 
 
+def _build_pageindex_runtime():
+    """Build a ``RagService`` whose backend is ``PageIndexBackend``.
+
+    Reranker is disabled — PageIndex blocks score on a 1-5 relevance scale, not
+    cosine similarity, and the cross-encoder reranker is calibrated for FAISS-
+    style scores. Trees are loaded lazily on the first ``retrieve`` call.
+    """
+    from rag.backends.pageindex_backend import PageIndexBackend  # type: ignore
+    from rag.service import RagService  # type: ignore
+
+    return RagService(backend=PageIndexBackend(), reranker=None)
+
+
 def _get_runtime():
-    """Construct and cache `RagRuntime` directly, bypassing the env-gated singleton.
+    """Construct and cache the backend-specific runtime.
 
-    `rag.runtime.get_runtime()` returns `None` when `RAG_ENABLED=false`, but we
-    always need the runtime here regardless of the env toggle (the toggle is
-    consumed by production, not by us). We instantiate the class directly.
+    Bypasses ``rag.runtime.get_runtime()``'s ``RAG_ENABLED`` gate: the replay
+    always needs a runtime regardless of the env toggle (the toggle is consumed
+    by production paths, not by us).
 
-    `RAG_BACKEND` is validated here:
-      - `faiss` (default) → existing RagRuntime path (works today).
-      - `pageindex` / `graph` → stubs on this branch; raise SystemExit with a
-        clear message so the team knows what to port before kickoff.
+    ``RAG_BACKEND`` is validated here:
+      - ``faiss`` (default) → ``RagRuntime`` (CodeBERT + MiniLM + FAISS).
+      - ``pageindex`` → ``RagService(backend=PageIndexBackend())``.
+      - ``graph`` → still a stub; raise ``SystemExit`` with a pointed message.
       - anything else → unknown backend.
     """
-    global _runtime
-    if _runtime is None:
-        backend = selected_backend()
-        if backend not in _KNOWN_BACKENDS:
-            raise SystemExit(
-                f"RAG_BACKEND={backend!r} is not in {sorted(_KNOWN_BACKENDS)}. "
-                f"Set RAG_BACKEND=faiss, pageindex, or graph."
-            )
-        if backend in _STUB_BACKENDS:
-            raise SystemExit(
-                f"RAG_BACKEND={backend!r} is a stub on feature/rag-pipeline-surya "
-                f"(src/rag/backends/{backend}_backend.py raises NotImplementedError). "
-                f"Port the backend (and wire it into RagRuntime) before running the replay."
-            )
+    global _runtime, _runtime_backend
+    if _runtime is not None:
+        return _runtime
+
+    backend = selected_backend()
+    if backend not in _KNOWN_BACKENDS:
+        raise SystemExit(
+            f"RAG_BACKEND={backend!r} is not in {sorted(_KNOWN_BACKENDS)}. "
+            f"Set RAG_BACKEND=faiss, pageindex, or graph."
+        )
+    if backend in _STUB_BACKENDS:
+        raise SystemExit(
+            f"RAG_BACKEND={backend!r} is a stub on feature/rag-pipeline-surya "
+            f"(src/rag/backends/{backend}_backend.py raises NotImplementedError). "
+            f"Port the backend (and wire it into RagRuntime) before running the replay."
+        )
+
+    if backend == "faiss":
         from rag.runtime import RagRuntime  # type: ignore
         _runtime = RagRuntime()
+    elif backend == "pageindex":
+        _runtime = _build_pageindex_runtime()
+    else:  # pragma: no cover — guarded above
+        raise SystemExit(f"Unhandled RAG_BACKEND={backend!r}")
+
+    _runtime_backend = backend
     return _runtime
 
 
-def augment_via_rag(req: AugmentRequest) -> AugmentResponse:
-    runtime = _get_runtime()
+def _augment_via_faiss(runtime, req: AugmentRequest) -> AugmentResponse:
     augmented, mutations = runtime.enhance_template(
         template=req.template,
         mutation_type=req.mutation_type,
@@ -104,6 +146,41 @@ def augment_via_rag(req: AugmentRequest) -> AugmentResponse:
         retrieved_n_text=text_n,
         rag_block_chars=max(0, len(augmented) - len(req.template)),
     )
+
+
+def _augment_via_pageindex(service, req: AugmentRequest) -> AugmentResponse:
+    """Run the PageIndex backend through ``RagService.augment``.
+
+    PageIndex doesn't differentiate code vs text namespaces — it returns
+    document tree nodes regardless. We classify the returned blocks by
+    ``kind`` so the journal still shows separate code/text counters: any block
+    of ``kind == "pageindex_node"`` is treated as a text-source contribution
+    (the trees in ``rag_corpus/`` are PDFs of papers, not code snippets).
+    """
+    from rag.api_types import AugmentRequest as ApiAugmentRequest  # type: ignore
+
+    api_req = ApiAugmentRequest(
+        template=req.template,
+        mutation_type=req.mutation_type or "",
+        query_code=req.query_code or "",
+        gene_id=req.gene_id,
+    )
+    resp = service.augment(api_req)
+    text_n = sum(1 for b in resp.blocks_used if b.kind == "pageindex_node")
+    code_n = len(resp.blocks_used) - text_n
+    return AugmentResponse(
+        augmented_template=resp.augmented_prompt,
+        retrieved_n_code=code_n,
+        retrieved_n_text=text_n,
+        rag_block_chars=max(0, len(resp.augmented_prompt) - len(req.template)),
+    )
+
+
+def augment_via_rag(req: AugmentRequest) -> AugmentResponse:
+    runtime = _get_runtime()
+    if _runtime_backend == "pageindex":
+        return _augment_via_pageindex(runtime, req)
+    return _augment_via_faiss(runtime, req)
 
 
 def warmup() -> None:
