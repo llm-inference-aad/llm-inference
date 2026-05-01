@@ -155,6 +155,14 @@ class LLMRequest(BaseModel):
     temperature: float = 0.7
     job_id: str | None = "default"
     gene_id: str | None = None
+    # Per-request system prompt override. Three modes:
+    #   None (omitted)  -> use the server's default SYSTEM_PROMPT env var.
+    #   ""              -> no system prompt at all (raw user prompt).
+    #   "<custom>"      -> use this string verbatim instead of the default.
+    # The server's default SYSTEM_PROMPT coerces output into a runnable
+    # Python code block, which suits the mutation-generation path (LLMGE)
+    # but breaks callers that need raw JSON (PageIndex) or other formats.
+    system_prompt: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -216,8 +224,11 @@ async def generate_text(request: LLMRequest):
     _start_time = time.time()
 
     try:
-        # Prepend system prompt (prefix-cached by vLLM)
-        full_prompt = SYSTEM_PROMPT + request.prompt
+        # Resolve the effective system prompt. None -> server default;
+        # "" -> no prompt; any string -> use verbatim. Prefix-cached by vLLM
+        # when the resolved prefix is non-empty and stable across requests.
+        effective_system_prompt = SYSTEM_PROMPT if request.system_prompt is None else request.system_prompt
+        full_prompt = effective_system_prompt + request.prompt
 
         # Clamp max_tokens so prompt + output fits within MAX_MODEL_LEN.
         # vLLM rejects requests where prompt_len + max_tokens > max_model_len.
