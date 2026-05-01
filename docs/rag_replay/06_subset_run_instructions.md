@@ -189,4 +189,5 @@ Status as of the integration owner's Step 0 launch (2026-05-01):
 - Per-row driver: `scripts/rag_replay/03_replay.py`
 - SLURM wrapper: `scripts/rag_replay/03_replay.sbatch`
 - Comparator: `scripts/rag_replay/04_compare.py`
+- Subset sampler: `scripts/rag_replay/subsample.py` — regenerates this CSV deterministically (`--n 30 --seed 21`); enforces unique `orig_parent_path` and stratifies fallback rows to match the eligible-pool ratio.
 - Componentization plan: `docs/plans/05_rag_componentization_plan.md`
