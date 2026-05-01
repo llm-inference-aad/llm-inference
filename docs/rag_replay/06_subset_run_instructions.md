@@ -57,6 +57,23 @@ All four people work in the same repo clone tip on `feature/rag-pipeline-surya` 
 
 ## 4. Step 0 — Shared no-RAG baseline (integration owner, one-time)
 
+> **Status (2026-05-01):** Step 0 has run. Baseline at `experiments/rag_replay/baseline_no_rag/`
+> (symlink → `baseline_no_rag_20260501_1241`). Headline numbers — used as the
+> denominator in every Step 1 paired comparison:
+>
+> | Metric | no_rag baseline (n=30) |
+> |---|---|
+> | Goodput (`syntax_valid_first_try`) | **25/30 = 83.3 %** |
+> | Trained successfully (`status=done`) | 25 |
+> | Train-invalid (LLM produced broken code, `status=failed`) | 5 |
+> | LLM-side fallback (exhausted retries, `was_fallback=true`) | 4 |
+> | Mean / median `test_acc` over 25 trained | 0.8460 / 0.8526 |
+>
+> Failure-mode quick read for the 5 train-invalid: 1× class rename
+> (`ExquisiteNetV2 → ExquisiteNetV3`), 1× shape mismatch in custom attention,
+> 3× `NameError` / `TypeError` from referenced-but-undefined symbols. These
+> are real LLM-produced bugs, not harness issues.
+
 This must finish before the three with_rag runs join against it. Plan ~40 min wall.
 
 ```bash
