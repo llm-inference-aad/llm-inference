@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=LLMGE01_Server
-#SBATCH -t 4:00:00
+#SBATCH -t 8:00:00
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:h200:2
 #SBATCH --mem 160G
@@ -18,8 +18,14 @@ module load cuda
 
 # Load environment variables from .env file
 if [ -f .env ]; then
-    echo "Loading environment variables from .env file"
-    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    echo "Loading environment defaults from .env file"
+    while IFS='=' read -r key value; do
+        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+        key="${key%%[[:space:]]*}"
+        if [[ -z "${!key:-}" ]]; then
+            export "${key}=${value}"
+        fi
+    done < .env
 else
     echo "Warning: .env file not found. Using default values."
     # Set defaults if .env doesn't exist
@@ -33,8 +39,8 @@ else
     export MKL_THREADING_LAYER="GNU"
 fi
 
-# IMPORTANT: Command-line/sbatch exports override .env values
-# This allows parallel jobs to use different ports
+# IMPORTANT: Command-line/sbatch exports override .env defaults.
+# This allows experiment sweeps to set SmoothQuant, batch size, and ports.
 echo "Checking for environment overrides..."
 if [ ! -z "$SERVER_PORT" ]; then
     echo "  SERVER_PORT override detected: $SERVER_PORT"

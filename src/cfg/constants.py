@@ -76,21 +76,21 @@ PROB_EOT = 0.25
 # =============================================================================
 
 #: Number of generations to run for
-num_generations = 12  # BASELINE: 10 generations for initial experiments
+num_generations = int(os.environ.get('GE_NUM_GENERATIONS', 12))  # BASELINE: 10 generations for initial experiments
 
 #: Population size for launching optimization
-start_population_size = 16  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
+start_population_size = int(os.environ.get('GE_START_POPULATION_SIZE', 16))  # BASELINE: 8 genes (matches BATCH_SIZE in server.py)
 
 #: Population size to utilize in each generation after optimization begins
-population_size = 8  # BASELINE: Keep consistent with start_population_size
+population_size = int(os.environ.get('GE_POPULATION_SIZE', 8))  # BASELINE: Keep consistent with start_population_size
 
 crossover_probability = 0.35  #: Probability of mating two individuals
 mutation_probability = 0.8 	  #: Probability of mutating an individual
 
 #: Number of elites to consider
-num_elites = 8
+num_elites = int(os.environ.get('GE_NUM_ELITES', 8))
 #: Number of individuals to keep in the hall of fame across the optimization
-hof_size = 8
+hof_size = int(os.environ.get('GE_HOF_SIZE', 8))
 
 
 # Job Sub Constants/Params
@@ -164,7 +164,13 @@ module load python/3.12.5
 
 # Load environment variables
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | grep -v '^$' | xargs)
+    while IFS='=' read -r key value; do
+        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+        key="${{key%%[[:space:]]*}}"
+        if [[ -z "${{!key:-}}" ]]; then
+            export "${{key}}=${{value}}"
+        fi
+    done < .env
 fi
 
 # Ensure uv is in PATH

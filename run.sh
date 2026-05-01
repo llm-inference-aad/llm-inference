@@ -5,7 +5,7 @@
 #SBATCH -n 1                      # number of CPU cores
 #SBATCH -N 1
 #SBATCH --gres=gpu:1
-#SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
+##SBATCH -C "A100-40GB|A100-80GB|H100|V100-16GB|V100-32GB|RTX6000|A40|L40S"
 #SBATCH --output=slurm-results/slurm-main-%j.out
 #SBATCH --error=slurm-results/slurm-main-%j.err
 
@@ -86,17 +86,67 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
-# Auto-export all keys defined in .env into this shell's environment
-set -a
-source .env
-set +a
+# Load .env as defaults only. Values passed via sbatch --export / shell exports
+# must win for experiment sweeps.
+while IFS='=' read -r key value; do
+  [[ -z "${key}" || "${key}" =~ ^[[:space:]]*# ]] && continue
+  key="${key%%[[:space:]]*}"
+  if [[ -z "${!key:-}" ]]; then
+    export "${key}=${value}"
+  fi
+done < .env
 
 # Quick masked sanity checks (show only prefixes)
 
 
-: "${LLM_INFERENCE_ROOT_DIR:=/home/hice1/satmuri6/scratch/llm-inference}"
+: "${LLM_INFERENCE_ROOT_DIR:=${REPO_ROOT}}"
 export LLM_INFERENCE_ROOT_DIR
 echo "LLM_INFERENCE_ROOT_DIR: $LLM_INFERENCE_ROOT_DIR"
+
+# Wait for the local LLM server to finish model/SmoothQuant startup before
+# launching child llm_oper jobs. Slurm after:<job> only means "server job has
+# started", not "Uvicorn is accepting requests".
+if [[ "${LLM_MODEL:-local_server}" == "local_server" ]]; then
+  SERVER_READY_TIMEOUT="${SERVER_READY_TIMEOUT:-1800}"
+  SERVER_READY_INTERVAL="${SERVER_READY_INTERVAL:-15}"
+  HOSTNAME_FILE="${HOSTNAME_LOG_FILE:-${REPO_ROOT}/hostname.log}"
+  SERVER_PORT="${SERVER_PORT:-8000}"
+
+  echo "Waiting for local LLM server readiness (timeout ${SERVER_READY_TIMEOUT}s)..."
+  START_WAIT=$(date +%s)
+  while true; do
+    if [[ -f "${HOSTNAME_FILE}" ]]; then
+      SERVER_HOSTNAME="$(tr -d '[:space:]' < "${HOSTNAME_FILE}")"
+      if [[ -n "${SERVER_HOSTNAME}" ]]; then
+        if uv run python - "$SERVER_HOSTNAME" "$SERVER_PORT" <<'PY'
+import sys
+import urllib.request
+
+host, port = sys.argv[1], sys.argv[2]
+try:
+    with urllib.request.urlopen(f"http://{host}:{port}/", timeout=5) as resp:
+        sys.exit(0 if resp.status == 200 else 1)
+except Exception:
+    sys.exit(1)
+PY
+        then
+          echo "Local LLM server is ready at http://${SERVER_HOSTNAME}:${SERVER_PORT}/"
+          break
+        fi
+      fi
+    fi
+
+    NOW=$(date +%s)
+    if (( NOW - START_WAIT > SERVER_READY_TIMEOUT )); then
+      echo "ERROR: Timed out waiting for local LLM server readiness."
+      echo "HOSTNAME_FILE=${HOSTNAME_FILE}"
+      exit 1
+    fi
+
+    echo "Server not ready yet; sleeping ${SERVER_READY_INTERVAL}s..."
+    sleep "${SERVER_READY_INTERVAL}"
+  done
+fi
 
 # ----------------------------
 # CUDA libs for uv environment (best-effort)

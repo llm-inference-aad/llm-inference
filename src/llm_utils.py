@@ -27,6 +27,32 @@ from huggingface_hub.utils import HfHubHTTPError
 import os, time, random
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    return os.getenv(name, str(default)).lower() in {"1", "true", "yes", "on"}
+
+
+def _log_text_summary(title: str, text: str, bbox_len: int = 60, preview_env: str = "LLM_LOG_PREVIEW_CHARS") -> None:
+    """Log bounded text diagnostics so Slurm stdout cannot bottleneck LLM jobs."""
+    text = text or ""
+    box_print(title, print_bbox_len=bbox_len, new_line_end=False)
+
+    if _env_bool("LLM_LOG_FULL_PROMPTS", False):
+        print(text, flush=True)
+        return
+
+    try:
+        preview_chars = int(os.getenv(preview_env, os.getenv("LLM_LOG_PREVIEW_CHARS", "800")))
+    except ValueError:
+        preview_chars = 800
+    preview = text[:preview_chars]
+    omitted = max(len(text) - len(preview), 0)
+    print(f"[{title}] chars={len(text)} preview_chars={len(preview)} omitted_chars={omitted}", flush=True)
+    if preview:
+        print(preview, flush=True)
+    if omitted:
+        print(f"[{title}] preview truncated; set LLM_LOG_FULL_PROMPTS=true to print full text.", flush=True)
+
+
 def retrieve_base_code(idx):
     """Retrieves base code for quality control."""
     base_network = SEED_NETWORK
@@ -101,8 +127,7 @@ def validate_module_source(source_code: str, module_path: str, module_name: Opti
 
 def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, temperature, inference_submission=False, gene_id=None):
     """Generate augmented code with retry loop: validates syntax before accepting LLM output."""
-    box_print("PROMPT TO LLM", print_bbox_len=60, new_line_end=False)
-    print(txt2llm)
+    _log_text_summary("PROMPT TO LLM", txt2llm)
 
     if inference_submission is False:
         if LLM_MODEL == 'local_server':
@@ -131,8 +156,7 @@ def generate_augmented_code(txt2llm, augment_idx, apply_quality_control, top_p, 
             candidate_code = qc_func(raw_response, base_code, generate_text)
         else:
             raw_response = llm_code_generator(prompt, top_p=top_p, temperature=temperature, gene_id=gene_id)
-            box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
-            print(raw_response)
+            _log_text_summary("TEXT FROM LLM", raw_response, preview_env="LLM_LOG_RESPONSE_PREVIEW_CHARS")
             candidate_code = clean_code_from_llm(raw_response)
 
         candidate_code = clean_code_from_llm(candidate_code)
@@ -186,7 +210,7 @@ def llm_code_qc(code_from_llm, base_code, generate_text):
         template_txt = file.read()
     # add code to be augmented
     prompt2llm = template_txt.format(code_from_llm, base_code)
-    print("="*120);print(prompt2llm);print("="*120)
+    _log_text_summary("QC PROMPT TO LLM", prompt2llm, bbox_len=120)
     
     res = generate_text(prompt2llm) # clean txt
     code_from_llm = res[0]["generated_text"]
@@ -202,13 +226,11 @@ def llm_code_qc_hf(code_from_llm, base_code, generate_text=None):
         template_txt = file.read()
     # add code to be augmented
     prompt2llm = template_txt.format(code_from_llm, base_code)
-    box_print("QC PROMPT TO LLM", print_bbox_len=120, new_line_end=False)
-    print(prompt2llm)
+    _log_text_summary("QC PROMPT TO LLM", prompt2llm, bbox_len=120)
     
     code_from_llm = submit_mixtral_hf(prompt2llm, max_new_tokens=4096, top_p=0.1, temperature=0.1, 
                       model_id="mistralai/Mixtral-8x7B-v0.1", return_gen=False)
-    box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
-    print(code_from_llm)
+    _log_text_summary("TEXT FROM LLM", code_from_llm, preview_env="LLM_LOG_RESPONSE_PREVIEW_CHARS")
     code_from_llm = clean_code_from_llm(code_from_llm)
     return code_from_llm
 
@@ -378,8 +400,7 @@ def submit_mixtral(txt2mixtral, max_new_tokens=4096, top_p=0.15, temperature=0.1
 
     res = generate_text(txt2mixtral)
     output_txt = res[0]["generated_text"]
-    box_print("LLM OUTPUT", print_bbox_len=60, new_line_end=False)
-    print(output_txt)
+    _log_text_summary("LLM OUTPUT", output_txt, preview_env="LLM_LOG_RESPONSE_PREVIEW_CHARS")
     box_print(f'time to load in seconds: {round(time.time()-start_time)}', print_bbox_len=120, new_line_end=False)   
     if return_gen is False:
         return output_txt
@@ -419,6 +440,8 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
     even when the primary gateway is down.
     """
     try:
+        max_new_tokens = int(os.getenv("LOCAL_SERVER_MAX_NEW_TOKENS", max_new_tokens))
+
         # Check if load balancer mode is enabled
         use_load_balancer = os.getenv("USE_LOAD_BALANCER", "false").lower() in ['true', '1', 'yes']
         
@@ -490,7 +513,7 @@ def submit_local_server(txt2llm, max_new_tokens=8192, top_p=0.8, temperature=0.7
         }
         
         timeout_seconds = float(os.getenv("LOCAL_SERVER_TIMEOUT", 300))
-        max_retries = int(os.getenv("LOCAL_SERVER_MAX_RETRIES", 3))
+        max_retries = int(os.getenv("LOCAL_SERVER_MAX_RETRIES", 120))
         enable_remote_fallback = os.getenv("ENABLE_LLM_REMOTE_FALLBACK", "false").lower() in {"1", "true", "yes"}
         fallback_target = os.getenv("LLM_REMOTE_FALLBACK_TARGET", "mixtral_hf")
         last_exception: Exception | None = None

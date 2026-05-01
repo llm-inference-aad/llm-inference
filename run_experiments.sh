@@ -1,4 +1,10 @@
 #!/bin/bash
+#SBATCH -t 8:00:00
+#SBATCH --mem=4G
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH --output=slurm-results/slurm-experiments-%j.out
+#SBATCH --error=slurm-results/slurm-experiments-%j.err
 # ==============================================================================
 # run_experiments.sh — Master experiment runner for SmoothQuant comparison
 #
@@ -10,17 +16,26 @@
 #   bash run_experiments.sh baseline     # only baseline runs
 #   bash run_experiments.sh smoothquant  # only SQ runs
 #   bash run_experiments.sh batchsweep  # only batch sweep
+#   bash run_experiments.sh quick       # one tiny baseline/SQ pair for quota-limited smoke testing
 # ==============================================================================
 
 set -uo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+    REPO_ROOT="${SLURM_SUBMIT_DIR}"
+else
+    REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 cd "${REPO_ROOT}"
 
 # ── Config ────────────────────────────────────────────────────────────────────
-N_BASELINE=5
-N_SQ=5
-BATCH_SIZES=(2 4 8 16)   # BS=1 already covered by baseline/SQ runs above
+N_BASELINE=${N_BASELINE:-5}
+N_SQ=${N_SQ:-5}
+if [[ -n "${BATCH_SIZES_OVERRIDE:-}" ]]; then
+    read -r -a BATCH_SIZES <<< "${BATCH_SIZES_OVERRIDE}"
+else
+    BATCH_SIZES=(2 4 8 16)   # BS=1 already covered by baseline/SQ runs above
+fi
 SQ_ALPHA=0.85
 
 EXPERIMENT_LOG="${REPO_ROOT}/experiment_log.txt"
@@ -28,6 +43,16 @@ SLURM_LOG_DIR="${REPO_ROOT}/slurm-results"
 mkdir -p "${SLURM_LOG_DIR}"
 
 MODE="${1:-all}"
+EXTRA_RUN_EXPORTS="${EXTRA_RUN_EXPORTS:-}"
+DEFAULT_RUN_EXPORTS=",LOCAL_SERVER_MAX_RETRIES=120,SERVER_READY_TIMEOUT=1800,SERVER_READY_INTERVAL=15"
+
+if [[ "${MODE}" == "quick" ]]; then
+    N_BASELINE=1
+    N_SQ=1
+    BATCH_SIZES=()
+    EXTRA_RUN_EXPORTS="${EXTRA_RUN_EXPORTS},GE_NUM_GENERATIONS=1,GE_START_POPULATION_SIZE=4,GE_POPULATION_SIZE=4,GE_NUM_ELITES=2,GE_HOF_SIZE=2,LLM_GENERATION_MAX_RETRIES=1,LLM_JOB_COMPLETION_TIMEOUT=1200,LOCAL_SERVER_TIMEOUT=900,LOCAL_SERVER_MAX_NEW_TOKENS=1024"
+fi
+EXTRA_RUN_EXPORTS="${DEFAULT_RUN_EXPORTS}${EXTRA_RUN_EXPORTS}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 log() {
@@ -66,7 +91,7 @@ EOF
     for attempt in $(seq 1 ${max_retries}); do
         SERVER_JOB_ID=$(sbatch \
             --job-name="server_${label}" \
-            --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},BATCH_WAIT_TIME=0,RUN_ID=${RUN_ID}" \
+            --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},BATCH_WAIT_TIME=0,RUN_ID=${RUN_ID}${EXTRA_RUN_EXPORTS}" \
             --output="${SLURM_LOG_DIR}/slurm-server-%j.out" \
             --error="${SLURM_LOG_DIR}/slurm-server-%j.err" \
             server.sh 2>&1 | awk '{print $NF}')
@@ -89,7 +114,7 @@ EOF
         MAIN_JOB_ID=$(sbatch \
             --job-name="run_${label}" \
             --dependency="after:${SERVER_JOB_ID}" \
-            --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},RUN_ID=${RUN_ID}" \
+            --export="ALL,SMOOTHQUANT=${sq},SMOOTHQUANT_ALPHA=${alpha},BATCH_SIZE=${bs},RUN_ID=${RUN_ID}${EXTRA_RUN_EXPORTS}" \
             --output="${SLURM_LOG_DIR}/slurm-main-%j.out" \
             --error="${SLURM_LOG_DIR}/slurm-main-%j.err" \
             run.sh 2>&1 | awk '{print $NF}')
@@ -131,7 +156,7 @@ log "========================================================"
 echo ""
 
 # ── 1. Baseline runs ──────────────────────────────────────────────────────────
-if [[ "${MODE}" == "all" || "${MODE}" == "baseline" ]]; then
+if [[ "${MODE}" == "all" || "${MODE}" == "baseline" || "${MODE}" == "quick" ]]; then
     log "--- BASELINE runs (SQ=0, BS=1) ---"
     for i in $(seq 1 ${N_BASELINE}); do
         submit_and_wait "baseline_bs1_run${i}" 0 1 ${SQ_ALPHA}
@@ -139,7 +164,7 @@ if [[ "${MODE}" == "all" || "${MODE}" == "baseline" ]]; then
 fi
 
 # ── 2. SmoothQuant runs ───────────────────────────────────────────────────────
-if [[ "${MODE}" == "all" || "${MODE}" == "smoothquant" ]]; then
+if [[ "${MODE}" == "all" || "${MODE}" == "smoothquant" || "${MODE}" == "quick" ]]; then
     log "--- SMOOTHQUANT runs (SQ=1, BS=1, alpha=${SQ_ALPHA}) ---"
     for i in $(seq 1 ${N_SQ}); do
         submit_and_wait "smoothquant_bs1_run${i}" 1 1 ${SQ_ALPHA}

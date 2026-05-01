@@ -258,7 +258,7 @@ def check_contents_for_error(contents):
     else:
         return None
         
-def check4job_completion(job_id, local_output=None, check_interval=60, timeout=120): # 3600 * 3
+def check4job_completion(job_id, local_output=None, check_interval=60, timeout=None): # 3600 * 3
     """
     Check for the completion of a job by searching for its output file and scanning for errors.
 
@@ -276,6 +276,9 @@ def check4job_completion(job_id, local_output=None, check_interval=60, timeout=1
     state: bool
         True if job completed successfully, False otherwise.
     """
+
+    if timeout is None:
+        timeout = int(os.environ.get("LLM_JOB_COMPLETION_TIMEOUT", 120))
 
     if local_output is not None:
         state = check_contents_for_error(local_output)

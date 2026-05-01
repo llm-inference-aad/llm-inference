@@ -19,14 +19,45 @@ from evaluator import OutputEvaluator
 # SmoothQuant helpers
 # Paper: https://arxiv.org/abs/2211.10438
 #
-# Core idea: activations are hard to quantize (outliers) but weights are easy.
-# We migrate difficulty by computing a per-channel scale s from calibration
-# data, then:
-#   X_smooth = X / s        (activations easier to quantize)
-#   W_smooth = W * s        (weights absorb the scale, still easy to quantize)
-# The scale is fused into the preceding layer offline so there is zero runtime
-# overhead. After smoothing, we quantize both X and W to INT8.
+# Core idea: activations are hard to quantize (outliers) but weights are easier.
+# We migrate difficulty by computing a per-input-channel scale s from
+# calibration data, then preserve the floating-point function as:
+#   X_smooth = X / s
+#   W_smooth = W * s
+#
+# This implementation performs the smoothing transform correctly and keeps the
+# model in floating point. SmoothQuant is the preconditioning step needed before
+# INT8 kernels; this repo does not depend on a CUDA INT8 GEMM backend, so we do
+# not claim INT8 speedups here.
 # ──────────────────────────────────────────────────────────────────────────────
+
+class SmoothQuantLinear(torch.nn.Module):
+    """Linear layer with SmoothQuant activation rescale fused into forward."""
+
+    def __init__(self, linear: torch.nn.Linear, activation_scale: torch.Tensor):
+        super().__init__()
+        self.in_features = linear.in_features
+        self.out_features = linear.out_features
+        self.weight = linear.weight
+        self.bias = linear.bias
+        self.register_buffer("smoothquant_scale", activation_scale.detach())
+
+    def forward(self, x):
+        scale = self.smoothquant_scale.to(device=x.device, dtype=x.dtype)
+        return torch.nn.functional.linear(x / scale, self.weight, self.bias)
+
+
+def _iter_named_linears(model):
+    for name, module in model.named_modules():
+        if isinstance(module, torch.nn.Linear):
+            yield name, module
+
+
+def _get_parent_module(model, module_name: str):
+    parent_name, child_name = module_name.rsplit(".", 1) if "." in module_name else ("", module_name)
+    parent = model.get_submodule(parent_name) if parent_name else model
+    return parent, child_name
+
 
 def _get_calibration_inputs(tokenizer, n_samples: int = 512, seq_len: int = 128, device: str = "cuda"):
     """
@@ -52,12 +83,12 @@ def _get_calibration_inputs(tokenizer, n_samples: int = 512, seq_len: int = 128,
             truncation=True,
             padding="max_length",
         )
-        all_inputs.append(enc["input_ids"].to(device))
+        all_inputs.append({key: value.to(device) for key, value in enc.items()})
     return all_inputs
 
 
 @torch.no_grad()
-def _collect_activation_scales(model, tokenizer, alpha: float, n_samples: int = 64, device: str = "cuda"):
+def _collect_activation_scales(model, tokenizer, alpha: float, n_samples: int = 64, device: str = "cuda", seq_len: int = 128):
     """
     Collect per-channel max absolute activation values for every linear layer
     whose input comes after an attention or FFN block.
@@ -78,22 +109,26 @@ def _collect_activation_scales(model, tokenizer, alpha: float, n_samples: int = 
         return hook
 
     # Register forward hooks on all linear layers
-    for name, module in model.named_modules():
-        if isinstance(module, torch.nn.Linear):
-            hooks.append(module.register_forward_hook(make_hook(name)))
+    for name, module in _iter_named_linears(model):
+        if name.endswith("lm_head"):
+            continue
+        hooks.append(module.register_forward_hook(make_hook(name)))
 
     # Run a small number of calibration samples
     model.eval()
-    calib_inputs = _get_calibration_inputs(tokenizer, n_samples=n_samples, device=device)
-    for inp in calib_inputs:
-        model(inp)
+    calib_inputs = _get_calibration_inputs(tokenizer, n_samples=n_samples, seq_len=seq_len, device=device)
+    for batch in calib_inputs:
+        try:
+            model(**batch, use_cache=False)
+        except TypeError:
+            model(**batch)
 
     for h in hooks:
         h.remove()
 
     # Compute smoothing scales: s_j = max|X_j|^alpha / max|W_j|^(1-alpha)
     scales = {}
-    for name, module in model.named_modules():
+    for name, module in _iter_named_linears(model):
         if isinstance(module, torch.nn.Linear) and name in activation_maxes:
             act_max = activation_maxes[name].to(module.weight.device)           # [C_in]
             weight_max = module.weight.abs().max(dim=0).values.float()          # [C_in]
@@ -109,17 +144,15 @@ def _collect_activation_scales(model, tokenizer, alpha: float, n_samples: int = 
 @torch.no_grad()
 def apply_smoothquant(model, tokenizer, alpha: float = 0.85, device: str = "cuda"):
     """
-    Apply the SmoothQuant offline transformation to every Linear layer:
+    Apply the SmoothQuant transform to Linear layers:
       1. Collect per-channel activation scales from calibration data.
-      2. Divide weight rows by the scale  (W_smooth = W / s[None, :]).
-      3. The complementary multiplication on the activation side (X * s) is
-         fused into the preceding LayerNorm / bias where possible, so at
-         runtime the activations arrive pre-scaled with zero extra ops.
-      4. Quantize weights to INT8 in-place and store the float32 scale factor
-         for dequantization during the forward pass.
+      2. Multiply each input column of W by s (W_smooth = W * s[None, :]).
+      3. Wrap the layer so forward uses X_smooth = X / s before F.linear.
 
-    After this call the model uses ~50% less VRAM and matrix multiplications
-    run via the faster INT8 GEMM path.
+    This preserves the original floating-point function while producing
+    smoothed activations/weights. It intentionally does not fake INT8 by
+    dequantizing weights back to float on every forward, because that is slower
+    and not an actual INT8 GEMM path.
 
     Args:
         model:     loaded AutoModelForCausalLM (bfloat16 on GPU)
@@ -128,66 +161,34 @@ def apply_smoothquant(model, tokenizer, alpha: float = 0.85, device: str = "cuda
                    Increase toward 1.0 if weight quantization errors are high.
         device:    'cuda' or specific cuda device string
     """
-    print(f"[SmoothQuant] Collecting activation scales (alpha={alpha}) …")
-    scales = _collect_activation_scales(model, tokenizer, alpha=alpha, device=device)
+    n_samples = int(os.getenv("SMOOTHQUANT_CALIBRATION_SAMPLES", "64"))
+    seq_len = int(os.getenv("SMOOTHQUANT_CALIBRATION_SEQ_LEN", "128"))
+    skip_lm_head = os.getenv("SMOOTHQUANT_SKIP_LM_HEAD", "1") == "1"
+
+    print(f"[SmoothQuant] Collecting activation scales (alpha={alpha}, samples={n_samples}, seq_len={seq_len})")
+    scales = _collect_activation_scales(model, tokenizer, alpha=alpha, n_samples=n_samples, seq_len=seq_len, device=device)
     print(f"[SmoothQuant] Collected scales for {len(scales)} linear layers.")
 
     smoothed = 0
-    for name, module in model.named_modules():
+    for name, module in list(_iter_named_linears(model)):
         if not isinstance(module, torch.nn.Linear):
+            continue
+        if skip_lm_head and name.endswith("lm_head"):
             continue
         if name not in scales:
             continue
 
         s = scales[name].to(module.weight.dtype).to(module.weight.device)  # [C_in]
 
-        # ── Smooth the weight: W_smooth[:, j] = W[:, j] / s[j] ──────────────
+        # Smooth the weight: W_smooth[:, j] = W[:, j] * s[j].
         # weight shape: [C_out, C_in]
-        module.weight.data.div_(s.unsqueeze(0))
+        module.weight.data.mul_(s.unsqueeze(0))
 
-        # ── Fuse s into the preceding LayerNorm (if any) ─────────────────────
-        # Walk the parent path to find the immediately preceding norm layer and
-        # absorb s into its weight so activations arrive pre-divided at runtime.
-        parts = name.split(".")
-        for depth in range(len(parts) - 1, 0, -1):
-            parent_name = ".".join(parts[:depth])
-            try:
-                parent = model.get_submodule(parent_name)
-            except AttributeError:
-                continue
-            # Look for a LayerNorm/RMSNorm sibling earlier in the same block
-            for sibling_name, sibling in parent.named_children():
-                if isinstance(sibling, (torch.nn.LayerNorm,)) or "norm" in sibling_name.lower():
-                    if hasattr(sibling, "weight") and sibling.weight is not None:
-                        if sibling.weight.shape[-1] == s.shape[0]:
-                            sibling.weight.data.div_(s)
-                            if sibling.bias is not None:
-                                sibling.bias.data.div_(s)
-                            break
-            break
-
-        # ── Quantize weight to INT8 ───────────────────────────────────────────
-        w_float = module.weight.data.float()
-        w_max   = w_float.abs().max(dim=1, keepdim=True).values.clamp(min=1e-8)  # per output-channel
-        w_scale = w_max / 127.0                                                   # float32 scale
-        w_int8  = (w_float / w_scale).round().clamp(-128, 127).to(torch.int8)
-
-        # Store quantized weight and scale as buffers
-        del module.weight
-        module.register_buffer("weight_int8",  w_int8)
-        module.register_buffer("weight_scale", w_scale.squeeze(1).to(torch.float16))
-
-        # Monkey-patch forward to dequantize on the fly
-        def _make_forward(mod):
-            def forward(x):
-                w = mod.weight_int8.to(x.dtype) * mod.weight_scale.unsqueeze(1).to(x.dtype)
-                return torch.nn.functional.linear(x, w, mod.bias)
-            return forward
-
-        module.forward = _make_forward(module)
+        parent, child_name = _get_parent_module(model, name)
+        setattr(parent, child_name, SmoothQuantLinear(module, s))
         smoothed += 1
 
-    print(f"[SmoothQuant] Smoothed and INT8-quantized {smoothed} linear layers.")
+    print(f"[SmoothQuant] Smoothed {smoothed} linear layers.")
     return model
 
 app = FastAPI(title="LLM API", version="1.0")
@@ -363,6 +364,14 @@ class LLMModel:
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         print(f"[{timestamp}] Tokenizer loaded in {tokenizer_time:.2f} seconds")
 
+        # Set pad tokens before calibration or batching. LLaMA-family tokenizers
+        # often do not define a pad token by default.
+        print(f"[{timestamp}] Configuring tokenizer for batching...")
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+            print(f"[{timestamp}] Set pad_token to eos_token")
+
         # ── SmoothQuant (applied offline once at load time) ───────────────────
         if SMOOTHQUANT_ENABLED:
             sq_start = time.time()
@@ -376,13 +385,6 @@ class LLMModel:
         else:
             print(f"[{timestamp}] SmoothQuant DISABLED (set SMOOTHQUANT=1 to enable)")
 
-        # Set pad tokens for batching
-        print(f"[{timestamp}] Configuring tokenizer for batching...")
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-            print(f"[{timestamp}] Set pad_token to eos_token")
-        
         # Create pipeline
         print(f"[{timestamp}] Creating text generation pipeline...")
         pipeline_start = time.time()
