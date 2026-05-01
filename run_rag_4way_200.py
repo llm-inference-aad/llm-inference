@@ -26,7 +26,7 @@ import requests
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", type=int, default=int(os.getenv("SERVER_PORT", 8001)))
 parser.add_argument("--server-host", type=str, default=os.getenv("SERVER_HOST", ""))
-parser.add_argument("--server-registry-file", type=Path, default=Path(os.getenv("SERVER_REGISTRY_FILE", "runs/rag-a100-server/logs/servers.json")))
+parser.add_argument("--server-registry-file", type=Path, default=Path(os.getenv("SERVER_REGISTRY_FILE", "")) if os.getenv("SERVER_REGISTRY_FILE") else None)
 parser.add_argument("--output-dir", type=Path, default=Path("runs/rag_4way_200/metrics"))
 parser.add_argument("--num-requests-per-config", type=int, default=200)
 parser.add_argument("--config-name", type=str, default="", help="Run only one config by name (e.g. 1_rag_only)")
@@ -105,9 +105,19 @@ def resolve_server_url() -> str:
     if args.server_host:
         return f"http://{args.server_host}:{args.port}/generate"
 
-    registry = args.server_registry_file
+    candidate_registries: list[Path] = []
+    if args.server_registry_file is not None:
+        candidate_registries.append(args.server_registry_file)
+
+    # Search for the newest registry written by an active server run.
+    for path in sorted(Path("runs").glob("*/logs/servers.json"), key=lambda p: p.stat().st_mtime if p.exists() else 0, reverse=True):
+        if path not in candidate_registries:
+            candidate_registries.append(path)
+
     for _ in range(120):  # wait up to ~20 minutes in 10s intervals
-        if registry.exists():
+        for registry in candidate_registries:
+            if registry is None or not registry.exists():
+                continue
             try:
                 data = json.loads(registry.read_text())
                 servers = data.get("servers", [])
@@ -116,6 +126,12 @@ def resolve_server_url() -> str:
                         host = server.get("hostname") or server.get("host")
                         if host:
                             return f"http://{host}:{args.port}/generate"
+                if servers:
+                    server = servers[-1]
+                    host = server.get("hostname") or server.get("host")
+                    port = int(server.get("port", args.port))
+                    if host:
+                        return f"http://{host}:{port}/generate"
             except Exception:
                 pass
         time.sleep(10)

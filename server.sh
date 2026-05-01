@@ -98,11 +98,21 @@ echo "RUN_METRICS_DIR: ${RUN_METRICS_DIR}"
 echo "RUN_ERRORS_DIR: ${RUN_ERRORS_DIR}"
 
 # Activate virtual environment
+export VENV_PATH="${VENV_PATH:-$(pwd)/.venv}"
 if [ -d "${VENV_PATH}/bin" ]; then
     echo "Activating virtual environment at: $VENV_PATH"
     source "${VENV_PATH}/bin/activate"
 else
     echo "Warning: Virtual environment not found at: $VENV_PATH"
+fi
+
+# Resolve a Python executable that does not depend on `uv` being installed.
+if [ -x "${VENV_PATH}/bin/python" ]; then
+    PYTHON_EXEC="${VENV_PATH}/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+    PYTHON_EXEC="$(command -v python3)"
+else
+    PYTHON_EXEC="python"
 fi
 
 export SERVER_HOSTNAME=$(hostname)
@@ -135,23 +145,25 @@ if [ -z "$SERVER_PORT" ]; then
     # Find next available port by checking existing servers
     if [ ! -z "$SERVER_REGISTRY_FILE" ] && [ -f "$SERVER_REGISTRY_FILE" ]; then
         # Read existing servers and find highest port
-        HIGHEST_PORT=$(uv run python << EOF
+        HIGHEST_PORT=$(SERVER_REGISTRY_FILE="$SERVER_REGISTRY_FILE" SERVER_BASE_PORT="$SERVER_BASE_PORT" "$PYTHON_EXEC" <<'EOF'
 import json
-import sys
+import os
+
+registry_file = os.environ["SERVER_REGISTRY_FILE"]
+base_port = int(os.environ["SERVER_BASE_PORT"])
 
 try:
-    with open('$SERVER_REGISTRY_FILE', 'r') as f:
+    with open(registry_file, "r") as f:
         registry = json.load(f)
-    
-    servers = registry.get('servers', [])
+
+    servers = registry.get("servers", [])
     if servers:
-        ports = [s.get('port', $SERVER_BASE_PORT) for s in servers]
-        highest = max(ports)
-        print(highest + 1)
+        ports = [int(s.get("port", base_port)) for s in servers]
+        print(max(ports) + 1)
     else:
-        print($SERVER_BASE_PORT)
-except Exception as e:
-    print($SERVER_BASE_PORT)
+        print(base_port)
+except Exception:
+    print(base_port)
 EOF
         )
         SERVER_PORT=$HIGHEST_PORT
@@ -190,37 +202,31 @@ if [ ! -z "$SERVER_REGISTRY_FILE" ]; then
         fi
         
         # Add new server to registry using Python
-        uv run python << EOF
+        SERVER_REGISTRY_FILE="$SERVER_REGISTRY_FILE" TEMP_ENTRY="$TEMP_ENTRY" EXISTING="$EXISTING" "$PYTHON_EXEC" <<'EOF'
 import json
-import sys
+import os
 
-# Read existing registry
-registry = json.loads('''$EXISTING''')
+registry = json.loads(os.environ["EXISTING"])
 
-# Read new server entry
-with open('$TEMP_ENTRY', 'r') as f:
+with open(os.environ["TEMP_ENTRY"], "r") as f:
     new_server = json.load(f)
 
-# Check if server already exists (same hostname and port)
-existing_servers = registry.get('servers', [])
-server_key = (new_server['hostname'], new_server['port'])
+existing_servers = registry.get("servers", [])
+server_key = (new_server["hostname"], new_server["port"])
 updated = False
 
 for i, server in enumerate(existing_servers):
-    if (server['hostname'], server['port']) == server_key:
-        # Update existing entry
+    if (server["hostname"], server["port"]) == server_key:
         existing_servers[i] = new_server
         updated = True
         break
 
 if not updated:
-    # Add new server
     existing_servers.append(new_server)
 
-registry['servers'] = existing_servers
+registry["servers"] = existing_servers
 
-# Write back to registry
-with open('$SERVER_REGISTRY_FILE', 'w') as f:
+with open(os.environ["SERVER_REGISTRY_FILE"], "w") as f:
     json.dump(registry, f, indent=2)
 
 print(f"Registered: {new_server['hostname']}:{new_server['port']}")
