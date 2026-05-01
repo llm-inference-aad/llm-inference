@@ -125,12 +125,16 @@ sbatch --export=ALL,\
 SMOKE_DIR=experiments/rag_replay/${RAG_BACKEND}_subset_n30_${TS},\
 EPOCHS=24,ELIGIBLE_ONLY=1,\
 RAG_BACKEND=${RAG_BACKEND},\
+RAG_DATA_DIR=rag_data_eval,\
+RAG_USE_CODE_CONTEXT=false,\
+RAG_USE_TEXT_CONTEXT=true,\
+RAG_MEMORY_STORE_ENABLED=false,\
 SERVER_URL=${SERVER_URL},\
 EXTRA_ARGS="--csv scripts/rag_replay/datasets/past_genes_subset_n30_seed21.csv --skip-arm no_rag" \
     scripts/rag_replay/03_replay.sbatch
 ```
 
-`--skip-arm no_rag` is what makes this Step 0's mirror image — only the with_rag arm runs, joined later against the shared baseline.
+`--skip-arm no_rag` is what makes this Step 0's mirror image — only the with_rag arm runs, joined later against the shared baseline. The `RAG_*` exports point retrieval at the curated `rag_data_eval/` corpus (10 PDFs, no code/memory) — see §7.8 for why this round is text-only.
 
 While the driver runs, watch the journal grow:
 
@@ -183,31 +187,27 @@ Status as of the integration owner's Step 0 launch (2026-05-01):
 1. ✅ **`RAG_BACKEND` validation.** `02_rag_service.py` now reads `RAG_BACKEND` (default `faiss`), records it in `run_metadata.json`, and **fails fast at startup** if set to a stub backend (`pageindex`, `graph` raise SystemExit on `RagRuntime` warmup). FAISS team is unblocked today.
 2. ✅ **`--skip-arm` flag.** `03_replay.py:362` already supports `--skip-arm no_rag` and `--skip-arm with_rag`. The Step 0 / Step 1 split above relies on this.
 3. ✅ **No-RAG warmup skip.** Step 0 (no_rag-only) no longer pays the ~30s embedding-model load and won't trip `RAG_BACKEND` validation — `RagRuntime` is constructed lazily only when `with_rag` is in `arms_to_run`.
-4. ⚠️ **PageIndex / Graph backend ports are still required** before those teams' Step 1 runs will actually retrieve anything. Today both raise `NotImplementedError` in `src/rag/backends/{pageindex,graph}_backend.py`, and the harness fails fast with a pointed error message ("port the backend before running the replay"). The FAISS team can ignore this; the other two teams must implement their backend and wire it into `RagRuntime` before kickoff.
+4. **Backend status.** PageIndex is implemented on `feature/rag-pipeline-ben` (commit `33735d465` — vendored `src/pageindex/`, tree-search retrieval against the local LLM). The Graph backend on this branch is **scaffolding** (`src/rag/backends/graph_backend.py`): protocol-compliant, returns a structured empty `RetrieveResponse` with `reason="scaffolding"` so a misconfigured run gets a diagnostic block instead of a traceback. The harness still fails fast at `02_rag_service.py` for `RAG_BACKEND=graph` so the eval can't accidentally consume scaffolding output. A worker checklist is in the module docstring; once retrieval is implemented, remove `"graph"` from `_STUB_BACKENDS` and flip `ImplementationStatus.SCAFFOLDING → IMPLEMENTED` to unblock the team.
 5. **`hostname.log` location.** The sbatch wrapper falls back to `hostname.log` at repo root; some configs write it under `runs/server-only/logs/`. Symlink before kickoff if needed.
 6. **vLLM server up.** All four runs share one vLLM endpoint to keep LLM stochasticity controlled. Confirm `$SERVER_URL` returns 200 on `/` before any team submits.
 7. **Sha pinned in tracking issue.** Paste both `89f5449f…6c6c` (full dataset) and `93ff2522…6c08` (subset) into the tracking issue so re-runs are byte-verifiable.
-8. ⚠️ **Code-retrieval holdout (`rag_data_eval/`).** The 30 eval rows came from two runs: `nemotron_rag_text_20260311_022245` (19 rows) and `nemotron_baseline_20260311_022419` (11 rows). If the FAISS code index includes either run, the LLM can retrieve its own answer — direct invalidation. Six of the 30 targets are also parents of other targets, so naive gene-level exclusion still leaks via siblings; **run-level exclusion is the only safe policy.**
+8. ✅ **Eval-time RAG corpus (`rag_data_eval/`) — text-only this round.**
 
-   Operational steps before Step 1 kickoff (one-time, by the integration owner):
+   Status (2026-05-01):
+   - **Text namespace: curated to 10 PDFs** (PageIndex-aligned set), 44 chunks. The same set is the source for the PageIndex tree builder, so FAISS-vs-PageIndex compare on identical document coverage.
+     - `text.index` sha256 `86ee8bf89f3d15824a823109bce11a6b7688a78b621741d4b6dae0c047608d2c`
+     - `text.jsonl` sha256 `7fa241eebffe777256cb71f279c0e02cc3390491c5a243602cf3df482fc52de4`
+   - **Code namespace: intentionally empty.** Of the three runs with checkpoints on disk, two are the eval source runs (`nemotron_rag_text_20260311_022245`, `nemotron_baseline_20260311_022419`) and the third (`nemotron_rag_text_20260318_162102`) has only `checkpoint_gen_0.pkl` — seed-only, no mutations to extract. Run-level holdout produces a 0-mutation corpus; including the source runs would leak the eval targets directly. **Step 1 runs text-only RAG.** Code namespace gets revisited once new runs without subset overlap exist.
+   - **Memory namespace: empty + `RAG_MEMORY_STORE_ENABLED=false` for the headline.** Memory is a separate ablation, not part of this round.
 
-   1. Create `rag_data_eval/` parallel to `rag_data/`. Copy the text-namespace artifacts as-is (`faiss_index/text.index`, `metadata/text.jsonl`) — public docs, no leak.
-   2. Build the code namespace via `scripts/rag_replay/build_eval_code_index.py`:
+   The audit trail (`rag_data_eval/holdout_dropped.jsonl`) records the rationale.
 
-      ```bash
-      uv run python scripts/rag_replay/build_eval_code_index.py \
-          --csv scripts/rag_replay/datasets/past_genes_subset_n30_seed21.csv \
-          --runs-dir runs/ \
-          --models-dir sota/ExquisiteNetV2/ \
-          --output rag_data_eval/
-      ```
+   Tooling (built earlier, kept for the next round when leak-free runs exist):
+   - `scripts/rag_replay/curate_text_index.py --input rag_data --output rag_data_eval` — re-embeds the whitelist subset of PDFs into the target dir.
+   - `scripts/rag_replay/build_eval_code_index.py` — auto-derives excluded runs from the CSV's `orig_run_id`, AST-hashes the 30 target network files via `ast_normalized_hash`, and runs `extract_mutations_from_checkpoints` with both holdouts.
+   - `_assert_no_target_leakage` in `scripts/rag_replay/03_replay.py` — runs at driver startup when `with_rag` is scheduled. Skips silently when no code namespace exists (current state); becomes load-bearing once one is rebuilt.
 
-      The script auto-derives the excluded run set from the CSV's `orig_run_id` column, AST-hashes the 30 target gene network files via `ast_normalized_hash` (collapses reformatted clones), and passes both holdouts into `extract_mutations_from_checkpoints`. It writes an audit trail to `rag_data_eval/holdout_dropped.jsonl`, runs an internal self-check, and prints the resulting `code.index` + `code.jsonl` sha256s for pinning.
-   3. Add to the Step 1 sbatch `--export`: `RAG_DATA_DIR=rag_data_eval, RAG_USE_CODE_CONTEXT=true, RAG_MEMORY_STORE_ENABLED=false`. Memory is a separate ablation; do not mix it into the headline arm.
-   4. Pin the printed `code.index` + `code.jsonl` sha256s in this section alongside the dataset shas before announcing the baseline ready.
-   5. Driver self-check (`_assert_no_target_leakage` in `scripts/rag_replay/03_replay.py`) runs at startup whenever `with_rag` is in `arms_to_run`. It AST-hashes the 30 target networks and asserts none appear in `rag_data_eval/metadata/code.jsonl`, failing the run before any LLM call if a leak is detected.
-
-   This is irrelevant for Step 0 (the no-RAG baseline doesn't retrieve anything) but is what makes the cross-backend numbers in Step 2 meaningful — without it, with_rag goodput is ceilinged at "FAISS found my own answer," not novel-mutation lift.
+   For Step 1: each team sets `RAG_DATA_DIR=rag_data_eval, RAG_USE_CODE_CONTEXT=false, RAG_USE_TEXT_CONTEXT=true, RAG_MEMORY_STORE_ENABLED=false`.
 
 ---
 

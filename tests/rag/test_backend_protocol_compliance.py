@@ -36,6 +36,14 @@ def _sample_request() -> RetrieveRequest:
 
 STUB_BACKENDS = [
     pytest.param(PageIndexBackend, id="PageIndexBackend"),
+]
+
+# Scaffolding backends are partially-built stubs that DON'T raise — they
+# return a structured empty :class:`RetrieveResponse` carrying a diagnostic
+# ``reason`` so callers (replays, sanity scripts) get a graceful no-op
+# instead of a traceback mid-batch. Workers flip the implementation status
+# once they fill in the retrieval body. ``index`` remains a no-op shim.
+SCAFFOLDING_BACKENDS = [
     pytest.param(GraphBackend, id="GraphBackend"),
 ]
 
@@ -58,6 +66,34 @@ class TestStubBackendCompliance:
     def test_index_raises_not_implemented(self, backend_cls):
         with pytest.raises(NotImplementedError):
             backend_cls().index({"text": "doc"})
+
+
+@pytest.mark.parametrize("backend_cls", SCAFFOLDING_BACKENDS)
+class TestScaffoldingBackendCompliance:
+    """Compliance for partially-implemented backends.
+
+    They satisfy BackendProtocol structurally but return a diagnostic
+    empty response on ``retrieve`` rather than raising. ``index`` is a
+    no-op (returns None) — both behaviours match the FaissBackend /
+    PageIndexBackend production pattern.
+    """
+
+    def test_isinstance_backend_protocol(self, backend_cls):
+        assert isinstance(backend_cls(), BackendProtocol)
+
+    def test_retrieve_returns_diagnostic_empty_response(self, backend_cls):
+        from src.rag.api_types import RetrieveResponse
+        resp = backend_cls().retrieve(_sample_request())
+        assert isinstance(resp, RetrieveResponse)
+        assert resp.blocks == [], "scaffolding backend must not return blocks"
+        diag = resp.diagnostics or {}
+        assert diag.get("reason") in {"scaffolding", "no_graph"}, (
+            f"expected a diagnostic reason; got {diag}"
+        )
+
+    def test_index_is_a_noop(self, backend_cls):
+        # Should not raise; should return None (mirrors FaissBackend).
+        assert backend_cls().index({"text": "doc"}) is None
 
 
 class TestFaissBackendClassShape:

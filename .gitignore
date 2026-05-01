@@ -29,6 +29,7 @@ metrics/gpu/
 metrics/eval/
 !metrics/scripts/
 rag_data/
+rag_data_eval/
 documentation/
 .cursor/
 .mcp.json
