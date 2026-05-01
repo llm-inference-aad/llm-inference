@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import pickle
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, Iterator, List, Sequence
+from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Set
 
 import pdfplumber
 
@@ -26,12 +27,58 @@ def _safe_load_checkpoint(path: Path) -> dict | None:
 
 
 def _discover_checkpoint_files(runs_dir: Path) -> Iterator[Path]:
-    for run_dir in runs_dir.glob("auto_*"):
-        checkpoint_dir = run_dir / "checkpoints"
-        if not checkpoint_dir.exists():
+    """Yield ``checkpoint_gen_*.pkl`` files under any direct subdir of *runs_dir*
+    that owns a ``checkpoints/`` directory.
+
+    Previously restricted to ``auto_*`` runs; widened so the eval-time replay
+    can ingest from any historical run directory (``nemotron_*``, etc.) and so
+    the holdout filter in :func:`extract_mutations_from_checkpoints` has a
+    surface to act on.
+    """
+    if not runs_dir.exists():
+        return
+    for run_dir in sorted(runs_dir.iterdir()):
+        if not run_dir.is_dir():
             continue
-        for checkpoint_file in checkpoint_dir.glob("checkpoint_gen_*.pkl"):
+        checkpoint_dir = run_dir / "checkpoints"
+        if not checkpoint_dir.is_dir():
+            continue
+        for checkpoint_file in sorted(checkpoint_dir.glob("checkpoint_gen_*.pkl")):
             yield checkpoint_file
+
+
+def ast_normalized_hash(code: str) -> str:
+    """Return a deterministic sha256 hash over the AST of *code*.
+
+    Whitespace, comments, and docstrings do not contribute to the hash, so
+    two textually-different but semantically-identical modules collide. This
+    is the dedup key used to prevent eval-time leakage when a "kept" run
+    contains a reformatted clone of a gene from an "excluded" run.
+
+    Falls back to a byte-level sha256 if *code* is not parseable as Python —
+    in that case we still want a hash, just one that doesn't collapse
+    formatting differences.
+    """
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return hashlib.sha256(code.encode("utf-8")).hexdigest()
+
+    # Strip module-/class-/function-level docstrings — they are pure prose
+    # and shouldn't drive identity. Also strip the location attributes that
+    # ast.dump bakes in by default; those carry whitespace info via column
+    # offsets.
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef,
+                             ast.AsyncFunctionDef)):
+            body = node.body
+            if (body and isinstance(body[0], ast.Expr)
+                    and isinstance(body[0].value, ast.Constant)
+                    and isinstance(body[0].value.value, str)):
+                node.body = body[1:] or [ast.Pass()]
+
+    canonical = ast.dump(tree, annotate_fields=True, include_attributes=False)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _chunk_text(text: str, max_words: int = 400) -> Iterator[str]:
@@ -238,11 +285,34 @@ def extract_mutations_from_checkpoints(
     models_dir: str,
     limit: int | None = None,
     min_accuracy: float = 0.0,
+    *,
+    excluded_runs: Optional[Iterable[str]] = None,
+    excluded_code_hashes: Optional[Iterable[str]] = None,
+    require_quality_gate: bool = True,
 ) -> List[MutationRecord]:
     """Parse DEAP checkpoints across run directories and extract mutation pairs.
 
     Reads checkpoint_gen_*.pkl files to reconstruct the genealogy and extracts
     the before/after code states for each successful mutation.
+
+    Holdout knobs (used by the eval-time replay to prevent leakage):
+
+    * ``excluded_runs`` — set of run-dir names whose checkpoints are skipped
+      entirely. Use this to drop the runs that produced the eval subset.
+    * ``excluded_code_hashes`` — set of AST-normalized code hashes; any gene
+      whose code matches is dropped, even if its run is "kept". Catches
+      reformatted clones that survive the run-level filter.
+    * ``require_quality_gate`` — when True (default), the seed-baseline
+      quality gate filters out genes that didn't beat the seed on either
+      accuracy or parameters. Set False to keep regressions / fallbacks for
+      use as "avoid" exemplars in a partitioned-retrieval setup.
+
+    Each emitted ``MutationRecord`` carries a ``quality_label`` in its
+    metadata: one of ``EXEMPLAR``, ``BASELINE_OK``, ``REGRESSION``,
+    ``FALLBACK``, or ``INVALID``. The label is computed at index time from
+    the gene's fitness vs its parent's; downstream prompt-formatting code
+    surfaces it so the LLM knows whether a retrieved snippet is a
+    "model-after" or "avoid" example.
     """
     try:
         from evolution.seed import train_seed_network_baseline
@@ -256,14 +326,30 @@ def extract_mutations_from_checkpoints(
     runs_path = Path(runs_dir)
     models_path = Path(models_dir)
 
+    excluded_run_set: Set[str] = set(excluded_runs or ())
+    excluded_hash_set: Set[str] = set(excluded_code_hashes or ())
+
     mutations: dict[str, MutationRecord] = {}
     seen_genes: set[str] = set()
     seen_code_hashes: set[str] = set()
 
+    holdout_drops_run = 0
+    holdout_drops_hash = 0
+
     print(f"[RAG] Scanning for checkpoints in {runs_path}")
     print(f"[RAG] Base seed threshold: accuracy > {seed_accuracy} OR params < {seed_params}")
+    if excluded_run_set:
+        print(f"[RAG] Run-level holdout: excluding {len(excluded_run_set)} run(s)")
+    if excluded_hash_set:
+        print(f"[RAG] Hash-level holdout: excluding {len(excluded_hash_set)} target code hash(es)")
 
     for idx, checkpoint_file in enumerate(_discover_checkpoint_files(runs_path)):
+        # checkpoint_file is .../<run_name>/checkpoints/checkpoint_gen_*.pkl
+        run_name = checkpoint_file.parent.parent.name
+        if run_name in excluded_run_set:
+            holdout_drops_run += 1
+            continue
+
         if limit and idx >= limit:
             break
         chk = _safe_load_checkpoint(checkpoint_file)
@@ -287,8 +373,11 @@ def extract_mutations_from_checkpoints(
                 code = code_path.read_text(encoding="utf-8")
             except OSError:
                 continue
-            
-            code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
+
+            code_hash = ast_normalized_hash(code)
+            if code_hash in excluded_hash_set:
+                holdout_drops_hash += 1
+                continue
             if code_hash in seen_code_hashes:
                 continue
             seen_code_hashes.add(code_hash)
@@ -296,19 +385,11 @@ def extract_mutations_from_checkpoints(
             fitness = record.get("fitness")
             if fitness in (None, ()):
                 continue
-            
-            # Quality gate — skip mutations below the seed baseline threshold.
-            # We index if test accuracy is greater than seed OR parameters are fewer.
+
             try:
                 test_acc = float(fitness[0])
                 params_count = float(fitness[1]) if len(fitness) > 1 else float('inf')
             except (TypeError, ValueError, IndexError):
-                continue
-
-            has_better_acc = test_acc > seed_accuracy
-            has_fewer_params = params_count < seed_params
-
-            if not (has_better_acc or has_fewer_params):
                 continue
 
             ancestry_info = ancestry.get(gene_id, {})
@@ -322,11 +403,28 @@ def extract_mutations_from_checkpoints(
                 parent_fitness = global_data[parent_gene_id].get("fitness")
 
             improvement = calculate_fitness_improvement(fitness, parent_fitness)
+
+            quality_label = _classify_quality(
+                test_acc=test_acc,
+                seed_accuracy=seed_accuracy,
+                params_count=params_count,
+                seed_params=seed_params,
+                improvement=improvement,
+                fallback=bool(record.get("fallback", False)),
+                status=record.get("status"),
+            )
+
+            if require_quality_gate and quality_label in {"REGRESSION", "FALLBACK", "INVALID"}:
+                continue
+
             description = build_mutation_description(gene_id, mutation_type, fitness, improvement)
 
             metadata = {
+                "run_name": run_name,
                 "run_checkpoint": str(checkpoint_file),
-                "fallback": record.get("fallback", False),
+                "code_ast_hash": code_hash,
+                "quality_label": quality_label,
+                "fallback": bool(record.get("fallback", False)),
                 "status": record.get("status"),
             }
 
@@ -341,7 +439,49 @@ def extract_mutations_from_checkpoints(
                 metadata=metadata,
             )
 
+    if excluded_run_set or excluded_hash_set:
+        print(
+            f"[RAG] Holdout drops: {holdout_drops_run} checkpoint(s) by run, "
+            f"{holdout_drops_hash} gene(s) by hash"
+        )
     return list(mutations.values())
+
+
+def _classify_quality(
+    *,
+    test_acc: float,
+    seed_accuracy: float,
+    params_count: float,
+    seed_params: float,
+    improvement: dict | None,
+    fallback: bool,
+    status,
+) -> str:
+    """Assign a coarse quality label used for prompt-time good/bad framing.
+
+    Five categories:
+      - ``EXEMPLAR``    — beats seed on accuracy *and* improved over parent
+      - ``BASELINE_OK`` — beats seed (or matches it) without parent regression
+      - ``REGRESSION``  — significant accuracy regression vs parent
+      - ``FALLBACK``    — LLM exhausted retries during generation
+      - ``INVALID``     — training crashed / no fitness
+    """
+    if fallback:
+        return "FALLBACK"
+    if status in (None, "error", "failed"):
+        return "INVALID"
+
+    acc_delta = (improvement or {}).get("accuracy_delta")
+    has_better_acc = test_acc > seed_accuracy
+    has_fewer_params = params_count < seed_params
+
+    if acc_delta is not None and acc_delta < -0.01:
+        return "REGRESSION"
+    if has_better_acc and (acc_delta is None or acc_delta > 0):
+        return "EXEMPLAR"
+    if has_better_acc or has_fewer_params:
+        return "BASELINE_OK"
+    return "REGRESSION"
 
 
 def process_pdfs(pdf_dir: str, max_pages: int | None = None) -> List[dict]:

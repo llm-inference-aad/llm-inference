@@ -224,33 +224,42 @@ class RetrievalService:
     # Formatting helpers
     # ------------------------------------------------------------------ #
     def format_context(self, mutations: Sequence[RetrievedMutation]) -> str:
-        lines: list[str] = []
+        blocks: list[str] = []
         for mutation in mutations:
             fitness = mutation.metadata.get("fitness") or []
             accuracy = f"{fitness[0]:.4f}" if fitness else "unknown"
             params = f"{int(fitness[1])}" if len(fitness) > 1 else "unknown"
-            
-            # Show improvement deltas if available (helps LLM understand what made mutations successful)
+
             improvement = mutation.metadata.get("improvement") or {}
             acc_delta = improvement.get("accuracy_delta")
             params_delta = improvement.get("parameters_delta")
-            
-            improvement_str = ""
-            if acc_delta is not None or params_delta is not None:
-                delta_parts = []
-                if acc_delta is not None:
-                    delta_parts.append(f"ΔAcc: {acc_delta:+.4f}")
-                if params_delta is not None:
-                    delta_parts.append(f"ΔParams: {params_delta:+.0f}")
-                if delta_parts:
-                    improvement_str = f" | {' | '.join(delta_parts)}"
-            
-            lines.append(
-                f"- Gene {mutation.gene_id} (score {mutation.score:.3f}) "
+
+            delta_parts: list[str] = []
+            if acc_delta is not None:
+                delta_parts.append(f"ΔAcc: {acc_delta:+.4f}")
+            if params_delta is not None:
+                delta_parts.append(f"ΔParams: {params_delta:+.0f}")
+            improvement_str = f" | {' | '.join(delta_parts)}" if delta_parts else ""
+
+            label = mutation.metadata.get("quality_label", "")
+            label_tag = f"[{label}] " if label else ""
+
+            # `mutation.code` contains the document body. Historical artifact:
+            # MutationRecord.to_document concatenated the one-line description
+            # ahead of the actual source as ``"<description>\n\nCode:\n<src>"``.
+            # Strip that prefix (when present) so we surface only the code.
+            code_only = mutation.code
+            if "\nCode:\n" in code_only:
+                code_only = code_only.split("\nCode:\n", 1)[1]
+            code_only = code_only.strip()
+
+            blocks.append(
+                f"{label_tag}Gene {mutation.gene_id} "
+                f"(retrieval score {mutation.score:.3f}) | "
                 f"Accuracy {accuracy}, Params {params}{improvement_str}\n"
-                f"{mutation.description}"
+                f"```python\n{code_only}\n```"
             )
-        return "\n".join(lines)
+        return "\n\n".join(blocks)
 
     def format_text_context(self, contexts: Sequence[RetrievedContext]) -> str:
         """Format retrieved text documents for injection into prompts."""

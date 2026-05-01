@@ -345,6 +345,59 @@ def _poll_results(journal_path: Path, run_dir: Path,
         _journal_append(journal_path, row)
 
 
+def _assert_no_target_leakage(csv_path: Path, root_dir: Path) -> None:
+    """Fail the run before any LLM call if eval target genes appear in the
+    code namespace.
+
+    Iterates ``rag_data*/metadata/code.jsonl`` (whichever ``RAG_DATA_DIR``
+    resolves to), AST-hashes the 30 target gene network files, and asserts
+    no overlap. Logs counts and returns silently on success.
+
+    Skips silently if no code namespace exists yet (e.g., production
+    ``rag_data/`` has only ``text.index``). That's fine — no leak is
+    possible if there's no code namespace to leak from.
+    """
+    sys.path.insert(0, str(root_dir / "src"))
+    from rag.data_ingestion import ast_normalized_hash  # type: ignore
+    from cfg.constants import RAG_DATA_DIR  # type: ignore
+
+    data_dir = Path(os.environ.get("RAG_DATA_DIR", RAG_DATA_DIR))
+    code_meta = data_dir / "metadata" / "code.jsonl"
+    if not code_meta.exists():
+        print(f"[leak-guard] no code namespace at {code_meta} — skipping check", flush=True)
+        return
+
+    models_root = root_dir / "sota" / "ExquisiteNetV2"
+    target_hashes: set[str] = set()
+    rows = list(csv.DictReader(csv_path.open()))
+    for row in rows:
+        gid = row["orig_gene_id"]
+        nf = models_root / "models" / f"network_{gid}.py"
+        if nf.exists():
+            target_hashes.add(ast_normalized_hash(nf.read_text(encoding="utf-8")))
+
+    leaks: list[str] = []
+    indexed_count = 0
+    for line in code_meta.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        indexed_count += 1
+        entry = json.loads(line)
+        meta = entry.get("metadata") or {}
+        if meta.get("code_ast_hash") in target_hashes:
+            leaks.append(meta.get("gene_id", "?"))
+
+    if leaks:
+        raise SystemExit(
+            f"[leak-guard] FAIL: {len(leaks)} target gene(s) present in code "
+            f"namespace at {code_meta}: {leaks[:5]}{'…' if len(leaks) > 5 else ''}. "
+            f"Rebuild rag_data_eval/ with the correct subset CSV before running."
+        )
+    print(f"[leak-guard] PASS: 0 of {len(target_hashes)} target hashes "
+          f"present in {indexed_count} indexed entries", flush=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--csv", type=Path,
@@ -426,6 +479,11 @@ def main() -> int:
         print(f"[setup] warming RagRuntime (RAG_BACKEND={rag_service.selected_backend()})...",
               flush=True)
         rag_service.warmup()
+        # Leak-guard: assert no target gene from the eval CSV is present in the
+        # code namespace at retrieval time. This is the last line of defense
+        # against a stale rag_data_eval/ that was rebuilt against a different
+        # subset (or pointed at the production rag_data/ which has no holdout).
+        _assert_no_target_leakage(args.csv, ROOT_DIR)
         print(f"[setup] runtime ready", flush=True)
     else:
         print(f"[setup] no_rag-only run; skipping RagRuntime warmup", flush=True)

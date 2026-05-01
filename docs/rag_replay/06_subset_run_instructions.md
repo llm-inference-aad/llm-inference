@@ -170,6 +170,27 @@ Status as of the integration owner's Step 0 launch (2026-05-01):
 5. **`hostname.log` location.** The sbatch wrapper falls back to `hostname.log` at repo root; some configs write it under `runs/server-only/logs/`. Symlink before kickoff if needed.
 6. **vLLM server up.** All four runs share one vLLM endpoint to keep LLM stochasticity controlled. Confirm `$SERVER_URL` returns 200 on `/` before any team submits.
 7. **Sha pinned in tracking issue.** Paste both `89f5449f…6c6c` (full dataset) and `93ff2522…6c08` (subset) into the tracking issue so re-runs are byte-verifiable.
+8. ⚠️ **Code-retrieval holdout (`rag_data_eval/`).** The 30 eval rows came from two runs: `nemotron_rag_text_20260311_022245` (19 rows) and `nemotron_baseline_20260311_022419` (11 rows). If the FAISS code index includes either run, the LLM can retrieve its own answer — direct invalidation. Six of the 30 targets are also parents of other targets, so naive gene-level exclusion still leaks via siblings; **run-level exclusion is the only safe policy.**
+
+   Operational steps before Step 1 kickoff (one-time, by the integration owner):
+
+   1. Create `rag_data_eval/` parallel to `rag_data/`. Copy the text-namespace artifacts as-is (`faiss_index/text.index`, `metadata/text.jsonl`) — public docs, no leak.
+   2. Build the code namespace via `scripts/rag_replay/build_eval_code_index.py`:
+
+      ```bash
+      uv run python scripts/rag_replay/build_eval_code_index.py \
+          --csv scripts/rag_replay/datasets/past_genes_subset_n30_seed21.csv \
+          --runs-dir runs/ \
+          --models-dir sota/ExquisiteNetV2/ \
+          --output rag_data_eval/
+      ```
+
+      The script auto-derives the excluded run set from the CSV's `orig_run_id` column, AST-hashes the 30 target gene network files via `ast_normalized_hash` (collapses reformatted clones), and passes both holdouts into `extract_mutations_from_checkpoints`. It writes an audit trail to `rag_data_eval/holdout_dropped.jsonl`, runs an internal self-check, and prints the resulting `code.index` + `code.jsonl` sha256s for pinning.
+   3. Add to the Step 1 sbatch `--export`: `RAG_DATA_DIR=rag_data_eval, RAG_USE_CODE_CONTEXT=true, RAG_MEMORY_STORE_ENABLED=false`. Memory is a separate ablation; do not mix it into the headline arm.
+   4. Pin the printed `code.index` + `code.jsonl` sha256s in this section alongside the dataset shas before announcing the baseline ready.
+   5. Driver self-check (`_assert_no_target_leakage` in `scripts/rag_replay/03_replay.py`) runs at startup whenever `with_rag` is in `arms_to_run`. It AST-hashes the 30 target networks and asserts none appear in `rag_data_eval/metadata/code.jsonl`, failing the run before any LLM call if a leak is detected.
+
+   This is irrelevant for Step 0 (the no-RAG baseline doesn't retrieve anything) but is what makes the cross-backend numbers in Step 2 meaningful — without it, with_rag goodput is ceilinged at "FAISS found my own answer," not novel-mutation lift.
 
 ---
 
