@@ -188,4 +188,4 @@ else
     echo "SERVER_REGISTRY_FILE not set, skipping load balancer registration"
 fi
 
-python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS
+PYTHONUNBUFFERED=1 python -m uvicorn server:app --host $SERVER_HOST --port $SERVER_PORT --workers $SERVER_WORKERS

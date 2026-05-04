@@ -1,0 +1,5 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting bitsandbytes
+  Downloading bitsandbytes-0.48.2-py3-none-manylinux_2_24_x86_64.whl (59.4 MB)
+Collecting torch<3,>=2.3
+  Downloading torch-2.8.0-cp39-cp39-manylinux_2_28_x86_64.whl (888.0 MB)

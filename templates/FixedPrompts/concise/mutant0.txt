@@ -1,4 +1,6 @@
-python
+Here is an example of a creatively modified neural network training loop:
+
+```python
 def train_model():
     model = Model()
     optimizer = optim.SGD(model.parameters(), lr=0.01)
@@ -11,6 +13,9 @@ def train_model():
             loss.backward()
             optimizer.step()
     return model
+```
+
+Now apply similarly creative modifications to improve the performance of this code snippet:
 
 ```python
 {}

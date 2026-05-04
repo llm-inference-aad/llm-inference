@@ -23,10 +23,14 @@ Requires-Dist: pyyaml>=6.0
 Requires-Dist: requests>=2.25.0
 Requires-Dist: seaborn>=0.11.0
 Requires-Dist: sphinx>=8.2.3
+Requires-Dist: bitsandbytes>=0.43.0
+Requires-Dist: datasets>=2.14.0
+Requires-Dist: peft>=0.10.0
 Requires-Dist: torch==2.6.0
 Requires-Dist: torchvision
-Requires-Dist: transformers>=4.30.0
+Requires-Dist: transformers>=4.44.0
 Requires-Dist: tqdm>=4.64.0
+Requires-Dist: trl>=0.8.6
 Requires-Dist: uvicorn>=0.20.0
 
 ## Guided Evolution:

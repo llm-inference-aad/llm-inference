@@ -15,10 +15,16 @@ from pathlib import Path
 from src.cfg.constants import *
 from evaluator import OutputEvaluator
 
+ENABLE_QUANTIZATION = os.getenv("ENABLE_QUANTIZATION", "false").lower() in ("true", "1", "yes")
+
 app = FastAPI(title="LLM API", version="1.0")
 
 # Path To Local Large Language Model (from environment variable)
 MODEL_PATH = os.getenv("MODEL_PATH", "/storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it")
+
+# Optional LoRA adapter path — set ADAPTER_PATH in .env to serve a fine-tuned model.
+# The adapter is merged into the base model weights at load time for full inference speed.
+ADAPTER_PATH = os.getenv("ADAPTER_PATH", "")
 
 # Note: Security middleware removed for compatibility
 # The 404 errors from malicious requests will still be logged by FastAPI
@@ -147,16 +153,42 @@ class LLMModel:
         
         # Load model
         print(f"[{timestamp}] Loading model weights and configuration...")
+        if ENABLE_QUANTIZATION:
+            print(f"[{timestamp}] 4-bit quantization enabled (ENABLE_QUANTIZATION=true)")
         model_load_start = time.time()
-        
+
+        load_kwargs = dict(
+            trust_remote_code=True,
+            device_map="auto",
+        )
+        if ENABLE_QUANTIZATION:
+            from transformers import BitsAndBytesConfig
+            load_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4",
+            )
+        else:
+            load_kwargs["torch_dtype"] = torch.bfloat16
+            load_kwargs["attn_implementation"] = "sdpa"
+
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             MODEL_PATH,
-            trust_remote_code=True,
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-            attn_implementation="sdpa" # faster inference
+            **load_kwargs,
         ).eval()
-        
+
+        # Optionally load a QLoRA adapter and merge it for full inference speed
+        if ADAPTER_PATH:
+            from peft import PeftModel
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            print(f"[{timestamp}] Loading LoRA adapter from {ADAPTER_PATH}")
+            self.model = PeftModel.from_pretrained(self.model, ADAPTER_PATH)
+            self.model = self.model.merge_and_unload()
+            self.model = self.model.eval()
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            print(f"[{timestamp}] Adapter merged and unloaded")
+
         model_load_time = time.time() - model_load_start
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         print(f"[{timestamp}] Model weights loaded in {model_load_time:.2f} seconds")

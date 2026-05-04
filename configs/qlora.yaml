@@ -1,0 +1,64 @@
+# QLoRA Fine-Tuning Configuration
+# Model path is read from MODEL_PATH env var at runtime (set in .env).
+# All other values here are defaults that can be overridden via CLI args.
+
+# ----- Model -----
+model_name_or_path: ""          # populated from $MODEL_PATH at runtime
+                                # default cluster path: /storage/ice-shared/vip-vvi/hf_models/models--google--gemma-7b-it
+
+# ----- BitsAndBytes 4-bit quantization -----
+load_in_4bit: true
+bnb_4bit_quant_type: nf4        # nf4 is standard for QLoRA
+bnb_4bit_compute_dtype: bfloat16
+bnb_4bit_use_double_quant: true # saves ~0.4 bits/param on top of nf4
+
+# ----- LoRA adapter -----
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+# Gemma-7b-it attention + MLP projection layers.
+# Adjust if switching to Llama/Mistral (names are identical; safe to leave as-is).
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# ----- Dataset -----
+dataset_path: dataset.json
+# Keep only samples whose top-1 accuracy (fitness col-0) meets this floor.
+# With only ~11 samples in the current dataset, 0.0 keeps everything.
+# Raise once more data is collected (recommended: 0.45).
+min_accuracy: 0.0
+max_seq_length: 2048
+
+# ----- Training -----
+output_dir: runs/qlora_default/qlora   # overridden by $RUN_DIR at runtime
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8        # effective batch = 8 with 1 GPU
+gradient_checkpointing: true           # required to fit long EMADE prompts in VRAM
+learning_rate: 2.0e-4
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+num_train_epochs: 3
+max_steps: -1                          # -1 = driven by num_train_epochs
+bf16: true
+fp16: false
+optim: paged_adamw_32bit               # memory-efficient optimizer for QLoRA
+
+# ----- Checkpointing / logging -----
+save_steps: 25
+save_total_limit: 3                    # keep last 3 checkpoints across job continuations
+logging_steps: 5
+
+# ----- Time budget (consecutive PACE jobs) -----
+# Stop training this many hours into the job so a clean checkpoint is written
+# before SLURM kills the process at the 16-hour hard limit.
+# 15.5 h = 15 h 30 min of actual training; remaining ~30 min is for save + teardown.
+time_budget_hours: 15.5
+
+# ----- Run identity -----
+run_id: qlora_default          # overridden by $RUN_ID at runtime

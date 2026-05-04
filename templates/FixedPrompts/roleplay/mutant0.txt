@@ -1,8 +1,13 @@
-python
+Here is an example of a creatively modified model training function:
+
+```python
 def train_model():
     model = Model()
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
     model.fit(x_train, y_train, epochs=10)
+```
+
+Now apply similarly creative modifications to improve the performance of this code snippet:
 
 ```python
 {}

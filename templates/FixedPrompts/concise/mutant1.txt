@@ -1,4 +1,6 @@
-python
+Here is an example of a refactored data processing function with cleaner structure:
+
+```python
 def process_data(data):
     result = []
     for item in data:
@@ -10,10 +12,9 @@ def process_data(data):
             }
             result.append(processed_item)
     return result
+```
 
-def calculate_value(item):
-    # Some complex calculations here...
-    pass
+Now apply similarly creative modifications to improve the performance of this code snippet:
 
 ```python
 {}

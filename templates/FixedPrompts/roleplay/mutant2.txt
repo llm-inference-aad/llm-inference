@@ -1,4 +1,6 @@
-python
+Here is an example of a PyTorch neural network with a clear structure:
+
+```python
 import torch
 from torch import nn
 
@@ -11,12 +13,12 @@ class Model(nn.Module):
 
     def forward(self, x):
         out = self.fc1(x)
-        out = self.out_relu(out)
+        out = self.relu(out)
         out = self.fc2(out)
         return out
+```
 
-model = Model()
-print(model)
+Now apply similarly creative modifications to improve the performance of this code snippet:
 
 ```python
 {}

@@ -11,3 +11,4 @@ src/llm_guided_evolution.egg-info/requires.txt
 src/llm_guided_evolution.egg-info/top_level.txt
 src/utils/print_utils.py
 tests/test_fitness_inheritance.py
+tests/test_qlora_smoke.py

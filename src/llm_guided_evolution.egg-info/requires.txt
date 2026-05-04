@@ -17,8 +17,12 @@ pyyaml>=6.0
 requests>=2.25.0
 seaborn>=0.11.0
 sphinx>=8.2.3
+bitsandbytes>=0.43.0
+datasets>=2.14.0
+peft>=0.10.0
 torch==2.6.0
 torchvision
-transformers>=4.30.0
+transformers>=4.44.0
 tqdm>=4.64.0
+trl>=0.8.6
 uvicorn>=0.20.0
